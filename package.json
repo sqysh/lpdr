@@ -50,7 +50,7 @@
     "eslint-config-next": "16.1.4",
     "prisma": "^5.22.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^7"
   },
   "allowScripts": {
     "@firebase/util@1.12.1": true,
