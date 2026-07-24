@@ -3,8 +3,9 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { containerVariants } from 'app/lib/constants/motion.constants'
 import { DogCard } from 'app/components/features/dachshunds/DogCard'
+import { IDachshund } from 'types/_rescue-groups.types'
 
-export default function IncomingDachshundsClient({ data }) {
+export default function OnHoldDachshundsClient({ data }) {
   return (
     <section
       aria-labelledby="adopt-heading"
@@ -14,9 +15,12 @@ export default function IncomingDachshundsClient({ data }) {
         {/* Header */}
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Incoming Dachshunds
+              On Hold Dachshunds
             </p>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
@@ -24,10 +28,13 @@ export default function IncomingDachshundsClient({ data }) {
               id="adopt-heading"
               className="font-quicksand text-3xl sm:text-4xl font-bold text-text-light dark:text-text-dark"
             >
-              Meet Our <span className="font-light text-muted-light dark:text-muted-dark">Incoming Wieners</span>
+              Meet Our{' '}
+              <span className="font-light text-muted-light dark:text-muted-dark">
+                On Hold Wieners
+              </span>
             </h1>
             <p className="text-sm text-muted-light dark:text-muted-dark font-mono">
-              {data?.data?.data?.length} dog{data?.data?.data?.length !== 1 ? 's' : ''} available
+              {data?.data?.data?.length} dog{data?.data?.data?.length !== 1 ? 's' : ''} on hold
             </p>
           </div>
         </div>
@@ -41,9 +48,9 @@ export default function IncomingDachshundsClient({ data }) {
               animate="show"
               className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2"
               role="list"
-              aria-label="Incoming dachshunds"
+              aria-label="On Hold dachshunds"
             >
-              {data?.data?.data?.map((dog, i) => (
+              {data?.data?.data?.map((dog: IDachshund, i: number) => (
                 <DogCard key={dog.id} dog={dog} index={i} />
               ))}
             </motion.ul>
@@ -57,7 +64,9 @@ export default function IncomingDachshundsClient({ data }) {
               role="status"
               aria-live="polite"
             >
-              <p className="text-muted-light dark:text-muted-dark font-mono text-sm">No dogs found in this category.</p>
+              <p className="text-muted-light dark:text-muted-dark font-mono text-sm">
+                No dogs found in this category.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>

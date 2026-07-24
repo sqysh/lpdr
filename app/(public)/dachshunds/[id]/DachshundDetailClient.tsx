@@ -112,7 +112,7 @@ export default function DachshundDetailClient({ data }: { data: Dog }) {
 
   const BREADCRUMB_LABELS: Record<string, string> = {
     '/dachshunds': 'Dachshunds',
-    '/dachshunds/hold': 'Incoming Dachshunds'
+    '/dachshunds/hold': 'On Hold Dachshunds'
   }
 
   type RequirementPill = { label: string; value: string }

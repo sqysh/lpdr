@@ -6,6 +6,7 @@ import {
   Gift,
   Handshake,
   Heart,
+  History,
   Home,
   Info,
   LayoutDashboard,
@@ -86,7 +87,7 @@ export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
         },
         {
           linkKey: '/dachshunds/hold',
-          linkText: 'Incoming Dachshunds'
+          linkText: 'On Hold'
         },
         {
           linkKey: '/dachshunds/surrender',
@@ -229,7 +230,8 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     heading: 'System',
     items: [
       { label: 'Guide', icon: BookOpen, href: '/admin/guide' },
-      { label: 'Flows', icon: Workflow, href: '/admin/flows' }
+      { label: 'Flows', icon: Workflow, href: '/admin/flows' },
+      { label: 'Changelog', icon: History, href: '/admin/changelog' }
     ]
   },
   {
