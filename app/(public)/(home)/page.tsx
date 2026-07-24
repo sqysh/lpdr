@@ -3,7 +3,10 @@ import { getDachshundsByStatus } from '../../lib/actions/_rescue-groups/getDachs
 import { getLiveWelcomeWieners } from '../../lib/actions/public/welcome-wiener/getLiveWelcomeWieners'
 
 export default async function HomePage() {
-  const dachshunds = await getDachshundsByStatus({ status: 'Available', pageLimit: 250, currentPage: 1 })
-  const welcomeWieners = await getLiveWelcomeWieners()
+  const [dachshunds, welcomeWieners] = await Promise.all([
+    getDachshundsByStatus({ status: 'Available', pageLimit: 250, currentPage: 1, source: 'home' }),
+    getLiveWelcomeWieners()
+  ])
+
   return <HomeClient dachshunds={dachshunds} welcomeWieners={welcomeWieners} />
 }

@@ -2,6 +2,11 @@ import { getDachshundsByStatus } from 'app/lib/actions/_rescue-groups/getDachshu
 import OnHoldDachshundsClient from './OnHoldDachshundsClient'
 
 export default async function OnHoldDachshundsPage() {
-  const data = await getDachshundsByStatus({ status: 'Hold', pageLimit: 250, currentPage: 1 })
+  const data = await getDachshundsByStatus({
+    status: 'Hold',
+    pageLimit: 250,
+    currentPage: 1,
+    source: 'public-dachshunds-hold'
+  })
   return <OnHoldDachshundsClient data={data} />
 }

@@ -7,8 +7,9 @@ import { Loader2 } from 'lucide-react'
 
 export function TopBar() {
   const session = useSession()
-  const isAdmin =
-    session?.data?.user?.role === 'ADMIN' || session?.data?.user?.role === 'SUPER_USER'
+  const role = session?.data?.user?.role
+  const isAdmin = role === 'ADMIN' || role === 'SUPER_USER'
+  const isSuperUser = role === 'SUPER_USER'
   const [signingOut, setSigningOut] = useState(false)
 
   const handleSignOut = () => {
@@ -38,6 +39,26 @@ export function TopBar() {
         </Link>
 
         <div className="flex items-center gap-4">
+          {isSuperUser && (
+            <Link
+              href="/super"
+              className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            >
+              <svg
+                viewBox="0 0 24 24"
+                className="w-3 h-3"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth={2}
+                strokeLinecap="square"
+                aria-hidden="true"
+              >
+                <path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z" />
+              </svg>
+              Super
+            </Link>
+          )}
+
           {isAdmin && (
             <Link
               href="/admin/dashboard"
@@ -60,6 +81,7 @@ export function TopBar() {
               Dashboard
             </Link>
           )}
+
           <button
             type="button"
             onClick={handleSignOut}

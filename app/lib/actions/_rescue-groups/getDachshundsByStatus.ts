@@ -5,11 +5,13 @@ import { getErrorMessage } from 'app/utils/_error.utils'
 export async function getDachshundsByStatus({
   status,
   pageLimit,
-  currentPage
+  currentPage,
+  source
 }: {
   status: string
   pageLimit: number
   currentPage: number
+  source: string
 }) {
   try {
     const response = await fetch(
@@ -49,6 +51,7 @@ export async function getDachshundsByStatus({
       status,
       pageLimit,
       currentPage,
+      source,
       error: getErrorMessage(error)
     })
 

@@ -14,6 +14,21 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.3.1',
+    date: '2026-07-24',
+    title: 'Dachshund fetch error tracing',
+    changes: [
+      {
+        type: 'improvement',
+        text: 'Added a source tag to every getDachshundsByStatus call so recurring RescueGroups fetch failures can be traced back to the exact page that triggered them'
+      },
+      {
+        type: 'improvement',
+        text: 'Parallelized independent dachshund and welcome wiener fetches with Promise.all on the home and admin dachshunds pages'
+      }
+    ]
+  },
+  {
     version: '1.3.0',
     date: '2026-07-24',
     title: 'Changelog page and codebase cleanup',

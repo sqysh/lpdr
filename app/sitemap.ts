@@ -8,7 +8,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   let dachshundPages: MetadataRoute.Sitemap = []
   try {
-    const data = await getDachshundsByStatus({ status: 'Available', currentPage: 1, pageLimit: 250 })
+    const data = await getDachshundsByStatus({
+      status: 'Available',
+      currentPage: 1,
+      pageLimit: 250,
+      source: 'sitemap'
+    })
     dachshundPages = data?.data?.data.map((dachshund) => ({
       url: `${baseUrl}/dachshunds/${dachshund.id}`,
       lastModified: dachshund.updatedAt,
