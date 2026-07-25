@@ -2,6 +2,27 @@ import { createLog } from '../log/createLog'
 import { getPicturesAndVideos } from '../../../utils/_rescue-group.utils'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
+async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
+  let lastError: unknown
+
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: AbortSignal.timeout(8000)
+      })
+      return response
+    } catch (error) {
+      lastError = error
+      if (attempt < retries) {
+        await new Promise((r) => setTimeout(r, 500 * (attempt + 1)))
+      }
+    }
+  }
+
+  throw lastError
+}
+
 export async function getDachshundsByStatus({
   status,
   pageLimit,
@@ -14,7 +35,7 @@ export async function getDachshundsByStatus({
   source: string
 }) {
   try {
-    const response = await fetch(
+    const response = await fetchWithRetry(
       `https://api.rescuegroups.org/v5/public/orgs/5798/animals/search/dogs?limit=${pageLimit}`,
       {
         method: 'POST',

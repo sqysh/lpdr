@@ -7,8 +7,13 @@ import { checkOwnMigrationStatus } from 'app/lib/actions/user/checkOwnMigrationS
 export const dynamic = 'force-dynamic'
 
 export default async function MyPackPage() {
-  const [packMemberResult, migrationResult] = await Promise.all([getPackMemberData(), checkOwnMigrationStatus()])
-  const hasPendingMigration = migrationResult.success ? (migrationResult.data?.pending ?? false) : false
+  const [packMemberResult, migrationResult] = await Promise.all([
+    getPackMemberData(),
+    checkOwnMigrationStatus()
+  ])
+  const hasPendingMigration = migrationResult.success
+    ? (migrationResult.data?.pending ?? false)
+    : false
 
   return (
     <Suspense fallback={<MyPackSkeleton />}>
@@ -20,7 +25,7 @@ export default async function MyPackPage() {
         paymentMethods={packMemberResult?.data?.paymentMethods}
         adoptionFees={packMemberResult?.data?.adoptionFees}
         multiItemOrders={packMemberResult?.data?.multiItemOrders}
-        auctionPurchases={packMemberResult.data.auctionPurchases}
+        auctionPurchases={packMemberResult.data?.auctionPurchases}
         hasPendingMigration={hasPendingMigration}
       />
     </Suspense>
