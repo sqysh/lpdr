@@ -363,9 +363,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
           </div>
           {/* ── Right column — orders ── */}
           <div className="space-y-4">
-            {migrationStatus?.hasPendingMigration && (
-              <MigrationTroubleshootPanel userId={user.id} />
-            )}
+            {loggedInUser.role === 'SUPER_USER' && <MigrationTroubleshootPanel userId={user.id} />}
             {/* Total spent stat */}
             <div className="grid grid-cols-2 gap-3">
               <div className="border border-border-light dark:border-border-dark p-4">

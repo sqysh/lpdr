@@ -28,36 +28,57 @@ export default async function getUsers() {
 
     const emails = users.map((u) => u.email.toLowerCase().trim())
 
-    const [mongoUsers, donations, orders, adoptionFees, auctionWinners, instantBuyers, bids] =
-      await Promise.all([
-        prisma.mongoUser.findMany({ where: { email: { in: emails } }, select: { email: true } }),
-        prisma.mongoDonation.groupBy({
-          by: ['email'],
-          where: { email: { in: emails } },
-          _count: true
-        }),
-        prisma.mongoOrder.groupBy({
-          by: ['email'],
-          where: { email: { in: emails } },
-          _count: true
-        }),
-        prisma.mongoAdoptionFee.groupBy({
-          by: ['email'],
-          where: { email: { in: emails } },
-          _count: true
-        }),
-        prisma.mongoAuctionWinner.groupBy({
-          by: ['email'],
-          where: { email: { in: emails } },
-          _count: true
-        }),
-        prisma.mongoInstantBuyer.groupBy({
-          by: ['email'],
-          where: { email: { in: emails } },
-          _count: true
-        }),
-        prisma.mongoBid.groupBy({ by: ['email'], where: { email: { in: emails } }, _count: true })
-      ])
+    const [
+      mongoUsers,
+      donations,
+      orders,
+      adoptionFees,
+      auctionWinners,
+      instantBuyers,
+      bids,
+      productOrders,
+      ecardOrders,
+      welcomeWienerOrders
+    ] = await Promise.all([
+      prisma.mongoUser.findMany({ where: { email: { in: emails } }, select: { email: true } }),
+      prisma.mongoDonation.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoOrder.groupBy({ by: ['email'], where: { email: { in: emails } }, _count: true }),
+      prisma.mongoAdoptionFee.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoAuctionWinner.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoInstantBuyer.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoBid.groupBy({ by: ['email'], where: { email: { in: emails } }, _count: true }),
+      prisma.mongoProductOrder.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoEcardOrder.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      }),
+      prisma.mongoWelcomeWienerOrder.groupBy({
+        by: ['email'],
+        where: { email: { in: emails } },
+        _count: true
+      })
+    ])
 
     const stagingEmailSet = new Set(mongoUsers.map((m) => m.email))
 
@@ -68,7 +89,10 @@ export default async function getUsers() {
       ...adoptionFees,
       ...auctionWinners,
       ...instantBuyers,
-      ...bids
+      ...bids,
+      ...productOrders,
+      ...ecardOrders,
+      ...welcomeWienerOrders
     ]) {
       pendingMap.set(group.email, (pendingMap.get(group.email) ?? 0) + group._count)
     }

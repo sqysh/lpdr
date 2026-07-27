@@ -583,7 +583,7 @@ async function migrateWelcomeWienerOrders(tx: any, normalizedEmail: string, user
     // Standalone welcome wiener order
     const order = await tx.order.create({
       data: {
-        type: 'WELCOME_WIENER',
+        type: 'PURCHASE',
         status: 'CONFIRMED',
         totalAmount: d.totalPrice,
         customerEmail: normalizedEmail,
@@ -599,6 +599,7 @@ async function migrateWelcomeWienerOrders(tx: any, normalizedEmail: string, user
     await tx.orderItem.create({
       data: {
         orderId: order.id,
+        itemType: 'WELCOME_WIENER',
         itemName: [d.dachshundName, d.productName].filter(Boolean).join(' — '),
         itemImage: d.productImage ?? null,
         quantity: d.quantity ?? 1,
@@ -638,6 +639,16 @@ async function runMigrationTransaction(
 
   if (mongoUser) {
     await tx.mongoUser.deleteMany({ where: { email: normalizedEmail } })
+  }
+
+  // Check the live side, not staging — staging empties out as records migrate,
+  // so this correctly catches both "just migrated now" and "already migrated
+  // in a prior run" cases.
+  const migratedOrderCount = await tx.order.count({
+    where: { userId, source: 'MONGO_MIGRATION' }
+  })
+
+  if (mongoUser || migratedOrderCount > 0) {
     await tx.user.update({
       where: { id: userId },
       data: { hasMigrated: true, migratedAt: new Date() }
@@ -651,7 +662,10 @@ async function runMigrationTransaction(
  * Deletes each staging record after successful migration.
  * Once all users have migrated, staging tables will be empty and can be dropped.
  */
-export async function migrateMongoUser(email: string, userId: string): Promise<void> {
+export async function migrateMongoUser(
+  email: string,
+  userId: string
+): Promise<{ success: boolean; error?: string }> {
   const normalizedEmail = email.toLowerCase().trim()
 
   try {
@@ -666,7 +680,7 @@ export async function migrateMongoUser(email: string, userId: string): Promise<v
         email: normalizedEmail,
         userId
       })
-      return
+      return { success: true }
     }
 
     await createLog('info', 'Starting migration', { email: normalizedEmail, userId })
@@ -678,11 +692,14 @@ export async function migrateMongoUser(email: string, userId: string): Promise<v
 
     await pusherTrigger(`user-${userId}`, 'migration-complete', {})
     await createLog('info', 'Mongo user migration complete', { email: normalizedEmail, userId })
+    return { success: true }
   } catch (err) {
+    const errorMessage = err instanceof Error ? err.message : 'Unknown error'
     await createLog('error', 'Mongo user migration failed', {
       email: normalizedEmail,
       userId,
-      error: err instanceof Error ? err.message : 'Unknown error'
+      error: errorMessage
     })
+    return { success: false, error: errorMessage }
   }
 }

@@ -24,23 +24,16 @@ export async function retriggerMigration(userId: string) {
       return { success: false, error: 'This user has already migrated successfully', data: null }
     }
 
-    // This is a direct server action call, awaited fully — no serverless
-    // early-teardown risk like the fire-and-forget signIn event has.
-    await migrateMongoUser(user.email, user.id)
-
-    const refreshed = await prisma.user.findUnique({
-      where: { id: userId },
-      select: { hasMigrated: true }
-    })
+    const result = await migrateMongoUser(user.email, user.id)
 
     await createLog('info', 'Migration manually re-triggered', {
       userId,
       email: user.email,
       triggeredBy: gate.userId,
-      succeeded: refreshed?.hasMigrated ?? false
+      succeeded: result.success
     })
 
-    if (!refreshed?.hasMigrated) {
+    if (!result?.success) {
       return {
         success: false,
         error: 'Migration ran but did not complete. Check logs for the underlying error.',
@@ -48,7 +41,12 @@ export async function retriggerMigration(userId: string) {
       }
     }
 
-    return { success: true, data: { hasMigrated: true }, error: null }
+    const refreshed = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { hasMigrated: true }
+    })
+
+    return { success: true, data: { hasMigrated: refreshed?.hasMigrated ?? false }, error: null }
   } catch (error) {
     await createLog('error', 'Manual migration re-trigger failed', {
       userId,
