@@ -461,8 +461,6 @@ export default function DachshundDetailClient({ data }: { data: Dog }) {
               </div>
               <a
                 href="/adopt"
-                target="_blank"
-                rel="noopener noreferrer"
                 className="block w-full text-center bg-button-light dark:bg-button-dark hover:bg-primary-light dark:hover:bg-primary-dark text-white font-semibold text-sm py-3.5 px-6 transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 aria-label={`Apply to adopt ${a?.name} (opens adoption application)`}
               >
