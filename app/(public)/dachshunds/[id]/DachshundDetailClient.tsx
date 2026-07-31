@@ -54,7 +54,7 @@ export default function DachshundDetailClient({ data }: { data: Dog }) {
   const canScrollBack = thumbStart > 0
   const canScrollFwd = thumbStart + THUMB_PAGE < a?.photos?.length
 
-  const cleanHtml = (a?.descriptionHtml ?? a?.descriptionText)
+  const cleanHtml = (a?.descriptionText ?? a?.descriptionHtml)
     ?.replace(/<img[^>]*tracker\.rescuegroups\.org[^>]*>/gi, '')
     ?.replace(/\sstyle="[^"]*"/gi, '')
     ?.replace(/\sstyle='[^']*'/gi, '')
