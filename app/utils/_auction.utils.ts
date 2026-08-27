@@ -64,7 +64,8 @@ function calculateIncrementalTotal(bids: IAuction['bids']): number {
 export function getDisplayRevenue(auction: IAuction): number {
   if (auction.status === 'ENDED') return auction.totalAuctionRevenue
 
-  const totalFromInstantBuys = auction.instantBuyers?.reduce((acc, item) => acc + (item.totalPrice ?? 0), 0) ?? 0
+  const totalFromInstantBuys =
+    auction.instantBuyers?.reduce((acc, item) => acc + (item.totalPrice ?? 0), 0) ?? 0
 
   return calculateIncrementalTotal(auction.bids) + totalFromInstantBuys
 }
@@ -81,8 +82,16 @@ export function validateAuctionHour(dateTimeLocal: string): string | null {
   if (!dateTimeLocal) return null
 
   const date = new Date(dateTimeLocal)
-  const hour = date.getHours()
-  const minutes = date.getMinutes()
+
+  const parts = new Intl.DateTimeFormat('en-US', {
+    timeZone: 'America/New_York',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: false
+  }).formatToParts(date)
+
+  const hour = Number(parts.find((p) => p.type === 'hour')?.value)
+  const minutes = Number(parts.find((p) => p.type === 'minute')?.value)
 
   if (minutes !== 0) {
     return 'Time must be on the hour (e.g. 9:00, not 9:15).'
