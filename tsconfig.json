@@ -19,7 +19,8 @@
     "paths": {
       "@redux/*": ["./app/redux/*"],
       "@hooks/*": ["./app/lib/hooks/*"],
-      "@public/*": ["./public/*"]
+      "@public/*": ["./public/*"],
+      "prisma/client": ["./prisma/client.ts"]
     }
   },
   "include": [

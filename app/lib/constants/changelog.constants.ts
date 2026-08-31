@@ -14,6 +14,25 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.4.0',
+    date: '2026-08-31',
+    title: 'Prisma 7 upgrade, payment security, and migration fixes',
+    changes: [
+      {
+        type: 'chore',
+        text: 'Upgraded Prisma from 5 to 7, including the new prisma.config.ts connection setup and Neon driver adapter'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed createPaymentIntent trusting a client-supplied userId instead of the verified session, which allowed spoofed anonymous payment attempts'
+      },
+      {
+        type: 'feature',
+        text: 'Added rate limiting to payment intent creation (5 attempts per user per 10 minutes) plus a daily cleanup cron for stale attempt records'
+      }
+    ]
+  },
+  {
     version: '1.3.1',
     date: '2026-07-24',
     title: 'Dachshund fetch error tracing',
