@@ -1,6 +1,6 @@
 'use client'
 
-import { containerVariants, rowVariants } from 'app/lib/constants/motion.constants'
+import { containerVariants, rowVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 
@@ -110,7 +110,8 @@ export const WaysToHelpBlock = () => {
             className="font-quicksand text-text-light dark:text-text-dark leading-tight"
             style={{ fontSize: 'clamp(1.5rem, 4vw, 3rem)' }}
           >
-            <span className="font-black">SUPPORT</span> <span className="font-light">LITTLE PAWS RESCUE</span>
+            <span className="font-black">SUPPORT</span>{' '}
+            <span className="font-light">LITTLE PAWS RESCUE</span>
           </h2>
         </div>
 
@@ -173,7 +174,9 @@ export const WaysToHelpBlock = () => {
                   <div className="sm:w-36 shrink-0">
                     <span
                       className={`text-[10px] font-mono tracking-[0.2em] uppercase tabular-nums ${
-                        row.free ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'
+                        row.free
+                          ? 'text-muted-light dark:text-muted-dark'
+                          : 'text-primary-light dark:text-primary-dark'
                       }`}
                     >
                       {row.cost}

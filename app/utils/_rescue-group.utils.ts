@@ -1,4 +1,4 @@
-import { createLog } from 'app/lib/actions/log/createLog'
+import { createLog } from 'lib/actions/log/createLog'
 
 type Picture = { objId: string; url: string }
 type Video = { objId: string; video: { url: string; urlThumbnail: string; id: string } }

@@ -1,7 +1,7 @@
 import Link from 'next/link'
-import createNewsletter from 'app/lib/actions/public/newsletter/createNewsletter'
+import createNewsletter from 'lib/actions/public/newsletter/createNewsletter'
 import { SyntheticEvent, useState } from 'react'
-import { NAV_LINKS, SOCIAL_LINKS } from 'app/lib/constants/footer.constants'
+import { NAV_LINKS, SOCIAL_LINKS } from 'lib/constants/footer.constants'
 import Picture from 'app/components/_common/Picture'
 
 export default function Footer() {

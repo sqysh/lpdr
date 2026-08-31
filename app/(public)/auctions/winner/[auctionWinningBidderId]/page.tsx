@@ -1,7 +1,7 @@
-import { getAuctionWinningBidderById } from 'app/lib/actions/user/auction/getAuctionWinningBidderById'
+import { getAuctionWinningBidderById } from 'lib/actions/user/auction/getAuctionWinningBidderById'
 import AuctionWinnerPaymentClient from './AuctionWinnerPaymentClient'
-import { getSavedPaymentMethods } from 'app/lib/actions/_stripe/getSavedPaymentMethods'
-import { auth } from 'app/lib/auth'
+import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
+import { auth } from 'lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function AuctionWinnerPaymentPage({
@@ -21,5 +21,10 @@ export default async function AuctionWinnerPaymentPage({
     getSavedPaymentMethods().catch(() => ({ success: false, data: [] }))
   ])
 
-  return <AuctionWinnerPaymentClient winningBidder={result?.data} savedCards={paymentMethodsResult.data} />
+  return (
+    <AuctionWinnerPaymentClient
+      winningBidder={result?.data}
+      savedCards={paymentMethodsResult.data}
+    />
+  )
 }

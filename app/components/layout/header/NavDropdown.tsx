@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
-import { Section } from 'app/lib/constants/navigation.constants'
+import { Section } from 'lib/constants/navigation.constants'
 import { getHeaderLinksVisibilityClass } from 'app/utils/_header.utils'
 
 export const NavDropdown = ({ section }: { section: Section }) => {
@@ -13,7 +13,8 @@ export const NavDropdown = ({ section }: { section: Section }) => {
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLLIElement>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const isActive = section?.linkKey === pathname || section?.links?.some((l) => l.linkKey === pathname) || false
+  const isActive =
+    section?.linkKey === pathname || section?.links?.some((l) => l.linkKey === pathname) || false
 
   const openMenu = () => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -69,7 +70,9 @@ export const NavDropdown = ({ section }: { section: Section }) => {
           aria-current={section.linkKey === pathname ? 'page' : undefined}
           className={labelClass}
         >
-          <span className={`relative py-7 ${isActive ? 'text-primary-light dark:text-primary-dark' : ''}`}>
+          <span
+            className={`relative py-7 ${isActive ? 'text-primary-light dark:text-primary-dark' : ''}`}
+          >
             {section.title}
             <span aria-hidden="true" className={underline(section.linkKey === pathname)} />
           </span>
@@ -77,7 +80,9 @@ export const NavDropdown = ({ section }: { section: Section }) => {
       ) : (
         /* Dropdown trigger */
         <button type="button" aria-expanded={open} aria-haspopup="menu" className={labelClass}>
-          <span className={`relative py-7 ${isActive || open ? 'text-primary-light dark:text-primary-dark' : ''}`}>
+          <span
+            className={`relative py-7 ${isActive || open ? 'text-primary-light dark:text-primary-dark' : ''}`}
+          >
             {section.title}
             <span aria-hidden="true" className={underline(isActive || open)} />
           </span>

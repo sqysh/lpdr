@@ -1,4 +1,4 @@
-import { TIERS } from 'app/lib/constants/subscriptions.constants'
+import { TIERS } from 'lib/constants/subscriptions.constants'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -37,7 +37,9 @@ export function StickyHeader({
             <ArrowLeft size={14} aria-hidden="true" />
           </button>
           <span className="block w-4 h-px bg-primary-dark shrink-0" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">Subscriptions</p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">
+            Subscriptions
+          </p>
         </div>
 
         {/* Center — selected tier */}
@@ -56,7 +58,9 @@ export function StickyHeader({
               </span>
             </motion.p>
           ) : (
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark">Select a tier</p>
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark">
+              Select a tier
+            </p>
           )}
         </div>
 
@@ -65,7 +69,9 @@ export function StickyHeader({
           <button
             onClick={onSubscribe}
             disabled={!selected}
-            aria-label={selectedTier ? `Subscribe to ${selectedTier.name}` : 'Select a tier to subscribe'}
+            aria-label={
+              selectedTier ? `Subscribe to ${selectedTier.name}` : 'Select a tier to subscribe'
+            }
             className="shrink-0 px-4 py-1.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-dark text-bg-dark hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed"
           >
             Subscribe

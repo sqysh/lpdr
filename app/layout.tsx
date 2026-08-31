@@ -1,7 +1,7 @@
 import './globals.css'
 import { SessionProvider } from 'next-auth/react'
 import { RootLayoutWrapper } from './root-layout'
-import { getCachedAuction } from './lib/actions/public/auction/getCachedAuction'
+import { getCachedAuction } from '../lib/actions/public/auction/getCachedAuction'
 import { cookies } from 'next/headers'
 import { bebas, nunito, quicksand, workSans } from './fonts'
 

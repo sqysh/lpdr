@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { IDachshund } from 'types/_rescue-groups.types'
-import { cardVariants } from 'app/lib/constants/motion.constants'
+import { cardVariants } from 'lib/constants/motion.constants'
 import Picture from '../../_common/Picture'
 
 export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
@@ -11,7 +11,14 @@ export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
   const pathname = usePathname()
 
   return (
-    <motion.li layout variants={cardVariants} initial="hidden" animate="show" exit="exit" className="group">
+    <motion.li
+      layout
+      variants={cardVariants}
+      initial="hidden"
+      animate="show"
+      exit="exit"
+      className="group"
+    >
       <Link
         href={`/dachshunds/${dog?.id}?from=${encodeURIComponent(pathname)}`}
         aria-label={`Meet ${a?.name}, ${a?.ageString}, ${a?.colorDetails} — click to view profile`}
@@ -28,12 +35,17 @@ export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
           />
         ) : (
           <div className="absolute inset-0 bg-surface-light dark:bg-surface-dark flex items-center justify-center">
-            <span className="text-muted-light dark:text-muted-dark text-xs font-mono">No photo</span>
+            <span className="text-muted-light dark:text-muted-dark text-xs font-mono">
+              No photo
+            </span>
           </div>
         )}
 
         {/* Gradient */}
-        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" aria-hidden="true" />
+        <div
+          className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent"
+          aria-hidden="true"
+        />
 
         {/* Hover wash */}
         <div

@@ -1,6 +1,6 @@
 import Link from 'next/link'
-import { setOpenAuctionSignInModal } from 'app/lib/store/slices/uiSlice'
-import { useAppDispatch } from 'app/lib/store/store'
+import { setOpenAuctionSignInModal } from 'lib/store/slices/uiSlice'
+import { useAppDispatch } from 'lib/store/store'
 import { IAuction } from 'types/_auction'
 
 type Props = {
@@ -15,7 +15,17 @@ type Props = {
   isAuthed: boolean
 }
 
-export function StickyHeader({ auction, isActive, done, days, hours, minutes, seconds, isEnded, isAuthed }: Props) {
+export function StickyHeader({
+  auction,
+  isActive,
+  done,
+  days,
+  hours,
+  minutes,
+  seconds,
+  isEnded,
+  isAuthed
+}: Props) {
   const dispatch = useAppDispatch()
 
   return (
@@ -40,7 +50,9 @@ export function StickyHeader({ auction, isActive, done, days, hours, minutes, se
                 Sign in to place bids and track your items
               </p>
               <button
-                onClick={() => dispatch(setOpenAuctionSignInModal(`/auctions/${auction.customAuctionLink}`))}
+                onClick={() =>
+                  dispatch(setOpenAuctionSignInModal(`/auctions/${auction.customAuctionLink}`))
+                }
                 className="shrink-0 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors"
               >
                 Sign in →
@@ -59,12 +71,15 @@ export function StickyHeader({ auction, isActive, done, days, hours, minutes, se
             <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />
             <span className="text-[10px] font-mono text-emerald-500 tabular-nums">
               {days > 0 ? `${days}d ` : ''}
-              {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
+              {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:
+              {String(seconds).padStart(2, '0')}
             </span>
           </div>
         )}
         {isEnded && (
-          <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark shrink-0">Auction Ended</span>
+          <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark shrink-0">
+            Auction Ended
+          </span>
         )}
       </div>
     </div>

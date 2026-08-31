@@ -1,12 +1,12 @@
 import Link from 'next/link'
 import { LogIn, Menu, ShoppingBasket, User } from 'lucide-react'
-import { store, useCartSelector, useUiSelector } from 'app/lib/store/store'
+import { store, useCartSelector, useUiSelector } from 'lib/store/store'
 import GoogleTranslate from './GoogleTranslate'
-import { setOpenContactModal, setOpenMobileNavigation } from 'app/lib/store/slices/uiSlice'
+import { setOpenContactModal, setOpenMobileNavigation } from 'lib/store/slices/uiSlice'
 import { NavDropdown } from './NavDropdown'
-import { mainNavigationLinks } from 'app/lib/constants/navigation.constants'
+import { mainNavigationLinks } from 'lib/constants/navigation.constants'
 import AuctionAnnouncementStrip from './AuctionAnnouncementStrip'
-import { useScrollDirection } from '@hooks/useScrollDirection.hook'
+import { useScrollDirection } from 'lib/hooks/useScrollDirection.hook'
 import Picture from 'app/components/_common/Picture'
 
 export default function Header({ auction, hasActiveFee, isAuthed }) {

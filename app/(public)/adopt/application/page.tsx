@@ -1,6 +1,6 @@
 import { redirect } from 'next/navigation'
 import AdoptionApplicationClient from 'app/(public)/adopt/application/AdoptionApplicationClient'
-import { hasActiveAdoptionFee } from 'app/lib/actions/my-pack/adoption-fee/hasActiveAdoptionFee'
+import { hasActiveAdoptionFee } from 'lib/actions/my-pack/adoption-fee/hasActiveAdoptionFee'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0

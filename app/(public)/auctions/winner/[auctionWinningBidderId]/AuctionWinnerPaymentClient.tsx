@@ -8,17 +8,17 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { IAuctionWinningBidder } from 'types/_auction-winning-bidder'
 import { IPaymentMethod } from 'types/_payment-method.types'
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { usePaymentProcessor } from '@hooks/usePaymentProcessor.hook'
-import { useDefaultCard } from '@hooks/useDefaultCard.hook'
-import { createPaymentIntent } from 'app/lib/actions/_stripe/createPaymentIntent'
+import { fadeUp } from 'lib/constants/motion.constants'
+import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
+import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
+import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { AuctionReceipt, WinnerOrderSummary } from 'app/components/features/auction/winner-payment'
 import {
   PaymentHandlers,
   PaymentState,
   WinnerPaymentForm
 } from 'app/components/features/auction/winner-payment/WinnerPaymentForm'
-import { calculateStripeFees } from 'app/lib/stripe/calculateStripeFees'
+import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 
 type WinnerFormInputs = {
   selectedCardId: string | null

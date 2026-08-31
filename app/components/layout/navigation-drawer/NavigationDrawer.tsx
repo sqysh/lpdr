@@ -1,8 +1,8 @@
 'use client'
 
-import { mainNavigationLinks } from 'app/lib/constants/navigation.constants'
-import { setCloseMobileNavigation, setOpenMobileNavigation } from 'app/lib/store/slices/uiSlice'
-import { store, useCartSelector, useUiSelector } from 'app/lib/store/store'
+import { mainNavigationLinks } from 'lib/constants/navigation.constants'
+import { setCloseMobileNavigation, setOpenMobileNavigation } from 'lib/store/slices/uiSlice'
+import { store, useCartSelector, useUiSelector } from 'lib/store/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePathname, useSearchParams } from 'next/navigation'

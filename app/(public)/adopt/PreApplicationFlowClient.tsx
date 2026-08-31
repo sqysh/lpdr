@@ -3,11 +3,11 @@
 import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { verifyBypassCode } from 'app/lib/actions/my-pack/adoption-fee/verifyBypassCode'
-import { store } from 'app/lib/store/store'
-import { setShowConfetti } from 'app/lib/store/slices/uiSlice'
-import { updateAdoptionFee } from 'app/lib/actions/my-pack/adoption-fee/updateAdoptionFee'
-import { STEPS } from 'app/lib/constants/adoption-application.constants'
+import { verifyBypassCode } from 'lib/actions/my-pack/adoption-fee/verifyBypassCode'
+import { store } from 'lib/store/store'
+import { setShowConfetti } from 'lib/store/slices/uiSlice'
+import { updateAdoptionFee } from 'lib/actions/my-pack/adoption-fee/updateAdoptionFee'
+import { STEPS } from 'lib/constants/adoption-application.constants'
 import { STEPS_TYPES } from 'types/_adoption-application.types'
 import {
   Header,

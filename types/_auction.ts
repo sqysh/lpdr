@@ -1,4 +1,4 @@
-import { TABS } from 'app/lib/constants/auction.constants'
+import { TABS } from 'lib/constants/auction.constants'
 import { IAuctionAnomaly } from './_auction-anomaly'
 import { IAuctionBid } from './_auction-bid'
 import { IAuctionBidder } from './_auction-bidder'

@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useUiSelector } from 'app/lib/store/store'
+import { useUiSelector } from 'lib/store/store'
 
 export const LPDRLogo = () => {
   const { isDark } = useUiSelector()

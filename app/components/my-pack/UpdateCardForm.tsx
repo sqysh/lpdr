@@ -1,8 +1,8 @@
-import { updateSubscriptionPaymentMethod } from 'app/lib/actions/_stripe/updateSubscriptionPaymentMethod'
+import { updateSubscriptionPaymentMethod } from 'lib/actions/_stripe/updateSubscriptionPaymentMethod'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useAppDispatch, useUiSelector } from 'app/lib/store/store'
+import { useAppDispatch, useUiSelector } from 'lib/store/store'
 import { useState } from 'react'
-import { showToast } from 'app/lib/store/slices/toastSlice'
+import { showToast } from 'lib/store/slices/toastSlice'
 import { AnimatePresence, motion } from 'framer-motion'
 
 export function UpdateCardForm({

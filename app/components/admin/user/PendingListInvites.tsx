@@ -2,11 +2,17 @@
 
 import { useState } from 'react'
 import { Clock, X } from 'lucide-react'
-import { revokePendingAdminInvite } from 'app/lib/actions/admin/user/revokePendingAdminInvite'
+import { revokePendingAdminInvite } from 'lib/actions/admin/user/revokePendingAdminInvite'
 
 type Invite = { id: string; email: string; createdAt: Date; role: string }
 
-export function PendingAdminInvitesList({ invites, onRevoked }: { invites: Invite[]; onRevoked: () => void }) {
+export function PendingAdminInvitesList({
+  invites,
+  onRevoked
+}: {
+  invites: Invite[]
+  onRevoked: () => void
+}) {
   const [revoking, setRevoking] = useState<string | null>(null)
 
   if (invites.length === 0) return null
@@ -30,7 +36,9 @@ export function PendingAdminInvitesList({ invites, onRevoked }: { invites: Invit
         {invites.map((invite) => (
           <div key={invite.id} className="flex items-center justify-between px-4 py-2.5">
             <div>
-              <p className="text-xs font-mono text-text-light dark:text-text-dark">{invite.email}</p>
+              <p className="text-xs font-mono text-text-light dark:text-text-dark">
+                {invite.email}
+              </p>
               <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
                 Will become {invite.role} on first sign-in
               </p>

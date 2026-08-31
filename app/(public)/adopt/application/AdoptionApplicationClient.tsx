@@ -2,8 +2,8 @@
 
 import { ApplicationExpiryTimer } from 'app/components/features/adoption-application'
 import { AdoptionFeeWelcomeModal } from 'app/components/features/adoption-application/AdoptionFeeModal'
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { useUiSelector } from 'app/lib/store/store'
+import { fadeUp } from 'lib/constants/motion.constants'
+import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'

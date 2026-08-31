@@ -1,4 +1,4 @@
-import { getAdoptionFees } from 'app/lib/actions/admin/adoption-fee/getAdoptionFees'
+import { getAdoptionFees } from 'lib/actions/admin/adoption-fee/getAdoptionFees'
 import AdminAdoptionFeesClient from './AdminAdoptionFeesClient'
 
 export default async function AdminAdoptionFeesPage() {

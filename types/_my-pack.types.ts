@@ -1,8 +1,15 @@
-import type { Address, OrderItemType, OrderStatus, OrderType, PaymentStatus, ShippingStatus } from '@prisma/client'
+import type {
+  Address,
+  OrderItemType,
+  OrderStatus,
+  OrderType,
+  PaymentStatus,
+  ShippingStatus
+} from '@prisma/client'
 import { IAdoptionFee } from './_adoption-fee'
 import { IPaymentMethod } from './_payment-method.types'
 import { IUser } from './_user'
-import { TIERS } from 'app/lib/constants/subscriptions.constants'
+import { TIERS } from 'lib/constants/subscriptions.constants'
 import { Dispatch, SetStateAction } from 'react'
 
 export type BillingInterval = 'MONTHLY' | 'YEARLY'

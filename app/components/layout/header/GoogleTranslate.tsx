@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
-import { store } from 'app/lib/store/store'
+import { store } from 'lib/store/store'
 import { motion } from 'framer-motion'
-import { setIsNotSpanish, setIsSpanish } from 'app/lib/store/slices/uiSlice'
+import { setIsNotSpanish, setIsSpanish } from 'lib/store/slices/uiSlice'
 
 const LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -85,7 +85,8 @@ export default function GoogleTranslate() {
     // Load the script
     if (!document.querySelector('script[src*="translate.google.com"]')) {
       const script = document.createElement('script')
-      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+      script.src =
+        'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
       document.body.appendChild(script)
     } else {
       // Script already loaded, just sync state

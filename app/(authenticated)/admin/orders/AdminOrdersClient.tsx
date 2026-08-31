@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { Package, DollarSign, Truck, XCircle, ChevronRight } from 'lucide-react'
 import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/_order.types'
-import { FILTER_LABELS, FILTERS, type Filter } from 'app/lib/constants/order.constants'
+import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/components/admin/_shared/Stat'
 import { fmtCurrency } from 'app/utils/_currency.utils'
 import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
@@ -26,8 +26,9 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
     return {
       revenue: confirmed.reduce((s, o) => s + o.totalAmount, 0),
       confirmedCount: confirmed.length,
-      needsShipping: orders.filter((o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
-        .length,
+      needsShipping: orders.filter(
+        (o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT'
+      ).length,
       failed: orders.filter((o) => o.status === 'FAILED').length
     }
   }, [orders])
@@ -116,7 +117,17 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
             <caption className="sr-only">All orders, newest first</caption>
             <thead>
               <tr className="border-b border-border-light dark:border-border-dark">
-                {['Order', 'Date', 'Customer', 'Type', 'Items', 'Total', 'Status', 'Shipping', ''].map((h, i) => (
+                {[
+                  'Order',
+                  'Date',
+                  'Customer',
+                  'Type',
+                  'Items',
+                  'Total',
+                  'Status',
+                  'Shipping',
+                  ''
+                ].map((h, i) => (
                   <th
                     key={i}
                     scope="col"
@@ -170,7 +181,8 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
                       </p>
                     </td>
                     <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
-                      {FILTER_LABELS[row.order.type as Filter] ?? row.order.type.replaceAll('_', ' ')}
+                      {FILTER_LABELS[row.order.type as Filter] ??
+                        row.order.type.replaceAll('_', ' ')}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono tabular-nums text-text-light dark:text-text-dark">
                       {row.order.itemCount || '—'}

@@ -5,19 +5,23 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, CreditCard, RefreshCw, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { store } from 'app/lib/store/store'
-import { showToast } from 'app/lib/store/slices/toastSlice'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { store } from 'lib/store/store'
+import { showToast } from 'lib/store/slices/toastSlice'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { formatDate } from 'app/utils/_date.utils'
-import { getSubscriptionById } from 'app/lib/actions/my-pack/getSubscriptionById'
-import { cancelSubscription } from 'app/lib/actions/_stripe/cancelSubscription'
+import { getSubscriptionById } from 'lib/actions/my-pack/getSubscriptionById'
+import { cancelSubscription } from 'lib/actions/_stripe/cancelSubscription'
 import { UpdateCardForm } from 'app/components/my-pack/UpdateCardForm'
 import { CancelSubscriptionModal } from 'app/components/my-pack/CancelSubscriptionModal'
 
 type Subscription = Awaited<ReturnType<typeof getSubscriptionById>>['data']
 
-export default function MyPackSubscriptionClient({ subscription }: { subscription: NonNullable<Subscription> }) {
+export default function MyPackSubscriptionClient({
+  subscription
+}: {
+  subscription: NonNullable<Subscription>
+}) {
   const router = useRouter()
 
   const [showCancelModal, setShowCancelModal] = useState(false)
@@ -31,7 +35,9 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
   const handleCancel = async () => {
     setCancelLoading(true)
     try {
-      const result = await cancelSubscription({ subscriptionId: subscription.stripeSubscriptionId! })
+      const result = await cancelSubscription({
+        subscriptionId: subscription.stripeSubscriptionId!
+      })
       if (!result.success) throw new Error(result.error ?? 'Failed to cancel')
       store.dispatch(
         showToast({
@@ -50,7 +56,10 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
   }
 
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
@@ -63,7 +72,10 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
           </Link>
 
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Subscription
             </p>
@@ -71,7 +83,8 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
 
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-quicksand text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark leading-tight">
-              {frequencyLabel} <span className="font-light text-muted-light dark:text-muted-dark">Membership</span>
+              {frequencyLabel}{' '}
+              <span className="font-light text-muted-light dark:text-muted-dark">Membership</span>
             </h1>
             {isCancelled && (
               <span className="shrink-0 mt-2 px-2.5 py-1 border border-red-500/30 text-[9px] font-mono tracking-[0.15em] uppercase text-red-500 dark:text-red-400">
@@ -110,14 +123,20 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
               },
               {
                 label: 'Frequency',
-                value: <span className="text-sm font-mono text-text-light dark:text-text-dark">{frequencyLabel}</span>
+                value: (
+                  <span className="text-sm font-mono text-text-light dark:text-text-dark">
+                    {frequencyLabel}
+                  </span>
+                )
               },
               {
                 label: 'Status',
                 value: (
                   <span
                     className={`text-[10px] font-mono tracking-[0.15em] uppercase ${
-                      isCancelled ? 'text-red-500 dark:text-red-400' : 'text-primary-light dark:text-primary-dark'
+                      isCancelled
+                        ? 'text-red-500 dark:text-red-400'
+                        : 'text-primary-light dark:text-primary-dark'
                     }`}
                   >
                     {isCancelled ? 'Cancelled' : (subscription.stripeStatus ?? subscription.status)}
@@ -199,7 +218,11 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
 
           <div className="px-5 py-4">
             {showUpdateCard ? (
-              <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+              <motion.div
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.25 }}
+              >
                 <UpdateCardForm
                   subscriptionId={subscription.stripeSubscriptionId!}
                   onSuccess={() => {
@@ -211,7 +234,10 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
               </motion.div>
             ) : subscription.paymentMethod ? (
               <div className="flex items-center gap-3">
-                <CreditCard className="w-4 h-4 text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+                <CreditCard
+                  className="w-4 h-4 text-muted-light dark:text-muted-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <div>
                   <p className="text-sm font-mono text-text-light dark:text-text-dark capitalize">
                     {subscription.paymentMethod.brand} •••• {subscription.paymentMethod.last4}
@@ -223,7 +249,9 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
                 </div>
               </div>
             ) : (
-              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">No payment method on file.</p>
+              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
+                No payment method on file.
+              </p>
             )}
           </div>
         </motion.div>
@@ -245,7 +273,11 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
           {subscription.billingHistory?.length > 0 ? (
             <ul className="divide-y divide-border-light dark:divide-border-dark" role="list">
               {subscription.billingHistory.map((payment) => (
-                <li key={payment.id} className="flex items-center justify-between px-5 py-3.5 gap-4" role="listitem">
+                <li
+                  key={payment.id}
+                  className="flex items-center justify-between px-5 py-3.5 gap-4"
+                  role="listitem"
+                >
                   <div className="flex items-center gap-3">
                     <Check
                       className="w-3.5 h-3.5 text-primary-light dark:text-primary-dark shrink-0"
@@ -263,7 +295,9 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
             </ul>
           ) : (
             <div className="px-5 py-8 text-center">
-              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">No billing history yet.</p>
+              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
+                No billing history yet.
+              </p>
             </div>
           )}
         </motion.div>
@@ -274,7 +308,9 @@ export default function MyPackSubscriptionClient({ subscription }: { subscriptio
             <div className="h-px bg-border-light dark:bg-border-dark mb-6" aria-hidden="true" />
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm font-mono text-text-light dark:text-text-dark mb-1">Cancel subscription</p>
+                <p className="text-sm font-mono text-text-light dark:text-text-dark mb-1">
+                  Cancel subscription
+                </p>
                 <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark leading-relaxed max-w-xs">
                   Your membership will remain active until the end of the current billing period.
                 </p>

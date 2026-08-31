@@ -1,5 +1,5 @@
-import { setOpenAuctionBidModal, setOpenAuctionSignInModal } from 'app/lib/store/slices/uiSlice'
-import { store } from 'app/lib/store/store'
+import { setOpenAuctionBidModal, setOpenAuctionSignInModal } from 'lib/store/slices/uiSlice'
+import { store } from 'lib/store/store'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { ChevronLeft, ChevronRight, Gavel, Zap } from 'lucide-react'
 import Link from 'next/link'
@@ -43,16 +43,24 @@ export function FixedFooterNav({ auctionItems, item, customAuctionLink, isFixed,
               onClick={() =>
                 isAuthed
                   ? store.dispatch(setOpenAuctionBidModal(item))
-                  : store.dispatch(setOpenAuctionSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`))
+                  : store.dispatch(
+                      setOpenAuctionSignInModal(
+                        `/auctions/${customAuctionLink}/${item.id}?bidModal=true`
+                      )
+                    )
               }
               type="button"
               className="group w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               aria-label={`Place a bid on ${item?.name}`}
             >
               <Gavel size={14} aria-hidden="true" />
-              <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Place a Bid</span>
+              <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                Place a Bid
+              </span>
               {item?.currentBid && (
-                <span className="text-[10px] font-mono font-black opacity-80">— {formatMoney(item.currentBid)}</span>
+                <span className="text-[10px] font-mono font-black opacity-80">
+                  — {formatMoney(item.currentBid)}
+                </span>
               )}
             </button>
           ) : item?.buyNowPrice != null ? (
@@ -63,21 +71,33 @@ export function FixedFooterNav({ auctionItems, item, customAuctionLink, isFixed,
                 aria-label={`Buy ${item?.name} now for ${formatMoney(item.buyNowPrice)}`}
               >
                 <Zap size={14} aria-hidden="true" />
-                <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Buy Now</span>
-                <span className="text-[10px] font-mono font-black opacity-80">— {formatMoney(item.buyNowPrice)}</span>
+                <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                  Buy Now
+                </span>
+                <span className="text-[10px] font-mono font-black opacity-80">
+                  — {formatMoney(item.buyNowPrice)}
+                </span>
               </Link>
             ) : (
               <button
                 type="button"
                 onClick={() =>
-                  store.dispatch(setOpenAuctionSignInModal(`/auctions/${customAuctionLink}/${item.id}/instant-buy`))
+                  store.dispatch(
+                    setOpenAuctionSignInModal(
+                      `/auctions/${customAuctionLink}/${item.id}/instant-buy`
+                    )
+                  )
                 }
                 className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 aria-label={`Buy ${item?.name} now for ${formatMoney(item.buyNowPrice)}`}
               >
                 <Zap size={14} aria-hidden="true" />
-                <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Buy Now</span>
-                <span className="text-[10px] font-mono font-black opacity-80">— {formatMoney(item.buyNowPrice)}</span>
+                <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                  Buy Now
+                </span>
+                <span className="text-[10px] font-mono font-black opacity-80">
+                  — {formatMoney(item.buyNowPrice)}
+                </span>
               </button>
             )
           ) : null}

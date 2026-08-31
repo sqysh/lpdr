@@ -1,8 +1,8 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { useCountdown } from 'app/lib/hooks/useCountdown.hook'
+import { fadeUp } from 'lib/constants/motion.constants'
+import { useCountdown } from 'lib/hooks/useCountdown.hook'
 
 type Props = {
   expiresAt: Date
@@ -14,8 +14,8 @@ export function ApplicationExpiryTimer({ expiresAt }: Props) {
   const timeLeft = done
     ? 'Expired'
     : days > 0
-    ? `${days}d ${hours}h ${minutes}m`
-    : `${hours}h ${minutes}m ${seconds}s`
+      ? `${days}d ${hours}h ${minutes}m`
+      : `${hours}h ${minutes}m ${seconds}s`
 
   return (
     <motion.div variants={fadeUp} initial="hidden" animate="show" custom={1} className="mb-8">
@@ -29,16 +29,17 @@ export function ApplicationExpiryTimer({ expiresAt }: Props) {
         aria-label={`Application access expires in ${timeLeft}`}
       >
         <div className="flex items-center gap-2">
-          <span className="block w-3 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+          <span
+            className="block w-3 h-px bg-primary-light dark:bg-primary-dark"
+            aria-hidden="true"
+          />
           <p className="text-xs font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
             Access Expires
           </p>
         </div>
         <p
           className={`text-sm uppercase tracking-wide tabular-nums ${
-            done
-              ? 'text-red-500 dark:text-red-400'
-              : 'text-primary-light dark:text-primary-dark'
+            done ? 'text-red-500 dark:text-red-400' : 'text-primary-light dark:text-primary-dark'
           }`}
         >
           {timeLeft}

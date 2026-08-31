@@ -1,5 +1,5 @@
-import { createLog } from 'app/lib/actions/log/createLog'
-import { stripeClient } from 'app/lib/stripe/stripe-client'
+import { createLog } from 'lib/actions/log/createLog'
+import { stripeClient } from 'lib/stripe/stripe-client'
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import {
@@ -13,7 +13,7 @@ import {
   handleSubscriptionCreated,
   handleSubscriptionDeleted,
   handleSubscriptionUpdated
-} from 'app/lib/stripe/webhooks'
+} from 'lib/stripe/webhooks'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -35,7 +35,9 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type as string) {
       case 'payment_intent.succeeded': {
-        const paymentIntent = event.data.object as Stripe.PaymentIntent & { invoice?: string | null }
+        const paymentIntent = event.data.object as Stripe.PaymentIntent & {
+          invoice?: string | null
+        }
         if (paymentIntent.invoice) break
         await handlePaymentIntentSucceeded(paymentIntent)
         break
@@ -65,7 +67,8 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.updated': {
         const updatedSub = event.data.object as Stripe.Subscription
         const statusesToHandle = ['active', 'past_due', 'canceled', 'unpaid', 'incomplete']
-        if (statusesToHandle.includes(updatedSub.status)) await handleSubscriptionUpdated(updatedSub)
+        if (statusesToHandle.includes(updatedSub.status))
+          await handleSubscriptionUpdated(updatedSub)
         break
       }
       case 'invoice.payment_succeeded':

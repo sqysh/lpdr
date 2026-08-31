@@ -1,7 +1,7 @@
 'use client'
 
 import Picture from 'app/components/_common/Picture'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 
 const adoptionFeeData = [
@@ -16,12 +16,24 @@ const adoptionFeeData = [
 
 export default function AdoptionFees() {
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Page header ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-14 sm:mb-20">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-14 sm:mb-20"
+        >
           <div className="flex items-center gap-3 mb-4">
-            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Adopt
             </p>
@@ -30,8 +42,9 @@ export default function AdoptionFees() {
             Adoption <span className="font-light text-muted-light dark:text-muted-dark">Fees</span>
           </h1>
           <p className="text-base sm:text-lg text-muted-light dark:text-on-dark leading-relaxed max-w-2xl">
-            Affordable adoption with comprehensive vetting — for all dachshund breeds and mixes. Regardless of whether
-            you adopt a purebred or mixed dachshund, vetting costs remain the same.
+            Affordable adoption with comprehensive vetting — for all dachshund breeds and mixes.
+            Regardless of whether you adopt a purebred or mixed dachshund, vetting costs remain the
+            same.
           </p>
         </motion.div>
 
@@ -55,7 +68,10 @@ export default function AdoptionFees() {
           <div className="bg-surface-light dark:bg-surface-dark p-6 sm:p-8 flex flex-col justify-center gap-5">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   Peace of Mind
                 </p>
@@ -64,23 +80,30 @@ export default function AdoptionFees() {
                 Adopt with Confidence
               </h2>
               <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
-                Whether purebred or mixed, every dog comes with all-inclusive vetting. Adopting a fully vetted dog costs
-                significantly less than buying one and covering the vetting expenses yourself.
+                Whether purebred or mixed, every dog comes with all-inclusive vetting. Adopting a
+                fully vetted dog costs significantly less than buying one and covering the vetting
+                expenses yourself.
               </p>
             </div>
             <div className="w-full h-px bg-border-light dark:bg-border-dark" aria-hidden="true" />
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   Finding Your Dog
                 </p>
               </div>
               <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
-                The adoption fee for each dog is listed in their biography. Find each dog&apos;s profile by visiting{' '}
-                <strong className="text-text-light dark:text-text-dark">Dachshunds → Available</strong> in the menu. A
-                health certificate is also the responsibility of the adopter when crossing state lines — cost depends on
-                what the vet charges LPDR.
+                The adoption fee for each dog is listed in their biography. Find each dog&apos;s
+                profile by visiting{' '}
+                <strong className="text-text-light dark:text-text-dark">
+                  Dachshunds → Available
+                </strong>{' '}
+                in the menu. A health certificate is also the responsibility of the adopter when
+                crossing state lines — cost depends on what the vet charges LPDR.
               </p>
             </div>
           </div>
@@ -96,7 +119,10 @@ export default function AdoptionFees() {
           aria-labelledby="fees-included-heading"
         >
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <h2
               id="fees-included-heading"
               className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
@@ -128,7 +154,9 @@ export default function AdoptionFees() {
                 >
                   {String(i + 1).padStart(2, '0')}
                 </span>
-                <p className="text-sm text-text-light dark:text-text-dark leading-relaxed">{item}</p>
+                <p className="text-sm text-text-light dark:text-text-dark leading-relaxed">
+                  {item}
+                </p>
               </motion.li>
             ))}
           </ol>

@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
 import { motion, AnimatePresence } from 'framer-motion'
 import Picture from 'app/components/_common/Picture'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 
 export function WelcomeWienerCard({
   dog,
@@ -130,7 +130,9 @@ export function WelcomeWienerCard({
                     <Plus className="w-2.5 h-2.5" aria-hidden="true" />
                   )}
                   <span>{product.name}</span>
-                  <span className="text-primary-light dark:text-primary-dark font-bold">${product.price}</span>
+                  <span className="text-primary-light dark:text-primary-dark font-bold">
+                    ${product.price}
+                  </span>
                 </button>
               ))}
               {products.length > 2 && (
@@ -201,7 +203,10 @@ export function WelcomeWienerCard({
                           {added.includes(product.id) ? (
                             <Check className="w-3 h-3 text-white" aria-hidden="true" />
                           ) : (
-                            <Plus className="w-3 h-3 text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                            <Plus
+                              className="w-3 h-3 text-muted-light dark:text-muted-dark"
+                              aria-hidden="true"
+                            />
                           )}
                         </div>
                       </div>
@@ -214,7 +219,9 @@ export function WelcomeWienerCard({
         </div>
       ) : (
         <div className="px-4 pt-3 pb-4">
-          <p className="text-[10px] font-mono text-muted-light/60 dark:text-muted-dark/60">No items listed yet.</p>
+          <p className="text-[10px] font-mono text-muted-light/60 dark:text-muted-dark/60">
+            No items listed yet.
+          </p>
         </div>
       )}
 

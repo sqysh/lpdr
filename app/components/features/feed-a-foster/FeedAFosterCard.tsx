@@ -1,11 +1,11 @@
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { useAppDispatch } from 'app/lib/store/store'
-import { addToCart } from 'app/lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'app/lib/store/slices/uiSlice'
+import { useAppDispatch } from 'lib/store/store'
+import { addToCart } from 'lib/store/slices/cartSlice'
+import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import { Check, Utensils } from 'lucide-react'
-import { ITEM_ICONS } from 'app/lib/constants/feed-a-foster.constants'
+import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
 
 export function FeedAFosterCard({
   i,
@@ -74,8 +74,12 @@ export function FeedAFosterCard({
       {/* Content */}
       <div className={`flex flex-col flex-1 p-5 sm:p-6 gap-4 ${!isAvailable ? 'opacity-50' : ''}`}>
         <div>
-          <h2 className="font-quicksand text-lg font-bold text-text-light dark:text-text-dark mb-2">{item.title}</h2>
-          <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">{item.textKey}</p>
+          <h2 className="font-quicksand text-lg font-bold text-text-light dark:text-text-dark mb-2">
+            {item.title}
+          </h2>
+          <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
+            {item.textKey}
+          </p>
         </div>
 
         <div className="mt-auto pt-2">

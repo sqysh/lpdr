@@ -4,12 +4,12 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Gavel, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAppDispatch, useUiSelector } from 'app/lib/store/store'
-import { setCloseAuctionDrawer } from 'app/lib/store/slices/uiSlice'
-import { useEscapeKey } from '@hooks/useEscapeKey.hook'
+import { useAppDispatch, useUiSelector } from 'lib/store/store'
+import { setCloseAuctionDrawer } from 'lib/store/slices/uiSlice'
+import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormField } from 'app/components/_primitives/FormField'
 import { FormError } from 'app/components/_primitives/FormError'
-import { createAuction } from 'app/lib/actions/admin/auction/createAuction'
+import { createAuction } from 'lib/actions/admin/auction/createAuction'
 import { AUCTION_HOUR_OPTIONS, validateAuctionHour } from 'app/utils/_auction.utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -57,7 +57,11 @@ function validate(inputs: FormInputs): FormErrors {
     if (hourError) errs.endDate = hourError
   }
 
-  if (inputs.startDate && inputs.endDate && new Date(inputs.startDate) >= new Date(inputs.endDate)) {
+  if (
+    inputs.startDate &&
+    inputs.endDate &&
+    new Date(inputs.startDate) >= new Date(inputs.endDate)
+  ) {
     errs.endDate = 'End date must be after start date'
   }
 
@@ -143,7 +147,11 @@ export default function AdminAuctionModal() {
             <div className="flex items-center justify-between px-6 py-5 border-b border-border-light dark:border-border-dark">
               <div className="flex items-center gap-3">
                 <div className="w-7 h-7 flex items-center justify-center bg-primary-light/10 dark:bg-primary-dark/10">
-                  <Gavel size={14} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
+                  <Gavel
+                    size={14}
+                    className="text-primary-light dark:text-primary-dark"
+                    aria-hidden="true"
+                  />
                 </div>
                 <div>
                   <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">

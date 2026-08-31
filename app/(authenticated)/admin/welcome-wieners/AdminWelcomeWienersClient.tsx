@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-import { getWelcomeWieners } from 'app/lib/actions/admin/welcome-wiener/getWelcomeWieners'
+import { getWelcomeWieners } from 'lib/actions/admin/welcome-wiener/getWelcomeWieners'
 import Picture from 'app/components/_common/Picture'
 import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
 import AdminHeaderButton from 'app/components/admin/_shared/AdminHeaderButton'
@@ -37,10 +37,14 @@ const columns: Column<WelcomeWienerRow>[] = [
         )}
         <div className="min-w-0">
           <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
-            {w.name ?? <span className="text-muted-light dark:text-muted-dark italic">Unnamed</span>}
+            {w.name ?? (
+              <span className="text-muted-light dark:text-muted-dark italic">Unnamed</span>
+            )}
           </p>
           {w.bio && (
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate max-w-45">{w.bio}</p>
+            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate max-w-45">
+              {w.bio}
+            </p>
           )}
         </div>
       </div>
@@ -105,7 +109,10 @@ export default function AdminWelcomeWienersClient({ welcomeWieners }: Props) {
         title="Welcome Wieners"
         count={{ value: wieners.length, noun: 'wiener' }}
         action={
-          <AdminHeaderButton href="/admin/welcome-wieners/new" icon={<Plus size={11} aria-hidden="true" />}>
+          <AdminHeaderButton
+            href="/admin/welcome-wieners/new"
+            icon={<Plus size={11} aria-hidden="true" />}
+          >
             Add Wiener
           </AdminHeaderButton>
         }

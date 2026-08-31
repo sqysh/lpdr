@@ -2,8 +2,8 @@
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { store } from 'app/lib/store/store'
-import { setOpenMobileNavigation } from 'app/lib/store/slices/uiSlice'
+import { store } from 'lib/store/store'
+import { setOpenMobileNavigation } from 'lib/store/slices/uiSlice'
 
 export function AuthRedirectWatcher() {
   const searchParams = useSearchParams()

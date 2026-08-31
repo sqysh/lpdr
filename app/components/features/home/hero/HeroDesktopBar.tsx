@@ -1,4 +1,4 @@
-import { SLIDES } from 'app/lib/constants/home.constants'
+import { SLIDES } from 'lib/constants/home.constants'
 import { EventCountdown } from './EventCountdown'
 import { VideoThumb } from './VideoThumb'
 
@@ -41,7 +41,10 @@ export function HeroDesktopBar({
             className="relative flex items-center justify-center transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark cursor-pointer"
           >
             {i === current ? (
-              <span className="relative flex items-center justify-center w-5 h-5" aria-hidden="true">
+              <span
+                className="relative flex items-center justify-center w-5 h-5"
+                aria-hidden="true"
+              >
                 <span className="absolute inset-0  border-2 border-primary-light dark:border-primary-dark" />
                 <span className="w-2 h-2  bg-primary-light dark:bg-primary-dark" />
               </span>

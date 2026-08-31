@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { RefreshCw, CheckCircle } from 'lucide-react'
-import { pusherClient } from 'app/lib/pusher/pusher-client'
+import { pusherClient } from 'lib/pusher/pusher-client'
 import { MigrationGridEffect } from './MigrationScanEffect'
 
 export function MigrationBanner({ initiallyPending }: { initiallyPending: boolean }) {
@@ -48,9 +48,14 @@ export function MigrationBanner({ initiallyPending }: { initiallyPending: boolea
     return (
       <div className="flex items-center gap-3 px-4 py-3 border border-emerald-500/40 bg-emerald-500/5 mb-6 transition-opacity duration-500">
         <MigrationGridEffect trigger={justCompleted} />
-        <CheckCircle className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" aria-hidden="true" />
+        <CheckCircle
+          className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0"
+          aria-hidden="true"
+        />
         <div>
-          <p className="text-xs font-mono font-bold text-text-light dark:text-text-dark">History restored</p>
+          <p className="text-xs font-mono font-bold text-text-light dark:text-text-dark">
+            History restored
+          </p>
           <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">
             Your past orders, donations, and auction activity are now up to date.
           </p>
@@ -68,10 +73,12 @@ export function MigrationBanner({ initiallyPending }: { initiallyPending: boolea
         aria-hidden="true"
       />
       <div>
-        <p className="text-xs font-mono font-bold text-text-light dark:text-text-dark">Restoring your history</p>
+        <p className="text-xs font-mono font-bold text-text-light dark:text-text-dark">
+          Restoring your history
+        </p>
         <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">
-          We&apos;re pulling in your past orders, donations, and auction activity from the old site. This usually takes
-          just a moment.
+          We&apos;re pulling in your past orders, donations, and auction activity from the old site.
+          This usually takes just a moment.
         </p>
       </div>
     </div>

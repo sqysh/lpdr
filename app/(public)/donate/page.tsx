@@ -1,8 +1,8 @@
 import PublicDonateClient from 'app/(public)/donate/PublicDonateClient'
 import { PublicDonateSkeleton } from 'app/components/features/donate/PublicDonateSkeleton'
-import { getSavedPaymentMethods } from 'app/lib/actions/_stripe/getSavedPaymentMethods'
-import { getUserName } from 'app/lib/actions/my-pack/getUserName'
-import { auth } from 'app/lib/auth'
+import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
+import { getUserName } from 'lib/actions/my-pack/getUserName'
+import { auth } from 'lib/auth'
 import { Suspense } from 'react'
 
 export default async function PublicDonatePage() {

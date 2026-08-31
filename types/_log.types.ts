@@ -1,5 +1,5 @@
 import { JsonValue } from '@prisma/client/runtime/client'
-import { LEVELS } from 'app/lib/constants/log.constants'
+import { LEVELS } from 'lib/constants/log.constants'
 
 export type Log = {
   id: string

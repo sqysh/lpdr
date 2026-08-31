@@ -1,7 +1,7 @@
 'use client'
 
-import { setHideConfetti } from 'app/lib/store/slices/uiSlice'
-import { store, useUiSelector } from 'app/lib/store/store'
+import { setHideConfetti } from 'lib/store/slices/uiSlice'
+import { store, useUiSelector } from 'lib/store/store'
 import React, { useRef, useEffect } from 'react'
 import * as THREE from 'three'
 
@@ -18,7 +18,8 @@ interface ConfettiUserData {
 }
 
 const COLORS: number[] = [
-  0x0891b2, 0xa78bfa, 0xf472b6, 0x0e7490, 0x38bdf8, 0xc084fc, 0xfb7185, 0x34d399, 0x22d3ee, 0xe879f9, 0x818cf8, 0xf9a8d4
+  0x0891b2, 0xa78bfa, 0xf472b6, 0x0e7490, 0x38bdf8, 0xc084fc, 0xfb7185, 0x34d399, 0x22d3ee,
+  0xe879f9, 0x818cf8, 0xf9a8d4
 ]
 
 export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
@@ -195,7 +196,12 @@ export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
     if (!mountElement) return
 
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(
+      75,
+      window.innerWidth / window.innerHeight,
+      0.1,
+      1000
+    )
     const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
 
     renderer.setSize(window.innerWidth, window.innerHeight)

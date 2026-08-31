@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useUiSelector } from 'app/lib/store/store'
+import { useUiSelector } from 'lib/store/store'
 import { GoogleButton } from '../login/GoogleButton'
 import { FacebookButton } from '../login/FacebookButton'
 import { MagicLink } from '../login/MagicLink'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 
 export function StepSignIn({ redirectTo, isDark }: { redirectTo: string; isDark?: boolean }) {
   const [email, setEmail] = useState('')

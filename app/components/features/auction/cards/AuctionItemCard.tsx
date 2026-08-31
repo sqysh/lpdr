@@ -1,6 +1,6 @@
-import { useSounds } from '@hooks/useSounds.hook'
+import { useSounds } from 'lib/hooks/useSounds.hook'
 import Picture from 'app/components/_common/Picture'
-import { placeBid } from 'app/lib/actions/user/auction/placeBid'
+import { placeBid } from 'lib/actions/user/auction/placeBid'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { useInView, motion } from 'framer-motion'
 import { Check, ChevronRight, Gavel, Loader2, Tag, Zap } from 'lucide-react'
@@ -18,7 +18,13 @@ type Props = {
   onBidSuccess?: () => void
 }
 
-export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink, onBidSuccess }: Props) {
+export function AuctionItemCard({
+  item,
+  auctionStatus,
+  index,
+  customAuctionLink,
+  onBidSuccess
+}: Props) {
   const router = useRouter()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -33,7 +39,8 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
   const isEnded = auctionStatus === 'ENDED'
   const isSold = item.status === 'SOLD'
 
-  const displayPrice = item.sellingFormat === 'FIXED' ? item.buyNowPrice : (item.currentBid ?? item.startingPrice)
+  const displayPrice =
+    item.sellingFormat === 'FIXED' ? item.buyNowPrice : (item.currentBid ?? item.startingPrice)
 
   const bidCount = item._count?.bids ?? 0
 
@@ -92,12 +99,20 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
           {item.sellingFormat === 'FIXED' ? (
             <>
               <Tag size={9} aria-hidden="true" className="text-muted-light dark:text-muted-dark" />
-              <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">Buy Now</span>
+              <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
+                Buy Now
+              </span>
             </>
           ) : (
             <>
-              <Gavel size={9} aria-hidden="true" className="text-primary-light dark:text-primary-dark" />
-              <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark">Auction</span>
+              <Gavel
+                size={9}
+                aria-hidden="true"
+                className="text-primary-light dark:text-primary-dark"
+              />
+              <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark">
+                Auction
+              </span>
             </>
           )}
         </div>
@@ -147,7 +162,9 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
               <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
                 Bids
               </span>
-              <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{bidCount}</span>
+              <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                {bidCount}
+              </span>
             </div>
           )}
 
@@ -155,7 +172,11 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
           {displayPrice != null && (
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-                {item.sellingFormat === 'FIXED' ? 'Price' : item.currentBid ? 'Current Bid' : 'Starting'}
+                {item.sellingFormat === 'FIXED'
+                  ? 'Price'
+                  : item.currentBid
+                    ? 'Current Bid'
+                    : 'Starting'}
               </span>
               <span className="font-mono font-black text-sm text-text-light dark:text-text-dark">
                 {formatMoney(displayPrice)}
@@ -173,7 +194,9 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
                     onClick={handleQuickBid}
                     disabled={quickBidLoading}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 text-[9px] font-mono tracking-[0.2em] uppercase font-black disabled:opacity-50 disabled:cursor-not-allowed ${
-                      confirming ? 'bg-amber-400 text-amber-950' : 'bg-amber-500 hover:bg-amber-400 text-white'
+                      confirming
+                        ? 'bg-amber-400 text-amber-950'
+                        : 'bg-amber-500 hover:bg-amber-400 text-white'
                     }`}
                   >
                     <span>
@@ -193,7 +216,9 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
                   </button>
 
                   {quickBidError && (
-                    <p className="text-[9px] font-mono text-red-500 dark:text-red-400">{quickBidError}</p>
+                    <p className="text-[9px] font-mono text-red-500 dark:text-red-400">
+                      {quickBidError}
+                    </p>
                   )}
                 </>
               )}

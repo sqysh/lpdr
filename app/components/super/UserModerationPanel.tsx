@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Search, ShieldOff, X, AlertTriangle } from 'lucide-react'
-import { searchUser } from 'app/lib/actions/super-user/searchUser'
-import { updateUserStatus } from 'app/lib/actions/super-user/updateUserStatus'
+import { searchUser } from 'lib/actions/super-user/searchUser'
+import { updateUserStatus } from 'lib/actions/super-user/updateUserStatus'
 
 interface ManagedUser {
   id: string
@@ -55,7 +55,9 @@ function ConfirmDialog({
           <p className="font-mono text-[10px] tracking-widest uppercase text-text-light dark:text-text-dark">
             {action === 'suspend' ? 'Suspend' : 'Terminate'} {user.name}?
           </p>
-          <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark mt-0.5">{user.email}</p>
+          <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark mt-0.5">
+            {user.email}
+          </p>
         </div>
       </div>
       <input
@@ -85,7 +87,10 @@ function ConfirmDialog({
   )
 }
 
-export default function UserModerationPanel({ suspended: initialSuspended, terminated: initialTerminated }: UserModerationPanelProps) {
+export default function UserModerationPanel({
+  suspended: initialSuspended,
+  terminated: initialTerminated
+}: UserModerationPanelProps) {
   const [query, setQuery] = useState('')
   const [searching, setSearching] = useState(false)
   const [result, setResult] = useState<UserSearchResult | null>(null)
@@ -223,7 +228,10 @@ export default function UserModerationPanel({ suspended: initialSuspended, termi
             className="flex items-center justify-between gap-2 border-l-2 border-red-500 bg-red-500/5 px-3 py-2 mb-4"
           >
             <span className="font-mono text-[10px] text-red-500">{error}</span>
-            <button onClick={() => setError(null)} className="text-red-500/60 hover:text-red-500 focus:outline-none">
+            <button
+              onClick={() => setError(null)}
+              className="text-red-500/60 hover:text-red-500 focus:outline-none"
+            >
               <X size={11} />
             </button>
           </motion.div>
@@ -257,17 +265,28 @@ export default function UserModerationPanel({ suspended: initialSuspended, termi
             <div className="flex items-start justify-between gap-2 mb-3">
               <div>
                 <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                  <span className="font-mono text-[10px] tracking-widest uppercase text-text-light dark:text-text-dark">{result.name}</span>
+                  <span className="font-mono text-[10px] tracking-widest uppercase text-text-light dark:text-text-dark">
+                    {result.name}
+                  </span>
                   {/* <Badge variant={result.status === 'ACTIVE' ? 'success' : result.status === 'SUSPENDED' ? 'warn' : 'danger'}>{result.status}</Badge>
                   <Badge variant="muted">{result.role}</Badge> */}
                 </div>
-                <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark">{result.email}</p>
+                <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark">
+                  {result.email}
+                </p>
               </div>
             </div>
 
             {/* Confirm dialog */}
             <AnimatePresence>
-              {confirm && <ConfirmDialog action={confirm} user={result} onConfirm={handleConfirm} onCancel={() => setConfirm(null)} />}
+              {confirm && (
+                <ConfirmDialog
+                  action={confirm}
+                  user={result}
+                  onConfirm={handleConfirm}
+                  onCancel={() => setConfirm(null)}
+                />
+              )}
             </AnimatePresence>
 
             {/* Action buttons */}
@@ -310,12 +329,16 @@ export default function UserModerationPanel({ suspended: initialSuspended, termi
       {/* Suspended list */}
       {suspended.length > 0 && (
         <div className="mb-4">
-          <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-amber-500 mb-2">Suspended — {suspended.length}</p>
+          <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-amber-500 mb-2">
+            Suspended — {suspended.length}
+          </p>
           <div className="flex flex-col divide-y divide-border-light dark:divide-border-dark">
             {suspended.map((u) => (
               <div key={u.id} className="flex items-center justify-between gap-2 py-2">
                 <div className="min-w-0">
-                  <p className="font-mono text-[10px] tracking-[0.05em] text-text-light dark:text-text-dark truncate">{u.email}</p>
+                  <p className="font-mono text-[10px] tracking-[0.05em] text-text-light dark:text-text-dark truncate">
+                    {u.email}
+                  </p>
                   <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark">
                     {u.actedAt}
                     {u.reason ? ` · ${u.reason}` : ''}
@@ -336,12 +359,16 @@ export default function UserModerationPanel({ suspended: initialSuspended, termi
       {/* Terminated list */}
       {terminated.length > 0 && (
         <div>
-          <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-red-500 mb-2">Terminated — {terminated.length}</p>
+          <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-red-500 mb-2">
+            Terminated — {terminated.length}
+          </p>
           <div className="flex flex-col divide-y divide-border-light dark:divide-border-dark">
             {terminated.map((u) => (
               <div key={u.id} className="flex items-center justify-between gap-2 py-2">
                 <div className="min-w-0">
-                  <p className="font-mono text-[10px] tracking-[0.05em] text-text-light dark:text-text-dark truncate">{u.email}</p>
+                  <p className="font-mono text-[10px] tracking-[0.05em] text-text-light dark:text-text-dark truncate">
+                    {u.email}
+                  </p>
                   <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark">
                     {u.actedAt}
                     {u.reason ? ` · ${u.reason}` : ''}
@@ -361,7 +388,9 @@ export default function UserModerationPanel({ suspended: initialSuspended, termi
 
       {/* Empty */}
       {suspended.length === 0 && terminated.length === 0 && !result && !notFound && (
-        <p className="font-mono text-[10px] tracking-widest text-muted-light dark:text-muted-dark">No suspended or terminated users.</p>
+        <p className="font-mono text-[10px] tracking-widest text-muted-light dark:text-muted-dark">
+          No suspended or terminated users.
+        </p>
       )}
     </div>
   )

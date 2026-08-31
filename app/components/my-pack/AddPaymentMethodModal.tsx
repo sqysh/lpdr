@@ -4,14 +4,14 @@ import { useState, useRef } from 'react'
 import { X, CreditCard, ShieldCheck, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
-import { store, useUiSelector } from 'app/lib/store/store'
-import { setCloseAddPaymentMethodModal } from 'app/lib/store/slices/uiSlice'
-import { useEscapeKey } from '@hooks/useEscapeKey.hook'
-import { useRemoveScroll } from '@hooks/useRemoveScroll.hook'
-import { showToast } from 'app/lib/store/slices/toastSlice'
+import { store, useUiSelector } from 'lib/store/store'
+import { setCloseAddPaymentMethodModal } from 'lib/store/slices/uiSlice'
+import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
+import { useRemoveScroll } from 'lib/hooks/useRemoveScroll.hook'
+import { showToast } from 'lib/store/slices/toastSlice'
 import { extractErrorMessage } from 'app/utils/_log.client.utils'
-import { getSetupIntentClientSecret } from 'app/lib/actions/_stripe/getSetupIntentClientSecret'
-import { createPaymentMethod } from 'app/lib/actions/_stripe/createPaymentMethod'
+import { getSetupIntentClientSecret } from 'lib/actions/_stripe/getSetupIntentClientSecret'
+import { createPaymentMethod } from 'lib/actions/_stripe/createPaymentMethod'
 
 export default function AddPaymentMethodModal() {
   const { addPaymentMethodModal, isDark } = useUiSelector()
@@ -78,7 +78,9 @@ export default function AddPaymentMethodModal() {
       if (error) throw error
 
       const paymentMethodId =
-        typeof setupIntent?.payment_method === 'string' ? setupIntent.payment_method : setupIntent?.payment_method?.id
+        typeof setupIntent?.payment_method === 'string'
+          ? setupIntent.payment_method
+          : setupIntent?.payment_method?.id
 
       if (!paymentMethodId) throw new Error('No payment method ID returned')
 
@@ -139,11 +141,17 @@ export default function AddPaymentMethodModal() {
           <div className="absolute top-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute top-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
-        <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+        <div
+          className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10"
+          aria-hidden="true"
+        >
           <div className="absolute bottom-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute bottom-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
-        <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+        <div
+          className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10"
+          aria-hidden="true"
+        >
           <div className="absolute bottom-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute bottom-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
@@ -186,9 +194,14 @@ export default function AddPaymentMethodModal() {
           {success ? (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <div className="w-12 h-12 flex items-center justify-center bg-cyan-600/10 dark:bg-violet-400/10">
-                <CheckCircle className="w-6 h-6 text-cyan-600 dark:text-violet-400" aria-hidden="true" />
+                <CheckCircle
+                  className="w-6 h-6 text-cyan-600 dark:text-violet-400"
+                  aria-hidden="true"
+                />
               </div>
-              <p className="  text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">Card Added</p>
+              <p className="  text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+                Card Added
+              </p>
               <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
                 Your card has been saved successfully.
               </p>
@@ -239,7 +252,8 @@ export default function AddPaymentMethodModal() {
                           color: isDark ? '#f1f0ff' : '#09090b',
                           backgroundColor: isDark ? '#13131f' : '#f9fafb',
                           fontSize: '14px',
-                          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                          fontFamily:
+                            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                           '::placeholder': { color: isDark ? '#4a4a6a' : '#a1a1aa' },
                           iconColor: isDark ? '#7c3aed' : '#0891b2'
                         },
@@ -267,7 +281,10 @@ export default function AddPaymentMethodModal() {
                   className="w-full flex items-center justify-between p-4 border border-zinc-200 dark:border-border-dark hover:border-cyan-600/40 dark:hover:border-violet-400/40 bg-zinc-50 dark:bg-[#13131f] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
                 >
                   <div className="flex items-center gap-3">
-                    <CreditCard className="w-4 h-4 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
+                    <CreditCard
+                      className="w-4 h-4 text-zinc-400 dark:text-muted-dark/50 shrink-0"
+                      aria-hidden="true"
+                    />
                     <div className="text-left">
                       <p className="  text-sm uppercase tracking-wide leading-none mb-0.5 text-zinc-950 dark:text-text-dark">
                         Set as default
@@ -280,7 +297,9 @@ export default function AddPaymentMethodModal() {
                   <div
                     aria-hidden="true"
                     className={`relative w-10 h-5 transition-colors duration-200 shrink-0 ${
-                      isDefault ? 'bg-cyan-600 dark:bg-violet-500' : 'bg-zinc-300 dark:bg-border-dark'
+                      isDefault
+                        ? 'bg-cyan-600 dark:bg-violet-500'
+                        : 'bg-zinc-300 dark:bg-border-dark'
                     }`}
                   >
                     <span

@@ -1,6 +1,6 @@
 import { Loader2 } from 'lucide-react'
 import { FormField } from 'app/components/_primitives'
-import { STATES } from 'app/lib/constants/location.constants'
+import { STATES } from 'lib/constants/location.constants'
 
 type AddressErrors = {
   addressLine1?: string
@@ -67,9 +67,13 @@ export function InstantBuyAddressSection({
             </button>
           </div>
           <div className="px-4 py-3 space-y-0.5">
-            <p className="font-lato text-sm text-text-light dark:text-text-dark">{inputs.addressLine1}</p>
+            <p className="font-lato text-sm text-text-light dark:text-text-dark">
+              {inputs.addressLine1}
+            </p>
             {inputs.addressLine2 && (
-              <p className="font-lato text-sm text-text-light dark:text-text-dark">{inputs.addressLine2}</p>
+              <p className="font-lato text-sm text-text-light dark:text-text-dark">
+                {inputs.addressLine2}
+              </p>
             )}
             <p className="font-lato text-sm text-text-light dark:text-text-dark">
               {inputs.city}, {inputs.state} {inputs.zipPostalCode}

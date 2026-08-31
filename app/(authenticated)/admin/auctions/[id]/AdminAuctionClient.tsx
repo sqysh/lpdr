@@ -5,7 +5,7 @@ import { IAuction, Tab } from 'types/_auction'
 import { formatDate } from 'app/utils/_date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getAuctionStatusConfig } from 'app/utils/_auction.utils'
-import { TABS } from 'app/lib/constants/auction.constants'
+import { TABS } from 'lib/constants/auction.constants'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -119,7 +119,12 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
 
         {/* ── Panels ── */}
         <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-          <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          >
             {ActivePanel && <ActivePanel auction={auction} />}
           </motion.div>
         </div>

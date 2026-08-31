@@ -1,8 +1,8 @@
 import { notFound } from 'next/navigation'
 import AdminUserDetailsClient from './AdminUserDetailsClient'
-import { getUserById } from 'app/lib/actions/admin/user/getUserById'
-import { checkMigrationStatus } from 'app/lib/actions/admin/user/checkMigrationStatus'
-import { auth } from 'app/lib/auth'
+import { getUserById } from 'lib/actions/admin/user/getUserById'
+import { checkMigrationStatus } from 'lib/actions/admin/user/checkMigrationStatus'
+import { auth } from 'lib/auth'
 
 export const dynamic = 'force-dynamic'
 

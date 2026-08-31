@@ -1,4 +1,4 @@
-import { SUPER_USER_CHANNEL } from 'app/lib/pusher/pusher.utils'
+import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.utils'
 import Pusher from 'pusher-js'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -33,7 +33,12 @@ interface LiveEvent {
 }
 
 const EVENT_CONFIG: Record<string, EventConfig> = {
-  'user-signed-in': { icon: User, label: 'Signed In', color: 'text-green-500', format: (d) => `${d.email}` },
+  'user-signed-in': {
+    icon: User,
+    label: 'Signed In',
+    color: 'text-green-500',
+    format: (d) => `${d.email}`
+  },
   'user-registered': {
     icon: Star,
     label: 'Registered',
@@ -56,7 +61,8 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: Activity,
     label: 'Recurring Donation',
     color: 'text-green-500',
-    format: (d) => `${d.email} — $${d.amount} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
+    format: (d) =>
+      `${d.email} — $${d.amount} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
   },
   'subscription-created': {
     icon: CreditCard,
@@ -203,7 +209,13 @@ export function LiveActionsFeed() {
       'user-terminated',
       'user-reinstated'
     ],
-    auctions: ['auction-created', 'auction-started', 'auction-ended', 'auction-updated', 'bid-placed'],
+    auctions: [
+      'auction-created',
+      'auction-started',
+      'auction-ended',
+      'auction-updated',
+      'bid-placed'
+    ],
     payments: [
       'subscription-created',
       'subscription-updated',
@@ -242,7 +254,8 @@ export function LiveActionsFeed() {
     }
   }, [])
 
-  const filtered = filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.includes(e.event))
+  const filtered =
+    filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.includes(e.event))
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
@@ -289,7 +302,11 @@ export function LiveActionsFeed() {
       >
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2 py-12">
-            <Activity size={20} className="text-muted-light dark:text-muted-dark opacity-30" aria-hidden="true" />
+            <Activity
+              size={20}
+              className="text-muted-light dark:text-muted-dark opacity-30"
+              aria-hidden="true"
+            />
             <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
               Waiting for activity...
             </p>
@@ -323,7 +340,9 @@ export function LiveActionsFeed() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>
+                        <span
+                          className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}
+                        >
                           {config.label}
                         </span>
                         {originChannel && (

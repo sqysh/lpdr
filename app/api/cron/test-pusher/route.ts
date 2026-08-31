@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { pusherSuperuser } from 'app/lib/pusher/pusher.utils'
-import { createLog } from 'app/lib/actions/log/createLog'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
+import { createLog } from 'lib/actions/log/createLog'
 
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)

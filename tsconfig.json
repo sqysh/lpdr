@@ -18,7 +18,7 @@
     "baseUrl": "./",
     "paths": {
       "@redux/*": ["./app/redux/*"],
-      "@hooks/*": ["./app/lib/hooks/*"],
+      "@hooks/*": ["lib/hooks/*"],
       "@public/*": ["./public/*"],
       "prisma/client": ["./prisma/client.ts"]
     }

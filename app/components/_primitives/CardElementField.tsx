@@ -1,5 +1,5 @@
 import { CardElement } from '@stripe/react-stripe-js'
-import { useUiSelector } from 'app/lib/store/store'
+import { useUiSelector } from 'lib/store/store'
 
 type Props = {
   onChange: (state: { complete: boolean; error: string | null }) => void

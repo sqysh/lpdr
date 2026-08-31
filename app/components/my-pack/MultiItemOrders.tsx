@@ -4,7 +4,7 @@ import { StatusPill } from 'app/components/_primitives/StatusPill'
 import { formatMoney } from 'app/utils/_currency.utils'
 import Picture from 'app/components/_common/Picture'
 import Link from 'next/link'
-import { ITEM_ICONS } from 'app/lib/constants/feed-a-foster.constants'
+import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
 import { Utensils } from 'lucide-react'
 
 const ITEM_TYPE_LABELS: Record<string, string> = {

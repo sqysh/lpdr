@@ -1,7 +1,7 @@
 import { NewsletterIssue } from '@prisma/client'
-import deleteNewsletterIssue from 'app/lib/actions/admin/newsletter-issue/deleteNewsletterIssue'
-import { showToast } from 'app/lib/store/slices/toastSlice'
-import { useAppDispatch } from 'app/lib/store/store'
+import deleteNewsletterIssue from 'lib/actions/admin/newsletter-issue/deleteNewsletterIssue'
+import { showToast } from 'lib/store/slices/toastSlice'
+import { useAppDispatch } from 'lib/store/store'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ExternalLink, FileText, Plus, Trash2 } from 'lucide-react'
@@ -53,7 +53,9 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
       cell: (issue) => (
         <span
           className={`inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.15em] uppercase ${
-            issue.isLive ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
+            issue.isLive
+              ? 'text-emerald-600 dark:text-emerald-400'
+              : 'text-amber-600 dark:text-amber-400'
           }`}
         >
           <span

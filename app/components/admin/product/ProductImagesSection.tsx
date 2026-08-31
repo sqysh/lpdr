@@ -4,8 +4,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
 import Picture from 'app/components/_common/Picture'
-import { uploadFileToFirebase } from 'app/lib/firebase/firebase.utils'
-import { createLog } from 'app/lib/actions/log/createLog'
+import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
+import { createLog } from 'lib/actions/log/createLog'
 import { FormState, SectionHeader } from './productForm.utils'
 
 type Props = {
@@ -14,7 +14,9 @@ type Props = {
 }
 
 export function ProductImagesSection({ form, set }: Props) {
-  const [uploadingImages, setUploadingImages] = useState<{ file: File; progress: number; url?: string }[]>([])
+  const [uploadingImages, setUploadingImages] = useState<
+    { file: File; progress: number; url?: string }[]
+  >([])
 
   const handleImageFiles = async (files: FileList | null) => {
     if (!files || files.length === 0) return
@@ -28,11 +30,15 @@ export function ProductImagesSection({ form, set }: Props) {
           const url = await uploadFileToFirebase(
             file,
             (progress) => {
-              setUploadingImages((prev) => prev.map((u) => (u.file.name === file.name ? { ...u, progress } : u)))
+              setUploadingImages((prev) =>
+                prev.map((u) => (u.file.name === file.name ? { ...u, progress } : u))
+              )
             },
             'image'
           )
-          setUploadingImages((prev) => prev.map((u) => (u.file.name === file.name ? { ...u, progress: 100, url } : u)))
+          setUploadingImages((prev) =>
+            prev.map((u) => (u.file.name === file.name ? { ...u, progress: 100, url } : u))
+          )
           set('images', [...form.images, url])
         } catch (error) {
           await createLog('error', 'Failed to upload product image', {
@@ -66,7 +72,9 @@ export function ProductImagesSection({ form, set }: Props) {
         <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark group-hover:text-text-light dark:group-hover:text-text-dark transition-colors">
           Click to upload images
         </p>
-        <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark mt-1">Multiple files supported</p>
+        <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark mt-1">
+          Multiple files supported
+        </p>
         <input
           id="image-upload"
           type="file"
@@ -90,7 +98,9 @@ export function ProductImagesSection({ form, set }: Props) {
             >
               <Loader2 className="w-3.5 h-3.5 animate-spin text-primary-light dark:text-primary-dark shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate mb-1">{file.name}</p>
+                <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate mb-1">
+                  {file.name}
+                </p>
                 <div className="h-1 bg-border-light dark:bg-border-dark w-full overflow-hidden">
                   <motion.div
                     className="h-full bg-primary-light dark:bg-primary-dark"
@@ -116,8 +126,15 @@ export function ProductImagesSection({ form, set }: Props) {
             exit={{ opacity: 0, x: -8 }}
             className="flex items-center gap-3 p-2.5 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark mb-2"
           >
-            <Picture priority src={url} alt={`Product image ${i + 1}`} className="w-10 h-10 object-cover shrink-0" />
-            <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate flex-1">{url}</span>
+            <Picture
+              priority
+              src={url}
+              alt={`Product image ${i + 1}`}
+              className="w-10 h-10 object-cover shrink-0"
+            />
+            <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate flex-1">
+              {url}
+            </span>
             <button
               type="button"
               onClick={() => removeImage(i)}

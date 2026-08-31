@@ -1,8 +1,13 @@
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { CartItem, decrementQuantity, incrementQuantity, removeFromCart } from 'app/lib/store/slices/cartSlice'
+import { fadeUp } from 'lib/constants/motion.constants'
+import {
+  CartItem,
+  decrementQuantity,
+  incrementQuantity,
+  removeFromCart
+} from 'lib/store/slices/cartSlice'
 import { motion } from 'framer-motion'
 import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
-import { useAppDispatch } from 'app/lib/store/store'
+import { useAppDispatch } from 'lib/store/store'
 import { formatMoney } from 'app/utils/_currency.utils'
 import Picture from 'app/components/_common/Picture'
 
@@ -21,10 +26,19 @@ export function CartItemRow({ item, index }: { item: CartItem; index: number }) 
       {/* Image */}
       <div className="w-16 h-16 sm:w-20 sm:h-20 shrink-0 overflow-hidden border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
         {item.image ? (
-          <Picture priority={true} src={item.image} alt={item.name} className="w-full h-full object-cover" />
+          <Picture
+            priority={true}
+            src={item.image}
+            alt={item.name}
+            className="w-full h-full object-cover"
+          />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag size={18} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+            <ShoppingBag
+              size={18}
+              className="text-muted-light dark:text-muted-dark"
+              aria-hidden="true"
+            />
           </div>
         )}
       </div>
@@ -41,7 +55,9 @@ export function CartItemRow({ item, index }: { item: CartItem; index: number }) 
             </p>
           )}
           <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-            {item.isPhysicalProduct ? 'Ships to your address' : 'Donated directly to a dachshund in our care'}
+            {item.isPhysicalProduct
+              ? 'Ships to your address'
+              : 'Donated directly to a dachshund in our care'}
           </p>
         </div>
 

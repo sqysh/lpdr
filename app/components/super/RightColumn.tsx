@@ -1,12 +1,12 @@
-import { AdminUser } from 'app/lib/actions/super-user/getAdminUsers'
-import { ManagedUser } from 'app/lib/actions/super-user/getManagedUsers'
+import { AdminUser } from 'lib/actions/super-user/getAdminUsers'
+import { ManagedUser } from 'lib/actions/super-user/getManagedUsers'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useState } from 'react'
-import { searchUser } from 'app/lib/actions/super-user/searchUser'
-import { updateUserStatus } from 'app/lib/actions/super-user/updateUserStatus'
+import { searchUser } from 'lib/actions/super-user/searchUser'
+import { updateUserStatus } from 'lib/actions/super-user/updateUserStatus'
 import { PanelHeader } from './PanelHeader'
 import { Search, Shield } from 'lucide-react'
-import { LogEntry } from 'app/lib/actions/super-user/getAuditLogs'
+import { LogEntry } from 'lib/actions/super-user/getAuditLogs'
 
 export function RightColumn({
   adminUsers,
@@ -55,7 +55,14 @@ export function RightColumn({
       } else if (searchResult) {
         setManaged((prev) => [
           ...prev,
-          { id: userId, name: searchResult.name, email: searchResult.email, status, actedAt: 'Just now', reason: null }
+          {
+            id: userId,
+            name: searchResult.name,
+            email: searchResult.email,
+            status,
+            actedAt: 'Just now',
+            reason: null
+          }
         ])
       }
     }
@@ -81,7 +88,9 @@ export function RightColumn({
               <p className="font-mono text-[9px] uppercase text-text-light dark:text-text-dark truncate">
                 {admin.name}
               </p>
-              <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark truncate">{admin.email}</p>
+              <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark truncate">
+                {admin.email}
+              </p>
             </div>
             <span
               className={`shrink-0 ${admin.role === 'SUPER_USER' ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'}`}
@@ -130,7 +139,11 @@ export function RightColumn({
         </div>
 
         {modError && <p className="font-mono text-[8px] text-red-500 mb-1">{modError}</p>}
-        {notFound && <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark">No user found.</p>}
+        {notFound && (
+          <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark">
+            No user found.
+          </p>
+        )}
 
         <AnimatePresence>
           {searchResult && (
@@ -198,12 +211,16 @@ export function RightColumn({
       {/* Suspended / Terminated list */}
       <div className="overflow-y-auto border-b border-border-light dark:divide-border-dark max-h-32 divide-y divide-border-light">
         {managed.length === 0 ? (
-          <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark px-3 py-2">No restricted users.</p>
+          <p className="font-mono text-[9px] text-muted-light dark:text-muted-dark px-3 py-2">
+            No restricted users.
+          </p>
         ) : (
           managed.map((u) => (
             <div key={u.id} className="flex items-center gap-2 px-3 py-1.5">
               <div className="flex-1 min-w-0">
-                <p className="font-mono text-[9px] text-text-light dark:text-text-dark truncate">{u.email}</p>
+                <p className="font-mono text-[9px] text-text-light dark:text-text-dark truncate">
+                  {u.email}
+                </p>
                 <p
                   className={`font-mono text-[8px] font-bold uppercase ${u.status === 'SUSPENDED' ? 'text-amber-500' : 'text-red-500'}`}
                 >
@@ -238,9 +255,13 @@ export function RightColumn({
               >
                 {log.level}
               </span>
-              <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark">{log.ts}</span>
+              <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark">
+                {log.ts}
+              </span>
             </div>
-            <p className="font-mono text-[8px] text-text-light dark:text-text-dark leading-snug">{log.message}</p>
+            <p className="font-mono text-[8px] text-text-light dark:text-text-dark leading-snug">
+              {log.message}
+            </p>
           </div>
         ))}
       </div>

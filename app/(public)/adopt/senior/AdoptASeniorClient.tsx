@@ -1,7 +1,7 @@
 'use client'
 
 import Picture from 'app/components/_common/Picture'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 
 const reasonsToAdoptASeniorData = [
@@ -12,7 +12,8 @@ const reasonsToAdoptASeniorData = [
   },
   {
     title: 'Won’t chew inappropriate items',
-    reason: 'Older dogs are not teething puppies and won’t chew your shoes and furniture while growing up.'
+    reason:
+      'Older dogs are not teething puppies and won’t chew your shoes and furniture while growing up.'
   },
   {
     title: 'Focus to learn',
@@ -40,7 +41,8 @@ const reasonsToAdoptASeniorData = [
   },
   {
     title: 'Instant Companions',
-    reason: 'Older dogs are instant companions – ready for hiking, car trips and other things you like to do.'
+    reason:
+      'Older dogs are instant companions – ready for hiking, car trips and other things you like to do.'
   },
   {
     title: 'Time for yourself',
@@ -56,12 +58,24 @@ const reasonsToAdoptASeniorData = [
 
 export function AdoptASeniorClient() {
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Page header ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-14 sm:mb-20">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-14 sm:mb-20"
+        >
           <div className="flex items-center gap-3 mb-4">
-            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Program
             </p>
@@ -69,15 +83,17 @@ export function AdoptASeniorClient() {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-10 lg:gap-16 items-end">
             <div>
               <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight mb-5">
-                Adopt a <span className="font-light text-muted-light dark:text-muted-dark">Senior</span>
+                Adopt a{' '}
+                <span className="font-light text-muted-light dark:text-muted-dark">Senior</span>
               </h1>
               <p className="text-base sm:text-lg text-muted-light dark:text-on-dark leading-relaxed max-w-xl">
                 The{' '}
                 <strong className="text-primary-light dark:text-primary-dark font-semibold">
                   Long on Love Senior Program
                 </strong>{' '}
-                is a way for experienced pet owners age 60 and older to find a loving senior dachshund to join their
-                home. Dachshunds can live to be 18 years old — senior dachshunds still have lots of love to give.
+                is a way for experienced pet owners age 60 and older to find a loving senior
+                dachshund to join their home. Dachshunds can live to be 18 years old — senior
+                dachshunds still have lots of love to give.
               </p>
             </div>
 
@@ -87,18 +103,30 @@ export function AdoptASeniorClient() {
                 <p className="text-xs font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mb-1">
                   Senior-to-Senior Adoption Fee
                 </p>
-                <p className="font-quicksand text-4xl font-bold text-primary-light dark:text-primary-dark">$125.00</p>
+                <p className="font-quicksand text-4xl font-bold text-primary-light dark:text-primary-dark">
+                  $125.00
+                </p>
               </div>
               <div className="w-full h-px bg-border-light dark:bg-border-dark" aria-hidden="true" />
               <ul className="space-y-1.5 text-xs text-muted-light dark:text-on-dark" role="list">
-                {['Spay / Neuter', 'Rabies & Distemper shots', 'Microchip implant', 'Dental if needed'].map((item) => (
+                {[
+                  'Spay / Neuter',
+                  'Rabies & Distemper shots',
+                  'Microchip implant',
+                  'Dental if needed'
+                ].map((item) => (
                   <li key={item} className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                    <span
+                      className="w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark shrink-0"
+                      aria-hidden="true"
+                    />
                     {item}
                   </li>
                 ))}
               </ul>
-              <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">Must show proof of age 60+</p>
+              <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                Must show proof of age 60+
+              </p>
             </div>
           </div>
         </motion.div>
@@ -122,33 +150,40 @@ export function AdoptASeniorClient() {
           <div className="bg-surface-light dark:bg-surface-dark p-6 sm:p-8 flex flex-col justify-center gap-6">
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <h2 className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   About the Program
                 </h2>
               </div>
               <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
-                Little Paws Dachshund Rescue encourages experienced pet owners to adopt by offering a discounted
-                adoption fee to seniors 60 and older who adopt a senior dachshund or dachshund mix from our rescue.
+                Little Paws Dachshund Rescue encourages experienced pet owners to adopt by offering
+                a discounted adoption fee to seniors 60 and older who adopt a senior dachshund or
+                dachshund mix from our rescue.
               </p>
             </div>
             <div>
               <div className="flex items-center gap-3 mb-3">
-                <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <h2 className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   How They Come to Us
                 </h2>
               </div>
               <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
-                LPDR receives senior dachshunds from shelters and owner surrenders — death of an owner, new babies,
-                moves, allergies, and other life changes. These dogs have given their love to someone their entire lives
-                and deserve a second chance.
+                LPDR receives senior dachshunds from shelters and owner surrenders — death of an
+                owner, new babies, moves, allergies, and other life changes. These dogs have given
+                their love to someone their entire lives and deserve a second chance.
               </p>
             </div>
             <div className="border border-border-light dark:border-border-dark p-4 bg-bg-light dark:bg-bg-dark">
               <p className="text-xs text-muted-light dark:text-on-dark leading-relaxed">
-                To qualify, you must show proof of age and have a care plan in place. Senior animals are identified on
-                our website with the notation{' '}
+                To qualify, you must show proof of age and have a care plan in place. Senior animals
+                are identified on our website with the notation{' '}
                 <strong className="text-text-light dark:text-text-dark">
                   &quot;I am part of the Long on Love Senior Program.&quot;
                 </strong>
@@ -158,7 +193,10 @@ export function AdoptASeniorClient() {
         </motion.div>
 
         {/* ── Divider ── */}
-        <div className="w-full h-px bg-border-light dark:bg-border-dark mb-14 sm:mb-18" aria-hidden="true" />
+        <div
+          className="w-full h-px bg-border-light dark:bg-border-dark mb-14 sm:mb-18"
+          aria-hidden="true"
+        />
 
         {/* ── Top 10 reasons ── */}
         <section aria-labelledby="reasons-heading">
@@ -171,7 +209,10 @@ export function AdoptASeniorClient() {
             className="mb-8"
           >
             <div className="flex items-center gap-3 mb-3">
-              <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+              <span
+                className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                aria-hidden="true"
+              />
               <h2
                 id="reasons-heading"
                 className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
@@ -205,8 +246,12 @@ export function AdoptASeniorClient() {
                   {String(i + 1).padStart(2, '0')}
                 </span>
                 <div>
-                  <p className="font-semibold text-sm text-text-light dark:text-text-dark mb-1">{item.title}</p>
-                  <p className="text-xs text-muted-light dark:text-on-dark leading-relaxed">{item.reason}</p>
+                  <p className="font-semibold text-sm text-text-light dark:text-text-dark mb-1">
+                    {item.title}
+                  </p>
+                  <p className="text-xs text-muted-light dark:text-on-dark leading-relaxed">
+                    {item.reason}
+                  </p>
                 </div>
               </motion.li>
             ))}

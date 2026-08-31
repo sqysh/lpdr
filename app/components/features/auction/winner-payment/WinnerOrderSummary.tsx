@@ -4,7 +4,7 @@ import { motion } from 'framer-motion'
 import { Package, Truck } from 'lucide-react'
 import Image from 'next/image'
 import { IAuctionWinningBidder } from 'types/_auction-winning-bidder'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 
 type Props = {
   winningBidder: IAuctionWinningBidder
@@ -14,14 +14,29 @@ type Props = {
   finalAmount: number
 }
 
-export function WinnerOrderSummary({ winningBidder, total, shipping, processingFee, finalAmount }: Props) {
+export function WinnerOrderSummary({
+  winningBidder,
+  total,
+  shipping,
+  processingFee,
+  finalAmount
+}: Props) {
   return (
-    <motion.div variants={fadeUp} initial="hidden" animate="show" custom={6} className="lg:sticky lg:top-8">
+    <motion.div
+      variants={fadeUp}
+      initial="hidden"
+      animate="show"
+      custom={6}
+      className="lg:sticky lg:top-8"
+    >
       <div className="border border-zinc-200 dark:border-border-dark">
         {/* Header */}
         <div className="px-5 py-4 border-b border-zinc-200 dark:border-border-dark">
           <div className="flex items-center gap-2">
-            <Package className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50" aria-hidden="true" />
+            <Package
+              className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50"
+              aria-hidden="true"
+            />
             <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
               Order Summary
             </span>
@@ -55,9 +70,14 @@ export function WinnerOrderSummary({ winningBidder, total, shipping, processingF
                   </p>
                   {item.requiresShipping && (
                     <div className="flex items-center gap-1 mt-0.5">
-                      <Truck className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
+                      <Truck
+                        className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0"
+                        aria-hidden="true"
+                      />
                       <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
-                        {item.shippingCosts ? `+$${item.shippingCosts.toLocaleString()} shipping` : 'Ships separately'}
+                        {item.shippingCosts
+                          ? `+$${item.shippingCosts.toLocaleString()} shipping`
+                          : 'Ships separately'}
                       </span>
                     </div>
                   )}
@@ -74,7 +94,9 @@ export function WinnerOrderSummary({ winningBidder, total, shipping, processingF
         <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark space-y-2.5">
           <div className="flex justify-between items-center">
             <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Items</span>
-            <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">${total.toLocaleString()}</span>
+            <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">
+              ${total.toLocaleString()}
+            </span>
           </div>
           {shipping > 0 && (
             <div className="flex justify-between items-center">
@@ -86,14 +108,18 @@ export function WinnerOrderSummary({ winningBidder, total, shipping, processingF
           )}
           {processingFee > 0 && (
             <div className="flex justify-between items-center">
-              <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Processing fee</span>
+              <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
+                Processing fee
+              </span>
               <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">
                 ${processingFee.toLocaleString()}
               </span>
             </div>
           )}
           <div className="pt-3 border-t border-zinc-200 dark:border-border-dark flex justify-between items-center">
-            <span className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">Total due</span>
+            <span className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+              Total due
+            </span>
             <span className="text-xl tabular-nums text-cyan-600 dark:text-violet-400">
               ${finalAmount.toLocaleString()}
             </span>

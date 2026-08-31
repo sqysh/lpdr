@@ -3,9 +3,9 @@
 import { useEffect, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Clock, Gavel } from 'lucide-react'
-import { useCountdown } from '@hooks/useCountdown.hook'
-import { store } from 'app/lib/store/store'
-import { setOpenAuctionBidModal } from 'app/lib/store/slices/uiSlice'
+import { useCountdown } from 'lib/hooks/useCountdown.hook'
+import { store } from 'lib/store/store'
+import { setOpenAuctionBidModal } from 'lib/store/slices/uiSlice'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { AuctionItemPhotoGallery } from 'app/components/features/auction/item/AuctionItemPhotoGallery'
@@ -85,7 +85,13 @@ export default function PublicAuctionItemClient({ item, auctionItems }) {
           {/* ══ RIGHT — Info + Bid ══ */}
           <div className="space-y-5">
             {/* Title block */}
-            <TitleBlock headerInView={headerInView} isActive={isActive} isFixed={isFixed} isSold={isSold} item={item} />
+            <TitleBlock
+              headerInView={headerInView}
+              isActive={isActive}
+              isFixed={isFixed}
+              isSold={isSold}
+              item={item}
+            />
 
             {/* Price block */}
             <PriceBlock
@@ -108,7 +114,11 @@ export default function PublicAuctionItemClient({ item, auctionItems }) {
                 className="border border-border-light dark:border-border-dark p-5"
               >
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                  <Clock
+                    size={11}
+                    className="text-muted-light dark:text-muted-dark"
+                    aria-hidden="true"
+                  />
                   <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
                     Auction Closes In
                   </span>
@@ -139,7 +149,11 @@ export default function PublicAuctionItemClient({ item, auctionItems }) {
         {item?.bids.length === 0 && !isFixed && (
           <div className="mt-12 border border-border-light dark:border-border-dark py-16 flex flex-col items-center gap-4 text-center px-6">
             <div className="relative w-12 h-12 border border-border-light dark:border-border-dark flex items-center justify-center">
-              <Gavel size={18} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+              <Gavel
+                size={18}
+                className="text-muted-light dark:text-muted-dark"
+                aria-hidden="true"
+              />
               <div
                 className="absolute -top-1 -right-1 w-3 h-3 bg-primary-light dark:bg-primary-dark"
                 aria-hidden="true"

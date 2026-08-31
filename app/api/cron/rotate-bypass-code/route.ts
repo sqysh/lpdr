@@ -1,7 +1,7 @@
-import { createLog } from 'app/lib/actions/log/createLog'
+import { createLog } from 'lib/actions/log/createLog'
 import { NextResponse } from 'next/server'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { rotateBypassCodeCore } from 'app/lib/actions/admin/adoption-fee/rotateBypassCode'
+import { rotateBypassCodeCore } from 'lib/actions/admin/adoption-fee/rotateBypassCode'
 
 export const runtime = 'nodejs'
 

@@ -5,9 +5,9 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Minus, Plus } from 'lucide-react'
 import Picture from 'app/components/_common/Picture'
-import { store, useCartSelector } from 'app/lib/store/store'
-import { addToCart } from 'app/lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'app/lib/store/slices/uiSlice'
+import { store, useCartSelector } from 'lib/store/store'
+import { addToCart } from 'lib/store/slices/cartSlice'
+import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 
 export interface ISize {
   size: string
@@ -40,9 +40,12 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
   // normalize both sides — a cart line saved without a size field has size === undefined,
   // and undefined === null is false, which makes inCart read 0 forever
   const inCart =
-    cartItems.find((i) => i.id === product.id && (i.size ?? null) === (selectedSize ?? null))?.quantity ?? 0
+    cartItems.find((i) => i.id === product.id && (i.size ?? null) === (selectedSize ?? null))
+      ?.quantity ?? 0
 
-  const stockForSelection = hasSizes ? (selectedSizeObj?.quantity ?? 0) : (product?.countInStock ?? 99)
+  const stockForSelection = hasSizes
+    ? (selectedSizeObj?.quantity ?? 0)
+    : (product?.countInStock ?? 99)
   const remaining = Math.max(0, stockForSelection - inCart)
   const quantity = Math.max(1, Math.min(rawQuantity, remaining || 1))
 
@@ -72,7 +75,10 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
   }
 
   return (
-    <main id="main-content" className="min-h-dvh bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-dvh bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
         {/* ── Back ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0}>
@@ -117,7 +123,12 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
                     className={`w-14 h-14 shrink-0 border-2 overflow-hidden transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark
                       ${activeImage === i ? 'border-primary-light dark:border-primary-dark' : 'border-border-light dark:border-border-dark hover:border-muted-light dark:hover:border-muted-dark'}`}
                   >
-                    <Picture priority={true} src={src} alt="" className="w-full h-full object-cover" />
+                    <Picture
+                      priority={true}
+                      src={src}
+                      alt=""
+                      className="w-full h-full object-cover"
+                    />
                   </button>
                 ))}
               </div>
@@ -127,20 +138,27 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
           {/* ── Details ── */}
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={2}>
             <div className="flex items-center gap-3 mb-4">
-              <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+              <span
+                className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+                aria-hidden="true"
+              />
               <p className="  text-[10px] uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">
                 Merch
               </p>
             </div>
 
-            <h1 className="font-quicksand text-3xl sm:text-4xl font-black leading-tight mb-2">{product.name}</h1>
+            <h1 className="font-quicksand text-3xl sm:text-4xl font-black leading-tight mb-2">
+              {product.name}
+            </h1>
 
             <p className="font-quicksand font-black text-2xl text-primary-light dark:text-primary-dark tabular-nums mb-6">
               ${product.price.toFixed(2)}
             </p>
 
             {product.description && (
-              <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed mb-8">{product.description}</p>
+              <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed mb-8">
+                {product.description}
+              </p>
             )}
 
             {/* ── Sizes ── */}
@@ -204,7 +222,10 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
                   >
                     <Minus className="w-3.5 h-3.5" aria-hidden="true" />
                   </button>
-                  <span className="w-10 text-center font-mono text-sm tabular-nums" aria-live="polite">
+                  <span
+                    className="w-10 text-center font-mono text-sm tabular-nums"
+                    aria-live="polite"
+                  >
                     {quantity}
                   </span>
                   <button

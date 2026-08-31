@@ -1,6 +1,6 @@
-import { requireSuper } from 'app/lib/actions/auth/requireSuper'
+import { requireSuper } from 'lib/actions/auth/requireSuper'
 import { SuperLogsClient } from './SuperLogsClient'
-import { fetchLogs } from 'app/lib/actions/super-user/fetchLogs'
+import { fetchLogs } from 'lib/actions/super-user/fetchLogs'
 import Link from 'next/link'
 
 export const metadata = { title: 'Logs — LPDR Super' }

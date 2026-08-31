@@ -1,5 +1,5 @@
-import { useSounds } from '@hooks/useSounds.hook'
-import { T, TIERS } from 'app/lib/constants/subscriptions.constants'
+import { useSounds } from 'lib/hooks/useSounds.hook'
+import { T, TIERS } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BillingInterval } from 'types/_my-pack.types'
 
@@ -83,7 +83,9 @@ export function TierCard({
         {/* ── Top gloss ── */}
         <div
           className="absolute top-0 left-0 right-0 h-[45%] pointer-events-none"
-          style={{ background: 'linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%)' }}
+          style={{
+            background: 'linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%)'
+          }}
           aria-hidden="true"
         />
 
@@ -107,7 +109,13 @@ export function TierCard({
               className="absolute z-10 inset-0 bg-linear-to-r from-transparent via-white/10 to-transparent pointer-events-none"
               style={{ skewX: -15 }}
               animate={{ x: ['-130%', '230%'] }}
-              transition={{ duration: 0.72, repeat: Infinity, repeatDelay: 0.28, delay: 0.2, ease: 'easeInOut' }}
+              transition={{
+                duration: 0.72,
+                repeat: Infinity,
+                repeatDelay: 0.28,
+                delay: 0.2,
+                ease: 'easeInOut'
+              }}
               aria-hidden="true"
             />
           )}

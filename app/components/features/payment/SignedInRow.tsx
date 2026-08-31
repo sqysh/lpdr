@@ -1,11 +1,11 @@
 'use client'
 
-import { useUiSelector } from 'app/lib/store/store'
+import { useUiSelector } from 'lib/store/store'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 
 export function SignedInRow({ isDark }: { isDark?: boolean }) {
   const session = useSession()

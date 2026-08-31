@@ -3,10 +3,10 @@
 import { X, Loader2, Send } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { setCloseContactModal } from 'app/lib/store/slices/uiSlice'
-import { store, useUiSelector } from 'app/lib/store/store'
-import sendContactEmail from 'app/lib/email/sendContactEmail'
-import { EMAIL_REGEX } from 'app/lib/constants/regex.constants'
+import { setCloseContactModal } from 'lib/store/slices/uiSlice'
+import { store, useUiSelector } from 'lib/store/store'
+import sendContactEmail from 'lib/email/sendContactEmail'
+import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { FormField } from 'app/components/_primitives'
 
 interface FormInputs {
@@ -109,7 +109,10 @@ export default function PublicContactModal() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border-light dark:border-border-dark">
               <div className="flex items-center gap-3">
-                <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-5 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <h2
                   id="contact-modal-title"
                   className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
@@ -196,7 +199,10 @@ export default function PublicContactModal() {
                   />
 
                   {errors.form && (
-                    <p role="alert" className="text-[10px] font-mono tracking-widest text-red-500 dark:text-red-400">
+                    <p
+                      role="alert"
+                      className="text-[10px] font-mono tracking-widest text-red-500 dark:text-red-400"
+                    >
                       {errors.form}
                     </p>
                   )}

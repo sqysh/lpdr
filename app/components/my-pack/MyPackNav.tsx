@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { TABS } from 'app/lib/constants/my-pack.constants'
+import { TABS } from 'lib/constants/my-pack.constants'
 import { useRouter } from 'next/navigation'
 import { MyPackTab } from 'types/_my-pack.types'
 

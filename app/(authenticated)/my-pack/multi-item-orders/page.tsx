@@ -1,4 +1,4 @@
-import { getMultiItemOrders } from 'app/lib/actions/my-pack/getMultiItemOrders'
+import { getMultiItemOrders } from 'lib/actions/my-pack/getMultiItemOrders'
 import MultiItemOrdersClient from './MultiItemOrdersClient'
 
 export default async function MultiItemOrdersPage() {

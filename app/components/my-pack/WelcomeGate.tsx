@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { TalkingDachshund } from 'app/components/_common/TalkingDachshund'
-import { markWelcomeSeen } from 'app/lib/actions/my-pack/markWelcomeSeen'
+import { markWelcomeSeen } from 'lib/actions/my-pack/markWelcomeSeen'
 
 export function WelcomeGate() {
   const { data: session } = useSession()
@@ -41,7 +41,9 @@ export function WelcomeGate() {
           >
             <div className="mb-8">
               <TalkingDachshund
-                message={firstName ? `Welcome to your pack, ${firstName}!` : 'Welcome to your pack!'}
+                message={
+                  firstName ? `Welcome to your pack, ${firstName}!` : 'Welcome to your pack!'
+                }
                 bubbleSide="top"
                 size={200}
                 typeSpeed={45}
@@ -53,8 +55,8 @@ export function WelcomeGate() {
               id="welcome-heading"
               className="text-sm text-muted-light dark:text-muted-dark leading-relaxed mb-8 max-w-xs"
             >
-              Your account is all set. Explore your pack, manage your donations, and keep track of everything in one
-              place.
+              Your account is all set. Explore your pack, manage your donations, and keep track of
+              everything in one place.
             </h2>
 
             <button

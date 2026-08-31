@@ -1,4 +1,4 @@
-import { createLog } from 'app/lib/actions/log/createLog'
+import { createLog } from 'lib/actions/log/createLog'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 

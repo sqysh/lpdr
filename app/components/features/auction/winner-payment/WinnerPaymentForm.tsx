@@ -5,7 +5,7 @@ import { ShieldCheck } from 'lucide-react'
 import { useSession } from 'next-auth/react'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { IAuctionWinningBidder } from 'types/_auction-winning-bidder'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { CardElementField, FormError, SubmitButton, Toggle } from 'app/components/_primitives'
 import { AuctionWinnerAddressSection } from './AuctionWinnerAddressSection'
 import { SavedCardSelector } from 'app/components/features/payment/SavedCardSelector'
@@ -42,9 +42,26 @@ type Props = {
 
 export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }: Props) {
   const session = useSession()
-  const { selectedCardId, useNewCard, loading, error, saveCard, coverFees, processingFee, finalAmount, isValid } = state
-  const { onSelectCard, onUseNewCard, onUseSavedCard, onCardChange, onSaveCardToggle, onCoverFeesChange, onSubmit } =
-    handlers
+  const {
+    selectedCardId,
+    useNewCard,
+    loading,
+    error,
+    saveCard,
+    coverFees,
+    processingFee,
+    finalAmount,
+    isValid
+  } = state
+  const {
+    onSelectCard,
+    onUseNewCard,
+    onUseSavedCard,
+    onCardChange,
+    onSaveCardToggle,
+    onCoverFeesChange,
+    onSubmit
+  } = handlers
 
   return (
     <div className="space-y-5">
@@ -80,7 +97,10 @@ export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }
             </div>
             <CardElementField onChange={onCardChange} />
             <div className="flex items-center gap-2 mt-2">
-              <ShieldCheck className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
+              <ShieldCheck
+                className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0"
+                aria-hidden="true"
+              />
               <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
                 Secured and encrypted by Stripe
               </p>
@@ -96,10 +116,16 @@ export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }
       <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4}>
         <div className="flex items-center gap-2 mb-3">
           <div className="w-3 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
-          <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Options</span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
+            Options
+          </span>
         </div>
         <div className="border border-zinc-200 dark:border-border-dark divide-y divide-zinc-200 dark:divide-border-dark">
-          <CoverFeesToggle checked={coverFees} onChange={onCoverFeesChange} processingFee={processingFee} />
+          <CoverFeesToggle
+            checked={coverFees}
+            onChange={onCoverFeesChange}
+            processingFee={processingFee}
+          />
           {session?.data?.user && (!selectedCardId || useNewCard) && (
             <Toggle
               id="save-card"

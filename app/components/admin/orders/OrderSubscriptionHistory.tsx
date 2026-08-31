@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { RefreshCw, ChevronRight } from 'lucide-react'
 import { SerializedSubscriptionOrder } from 'types/_order.types'
-import { STATUS_STYLES } from 'app/lib/constants/order.constants'
+import { STATUS_STYLES } from 'lib/constants/order.constants'
 import { fmtCurrency } from 'app/utils/_currency.utils'
 
 export function OrderSubscriptionHistory({
@@ -24,7 +24,10 @@ export function OrderSubscriptionHistory({
           id="subscription-heading"
           className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark"
         >
-          <RefreshCw className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
+          <RefreshCw
+            className="w-4 h-4 text-primary-light dark:text-primary-dark"
+            aria-hidden="true"
+          />
           Subscription History
         </h2>
         <div className="text-right">

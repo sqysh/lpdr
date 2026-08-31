@@ -2,12 +2,15 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
-import { container, imageReveal, item } from 'app/lib/constants/motion.constants'
+import { container, imageReveal, item } from 'lib/constants/motion.constants'
 import Picture from 'app/components/_common/Picture'
 
 export const AboutBlock = () => {
   return (
-    <section aria-labelledby="about-heading" className="relative w-full overflow-x-hidden bg-bg-light dark:bg-bg-dark">
+    <section
+      aria-labelledby="about-heading"
+      className="relative w-full overflow-x-hidden bg-bg-light dark:bg-bg-dark"
+    >
       {/* Texture background */}
       <div
         className="absolute inset-0 bg-repeat dark:opacity-20 pointer-events-none"
@@ -70,12 +73,12 @@ export const AboutBlock = () => {
             {/* Body copy */}
             <motion.div variants={item} className="space-y-3 sm:space-y-4">
               <p className="font-nunito text-sm sm:text-base text-text-light dark:text-text-dark font-semibold leading-relaxed">
-                We are a volunteer-based nonprofit dedicated to rescuing, rehabilitating, and rehoming dachshunds and
-                dachshund mixes across the United States.
+                We are a volunteer-based nonprofit dedicated to rescuing, rehabilitating, and
+                rehoming dachshunds and dachshund mixes across the United States.
               </p>
               <p className="font-nunito text-sm sm:text-base text-muted-light dark:text-muted-dark leading-relaxed">
-                Every dog in our care receives veterinary attention, foster love, and the chance at a forever home. We
-                believe every dachshund deserves a safe, loving family.
+                Every dog in our care receives veterinary attention, foster love, and the chance at
+                a forever home. We believe every dachshund deserves a safe, loving family.
               </p>
             </motion.div>
 

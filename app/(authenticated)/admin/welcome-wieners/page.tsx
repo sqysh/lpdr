@@ -1,5 +1,5 @@
 import AdminWelcomeWienersClient from 'app/(authenticated)/admin/welcome-wieners/AdminWelcomeWienersClient'
-import { getWelcomeWieners } from 'app/lib/actions/admin/welcome-wiener/getWelcomeWieners'
+import { getWelcomeWieners } from 'lib/actions/admin/welcome-wiener/getWelcomeWieners'
 
 export default async function AdminWelcomeWienersPage() {
   const result = await getWelcomeWieners()

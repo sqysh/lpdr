@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertTriangle, Trash2, Loader2 } from 'lucide-react'
-import { deleteProduct } from 'app/lib/actions/admin/product/deleteProduct'
+import { deleteProduct } from 'lib/actions/admin/product/deleteProduct'
 
 type Props = {
   productId: string

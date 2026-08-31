@@ -1,4 +1,4 @@
-import { getDachshundsByStatus } from 'app/lib/actions/_rescue-groups/getDachshundsByStatus'
+import { getDachshundsByStatus } from 'lib/actions/_rescue-groups/getDachshundsByStatus'
 import { IDachshund } from 'types/_rescue-groups.types'
 import AdoptFAQClient from './AdoptFAQClient'
 

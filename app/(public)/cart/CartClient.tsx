@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag } from 'lucide-react'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'app/utils/_currency.utils'
-import { useAppDispatch, useCartSelector } from 'app/lib/store/store'
-import { CartItem, clearCart } from 'app/lib/store/slices/cartSlice'
+import { useAppDispatch, useCartSelector } from 'lib/store/store'
+import { CartItem, clearCart } from 'lib/store/slices/cartSlice'
 import { CartItemRow } from 'app/components/features/cart/CartItemRow'
 import { useRouter } from 'next/navigation'
 
@@ -15,20 +15,36 @@ export default function CartClient() {
   const dispatch = useAppDispatch()
   const router = useRouter()
 
-  const subtotal = items.reduce((s: number, i: { price: number; quantity: number }) => s + i.price * i.quantity, 0)
+  const subtotal = items.reduce(
+    (s: number, i: { price: number; quantity: number }) => s + i.price * i.quantity,
+    0
+  )
   const shipping = items
     .filter((i: { isPhysicalProduct: boolean }) => i.isPhysicalProduct)
-    .reduce((sum: number, i: { shippingPrice: number; quantity: number }) => sum + i.shippingPrice * i.quantity, 0)
+    .reduce(
+      (sum: number, i: { shippingPrice: number; quantity: number }) =>
+        sum + i.shippingPrice * i.quantity,
+      0
+    )
   const total = subtotal + shipping
   const itemCount = items.reduce((s: any, i: { quantity: number }) => s + i.quantity, 0)
   const isEmpty = items?.length === 0
   const isFeedAFosterMonth = new Date().getMonth() === 6 // 0-indexed: 6 = July
 
   return (
-    <main id="main-content" className="min-h-200 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-200 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-10 sm:mb-12"
+        >
           <button
             onClick={() => router.back()}
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -48,7 +64,10 @@ export default function CartClient() {
           </button>
 
           <div className="flex items-center gap-3 mb-2">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Your Cart
             </p>
@@ -78,7 +97,11 @@ export default function CartClient() {
               aria-live="polite"
             >
               <div className="w-14 h-14 border border-border-light dark:border-border-dark flex items-center justify-center">
-                <ShoppingBag size={22} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                <ShoppingBag
+                  size={22}
+                  className="text-muted-light dark:text-muted-dark"
+                  aria-hidden="true"
+                />
               </div>
               <div>
                 <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark mb-1">
@@ -157,7 +180,10 @@ export default function CartClient() {
                 {/* Summary header */}
                 <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
                   <div className="flex items-center gap-3">
-                    <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+                    <span
+                      className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
+                      aria-hidden="true"
+                    />
                     <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                       Order Summary
                     </p>
@@ -170,20 +196,30 @@ export default function CartClient() {
                     <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
                       Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})
                     </p>
-                    <p className="text-xs font-mono text-text-light dark:text-text-dark">{formatMoney(subtotal)}</p>
+                    <p className="text-xs font-mono text-text-light dark:text-text-dark">
+                      {formatMoney(subtotal)}
+                    </p>
                   </div>
 
                   {shipping > 0 && (
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Shipping</p>
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark">{formatMoney(shipping)}</p>
+                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
+                        Shipping
+                      </p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark">
+                        {formatMoney(shipping)}
+                      </p>
                     </div>
                   )}
 
                   {shipping === 0 && (
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Shipping</p>
-                      <p className="text-[10px] font-mono text-green-600 dark:text-green-400">Free</p>
+                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
+                        Shipping
+                      </p>
+                      <p className="text-[10px] font-mono text-green-600 dark:text-green-400">
+                        Free
+                      </p>
                     </div>
                   )}
 
@@ -192,7 +228,9 @@ export default function CartClient() {
 
                   {/* Total */}
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-mono font-black text-text-light dark:text-text-dark">Total</p>
+                    <p className="text-xs font-mono font-black text-text-light dark:text-text-dark">
+                      Total
+                    </p>
                     <p className="font-quicksand font-black text-xl text-primary-light dark:text-primary-dark">
                       {formatMoney(total)}
                     </p>

@@ -1,6 +1,6 @@
 'use client'
 
-import { useCountdown } from '@hooks/useCountdown.hook'
+import { useCountdown } from 'lib/hooks/useCountdown.hook'
 import { StickyHeader } from './StickyHeader'
 import { HeaderBand } from './HeaderBand'
 import { IAuction } from 'types/_auction'

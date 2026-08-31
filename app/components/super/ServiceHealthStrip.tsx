@@ -1,6 +1,6 @@
 import { AlertTriangle, CheckCircle, XCircle, Minus } from 'lucide-react'
 import { PanelHeader } from './PanelHeader'
-import { ServiceHealth } from 'app/lib/actions/super-user/getServiceHealth'
+import { ServiceHealth } from 'lib/actions/super-user/getServiceHealth'
 
 const healthIcon: Record<string, React.ReactNode> = {
   ok: <CheckCircle size={10} className="text-green-500 shrink-0" />,
@@ -18,7 +18,9 @@ export function ServiceStrip({ services }: { services: ServiceHealth[] }) {
           <div key={svc.name} className="flex items-center gap-2 px-3 py-2 shrink-0">
             {healthIcon[svc.status]}
             <div>
-              <p className="font-mono text-[9px] text-text-light dark:text-text-dark whitespace-nowrap">{svc.name}</p>
+              <p className="font-mono text-[9px] text-text-light dark:text-text-dark whitespace-nowrap">
+                {svc.name}
+              </p>
               <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark whitespace-nowrap">
                 {svc.latency && svc.latency !== '—' ? `${svc.latency} · ` : ''}
                 {svc.detail}

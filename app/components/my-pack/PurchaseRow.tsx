@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { MultiItemOrder } from 'types/_my-pack.types'
 import { motion, AnimatePresence } from 'framer-motion'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { formatDate } from 'app/utils/_date.utils'
 import { StatusPill } from 'app/components/admin/orders/StatusPill'
 import { formatMoney } from 'app/utils/_currency.utils'
@@ -31,13 +31,18 @@ export function PurchaseRow({ order, index }: { order: MultiItemOrder; index: nu
         {/* Date + name */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 mb-0.5">
-            <span className="block w-3 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-3 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark truncate">
               {formatDate(order.createdAt, true)}
             </p>
           </div>
           {order.customerName && (
-            <p className="text-xs font-mono text-text-light dark:text-text-dark pl-5 truncate">{order.customerName}</p>
+            <p className="text-xs font-mono text-text-light dark:text-text-dark pl-5 truncate">
+              {order.customerName}
+            </p>
           )}
           {/* Items preview — collapsed only */}
           {!expanded && (
@@ -57,9 +62,15 @@ export function PurchaseRow({ order, index }: { order: MultiItemOrder; index: nu
             {formatMoney(order.totalAmount)}
           </span>
           {expanded ? (
-            <ChevronUp className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+            <ChevronUp
+              className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0"
+              aria-hidden="true"
+            />
           ) : (
-            <ChevronDown className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+            <ChevronDown
+              className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0"
+              aria-hidden="true"
+            />
           )}
         </div>
       </button>
@@ -99,14 +110,20 @@ export function PurchaseRow({ order, index }: { order: MultiItemOrder; index: nu
                         />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">?</span>
+                          <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
+                            ?
+                          </span>
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">
+                        {item.name}
+                      </p>
                       {item.quantity > 1 && (
-                        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">×{item.quantity}</p>
+                        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                          ×{item.quantity}
+                        </p>
                       )}
                     </div>
                     <span className="text-[11px] font-mono text-muted-light dark:text-muted-dark tabular-nums shrink-0">
@@ -124,9 +141,11 @@ export function PurchaseRow({ order, index }: { order: MultiItemOrder; index: nu
                   </p>
                   <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
                     {order.shippingAddress.addressLine1}
-                    {order.shippingAddress.addressLine2 && `, ${order.shippingAddress.addressLine2}`}
+                    {order.shippingAddress.addressLine2 &&
+                      `, ${order.shippingAddress.addressLine2}`}
                     {', '}
-                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipPostalCode}
+                    {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
+                    {order.shippingAddress.zipPostalCode}
                   </p>
                 </div>
               )}

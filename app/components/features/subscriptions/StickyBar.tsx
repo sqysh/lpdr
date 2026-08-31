@@ -1,5 +1,5 @@
-import { useSounds } from '@hooks/useSounds.hook'
-import { T } from 'app/lib/constants/subscriptions.constants'
+import { useSounds } from 'lib/hooks/useSounds.hook'
+import { T } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 
 export function StickyBar({ selected, selectedTier, billing, setView }) {
@@ -37,7 +37,9 @@ export function StickyBar({ selected, selectedTier, billing, setView }) {
                   </span>
                   <span className="font-quicksand font-black text-lg text-white">
                     ${selectedTier.price[billing]}
-                    <span className="text-xs font-mono text-on-dark ml-1">/{billing === 'MONTHLY' ? 'mo' : 'yr'}</span>
+                    <span className="text-xs font-mono text-on-dark ml-1">
+                      /{billing === 'MONTHLY' ? 'mo' : 'yr'}
+                    </span>
                   </span>
                 </div>
                 {billing === 'YEARLY' && (
@@ -47,7 +49,9 @@ export function StickyBar({ selected, selectedTier, billing, setView }) {
                       <span className="block text-[9px] font-mono tracking-[0.2em] uppercase text-on-dark mb-0.5">
                         You save
                       </span>
-                      <span className={`font-quicksand font-black text-lg ${T[selectedTier.tier].darkPriceActive}`}>
+                      <span
+                        className={`font-quicksand font-black text-lg ${T[selectedTier.tier].darkPriceActive}`}
+                      >
                         ${selectedTier.price.MONTHLY * 12 - selectedTier.price.YEARLY}
                       </span>
                     </div>

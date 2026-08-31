@@ -1,10 +1,10 @@
-import { getAuctionItemById } from 'app/lib/actions/admin/auction/getAuctionItemById'
-import { getUserAddress } from 'app/lib/actions/my-pack/getUserAddress'
-import { getUserName } from 'app/lib/actions/my-pack/getUserName'
+import { getAuctionItemById } from 'lib/actions/admin/auction/getAuctionItemById'
+import { getUserAddress } from 'lib/actions/my-pack/getUserAddress'
+import { getUserName } from 'lib/actions/my-pack/getUserName'
 import { IAuctionItem } from 'types/_auction-item'
 import PublicAuctionInstantBuyClient from './PublicAuctionInstantBuyClient'
-import { getSavedPaymentMethods } from 'app/lib/actions/_stripe/getSavedPaymentMethods'
-import { auth } from 'app/lib/auth'
+import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
+import { auth } from 'lib/auth'
 
 export const dynamic = 'force-dynamic'
 

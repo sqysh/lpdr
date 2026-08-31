@@ -4,9 +4,9 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import Picture from '../../../components/_common/Picture'
-import { store } from 'app/lib/store/store'
-import { setOpenContactModal } from 'app/lib/store/slices/uiSlice'
-import { QUALITY_LABELS } from 'app/lib/constants/rescue-groups.constants'
+import { store } from 'lib/store/store'
+import { setOpenContactModal } from 'lib/store/slices/uiSlice'
+import { QUALITY_LABELS } from 'lib/constants/rescue-groups.constants'
 import { Dog } from 'types/_rescue-groups.types'
 
 // ─── Stat pill ────────────────────────────────────────────────────────────────

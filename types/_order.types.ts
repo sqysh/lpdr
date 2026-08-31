@@ -1,5 +1,5 @@
 import { OrderStatus, OrderType, ShippingStatus } from '@prisma/client'
-import { FILTERS } from 'app/lib/constants/order.constants'
+import { FILTERS } from 'lib/constants/order.constants'
 
 export interface IOrderItem {
   shippingPrice: any
@@ -114,7 +114,12 @@ export type SerializedOrder = {
   updatedAt: string
   paidAt: string | null
   items: SerializedOrderItem[]
-  user: { id: string; email: string | null; firstName: string | null; lastName: string | null } | null
+  user: {
+    id: string
+    email: string | null
+    firstName: string | null
+    lastName: string | null
+  } | null
   failureReason: string | null
   failureCode: string
   failureEmailSentAt: string | null

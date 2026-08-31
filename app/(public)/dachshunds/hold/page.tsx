@@ -1,4 +1,4 @@
-import { getDachshundsByStatus } from 'app/lib/actions/_rescue-groups/getDachshundsByStatus'
+import { getDachshundsByStatus } from 'lib/actions/_rescue-groups/getDachshundsByStatus'
 import OnHoldDachshundsClient from './OnHoldDachshundsClient'
 
 export default async function OnHoldDachshundsPage() {

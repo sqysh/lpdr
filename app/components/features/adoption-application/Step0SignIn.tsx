@@ -1,4 +1,4 @@
-import { slideVariants } from 'app/lib/constants/motion.constants'
+import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { GoogleButton } from 'app/components/features/login/GoogleButton'
 import { FacebookButton } from 'app/components/features/login/FacebookButton'
@@ -17,7 +17,10 @@ export function Step0SignIn({ magicLinkSent, magicEmail, setMagicEmail, setMagic
     >
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
-          <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+          <span
+            className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+            aria-hidden="true"
+          />
           <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
             Step 1
           </p>
@@ -40,15 +43,24 @@ export function Step0SignIn({ magicLinkSent, magicEmail, setMagicEmail, setMagic
 
       <div className="flex items-center gap-3 my-4" aria-hidden="true">
         <div className="flex-1 h-px bg-border-light dark:bg-border-dark" />
-        <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">or</span>
+        <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
+          or
+        </span>
         <div className="flex-1 h-px bg-border-light dark:bg-border-dark" />
       </div>
 
       {!magicLinkSent ? (
-        <MagicLink email={magicEmail} setEmail={setMagicEmail} setSent={setMagicLinkSent} redirectTo="/adopt" />
+        <MagicLink
+          email={magicEmail}
+          setEmail={setMagicEmail}
+          setSent={setMagicLinkSent}
+          redirectTo="/adopt"
+        />
       ) : (
         <div className="border-l-2 border-primary-light dark:border-primary-dark pl-4">
-          <p className="text-xs font-mono text-text-light dark:text-text-dark mb-1">Check your inbox</p>
+          <p className="text-xs font-mono text-text-light dark:text-text-dark mb-1">
+            Check your inbox
+          </p>
           <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mb-3">
             We sent a sign in link to <strong>{magicEmail}</strong>
           </p>

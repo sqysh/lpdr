@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { TIERS } from 'app/lib/constants/subscriptions.constants'
+import { TIERS } from 'lib/constants/subscriptions.constants'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { useSearchParams } from 'next/navigation'
 import Picture from '../../components/_common/Picture'
@@ -16,12 +16,17 @@ type IPublicSubscriptionsClient = {
   userName: { firstName: string; lastName: string }
 }
 
-export default function PublicSubscriptionsClient({ savedPaymentMethods, userName }: IPublicSubscriptionsClient) {
+export default function PublicSubscriptionsClient({
+  savedPaymentMethods,
+  userName
+}: IPublicSubscriptionsClient) {
   const searchParams = useSearchParams()
   const [billing, setBilling] = useState<'MONTHLY' | 'YEARLY'>(
     (searchParams.get('billing') as 'MONTHLY' | 'YEARLY') ?? 'MONTHLY'
   )
-  const [view, setView] = useState<'select' | 'payment'>((searchParams.get('view') as 'select' | 'payment') ?? 'select')
+  const [view, setView] = useState<'select' | 'payment'>(
+    (searchParams.get('view') as 'select' | 'payment') ?? 'select'
+  )
   const [selected, setSelected] = useState<string | null>(searchParams.get('tier'))
 
   const selectedTier = TIERS.find((t) => t.id === selected)
@@ -77,7 +82,12 @@ export default function PublicSubscriptionsClient({ savedPaymentMethods, userNam
 
       {/* ── STICKY BAR ── */}
       {view === 'select' && (
-        <StickyBar billing={billing} selected={selected} selectedTier={selectedTier} setView={setView} />
+        <StickyBar
+          billing={billing}
+          selected={selected}
+          selectedTier={selectedTier}
+          setView={setView}
+        />
       )}
     </main>
   )

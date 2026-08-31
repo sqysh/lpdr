@@ -1,11 +1,17 @@
-import { createLog } from 'app/lib/actions/log/createLog'
-import { pusherTrigger } from 'app/lib/pusher/pusher.utils'
-import { processAutoPay, resolveAuctionWinners, sendWinnerEmail } from 'app/utils/_end-auction.utils'
+import { createLog } from 'lib/actions/log/createLog'
+import { pusherTrigger } from 'lib/pusher/pusher.utils'
+import {
+  processAutoPay,
+  resolveAuctionWinners,
+  sendWinnerEmail
+} from 'app/utils/_end-auction.utils'
 import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 
-export async function endAuctionCore(overrideAuctionId?: string): Promise<{ success: boolean; error?: string }> {
+export async function endAuctionCore(
+  overrideAuctionId?: string
+): Promise<{ success: boolean; error?: string }> {
   const start = Date.now()
   try {
     const now = new Date()
@@ -26,7 +32,9 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       }),
       prisma.auctionBid.aggregate({
         where: {
-          auction: overrideAuctionId ? { id: overrideAuctionId } : { status: 'ACTIVE', endDate: { lte: now } },
+          auction: overrideAuctionId
+            ? { id: overrideAuctionId }
+            : { status: 'ACTIVE', endDate: { lte: now } },
           status: 'TOP_BID'
         },
         _sum: { bidAmount: true }

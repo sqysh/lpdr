@@ -13,8 +13,8 @@ import { ProductSizesSection } from './ProductSizesSection'
 import { ProductImagesSection } from './ProductImagesSection'
 import { ProductSettingsSection } from './ProductSettingsSection'
 import { ProductSummarySection } from './ProductSummarySection'
-import { updateProduct } from 'app/lib/actions/admin/product/updateProduct'
-import { createProduct } from 'app/lib/actions/admin/product/createProduct'
+import { updateProduct } from 'lib/actions/admin/product/updateProduct'
+import { createProduct } from 'lib/actions/admin/product/createProduct'
 import { ProductDangerSection } from './ProductDangerSection'
 
 export default function ProductForm({ product }: { product?: IProduct }) {

@@ -3,8 +3,8 @@
 import { useState } from 'react'
 import { AlertCircle, RefreshCw, Search } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { diagnoseMigration } from 'app/lib/actions/admin/user/diagnoseMigration'
-import { retriggerMigration } from 'app/lib/actions/admin/user/retriggerMigration'
+import { diagnoseMigration } from 'lib/actions/admin/user/diagnoseMigration'
+import { retriggerMigration } from 'lib/actions/admin/user/retriggerMigration'
 
 export function MigrationTroubleshootPanel({ userId }: { userId: string }) {
   const router = useRouter()

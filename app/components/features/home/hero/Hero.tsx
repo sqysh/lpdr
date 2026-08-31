@@ -1,7 +1,7 @@
 'use client'
 
-import { SLIDES } from 'app/lib/constants/home.constants'
-import { useCarousel } from '@hooks/useCarousel.hook'
+import { SLIDES } from 'lib/constants/home.constants'
+import { useCarousel } from 'lib/hooks/useCarousel.hook'
 import { HeroBackground } from './HeroBackground'
 import { SlideContent } from './SlideContent'
 import { HeroMobileBar } from './HeroMobileBar'
@@ -26,7 +26,13 @@ export const Hero = () => {
       <div className="max-w-180 1000:max-w-240 1200:max-w-300 mx-auto relative z-10 flex h-full min-h-[inherit] flex-col justify-between">
         <SlideContent slide={slide} />
         <div className="relative z-10 w-full bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark">
-          <HeroMobileBar current={current} goNext={goNext} goPrev={goPrev} goTo={goTo} hasEvent={hasEvent} />
+          <HeroMobileBar
+            current={current}
+            goNext={goNext}
+            goPrev={goPrev}
+            goTo={goTo}
+            hasEvent={hasEvent}
+          />
           <HeroDesktopBar current={current} goTo={goTo} hasEvent={hasEvent} />
         </div>
       </div>

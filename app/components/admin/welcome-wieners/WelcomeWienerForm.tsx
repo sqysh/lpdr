@@ -6,19 +6,19 @@ import {
   WELCOME_WIENER_CATALOG,
   WELCOME_WIENER_CATEGORIES,
   WELCOME_WIENER_CATEGORY_LABELS
-} from 'app/lib/constants/welcome-wiener.constants'
-import { store } from 'app/lib/store/store'
-import { uploadFileToFirebase } from 'app/lib/firebase/firebase.utils'
-import { showToast } from 'app/lib/store/slices/toastSlice'
+} from 'lib/constants/welcome-wiener.constants'
+import { store } from 'lib/store/store'
+import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
+import { showToast } from 'lib/store/slices/toastSlice'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateWelcomeWiener } from 'app/lib/actions/admin/welcome-wiener/updateWelcomeWiener'
+import { updateWelcomeWiener } from 'lib/actions/admin/welcome-wiener/updateWelcomeWiener'
 import Link from 'next/link'
 import { FormField, SectionLabel, Toggle } from 'app/components/_primitives'
 import Picture from 'app/components/_common/Picture'
-import { createWelcomeWiener } from 'app/lib/actions/admin/welcome-wiener/createWelcomeWiener'
+import { createWelcomeWiener } from 'lib/actions/admin/welcome-wiener/createWelcomeWiener'
 import { DangerZone } from './DangerZone'
-import { deleteWelcomeWiener } from 'app/lib/actions/admin/welcome-wiener/deleteWelcomeWiener'
+import { deleteWelcomeWiener } from 'lib/actions/admin/welcome-wiener/deleteWelcomeWiener'
 
 type FormState = {
   name: string

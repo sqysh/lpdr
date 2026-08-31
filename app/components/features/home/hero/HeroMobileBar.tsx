@@ -1,4 +1,4 @@
-import { SLIDES } from 'app/lib/constants/home.constants'
+import { SLIDES } from 'lib/constants/home.constants'
 import { EventCountdown } from './EventCountdown'
 
 export function HeroMobileBar({
@@ -24,7 +24,11 @@ export function HeroMobileBar({
       {/* Dots / counter / arrows row */}
       <div className="flex items-center justify-between gap-2 px-3 min-[400px]:px-4 py-3">
         {/* Dots */}
-        <div className="flex items-center gap-2 min-[400px]:gap-3 shrink" role="tablist" aria-label="Slide indicators">
+        <div
+          className="flex items-center gap-2 min-[400px]:gap-3 shrink"
+          role="tablist"
+          aria-label="Slide indicators"
+        >
           {SLIDES.map((s, i) => (
             <button
               key={s.id}
@@ -35,7 +39,10 @@ export function HeroMobileBar({
               className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               {i === current ? (
-                <span className="relative flex items-center justify-center w-4 h-4" aria-hidden="true">
+                <span
+                  className="relative flex items-center justify-center w-4 h-4"
+                  aria-hidden="true"
+                >
                   <span className="absolute inset-0 border-2 border-primary-light dark:border-primary-dark" />
                   <span className="w-1.5 h-1.5 bg-primary-light dark:bg-primary-dark" />
                 </span>

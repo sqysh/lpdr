@@ -1,5 +1,5 @@
-import { updateAddress } from 'app/lib/actions/my-pack/updateAddress'
-import { STATES } from 'app/lib/constants/location.constants'
+import { updateAddress } from 'lib/actions/my-pack/updateAddress'
+import { STATES } from 'lib/constants/location.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { ArrowLeft, ArrowRight, Check, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -17,7 +17,9 @@ interface IAddress {
 interface Props {
   inputs: any
   errors: Record<string, string>
-  handleInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+  handleInput: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void
   onNext: () => void
   onBack: () => void
   userAddress: IAddress | null
@@ -64,7 +66,10 @@ export function Step3Address({
 
   const isValid = useSaved
     ? !!userAddress
-    : !!inputs?.addressLine1?.trim() && !!inputs?.city?.trim() && !!inputs?.state && !!inputs?.zipPostalCode?.trim()
+    : !!inputs?.addressLine1?.trim() &&
+      !!inputs?.city?.trim() &&
+      !!inputs?.state &&
+      !!inputs?.zipPostalCode?.trim()
 
   return (
     <>
@@ -93,7 +98,10 @@ export function Step3Address({
             >
               <div className="px-6 py-5 border-b border-border-light dark:border-border-dark">
                 <div className="flex items-center gap-3 mb-1">
-                  <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+                  <span
+                    className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
+                    aria-hidden="true"
+                  />
                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                     Shipping Address
                   </p>
@@ -158,7 +166,8 @@ export function Step3Address({
       >
         <div>
           <h2 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-1">
-            Shipping <span className="font-light text-muted-light dark:text-muted-dark">address</span>
+            Shipping{' '}
+            <span className="font-light text-muted-light dark:text-muted-dark">address</span>
           </h2>
           <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
             One or more items in your cart ship physically.
@@ -184,7 +193,10 @@ export function Step3Address({
                   {userAddress.city}, {userAddress.state} {userAddress.zipPostalCode}
                 </p>
               </div>
-              <Check className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
+              <Check
+                className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5"
+                aria-hidden="true"
+              />
             </button>
 
             <button

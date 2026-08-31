@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { IAuction } from 'types/_auction'
-import { pusherClient } from 'app/lib/pusher/pusher-client'
+import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
 import {
   AuctionEmptyState,
@@ -72,7 +72,11 @@ export default function PublicAuctionClient({ auction }: { auction: IAuction }) 
             filter={filter}
             setSlotTrigger={setSlotTrigger}
           />
-          <AuctionSoldGrid auction={auction} customAuctionLink={auction.customAuctionLink} sold={sold} />
+          <AuctionSoldGrid
+            auction={auction}
+            customAuctionLink={auction.customAuctionLink}
+            sold={sold}
+          />
           <AuctionEmptyState auction={auction} />
           <AuctionHowItWorks isActive={isActive} />
         </div>

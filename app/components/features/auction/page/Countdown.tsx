@@ -1,9 +1,12 @@
-import { useCountdown } from '@hooks/useCountdown.hook'
+import { useCountdown } from 'lib/hooks/useCountdown.hook'
 import { CountUnit } from 'app/components/_primitives'
 
 export function Countdown({ endDate }: { endDate: Date }) {
   const { days, hours, minutes, seconds, done } = useCountdown(endDate)
-  if (done) return <span className="text-[10px] font-mono text-red-500 tracking-widest uppercase">Ended</span>
+  if (done)
+    return (
+      <span className="text-[10px] font-mono text-red-500 tracking-widest uppercase">Ended</span>
+    )
   return (
     <div
       className="flex items-end gap-2.5"

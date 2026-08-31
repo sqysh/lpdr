@@ -3,8 +3,8 @@
 import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from 'lucide-react'
-import { store, useToastSelector } from 'app/lib/store/store'
-import { hideToast } from 'app/lib/store/slices/toastSlice'
+import { store, useToastSelector } from 'lib/store/store'
+import { hideToast } from 'lib/store/slices/toastSlice'
 
 export const Toast = () => {
   const { isVisible, type, message, description, duration } = useToastSelector()

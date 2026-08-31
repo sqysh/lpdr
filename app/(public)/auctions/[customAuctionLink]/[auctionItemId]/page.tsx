@@ -1,9 +1,13 @@
-import { getActiveAuctionItems } from 'app/lib/actions/public/auction/getActiveAuctionItems'
-import { getAuctionItemById } from 'app/lib/actions/admin/auction/getAuctionItemById'
+import { getActiveAuctionItems } from 'lib/actions/public/auction/getActiveAuctionItems'
+import { getAuctionItemById } from 'lib/actions/admin/auction/getAuctionItemById'
 import PublicAuctionItemClient from './PublicAuctionItemClient'
 import { notFound } from 'next/navigation'
 
-export default async function PublicAuctionItemPage({ params }: { params: Promise<{ auctionItemId: string }> }) {
+export default async function PublicAuctionItemPage({
+  params
+}: {
+  params: Promise<{ auctionItemId: string }>
+}) {
   const { auctionItemId } = await params
   const data = await getAuctionItemById(auctionItemId)
 

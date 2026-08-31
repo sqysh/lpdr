@@ -3,11 +3,11 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Check, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { IProduct } from 'types/_product'
-import { store, useCartSelector } from 'app/lib/store/store'
-import { addToCart } from 'app/lib/store/slices/cartSlice'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { store, useCartSelector } from 'lib/store/store'
+import { addToCart } from 'lib/store/slices/cartSlice'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'app/utils/_currency.utils'
-import { setOpenCartToast } from 'app/lib/store/slices/uiSlice'
+import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import Picture from 'app/components/_common/Picture'
 
 export function ProductCard({ product, index }: { product: IProduct; index: number }) {
@@ -69,7 +69,10 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag className="w-8 h-8 text-muted-light/30 dark:text-muted-dark/30" aria-hidden="true" />
+            <ShoppingBag
+              className="w-8 h-8 text-muted-light/30 dark:text-muted-dark/30"
+              aria-hidden="true"
+            />
           </div>
         )}
 
@@ -179,7 +182,10 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
                       exit={{ scale: 0 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <Plus className="w-4 h-4 text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                      <Plus
+                        className="w-4 h-4 text-muted-light dark:text-muted-dark"
+                        aria-hidden="true"
+                      />
                     </motion.span>
                   )}
                 </AnimatePresence>

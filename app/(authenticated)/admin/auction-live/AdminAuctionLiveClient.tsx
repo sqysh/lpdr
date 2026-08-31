@@ -4,16 +4,16 @@ import { useEffect, useState, useRef } from 'react'
 import Pusher from 'pusher-js'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, Zap, AlertTriangle, Trash2, X, Users, Activity } from 'lucide-react'
-import deleteBid from 'app/lib/actions/super-user/deleteBid'
+import deleteBid from 'lib/actions/super-user/deleteBid'
 import { IAuctionBid } from 'types/_auction-bid'
 import { IAuctionItem } from 'types/_auction-item'
-import { store } from 'app/lib/store/store'
-import { showToast } from 'app/lib/store/slices/toastSlice'
+import { store } from 'lib/store/store'
+import { showToast } from 'lib/store/slices/toastSlice'
 import { formatDate } from 'app/utils/_date.utils'
-import { Anomaly, ANOMALY_COLORS, ANOMALY_LABELS, LiveBidEvent } from 'app/lib/mock/live-auction.mock'
+import { Anomaly, ANOMALY_COLORS, ANOMALY_LABELS, LiveBidEvent } from 'lib/mock/live-auction.mock'
 import { IAuction } from 'types/_auction'
-import dismissAuctionAnomaly from 'app/lib/actions/super-user/dismissAuctionAnomoly'
-import { detectAuctionAnomalies } from 'app/lib/actions/super-user/detectAuctionAnomalies'
+import dismissAuctionAnomaly from 'lib/actions/super-user/dismissAuctionAnomoly'
+import { detectAuctionAnomalies } from 'lib/actions/super-user/detectAuctionAnomalies'
 import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
 
 export default function AdminAuctionLiveClient({ auction }: { auction: IAuction | null }) {
@@ -27,7 +27,8 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
       currentBid: Number(bid.bidAmount),
       minimumBid: Number(bid.bidAmount) + 1,
       status: bid.status,
-      createdAt: bid.createdAt instanceof Date ? bid.createdAt.toISOString() : String(bid.createdAt),
+      createdAt:
+        bid.createdAt instanceof Date ? bid.createdAt.toISOString() : String(bid.createdAt),
       auctionItemId: bid.auctionItemId,
       userId: bid.userId,
       userEmail: bid.email ?? undefined
@@ -206,10 +207,17 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
               alert: activeAnomalies.length > 0
             }
           ].map((stat) => (
-            <div key={stat.label} className="bg-bg-light dark:bg-bg-dark px-5 py-4 flex items-center gap-3">
+            <div
+              key={stat.label}
+              className="bg-bg-light dark:bg-bg-dark px-5 py-4 flex items-center gap-3"
+            >
               <stat.icon
                 size={16}
-                className={stat.alert ? 'text-red-500 dark:text-red-400' : 'text-muted-light dark:text-muted-dark'}
+                className={
+                  stat.alert
+                    ? 'text-red-500 dark:text-red-400'
+                    : 'text-muted-light dark:text-muted-dark'
+                }
                 aria-hidden="true"
               />
               <div>
@@ -247,15 +255,21 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <p className={`text-[10px] font-mono tracking-[0.2em] uppercase ${ANOMALY_COLORS[anomaly.type]}`}>
+                      <p
+                        className={`text-[10px] font-mono tracking-[0.2em] uppercase ${ANOMALY_COLORS[anomaly.type]}`}
+                      >
                         {ANOMALY_LABELS[anomaly.type]}
                       </p>
-                      <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">—</span>
+                      <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                        —
+                      </span>
                       <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-light dark:text-text-dark font-bold">
                         {anomaly.itemName}
                       </p>
                     </div>
-                    <p className="text-xs font-mono text-text-light dark:text-text-dark">{anomaly.message}</p>
+                    <p className="text-xs font-mono text-text-light dark:text-text-dark">
+                      {anomaly.message}
+                    </p>
 
                     {/* Affected bids */}
                     {anomaly.bids.length > 0 && (
@@ -380,7 +394,9 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
                   <div
                     key={item.id}
                     className={`bg-bg-light dark:bg-bg-dark p-5 space-y-3 ${
-                      itemAnomalies.length > 0 ? 'border-l-4 border-red-500 dark:border-red-400' : ''
+                      itemAnomalies.length > 0
+                        ? 'border-l-4 border-red-500 dark:border-red-400'
+                        : ''
                     }`}
                   >
                     {/* Item header */}
@@ -401,7 +417,8 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
                             aria-hidden="true"
                           />
                           <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-red-500 dark:text-red-400">
-                            {itemAnomalies.length} {itemAnomalies.length === 1 ? 'anomaly' : 'anomalies'}
+                            {itemAnomalies.length}{' '}
+                            {itemAnomalies.length === 1 ? 'anomaly' : 'anomalies'}
                           </span>
                         </div>
                       )}
@@ -443,7 +460,8 @@ export default function AdminAuctionLiveClient({ auction }: { auction: IAuction 
                         </p>
                         {item.bids.slice(0, 5).map((bid) => {
                           const isDuplicate =
-                            item.bids.filter((b) => Number(b.bidAmount) === Number(bid.bidAmount)).length > 1
+                            item.bids.filter((b) => Number(b.bidAmount) === Number(bid.bidAmount))
+                              .length > 1
                           return (
                             <div
                               key={bid.id}

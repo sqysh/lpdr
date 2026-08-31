@@ -3,8 +3,8 @@
 import { motion } from 'framer-motion'
 import { FileText, ExternalLink } from 'lucide-react'
 import { NewsletterIssue } from '@prisma/client'
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { MONTH_INDEX } from 'app/lib/constants/date.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
+import { MONTH_INDEX } from 'lib/constants/date.constants'
 
 export default function PublicNewslettersClient({ issues }: { issues: NewsletterIssue[] }) {
   // Only show live issues, grouped by year (year is a string on the model)
@@ -31,15 +31,25 @@ export default function PublicNewslettersClient({ issues }: { issues: Newsletter
     >
       <div className="max-w-6xl mx-auto px-4 xs:px-5 sm:px-6 py-10 sm:py-16">
         {/* ── Header ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-10 sm:mb-12"
+        >
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Little Paws Rescue
             </p>
           </div>
           <h1 className="font-quicksand text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark leading-tight mb-3">
-            Newsletter <span className="font-light text-muted-light dark:text-muted-dark">Issues</span>
+            Newsletter{' '}
+            <span className="font-light text-muted-light dark:text-muted-dark">Issues</span>
           </h1>
           <p className="text-sm font-mono text-muted-light dark:text-muted-dark max-w-md leading-relaxed">
             Quarterly updates on rescues, adoptions, events, and ways to get involved.
@@ -63,11 +73,17 @@ export default function PublicNewslettersClient({ issues }: { issues: Newsletter
                   <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                     {year}
                   </span>
-                  <span className="flex-1 h-px bg-border-light dark:bg-border-dark" aria-hidden="true" />
+                  <span
+                    className="flex-1 h-px bg-border-light dark:bg-border-dark"
+                    aria-hidden="true"
+                  />
                 </div>
 
                 {/* Issues */}
-                <ul role="list" className="space-y-0 border border-border-light dark:border-border-dark">
+                <ul
+                  role="list"
+                  className="space-y-0 border border-border-light dark:border-border-dark"
+                >
                   {byYear[year].map((issue, i) => (
                     <motion.li
                       key={issue.id}

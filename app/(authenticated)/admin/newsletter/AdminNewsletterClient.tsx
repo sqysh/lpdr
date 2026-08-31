@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Newsletter, NewsletterIssue } from '@prisma/client'
 import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
 import { Tab } from 'types/_newsletter.types'
-import { TABS } from 'app/lib/constants/newsletter.constants'
+import { TABS } from 'lib/constants/newsletter.constants'
 import { SubscribersPanel } from 'app/components/admin/newsletter/SubscribersPanel'
 import { IssuesPanel } from 'app/components/admin/newsletter/IssuesPanel'
 
@@ -45,7 +45,12 @@ export default function AdminNewsletterPageClient({
       </div>
 
       {/* Panels */}
-      <div id="panel-subscribers" role="tabpanel" aria-labelledby="tab-subscribers" hidden={tab !== 'subscribers'}>
+      <div
+        id="panel-subscribers"
+        role="tabpanel"
+        aria-labelledby="tab-subscribers"
+        hidden={tab !== 'subscribers'}
+      >
         <SubscribersPanel newsletters={newsletters} />
       </div>
       <div id="panel-issues" role="tabpanel" aria-labelledby="tab-issues" hidden={tab !== 'issues'}>

@@ -1,7 +1,7 @@
 'use client'
 
-import { hydrateCart } from 'app/lib/store/slices/cartSlice'
-import { store } from 'app/lib/store/store'
+import { hydrateCart } from 'lib/store/slices/cartSlice'
+import { store } from 'lib/store/store'
 import { useEffect } from 'react'
 
 const KEY = 'lpdr-cart'
@@ -21,7 +21,10 @@ export function CartPersistence() {
       if (next !== prev) {
         prev = next
         try {
-          localStorage.setItem(KEY, JSON.stringify({ items: next.items, lastUpdated: next.lastUpdated }))
+          localStorage.setItem(
+            KEY,
+            JSON.stringify({ items: next.items, lastUpdated: next.lastUpdated })
+          )
         } catch {}
       }
     })

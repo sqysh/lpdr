@@ -1,11 +1,16 @@
-import { T, TIERS } from 'app/lib/constants/subscriptions.constants'
+import { T, TIERS } from 'lib/constants/subscriptions.constants'
 import { motion } from 'framer-motion'
 import { TierCard } from './TierCard'
 import { MobileTierCard } from './MobileTierCard'
 import { TierKey } from 'types/_subscriptions.types'
 import { SubscriptionSelectorProps } from 'types/_my-pack.types'
 
-export function SubscriptionSelector({ setBilling, billing, selected, setSelected }: SubscriptionSelectorProps) {
+export function SubscriptionSelector({
+  setBilling,
+  billing,
+  selected,
+  setSelected
+}: SubscriptionSelectorProps) {
   return (
     <motion.div
       key="select"
@@ -20,7 +25,9 @@ export function SubscriptionSelector({ setBilling, billing, selected, setSelecte
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-dark" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">Memberships</p>
+            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">
+              Memberships
+            </p>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
@@ -57,14 +64,20 @@ export function SubscriptionSelector({ setBilling, billing, selected, setSelecte
         {/* ── Tier column labels ── */}
         <div className="hidden md:grid grid-cols-4 gap-2 mb-2" aria-hidden="true">
           {(['bronze', 'silver', 'gold', 'elite'] as TierKey[]).map((k) => (
-            <p key={k} className={`text-center text-[9px] font-mono tracking-widest uppercase ${T[k].labelClass}`}>
+            <p
+              key={k}
+              className={`text-center text-[9px] font-mono tracking-widest uppercase ${T[k].labelClass}`}
+            >
               {T[k].label}
             </p>
           ))}
         </div>
 
         {/* ── Tier grid — md+ ── */}
-        <div className="hidden md:block" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
+        <div
+          className="hidden md:block"
+          style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
+        >
           <div
             role="list"
             aria-label="Subscription tiers"
@@ -105,7 +118,10 @@ export function SubscriptionSelector({ setBilling, billing, selected, setSelecte
         {/* ── Trust bar ── */}
         <div className="flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
           {['Cancel anytime', 'Secure payment', '100% goes to rescue'].map((item) => (
-            <span key={item} className="flex items-center gap-2 text-[11px] text-muted-dark font-mono">
+            <span
+              key={item}
+              className="flex items-center gap-2 text-[11px] text-muted-dark font-mono"
+            >
               <span className="w-1 h-1 bg-primary-dark" aria-hidden="true" />
               {item}
             </span>

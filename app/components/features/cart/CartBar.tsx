@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, ArrowRight, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { store, useCartSelector } from 'app/lib/store/store'
-import { clearCart, removeFromCart } from 'app/lib/store/slices/cartSlice'
+import { store, useCartSelector } from 'lib/store/store'
+import { clearCart, removeFromCart } from 'lib/store/slices/cartSlice'
 import { usePathname } from 'next/navigation'
 import Picture from 'app/components/_common/Picture'
 
@@ -40,7 +40,12 @@ export function CartBar() {
       </AnimatePresence>
 
       {/* Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-70" role="region" aria-label="Shopping cart" aria-live="polite">
+      <div
+        className="fixed bottom-0 left-0 right-0 z-70"
+        role="region"
+        aria-label="Shopping cart"
+        aria-live="polite"
+      >
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -65,7 +70,12 @@ export function CartBar() {
                       aria-hidden="true"
                     >
                       {item.image ? (
-                        <Picture priority={true} src={item.image} alt="" className="w-full h-full object-cover" />
+                        <Picture
+                          priority={true}
+                          src={item.image}
+                          alt=""
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <ShoppingBag className="w-3 h-3 text-muted-light dark:text-muted-dark" />
@@ -75,9 +85,13 @@ export function CartBar() {
 
                     {/* Name + qty */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
+                      <p className="text-[11px] font-mono text-text-light dark:text-text-dark truncate">
+                        {item.name}
+                      </p>
                       {item.quantity > 1 && (
-                        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">×{item.quantity}</p>
+                        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                          ×{item.quantity}
+                        </p>
                       )}
                     </div>
 

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { AdminLayoutClient } from './AdminLayoutClient'
-import { auth } from 'app/lib/auth'
+import { auth } from 'lib/auth'
 import { redirect } from 'next/navigation'
 
 export const dynamic = 'force-dynamic'

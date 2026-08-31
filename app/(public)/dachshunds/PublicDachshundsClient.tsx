@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { containerVariants } from 'app/lib/constants/motion.constants'
+import { containerVariants } from 'lib/constants/motion.constants'
 import { DogCard } from 'app/components/features/dachshunds/DogCard'
 
 export default function PublicDachshundsClient({ data }) {
@@ -14,7 +14,10 @@ export default function PublicDachshundsClient({ data }) {
         {/* Header */}
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Available Now
             </p>
@@ -24,7 +27,10 @@ export default function PublicDachshundsClient({ data }) {
               id="adopt-heading"
               className="font-quicksand text-3xl sm:text-4xl font-bold text-text-light dark:text-text-dark"
             >
-              Find Your <span className="font-light text-muted-light dark:text-muted-dark">Forever Wiener</span>
+              Find Your{' '}
+              <span className="font-light text-muted-light dark:text-muted-dark">
+                Forever Wiener
+              </span>
             </h1>
             <p className="text-sm text-muted-light dark:text-muted-dark font-mono">
               {data?.data?.data?.length} dog{data?.data?.data?.length !== 1 ? 's' : ''} available
@@ -57,7 +63,9 @@ export default function PublicDachshundsClient({ data }) {
               role="status"
               aria-live="polite"
             >
-              <p className="text-muted-light dark:text-muted-dark font-mono text-sm">No dogs found in this category.</p>
+              <p className="text-muted-light dark:text-muted-dark font-mono text-sm">
+                No dogs found in this category.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>

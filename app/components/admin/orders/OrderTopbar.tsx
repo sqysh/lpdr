@@ -1,12 +1,15 @@
 import Link from 'next/link'
-import { STATUS_STYLES } from 'app/lib/constants/order.constants'
+import { STATUS_STYLES } from 'lib/constants/order.constants'
 import { SerializedOrder } from 'types/_order.types'
 
 export function OrderTopbar({ order }: { order: SerializedOrder }) {
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between">
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
-        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+        <span
+          className="text-[9px] font-mono text-border-light dark:text-border-dark"
+          aria-hidden="true"
+        >
           /
         </span>
         <Link
@@ -15,7 +18,10 @@ export function OrderTopbar({ order }: { order: SerializedOrder }) {
         >
           Orders
         </Link>
-        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+        <span
+          className="text-[9px] font-mono text-border-light dark:text-border-dark"
+          aria-hidden="true"
+        >
           /
         </span>
         <p

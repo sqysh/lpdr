@@ -1,11 +1,11 @@
 import SuperDashboardClient from 'app/(authenticated)/super/SuperDashboardClient'
-import { getAdminUsers } from 'app/lib/actions/super-user/getAdminUsers'
-import { getAuditLogs } from 'app/lib/actions/super-user/getAuditLogs'
-import { getCronJobs } from 'app/lib/actions/super-user/getCronJobs'
-import { getManagedUsers } from 'app/lib/actions/super-user/getManagedUsers'
-import { getPulseStats } from 'app/lib/actions/super-user/getPulseStats'
-import { getServiceHealth } from 'app/lib/actions/super-user/getServiceHealth'
-import { auth } from 'app/lib/auth'
+import { getAdminUsers } from 'lib/actions/super-user/getAdminUsers'
+import { getAuditLogs } from 'lib/actions/super-user/getAuditLogs'
+import { getCronJobs } from 'lib/actions/super-user/getCronJobs'
+import { getManagedUsers } from 'lib/actions/super-user/getManagedUsers'
+import { getPulseStats } from 'lib/actions/super-user/getPulseStats'
+import { getServiceHealth } from 'lib/actions/super-user/getServiceHealth'
+import { auth } from 'lib/auth'
 import { redirect } from 'next/navigation'
 
 export default async function SuperDashboardPage() {

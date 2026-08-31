@@ -4,10 +4,10 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
-import createNewsletter from 'app/lib/actions/public/newsletter/createNewsletter'
-import { showToast } from 'app/lib/store/slices/toastSlice'
-import { useAppDispatch } from 'app/lib/store/store'
-import { EMAIL_REGEX } from 'app/lib/constants/regex.constants'
+import createNewsletter from 'lib/actions/public/newsletter/createNewsletter'
+import { showToast } from 'lib/store/slices/toastSlice'
+import { useAppDispatch } from 'lib/store/store'
+import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 
 const CORE_GRADIENT = {
   background: 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4, #0891b2, #0e7490)',

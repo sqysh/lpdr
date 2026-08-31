@@ -1,7 +1,7 @@
 import { useSession } from 'next-auth/react'
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
-import { T } from 'app/lib/constants/subscriptions.constants'
+import { T } from 'lib/constants/subscriptions.constants'
 import { StepIndicator } from '../payment/StepIndicator'
 import { SignedInRow } from '../payment/SignedInRow'
 import { StepSignIn } from '../payment/SignInStep'
@@ -10,7 +10,13 @@ import { SubscriptionPaymentForm } from './SubscriptionsPaymentForm'
 
 const paymentStepLabels = ['Choose Plan', 'Sign-In', 'Payment']
 
-export function SubscriptionPaymentView({ setView, selectedTier, billing, savedPaymentMethods, userName }) {
+export function SubscriptionPaymentView({
+  setView,
+  selectedTier,
+  billing,
+  savedPaymentMethods,
+  userName
+}) {
   const session = useSession()
   const isAuthed = session.status === 'authenticated'
   const currentStep = isAuthed ? 3 : 2

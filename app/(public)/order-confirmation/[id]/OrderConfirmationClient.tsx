@@ -12,17 +12,17 @@ import {
   User,
   Utensils
 } from 'lucide-react'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from '../../../components/_common/Picture'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
-import { clearCart } from 'app/lib/store/slices/cartSlice'
-import { ORDER_TYPE_CONFIG } from 'app/lib/constants/order.constants'
+import { clearCart } from 'lib/store/slices/cartSlice'
+import { ORDER_TYPE_CONFIG } from 'lib/constants/order.constants'
 import { formatWithCommas } from 'app/utils/_currency.utils'
-import { useAppDispatch } from 'app/lib/store/store'
-import { setShowConfetti } from 'app/lib/store/slices/uiSlice'
+import { useAppDispatch } from 'lib/store/store'
+import { setShowConfetti } from 'lib/store/slices/uiSlice'
 import { useSearchParams } from 'next/navigation'
-import { ITEM_ICONS } from 'app/lib/constants/feed-a-foster.constants'
+import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
 
 export default function OrderConfirmationClient({ order }) {
   const config = ORDER_TYPE_CONFIG[order?.type] ?? ORDER_TYPE_CONFIG['ONE_TIME_DONATION']

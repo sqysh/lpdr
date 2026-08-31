@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, FileText, Radio, CheckCircle, Gavel } from 'lucide-react'
-import { store } from 'app/lib/store/store'
-import { setOpenAuctionDrawer } from 'app/lib/store/slices/uiSlice'
+import { store } from 'lib/store/store'
+import { setOpenAuctionDrawer } from 'lib/store/slices/uiSlice'
 import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
 import AdminHeaderButton from 'app/components/admin/_shared/AdminHeaderButton'
 import { Stat } from 'app/components/admin/_shared/Stat'
 import AdminEmptyState from 'app/components/admin/_shared/AdminEmptyState'
 import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
-import { AUCTION_FILTERS } from 'app/lib/constants/auction.constants'
+import { AUCTION_FILTERS } from 'lib/constants/auction.constants'
 import { IAuction } from 'types/_auction'
 import { AdminAuctionCard } from 'app/components/admin/auctions'
 
@@ -146,7 +146,11 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
                         {/* Full-width cards */}
                         <div className="space-y-3">
                           {auctions.map((auction) => (
-                            <AdminAuctionCard key={auction.id} auction={auction} index={cardIndex++} />
+                            <AdminAuctionCard
+                              key={auction.id}
+                              auction={auction}
+                              index={cardIndex++}
+                            />
                           ))}
                         </div>
                       </div>
@@ -156,7 +160,12 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
               ))}
             </motion.div>
           ) : (
-            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+            >
               <AdminEmptyState
                 icon={<Gavel size={20} aria-hidden="true" />}
                 title="No auctions yet"

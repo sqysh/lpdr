@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Merge, AlertTriangle, Loader2 } from 'lucide-react'
-import { mergeUsers } from 'app/lib/actions/super-user/mergeUsers'
+import { mergeUsers } from 'lib/actions/super-user/mergeUsers'
 import { FormField } from 'app/components/_primitives'
 
 type Props = {

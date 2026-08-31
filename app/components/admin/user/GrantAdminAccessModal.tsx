@@ -2,9 +2,9 @@
 
 import { useState, useMemo } from 'react'
 import { Search, X, CheckCircle } from 'lucide-react'
-import { EMAIL_REGEX } from 'app/lib/constants/regex.constants'
+import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { IUser } from 'types/_user'
-import { grantAdminAccess } from 'app/lib/actions/admin/user/grantAdminAccess'
+import { grantAdminAccess } from 'lib/actions/admin/user/grantAdminAccess'
 
 type Props = {
   open: boolean
@@ -115,7 +115,9 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                           <p className="text-xs font-semibold text-text-light dark:text-text-dark">
                             {u.firstName} {u.lastName}
                           </p>
-                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{u.email}</p>
+                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                            {u.email}
+                          </p>
                         </button>
                       ))}
                     </div>
@@ -132,7 +134,8 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                         No account yet for <span className="font-bold">{query.trim()}</span>
                       </p>
                       <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                        Grant admin access now — it applies automatically the first time they sign in.
+                        Grant admin access now — it applies automatically the first time they sign
+                        in.
                       </p>
                     </button>
                   )}
@@ -179,7 +182,9 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                 <p
                   className={`text-[11px] font-mono mt-4 flex items-center gap-1.5 ${result.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
                 >
-                  {result.success && <CheckCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
+                  {result.success && (
+                    <CheckCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  )}
                   {result.message}
                 </p>
               )}

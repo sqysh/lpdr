@@ -2,8 +2,8 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { Check, X } from 'lucide-react'
-import { store, useUiSelector } from 'app/lib/store/store'
-import { setCloseCartToast } from 'app/lib/store/slices/uiSlice'
+import { store, useUiSelector } from 'lib/store/store'
+import { setCloseCartToast } from 'lib/store/slices/uiSlice'
 import Link from 'next/link'
 import { useEffect } from 'react'
 
@@ -44,15 +44,24 @@ export function CartToast() {
 
             <div className="flex items-start gap-3 px-4 py-3.5">
               {/* Check icon */}
-              <div className="shrink-0 w-6 h-6 flex items-center justify-center bg-primary-light dark:bg-primary-dark mt-0.5" aria-hidden="true">
+              <div
+                className="shrink-0 w-6 h-6 flex items-center justify-center bg-primary-light dark:bg-primary-dark mt-0.5"
+                aria-hidden="true"
+              >
                 <Check className="w-3.5 h-3.5 text-white" />
               </div>
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark mb-0.5">Added to cart</p>
-                <p className="text-sm font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
-                <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mt-0.5 tabular-nums">${item.price}</p>
+                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark mb-0.5">
+                  Added to cart
+                </p>
+                <p className="text-sm font-mono text-text-light dark:text-text-dark truncate">
+                  {item.name}
+                </p>
+                <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mt-0.5 tabular-nums">
+                  ${item.price}
+                </p>
               </div>
 
               {/* Dismiss */}

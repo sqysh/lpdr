@@ -1,5 +1,5 @@
 import { Newsletter } from '@prisma/client'
-import { PAGE_SIZE } from 'app/lib/constants/newsletter.constants'
+import { PAGE_SIZE } from 'lib/constants/newsletter.constants'
 import { useMemo, useState } from 'react'
 import { formatDate } from 'app/utils/_date.utils'
 import { Check, Copy, Search, X } from 'lucide-react'
@@ -46,7 +46,8 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
     },
     {
       header: 'Subscribed',
-      className: 'text-[10px] font-mono tracking-widest text-muted-light dark:text-muted-dark whitespace-nowrap',
+      className:
+        'text-[10px] font-mono tracking-widest text-muted-light dark:text-muted-dark whitespace-nowrap',
       cell: (n) => formatDate(new Date(n.createdAt))
     }
   ]
@@ -89,10 +90,18 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
             type="button"
             onClick={handleCopyAll}
             disabled={filtered.length === 0}
-            aria-label={copied ? 'Emails copied to clipboard' : 'Copy all emails to clipboard as comma-separated list'}
+            aria-label={
+              copied
+                ? 'Emails copied to clipboard'
+                : 'Copy all emails to clipboard as comma-separated list'
+            }
             className="inline-flex items-center gap-2 px-3 py-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
           >
-            {copied ? <Check size={11} aria-hidden="true" /> : <Copy size={11} aria-hidden="true" />}
+            {copied ? (
+              <Check size={11} aria-hidden="true" />
+            ) : (
+              <Copy size={11} aria-hidden="true" />
+            )}
             {copied ? 'Copied' : 'Copy all emails'}
           </button>
         </div>

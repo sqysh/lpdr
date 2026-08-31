@@ -1,4 +1,4 @@
-import { T, TIERS } from 'app/lib/constants/subscriptions.constants'
+import { T, TIERS } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BillingInterval } from 'types/_my-pack.types'
 
@@ -77,7 +77,9 @@ export function MobileTierCard({
         {/* ── Top gloss ── */}
         <div
           className="absolute top-0 left-0 right-0 h-[45%] pointer-events-none"
-          style={{ background: 'linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%)' }}
+          style={{
+            background: 'linear-gradient(180deg,rgba(255,255,255,.06) 0%,transparent 100%)'
+          }}
           aria-hidden="true"
         />
 
@@ -146,7 +148,9 @@ export function MobileTierCard({
           >
             ${price}
           </motion.span>
-          <span className={`font-mono text-[9px] ${s.darkRank}`}>/{billing === 'MONTHLY' ? 'mo' : 'yr'}</span>
+          <span className={`font-mono text-[9px] ${s.darkRank}`}>
+            /{billing === 'MONTHLY' ? 'mo' : 'yr'}
+          </span>
         </div>
       </motion.button>
     </motion.div>

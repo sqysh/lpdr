@@ -1,7 +1,16 @@
-import { useUiSelector } from 'app/lib/store/store'
+import { useUiSelector } from 'lib/store/store'
 import { Check } from 'lucide-react'
 
-export function StepIndicator({ current, labels, isDark }: { current: number; total: number; labels: string[]; isDark?: boolean }) {
+export function StepIndicator({
+  current,
+  labels,
+  isDark
+}: {
+  current: number
+  total: number
+  labels: string[]
+  isDark?: boolean
+}) {
   const { isDark: storeDark } = useUiSelector()
   const dark = isDark ?? storeDark
 
@@ -33,7 +42,11 @@ export function StepIndicator({ current, labels, isDark }: { current: number; to
                   {isDone ? (
                     <Check className="w-3 h-3 text-white" aria-hidden="true" />
                   ) : (
-                    <span className={`text-[10px] font-mono font-bold ${isActive ? c.textActive : c.textIdle}`}>{stepNum}</span>
+                    <span
+                      className={`text-[10px] font-mono font-bold ${isActive ? c.textActive : c.textIdle}`}
+                    >
+                      {stepNum}
+                    </span>
                   )}
                 </div>
                 <span

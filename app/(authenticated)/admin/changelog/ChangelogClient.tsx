@@ -1,4 +1,4 @@
-import { CHANGELOG, ChangeType } from 'app/lib/constants/changelog.constants'
+import { CHANGELOG, ChangeType } from 'lib/constants/changelog.constants'
 import { formatDate } from 'app/utils/_date.utils'
 import { Sparkles, Wrench, TrendingUp, Package } from 'lucide-react'
 

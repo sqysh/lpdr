@@ -1,5 +1,5 @@
-import { setOpenAuctionBidModal, setOpenAuctionSignInModal } from 'app/lib/store/slices/uiSlice'
-import { store } from 'app/lib/store/store'
+import { setOpenAuctionBidModal, setOpenAuctionSignInModal } from 'lib/store/slices/uiSlice'
+import { store } from 'lib/store/store'
 import { bidderDisplay } from 'app/utils/_auction.utils'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { motion } from 'framer-motion'
@@ -50,7 +50,10 @@ export function PriceBlock({
                 {topBid && (
                   <>
                     {' '}
-                    · Top bidder: <span className="text-text-light dark:text-text-dark">{bidderDisplay(topBid)}</span>
+                    · Top bidder:{' '}
+                    <span className="text-text-light dark:text-text-dark">
+                      {bidderDisplay(topBid)}
+                    </span>
                   </>
                 )}
               </p>
@@ -60,7 +63,9 @@ export function PriceBlock({
 
         {/* Fixed price */}
         {isFixed && item?.buyNowPrice != null && (
-          <div className={isFixed ? '' : 'pt-4 border-t border-border-light dark:border-border-dark'}>
+          <div
+            className={isFixed ? '' : 'pt-4 border-t border-border-light dark:border-border-dark'}
+          >
             <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1.5">
               {isFixed ? 'Price' : 'Buy Now Price'}
             </p>
@@ -76,7 +81,9 @@ export function PriceBlock({
         {item?.minimumBid != null && !isFixed && (
           <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
             Minimum bid:{' '}
-            <span className="text-text-light dark:text-text-dark font-black">{formatMoney(item?.minimumBid)}</span>
+            <span className="text-text-light dark:text-text-dark font-black">
+              {formatMoney(item?.minimumBid)}
+            </span>
           </p>
         )}
 
@@ -89,7 +96,9 @@ export function PriceBlock({
                   isAuthed
                     ? store.dispatch(setOpenAuctionBidModal(item))
                     : store.dispatch(
-                        setOpenAuctionSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`)
+                        setOpenAuctionSignInModal(
+                          `/auctions/${customAuctionLink}/${item.id}?bidModal=true`
+                        )
                       )
                 }
                 type="button"
@@ -98,7 +107,9 @@ export function PriceBlock({
               >
                 <div className="flex items-center gap-2">
                   <Gavel size={14} aria-hidden="true" />
-                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Place a Bid</span>
+                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                    Place a Bid
+                  </span>
                 </div>
                 <ChevronRight
                   size={14}
@@ -115,24 +126,36 @@ export function PriceBlock({
                 >
                   <div className="flex items-center gap-2">
                     <Zap size={14} aria-hidden="true" />
-                    <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Buy Now</span>
+                    <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                      Buy Now
+                    </span>
                   </div>
-                  <span className="text-[10px] font-mono font-black">{formatMoney(item.buyNowPrice)}</span>
+                  <span className="text-[10px] font-mono font-black">
+                    {formatMoney(item.buyNowPrice)}
+                  </span>
                 </Link>
               ) : (
                 <button
                   type="button"
                   onClick={() =>
-                    store.dispatch(setOpenAuctionSignInModal(`/auctions/${customAuctionLink}/${item.id}/instant-buy`))
+                    store.dispatch(
+                      setOpenAuctionSignInModal(
+                        `/auctions/${customAuctionLink}/${item.id}/instant-buy`
+                      )
+                    )
                   }
                   className="group w-full flex items-center justify-between px-5 py-4 bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2"
                   aria-label={`Buy ${item?.name} now for ${formatMoney(item.buyNowPrice)}`}
                 >
                   <div className="flex items-center gap-2">
                     <Zap size={14} aria-hidden="true" />
-                    <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Buy Now</span>
+                    <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+                      Buy Now
+                    </span>
                   </div>
-                  <span className="text-[10px] font-mono font-black">{formatMoney(item.buyNowPrice)}</span>
+                  <span className="text-[10px] font-mono font-black">
+                    {formatMoney(item.buyNowPrice)}
+                  </span>
                 </button>
               )
             ) : null}
@@ -142,7 +165,11 @@ export function PriceBlock({
         {/* Ended state */}
         {isEnded && (
           <div className="pt-2 flex items-center gap-2 px-4 py-3 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
-            <Package size={13} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+            <Package
+              size={13}
+              className="text-muted-light dark:text-muted-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
               {isSold ? 'This item has been sold.' : 'This auction has ended.'}
             </p>

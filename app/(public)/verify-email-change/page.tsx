@@ -1,9 +1,13 @@
 import { redirect } from 'next/navigation'
 import { CheckCircle, XCircle } from 'lucide-react'
 import Link from 'next/link'
-import { verifyEmailChange } from 'app/lib/actions/my-pack/email-change/verifyEmailChange'
+import { verifyEmailChange } from 'lib/actions/my-pack/email-change/verifyEmailChange'
 
-export default async function VerifyEmailChangePage({ searchParams }: { searchParams: { token?: string } }) {
+export default async function VerifyEmailChangePage({
+  searchParams
+}: {
+  searchParams: { token?: string }
+}) {
   if (!searchParams.token) redirect('/my-pack')
 
   const result = await verifyEmailChange(searchParams.token)
@@ -16,9 +20,12 @@ export default async function VerifyEmailChangePage({ searchParams }: { searchPa
             <div className="flex justify-center mb-6">
               <CheckCircle className="w-12 h-12 text-emerald-500" aria-hidden="true" />
             </div>
-            <h1 className="text-2xl uppercase tracking-wide text-text-light dark:text-text-dark mb-3">Email Updated</h1>
+            <h1 className="text-2xl uppercase tracking-wide text-text-light dark:text-text-dark mb-3">
+              Email Updated
+            </h1>
             <p className="font-mono text-sm text-muted-light dark:text-muted-dark mb-8 leading-relaxed">
-              Your email address has been successfully updated. Use your new email to sign in going forward.
+              Your email address has been successfully updated. Use your new email to sign in going
+              forward.
             </p>
             <Link
               href="/my-pack"

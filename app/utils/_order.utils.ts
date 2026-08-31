@@ -1,5 +1,5 @@
 import { OrderType } from '@prisma/client'
-import { CartItem } from 'app/lib/store/slices/cartSlice'
+import { CartItem } from 'lib/store/slices/cartSlice'
 import { OrderRow } from 'types/_order.types'
 
 export function getOrderType(items: CartItem[]): OrderType {

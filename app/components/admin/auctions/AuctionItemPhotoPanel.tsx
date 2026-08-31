@@ -1,8 +1,8 @@
 'use client'
 
 import Picture from 'app/components/_common/Picture'
-import { deleteAuctionItemPhoto } from 'app/lib/actions/admin/auction/deleteAuctionItemPhoto'
-import { setPrimaryAuctionItemPhoto } from 'app/lib/actions/admin/auction/setPrimaryAuctionItemPhoto'
+import { deleteAuctionItemPhoto } from 'lib/actions/admin/auction/deleteAuctionItemPhoto'
+import { setPrimaryAuctionItemPhoto } from 'lib/actions/admin/auction/setPrimaryAuctionItemPhoto'
 import { convertIfHeic } from 'app/utils/_common.utils'
 import { ImagePlus, Star, Trash2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -98,7 +98,12 @@ export function AuctionItemPhotoPanel({
             key={`${file.name}-${i}`}
             className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden"
           >
-            <Picture priority={false} src={previewUrl} alt={file.name} className="w-full h-full object-cover" />
+            <Picture
+              priority={false}
+              src={previewUrl}
+              alt={file.name}
+              className="w-full h-full object-cover"
+            />
             {i === 0 && !isUpdating && (
               <span className="absolute top-1 left-1 text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 bg-primary-light dark:bg-primary-dark text-white">
                 Primary

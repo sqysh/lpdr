@@ -1,5 +1,5 @@
-import { updateAddress } from 'app/lib/actions/my-pack/updateAddress'
-import { STATES } from 'app/lib/constants/location.constants'
+import { updateAddress } from 'lib/actions/my-pack/updateAddress'
+import { STATES } from 'lib/constants/location.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, CheckCircle, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
@@ -63,7 +63,8 @@ export function UpdateAddressModal({
 
   const inputClass =
     'w-full px-3.5 py-2.5 border-l-2 border-l-cyan-600 dark:border-l-violet-400 border-t border-r border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-surface-dark text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40 font-lato text-sm outline-none transition-all focus:border-cyan-600 dark:focus:border-violet-400'
-  const labelClass = 'block   text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2'
+  const labelClass =
+    'block   text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2'
 
   return (
     <AnimatePresence>
@@ -83,19 +84,31 @@ export function UpdateAddressModal({
             onClick={(e) => e.stopPropagation()}
           >
             {/* Corner tick marks */}
-            <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+            <div
+              className="absolute top-0 left-0 w-6 h-6 pointer-events-none z-10"
+              aria-hidden="true"
+            >
               <div className="absolute top-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
               <div className="absolute top-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
             </div>
-            <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+            <div
+              className="absolute top-0 right-0 w-6 h-6 pointer-events-none z-10"
+              aria-hidden="true"
+            >
               <div className="absolute top-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
               <div className="absolute top-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
             </div>
-            <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+            <div
+              className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10"
+              aria-hidden="true"
+            >
               <div className="absolute bottom-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
               <div className="absolute bottom-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
             </div>
-            <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
+            <div
+              className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10"
+              aria-hidden="true"
+            >
               <div className="absolute bottom-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
               <div className="absolute bottom-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
             </div>
@@ -137,9 +150,14 @@ export function UpdateAddressModal({
               {success ? (
                 <div className="flex flex-col items-center justify-center py-8 gap-3">
                   <div className="w-12 h-12 flex items-center justify-center bg-cyan-600/10 dark:bg-violet-400/10">
-                    <CheckCircle className="w-6 h-6 text-cyan-600 dark:text-violet-400" aria-hidden="true" />
+                    <CheckCircle
+                      className="w-6 h-6 text-cyan-600 dark:text-violet-400"
+                      aria-hidden="true"
+                    />
                   </div>
-                  <p className="  text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">Address Updated</p>
+                  <p className="  text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+                    Address Updated
+                  </p>
                 </div>
               ) : (
                 <>
@@ -279,7 +297,9 @@ export function UpdateAddressModal({
                         className="w-4 h-4 shrink-0 mt-0.5 text-red-500 dark:text-red-400"
                         aria-hidden="true"
                       />
-                      <p className="font-lato text-xs text-red-600 dark:text-red-400 leading-relaxed">{error}</p>
+                      <p className="font-lato text-xs text-red-600 dark:text-red-400 leading-relaxed">
+                        {error}
+                      </p>
                     </div>
                   )}
 

@@ -1,5 +1,5 @@
 import ProductForm from 'app/components/admin/product/ProductForm'
-import { getProductById } from 'app/lib/actions/admin/product/getProductById'
+import { getProductById } from 'lib/actions/admin/product/getProductById'
 
 export default async function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params

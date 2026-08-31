@@ -1,4 +1,4 @@
-import { slideVariants } from 'app/lib/constants/motion.constants'
+import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { Step3PaymentForm } from './Step3PaymentForm'
 

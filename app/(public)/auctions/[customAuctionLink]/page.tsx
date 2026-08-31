@@ -1,8 +1,12 @@
-import { getAuctionByCustomAuctionLink } from 'app/lib/actions/public/auction/getAuctionByCustomAuctionLink'
+import { getAuctionByCustomAuctionLink } from 'lib/actions/public/auction/getAuctionByCustomAuctionLink'
 import { notFound } from 'next/navigation'
 import PublicAuctionClient from './PublicAuctionClient'
 
-export default async function PublicAuctionPage({ params }: { params: Promise<{ customAuctionLink: string }> }) {
+export default async function PublicAuctionPage({
+  params
+}: {
+  params: Promise<{ customAuctionLink: string }>
+}) {
   const { customAuctionLink } = await params
   const result = await getAuctionByCustomAuctionLink(customAuctionLink)
   if (!result.success || !result.data) notFound()

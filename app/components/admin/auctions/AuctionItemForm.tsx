@@ -2,12 +2,12 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { updateAuctionItem } from 'app/lib/actions/admin/auction/updateAuctionItem'
-import { deleteAuctionItem } from 'app/lib/actions/admin/auction/deleteAuctionItem'
-import { uploadFileToFirebase } from 'app/lib/firebase/firebase.utils'
+import { updateAuctionItem } from 'lib/actions/admin/auction/updateAuctionItem'
+import { deleteAuctionItem } from 'lib/actions/admin/auction/deleteAuctionItem'
+import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { formatMoney } from 'app/utils/_currency.utils'
-import { store } from 'app/lib/store/store'
-import { showToast } from 'app/lib/store/slices/toastSlice'
+import { store } from 'lib/store/store'
+import { showToast } from 'lib/store/slices/toastSlice'
 import type { IAuctionItem, SellingFormat } from 'types/_auction-item'
 import type { AuctionStatus } from 'types/_auction'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'
@@ -16,7 +16,7 @@ import { AuctionItemFormTitleBand } from './AuctionItemFormTitleBand'
 import { AuctionItemFields } from './AuctionItemFields'
 import { AuctionItemPhotoPanel } from './AuctionItemPhotoPanel'
 import { AuctionItemDangerZone } from './AuctionItemDangerZone'
-import { createAuctionItem } from 'app/lib/actions/admin/auction/createAuctionItem'
+import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 
 interface FormInputs {
   name: string
@@ -81,8 +81,9 @@ export function AuctionItemForm({
 
   const patch = (data: Partial<FormInputs>) => setInputs((prev) => ({ ...prev, ...data }))
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
+  const handleInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [loading, setLoading] = useState(false)
@@ -105,7 +106,9 @@ export function AuctionItemForm({
     if (pendingPhotos.length > 0) {
       try {
         photos = await Promise.all(
-          pendingPhotos.map(({ file }) => uploadFileToFirebase(file, (progress) => setUploadProgress(progress)))
+          pendingPhotos.map(({ file }) =>
+            uploadFileToFirebase(file, (progress) => setUploadProgress(progress))
+          )
         )
       } catch {
         setErrors({ form: 'Failed to upload photos. Please try again.' })
@@ -127,7 +130,9 @@ export function AuctionItemForm({
       photos
     }
 
-    const result = isUpdating ? await updateAuctionItem(auctionItem!.id, payload) : await createAuctionItem(payload)
+    const result = isUpdating
+      ? await updateAuctionItem(auctionItem!.id, payload)
+      : await createAuctionItem(payload)
 
     if (!result.success) {
       setErrors({ form: result.error ?? 'Something went wrong.' })
@@ -159,7 +164,9 @@ export function AuctionItemForm({
             payload.sellingFormat === 'AUCTION' ? 'Auction item' : 'Instant buy',
             price,
             shipping,
-            photos.length > 0 ? `${photos.length} photo${photos.length === 1 ? '' : 's'} added` : null
+            photos.length > 0
+              ? `${photos.length} photo${photos.length === 1 ? '' : 's'} added`
+              : null
           ]
             .filter(Boolean)
             .join(' · ') || undefined,

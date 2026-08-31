@@ -5,12 +5,12 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Plus, Check, Share2 } from 'lucide-react'
 import Link from 'next/link'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from '../../../components/_common/Picture'
-import { useAppDispatch } from 'app/lib/store/store'
-import { addToCart } from 'app/lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'app/lib/store/slices/uiSlice'
-import { WELCOME_WIENER_CATEGORY_LABELS } from 'app/lib/constants/welcome-wiener.constants'
+import { useAppDispatch } from 'lib/store/store'
+import { addToCart } from 'lib/store/slices/cartSlice'
+import { setOpenCartToast } from 'lib/store/slices/uiSlice'
+import { WELCOME_WIENER_CATEGORY_LABELS } from 'lib/constants/welcome-wiener.constants'
 
 export default function PublicWelcomeWienerClient({
   welcomeWiener

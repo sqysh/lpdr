@@ -1,4 +1,4 @@
-import { PulseStat } from 'app/lib/actions/super-user/getPulseStats'
+import { PulseStat } from 'lib/actions/super-user/getPulseStats'
 import { PanelHeader } from './PanelHeader'
 
 const signalColor: Record<string, string> = {
@@ -21,10 +21,21 @@ export function PulseColumn({ stats }: { stats: PulseStat[] }) {
       <div className="flex flex-col divide-y divide-border-light dark:divide-border-dark overflow-y-auto flex-1">
         {stats.map((s) => (
           <div key={s.label} className="px-3 py-2.5 relative">
-            <div className={`absolute top-0 left-0 w-0.5 h-full ${signalBg[s.signal]}`} aria-hidden="true" />
-            <p className="font-mono text-[9px] tracking-[0.12em] uppercase text-muted-light dark:text-muted-dark mb-1 pl-1">{s.label}</p>
-            <p className={`font-quicksand font-black text-xl leading-none pl-1 ${signalColor[s.signal]}`}>{s.value}</p>
-            <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark mt-0.5 pl-1 leading-snug">{s.detail}</p>
+            <div
+              className={`absolute top-0 left-0 w-0.5 h-full ${signalBg[s.signal]}`}
+              aria-hidden="true"
+            />
+            <p className="font-mono text-[9px] tracking-[0.12em] uppercase text-muted-light dark:text-muted-dark mb-1 pl-1">
+              {s.label}
+            </p>
+            <p
+              className={`font-quicksand font-black text-xl leading-none pl-1 ${signalColor[s.signal]}`}
+            >
+              {s.value}
+            </p>
+            <p className="font-mono text-[8px] text-muted-light dark:text-muted-dark mt-0.5 pl-1 leading-snug">
+              {s.detail}
+            </p>
           </div>
         ))}
       </div>

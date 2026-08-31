@@ -1,4 +1,4 @@
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PaymentInputs } from './DonateForm'
 

@@ -1,6 +1,6 @@
 import { Toggle } from 'app/components/_primitives'
-import { TERMS_AND_CONDITIONS } from 'app/lib/constants/adoption-application.constants'
-import { slideVariants } from 'app/lib/constants/motion.constants'
+import { TERMS_AND_CONDITIONS } from 'lib/constants/adoption-application.constants'
+import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 
 export function Step1Terms({ agreedToTerms, handleContinueToInfo, setAgreedToTerms }) {

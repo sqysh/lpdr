@@ -1,4 +1,4 @@
-import getAuctions from 'app/lib/actions/public/auction/getAuctions'
+import getAuctions from 'lib/actions/public/auction/getAuctions'
 import PublicAuctionsClient from './PublicAuctionsClient'
 
 export default async function PublicAuctionsPage() {

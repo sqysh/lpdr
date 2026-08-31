@@ -1,9 +1,9 @@
-import { getUserAddress } from 'app/lib/actions/my-pack/getUserAddress'
-import { getUserName } from 'app/lib/actions/my-pack/getUserName'
-import { auth } from 'app/lib/auth'
+import { getUserAddress } from 'lib/actions/my-pack/getUserAddress'
+import { getUserName } from 'lib/actions/my-pack/getUserName'
+import { auth } from 'lib/auth'
 import { PublicCheckoutClient } from './PublicCheckoutClient'
 import { IPaymentMethod } from 'types/_payment-method.types'
-import { getSavedPaymentMethods } from 'app/lib/actions/_stripe/getSavedPaymentMethods'
+import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
 
 export default async function PublicCheckoutPage() {
   const session = await auth()

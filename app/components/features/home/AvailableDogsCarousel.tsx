@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { card, cardContainer } from 'app/lib/constants/motion.constants'
+import { card, cardContainer } from 'lib/constants/motion.constants'
 import { ArrowLink } from 'app/components/_primitives/ArrowLink'
 import Picture from 'app/components/_common/Picture'
 
@@ -80,8 +80,8 @@ export const AvailableDogsBlock = ({ data }) => {
             No Dogs Available Right Now
           </h2>
           <p className="font-nunito text-muted-light dark:text-muted-dark mb-8 max-w-md leading-relaxed">
-            All of our dachshunds have found homes — check back soon, or sign up to be notified when new dogs are
-            available.
+            All of our dachshunds have found homes — check back soon, or sign up to be notified when
+            new dogs are available.
           </p>
           <Link
             href="/dachshunds"

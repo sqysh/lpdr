@@ -3,14 +3,18 @@
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
-import { fadeUp } from 'app/lib/constants/motion.constants'
-import { useAppDispatch } from 'app/lib/store/store'
-import { addToCart } from 'app/lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'app/lib/store/slices/uiSlice'
-import { FILTERS, FilterValue } from 'app/lib/constants/welcome-wiener.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
+import { useAppDispatch } from 'lib/store/store'
+import { addToCart } from 'lib/store/slices/cartSlice'
+import { setOpenCartToast } from 'lib/store/slices/uiSlice'
+import { FILTERS, FilterValue } from 'lib/constants/welcome-wiener.constants'
 import { WelcomeWienerCard } from 'app/components/features/welcome-wieners/WelcomeWienerCard'
 
-export function PublicWelcomeWienersClient({ welcomeWieners }: { welcomeWieners: IWelcomeWiener[] }) {
+export function PublicWelcomeWienersClient({
+  welcomeWieners
+}: {
+  welcomeWieners: IWelcomeWiener[]
+}) {
   const dispatch = useAppDispatch()
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
   const [added, setAdded] = useState<Record<string, string[]>>({})
@@ -47,16 +51,32 @@ export function PublicWelcomeWienersClient({ welcomeWieners }: { welcomeWieners:
     dispatch(addToCart(cartItem))
     dispatch(setOpenCartToast(cartItem))
     setAdded((prev) => ({ ...prev, [dog.id]: [...(prev[dog.id] ?? []), product.id] }))
-    setTimeout(() => setAdded((prev) => ({ ...prev, [dog.id]: prev[dog.id].filter((id) => id !== product.id) })), 2000)
+    setTimeout(
+      () =>
+        setAdded((prev) => ({ ...prev, [dog.id]: prev[dog.id].filter((id) => id !== product.id) })),
+      2000
+    )
   }
 
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-10 sm:mb-12"
+        >
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Welcome Wieners
             </p>
@@ -65,8 +85,8 @@ export function PublicWelcomeWienersClient({ welcomeWieners }: { welcomeWieners:
             Meet the <span className="font-light text-muted-light dark:text-muted-dark">Dogs</span>
           </h1>
           <p className="text-sm text-muted-light dark:text-muted-dark max-w-md leading-relaxed">
-            These dogs are in our care and need your support. Pick an item from any dog&apos;s list to donate it
-            directly.
+            These dogs are in our care and need your support. Pick an item from any dog&apos;s list
+            to donate it directly.
           </p>
         </motion.div>
 
@@ -130,7 +150,9 @@ export function PublicWelcomeWienersClient({ welcomeWieners }: { welcomeWieners:
               role="status"
               aria-live="polite"
             >
-              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">No dogs found.</p>
+              <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
+                No dogs found.
+              </p>
             </motion.div>
           )}
         </AnimatePresence>

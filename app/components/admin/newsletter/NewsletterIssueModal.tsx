@@ -4,11 +4,11 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, FileText } from 'lucide-react'
-import { store } from 'app/lib/store/store'
-import { showToast } from 'app/lib/store/slices/toastSlice'
-import { MONTHS, YEARS, CURRENT_YEAR } from 'app/lib/constants/date.constants'
-import createNewsletterIssue from 'app/lib/actions/admin/newsletter-issue/createNewsletterIssue'
-import { useEscapeKey } from '@hooks/useEscapeKey.hook'
+import { store } from 'lib/store/store'
+import { showToast } from 'lib/store/slices/toastSlice'
+import { MONTHS, YEARS, CURRENT_YEAR } from 'lib/constants/date.constants'
+import createNewsletterIssue from 'lib/actions/admin/newsletter-issue/createNewsletterIssue'
+import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormState } from 'types/_newsletter-issue.types'
 import { Toggle } from 'app/components/_primitives'
 
@@ -19,7 +19,13 @@ const initialState = (): FormState => ({
   isLive: false
 })
 
-export function NewsletterIssueModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
+export function NewsletterIssueModal({
+  isOpen,
+  onClose
+}: {
+  isOpen: boolean
+  onClose: () => void
+}) {
   const router = useRouter()
 
   const [form, setForm] = useState<FormState>(initialState)

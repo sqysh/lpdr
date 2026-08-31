@@ -2,18 +2,24 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { fadeUp } from 'app/lib/constants/motion.constants'
+import { fadeUp } from 'lib/constants/motion.constants'
 import { MultiItemOrder } from 'types/_my-pack.types'
 import { PurchaseRow } from 'app/components/my-pack/PurchaseRow'
 
 export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrder[] }) {
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
+    >
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
           <div className="flex items-center gap-3 mb-3">
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Multi Item Orders
             </p>

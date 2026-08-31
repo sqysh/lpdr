@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { containerVariants } from 'app/lib/constants/motion.constants'
+import { containerVariants } from 'lib/constants/motion.constants'
 import { DogCard } from 'app/components/features/dachshunds/DogCard'
 import { IDachshund } from 'types/_rescue-groups.types'
 
