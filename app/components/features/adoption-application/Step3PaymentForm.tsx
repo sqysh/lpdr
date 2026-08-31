@@ -25,13 +25,12 @@ type PaymentInputs = {
 type Props = {
   savedCards: IPaymentMethod[]
   isAuthed: boolean
-  userId: string | null
   firstName: string
   lastName: string
   email: string
 }
 
-export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, lastName, email }: Props) {
+export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, email }: Props) {
   const stripe = useStripe()
   const elements = useElements()
   const { setupPusherListenerOneTime } = usePaymentProcessor()
@@ -57,7 +56,10 @@ export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, last
   const usingSavedCard = !!payment.selectedCardId && !payment.useNewCard && isAuthed
 
   const isValid =
-    !!firstName.trim() && !!lastName.trim() && EMAIL_REGEX.test(email) && (usingSavedCard ? true : payment.cardComplete)
+    !!firstName.trim() &&
+    !!lastName.trim() &&
+    EMAIL_REGEX.test(email) &&
+    (usingSavedCard ? true : payment.cardComplete)
 
   // ── Hooks ─────────────────────────────────────────────────────────────────
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
@@ -76,7 +78,6 @@ export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, last
       const amountInCents = Math.round(finalAmount * 100)
 
       const basePayload = {
-        userId,
         email: trimmedEmail,
         name,
         amount: amountInCents,
@@ -104,7 +105,6 @@ export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, last
           name,
           email: trimmedEmail,
           orderType: 'ADOPTION_FEE',
-          userId,
           saveCard: payment.saveCard,
           coverFees: payment.coverFees,
           feesCovered
@@ -143,13 +143,17 @@ export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, last
           useNewCard={payment.useNewCard}
           onSelectCard={(id) => patch({ selectedCardId: id })}
           onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-          onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
+          onUseSavedCard={() =>
+            patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
+          }
         />
       )}
 
       {/* ── Card element ── */}
       {(!isAuthed || savedCards.length === 0 || payment.useNewCard) && (
-        <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error })} />
+        <CardElementField
+          onChange={({ complete, error }) => patch({ cardComplete: complete, error })}
+        />
       )}
 
       {/* ── Cover fees ── */}
@@ -191,7 +195,8 @@ export function Step3PaymentForm({ savedCards, isAuthed, userId, firstName, last
           <rect x="3" y="11" width="18" height="11" />
           <path d="M7 11V7a5 5 0 0110 0v4" />
         </svg>
-        Secured by Stripe. We never store your card details. All donations are final and non-refundable.
+        Secured by Stripe. We never store your card details. All donations are final and
+        non-refundable.
       </p>
     </form>
   )

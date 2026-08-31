@@ -674,6 +674,14 @@ model PendingAdminInvite {
   createdBy String
 }
 
+model PaymentAttempt {
+  id        String   @id @default(cuid())
+  userId    String
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}
+
 // ─── STAGING TABLES ───────────────────────────────────────────────────
 model MongoUser {
   id        String   @id @default(cuid())

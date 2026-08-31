@@ -43,11 +43,10 @@ type Props = {
   savedCards: IPaymentMethod[]
   userName: { firstName?: string; lastName?: string }
   isAuthed: boolean
-  userId: string | null
   email: string
 }
 
-export function DonateForm({ savedCards, userName, isAuthed, userId, email }: Props) {
+export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   const stripe = useStripe()
   const elements = useElements()
   const { setupPusherListenerOneTime } = usePaymentProcessor()
@@ -122,7 +121,6 @@ export function DonateForm({ savedCards, userName, isAuthed, userId, email }: Pr
       const amountInCents = Math.round(finalAmount * 100)
 
       const basePayload = {
-        userId,
         email: trimmedEmail,
         name,
         amount: amountInCents,

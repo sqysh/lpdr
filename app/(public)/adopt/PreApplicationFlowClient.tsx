@@ -23,7 +23,6 @@ type Props = {
   savedCards: IPaymentMethod[]
   userName?: { firstName: string; lastName: string } | any
   isAuthed: boolean
-  id?: string
   email?: string
 }
 
@@ -31,8 +30,7 @@ export const PreApplicationFlowClient = ({
   savedCards,
   userName,
   isAuthed,
-  email,
-  id
+  email
 }: Props & { isAuthed: boolean; email: string | null }) => {
   const router = useRouter()
 
@@ -174,7 +172,6 @@ export const PreApplicationFlowClient = ({
               email={email}
               firstName={inputs.firstName}
               lastName={inputs.lastName}
-              userId={id}
               isAuthed={isAuthed}
             />
           )}

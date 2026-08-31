@@ -2,7 +2,7 @@ import { slideVariants } from 'app/lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { Step3PaymentForm } from './Step3PaymentForm'
 
-export function Step3Payment({ savedCards, setStep, email, firstName, lastName, userId, isAuthed }) {
+export function Step3Payment({ savedCards, setStep, email, firstName, lastName, isAuthed }) {
   return (
     <motion.section
       key="payment"
@@ -24,8 +24,12 @@ export function Step3Payment({ savedCards, setStep, email, firstName, lastName, 
       </p>
 
       <div className="bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark p-4 mb-6 flex items-center justify-between">
-        <span className="text-sm font-medium text-text-light dark:text-text-dark">Application Fee</span>
-        <span className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark">$15.00</span>
+        <span className="text-sm font-medium text-text-light dark:text-text-dark">
+          Application Fee
+        </span>
+        <span className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark">
+          $15.00
+        </span>
       </div>
 
       <Step3PaymentForm
@@ -34,7 +38,6 @@ export function Step3Payment({ savedCards, setStep, email, firstName, lastName, 
         firstName={firstName}
         isAuthed={isAuthed}
         lastName={lastName}
-        userId={userId}
       />
 
       <button

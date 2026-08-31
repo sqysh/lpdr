@@ -69,7 +69,6 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
 
   const name = `${winningBidder?.user.firstName} ${winningBidder?.user.lastName}`
   const email = session.data?.user?.email
-  const userId = session.data?.user?.id
 
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
   useDefaultCard(savedCards, setDefaultCard)
@@ -86,21 +85,26 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
         name,
         email,
         orderType: 'AUCTION_PURCHASE' as const,
-        userId,
         coverFees: inputs.coverFees,
         feesCovered,
         winningBidderId: winningBidder.id
       }
 
       if (usingSavedCard) {
-        const result = await createPaymentIntent({ ...basePayload, savedCardId: inputs.selectedCardId })
+        const result = await createPaymentIntent({
+          ...basePayload,
+          savedCardId: inputs.selectedCardId
+        })
         if (!result.success) throw new Error(result.error)
         setupPusherListenerOneTime()
       } else {
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) throw new Error('Card element not found')
 
-        const intentResult = await createPaymentIntent({ ...basePayload, saveCard: inputs.saveCard })
+        const intentResult = await createPaymentIntent({
+          ...basePayload,
+          saveCard: inputs.saveCard
+        })
         if (!intentResult.success) throw new Error(intentResult.error)
 
         const result = await stripe.confirmCardPayment(intentResult.clientSecret!, {
@@ -138,7 +142,8 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
   const handlers: PaymentHandlers = {
     onSelectCard: (id) => patch({ selectedCardId: id }),
     onUseNewCard: () => patch({ useNewCard: true, selectedCardId: null }),
-    onUseSavedCard: () => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null }),
+    onUseSavedCard: () =>
+      patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null }),
     onCardChange: ({ complete, error }) => patch({ cardComplete: complete, error }),
     onSaveCardToggle: () => patch({ saveCard: !inputs.saveCard }),
     onCoverFeesChange: (coverFees) => patch({ coverFees }),
@@ -175,7 +180,9 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
               </h1>
               <p className="font-lato text-sm text-zinc-500 dark:text-muted-dark leading-relaxed max-w-lg">
                 You won{' '}
-                {winningBidder?.auctionItems.length === 1 ? 'an item' : `${winningBidder?.auctionItems.length} items`}{' '}
+                {winningBidder?.auctionItems.length === 1
+                  ? 'an item'
+                  : `${winningBidder?.auctionItems.length} items`}{' '}
                 in the auction. Complete your payment below to claim{' '}
                 {winningBidder?.auctionItems.length === 1 ? 'it' : 'them'}.
               </p>
@@ -185,13 +192,21 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
 
         {/* ── Paying as ── */}
         {winningBidder.user?.firstName && (
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0.5} className="mb-6">
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={0.5}
+            className="mb-6"
+          >
             <div className="border-l-2 border-cyan-600 dark:border-violet-400 pl-4">
               <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-0.5">
                 Paying as
               </p>
               <p className="text-lg uppercase leading-none text-zinc-950 dark:text-text-dark">
-                {[winningBidder.user.firstName, winningBidder.user.lastName].filter(Boolean).join(' ')}
+                {[winningBidder.user.firstName, winningBidder.user.lastName]
+                  .filter(Boolean)
+                  .join(' ')}
               </p>
               <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50 mt-0.5">
                 {winningBidder.user.email}
@@ -202,7 +217,12 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
 
         {/* ── Two column layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
-          <WinnerPaymentForm winningBidder={winningBidder} savedCards={savedCards} state={state} handlers={handlers} />
+          <WinnerPaymentForm
+            winningBidder={winningBidder}
+            savedCards={savedCards}
+            state={state}
+            handlers={handlers}
+          />
           <WinnerOrderSummary
             winningBidder={winningBidder}
             total={total}

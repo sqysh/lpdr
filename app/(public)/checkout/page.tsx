@@ -30,7 +30,6 @@ export default async function PublicCheckoutPage() {
       userName={userName?.data}
       isAuthed={isAuthed}
       email={session?.user?.email ?? null}
-      userId={session?.user?.id ?? null}
     />
   )
 }

@@ -31,7 +31,6 @@ export type CreatePaymentIntentParams = {
   name: string
   email: string
   orderType: OrderType
-  userId?: string
   saveCard?: boolean
   coverFees?: boolean
   feesCovered?: number
@@ -41,12 +40,14 @@ export type CreatePaymentIntentParams = {
   auctionItemId?: string
 }
 
+const RATE_LIMIT_MAX_ATTEMPTS = 5
+const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000 // 10 minutes
+
 export async function createPaymentIntent({
   amount,
   name,
   email,
   orderType,
-  userId,
   saveCard = false,
   coverFees = false,
   feesCovered = 0,
@@ -57,6 +58,28 @@ export async function createPaymentIntent({
 }: CreatePaymentIntentParams) {
   const gate = await requireAuth()
   if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+
+  const userId = gate.userId
+  const verifiedEmail = gate.email ?? email // fall back to client email only for display purposes, never for identity/auth logic
+
+  const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS)
+  const recentAttempts = await prisma.paymentAttempt.count({
+    where: { userId, createdAt: { gt: windowStart } }
+  })
+
+  if (recentAttempts >= RATE_LIMIT_MAX_ATTEMPTS) {
+    await createLog('warn', 'Payment intent rate limit exceeded', {
+      userId,
+      orderType,
+      recentAttempts
+    })
+    return {
+      success: false,
+      error: 'Too many payment attempts. Please try again in a few minutes.'
+    }
+  }
+
+  await prisma.paymentAttempt.create({ data: { userId } })
 
   if (orderType === 'ONE_TIME_DONATION' && amount < 500) {
     return { success: false, error: 'Minimum donation is $5' }
@@ -129,7 +152,7 @@ export async function createPaymentIntent({
 
     const [details, customerId] = await Promise.all([
       stampUserGeoFromRequest(userId),
-      getOrCreateStripeCustomer({ userId, email })
+      getOrCreateStripeCustomer({ userId, email: verifiedEmail })
     ])
 
     const descriptions: Record<string, string> = {
@@ -147,14 +170,14 @@ export async function createPaymentIntent({
       amount: finalCents,
       currency: 'usd',
       customer: customerId,
-      receipt_email: email,
+      receipt_email: verifiedEmail,
       description: descriptions[orderType] ?? `Payment from ${name}`,
       setup_future_usage: saveCard ? 'on_session' : undefined,
       metadata: {
         orderType,
         userId: userId ?? '',
         name,
-        email,
+        email: verifiedEmail,
         saveCard: saveCard ? 'true' : 'false',
         coverFees: coverFees ? 'true' : 'false',
         feesCovered: feesCovered.toString(),
@@ -202,7 +225,7 @@ export async function createPaymentIntent({
       orderType,
       userId: userId ?? null,
       name,
-      email
+      email: verifiedEmail
     })
 
     return {

@@ -11,12 +11,11 @@ import Picture from 'app/components/_common/Picture'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 
-type IPublicDonateClient = {
+type Props = {
   savedCards: IPaymentMethod[]
   userName: { firstName?: string; lastName?: string }
   isAuthed: boolean
   email?: string | null
-  userId?: string | null
   userImage?: string | null
 }
 
@@ -25,9 +24,8 @@ export default function PublicDonateClient({
   userName,
   isAuthed,
   email,
-  userId,
   userImage
-}: IPublicDonateClient) {
+}: Props) {
   const router = useRouter()
   const [navigatingToMyPack, setNavigatingToMyPack] = useState(false)
 
@@ -246,7 +244,6 @@ export default function PublicDonateClient({
               userName={userName}
               isAuthed={isAuthed}
               email={email}
-              userId={userId}
             />
           </div>
           {/* end two-column grid */}

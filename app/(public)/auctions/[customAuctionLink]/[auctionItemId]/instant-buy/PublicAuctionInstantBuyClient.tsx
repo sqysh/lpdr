@@ -52,7 +52,6 @@ interface Props {
   savedCards: IPaymentMethod[]
   // from server page — no useSession flash
   isAuthed: boolean
-  userId: string | null
   userEmail: string
   userName: { firstName: string; lastName: string } | null
   userAddress: {
@@ -68,7 +67,6 @@ export default function PublicAuctionInstantBuyClient({
   auctionItem,
   savedCards,
   isAuthed,
-  userId,
   userEmail,
   userName,
   userAddress
@@ -124,7 +122,11 @@ export default function PublicAuctionInstantBuyClient({
 
   const hasName = !!inputs.firstName && !!inputs.lastName && !editingName
   const hasAddress =
-    !!inputs.addressLine1 && !!inputs.city && !!inputs.state && !!inputs.zipPostalCode && !editingAddress
+    !!inputs.addressLine1 &&
+    !!inputs.city &&
+    !!inputs.state &&
+    !!inputs.zipPostalCode &&
+    !editingAddress
 
   const addressRequired = !!auctionItem?.requiresShipping
   const addressReady = !addressRequired || hasAddress
@@ -222,7 +224,6 @@ export default function PublicAuctionInstantBuyClient({
         name,
         email: userEmail,
         orderType: 'AUCTION_PURCHASE' as const,
-        userId,
         coverFees: inputs.coverFees,
         feesCovered,
         auctionItemId: auctionItem?.id
@@ -358,7 +359,10 @@ export default function PublicAuctionInstantBuyClient({
                   onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
                   onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
                   onUseSavedCard={() =>
-                    patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
+                    patch({
+                      useNewCard: false,
+                      selectedCardId: savedCards[0]?.stripePaymentId ?? null
+                    })
                   }
                 />
               )}
@@ -366,7 +370,9 @@ export default function PublicAuctionInstantBuyClient({
               {enteringNewCard && (
                 <>
                   <CardElementField
-                    onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })}
+                    onChange={({ complete, error }) =>
+                      patch({ cardComplete: complete, error: error ?? null })
+                    }
                   />
                   <Toggle
                     id="instant-buy-save-card"
@@ -394,7 +400,8 @@ export default function PublicAuctionInstantBuyClient({
               />
 
               <p className="font-lato text-xs text-muted-light dark:text-muted-dark text-center leading-relaxed">
-                Your payment is secured by Stripe. Little Paws Dachshund Rescue will never store your card details.
+                Your payment is secured by Stripe. Little Paws Dachshund Rescue will never store
+                your card details.
               </p>
             </form>
           </section>

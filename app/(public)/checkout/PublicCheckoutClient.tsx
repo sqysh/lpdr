@@ -17,7 +17,12 @@ import { IAddress } from 'types/_address.types'
 import { StepIndicator } from 'app/components/features/payment/StepIndicator'
 import { SignedInRow } from 'app/components/features/payment/SignedInRow'
 import { StepSignIn } from 'app/components/features/payment/SignInStep'
-import { OrderSummary, Step2Name, Step3Address, Step4Payment } from 'app/components/features/checkout'
+import {
+  OrderSummary,
+  Step2Name,
+  Step3Address,
+  Step4Payment
+} from 'app/components/features/checkout'
 
 interface CheckoutFormInputs {
   // identity
@@ -43,13 +48,12 @@ interface CheckoutFormInputs {
   error: string | null
 }
 
-type IPublicCheckoutClient = {
+type Props = {
   savedCards: IPaymentMethod[]
   userAddress: IAddress | null
   userName: { firstName: string; lastName: string } | null
   // from server page — no useSession() flash
   isAuthed: boolean
-  userId: string | null
   email: string | null
 }
 
@@ -57,7 +61,11 @@ type IPublicCheckoutClient = {
 
 type ErrorMap = Record<string, string>
 
-const validateName = (inputs: CheckoutFormInputs, setErrors: (e: ErrorMap) => void, isAuthed: boolean): boolean => {
+const validateName = (
+  inputs: CheckoutFormInputs,
+  setErrors: (e: ErrorMap) => void,
+  isAuthed: boolean
+): boolean => {
   const errs: ErrorMap = {}
   if (!inputs.firstName.trim()) errs.firstName = 'Required'
   if (!inputs.lastName.trim()) errs.lastName = 'Required'
@@ -84,9 +92,8 @@ export function PublicCheckoutClient({
   userAddress,
   userName,
   isAuthed,
-  email,
-  userId
-}: IPublicCheckoutClient) {
+  email
+}: Props) {
   const stripe = useStripe()
   const elements = useElements()
   const { setupPusherListenerOneTime } = usePaymentProcessor()
@@ -132,7 +139,9 @@ export function PublicCheckoutClient({
 
   // ── Step machine ──────────────────────────────────────────────────────────
   const FLOW: number[] = hasPhysical ? [1, 2, 3, 4] : [1, 2, 4]
-  const stepLabels = hasPhysical ? ['Sign In', 'Your Name', 'Shipping', 'Payment'] : ['Sign In', 'Your Name', 'Payment']
+  const stepLabels = hasPhysical
+    ? ['Sign In', 'Your Name', 'Shipping', 'Payment']
+    : ['Sign In', 'Your Name', 'Payment']
 
   const [step, setStep] = useState<number>(() => {
     if (!isAuthed) return 1
@@ -173,7 +182,12 @@ export function PublicCheckoutClient({
     : null
 
   const formattedShippingAddress = shippingAddress
-    ? [shippingAddress.addressLine1, shippingAddress.addressLine2, shippingAddress.city, shippingAddress.state]
+    ? [
+        shippingAddress.addressLine1,
+        shippingAddress.addressLine2,
+        shippingAddress.city,
+        shippingAddress.state
+      ]
         .filter(Boolean)
         .join(', ') + (shippingAddress.zipPostalCode ? ` ${shippingAddress.zipPostalCode}` : '')
     : ''
@@ -183,12 +197,14 @@ export function PublicCheckoutClient({
   useDefaultCard(savedCards, setDefaultCard)
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    patch({ [e.target.name]: e.target.value } as Partial<CheckoutFormInputs>)
+  const handleInput = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => patch({ [e.target.name]: e.target.value } as Partial<CheckoutFormInputs>)
 
   const handleNext = () => {
     if (effectiveStep === 2 && !validateName(inputs, setErrors, isAuthed)) return
-    if (effectiveStep === 3 && !inputs.useSavedAddress && !validateAddress(inputs, setErrors)) return
+    if (effectiveStep === 3 && !inputs.useSavedAddress && !validateAddress(inputs, setErrors))
+      return
     setErrors({})
     goNext()
   }
@@ -215,7 +231,6 @@ export function PublicCheckoutClient({
         name,
         email: trimmedEmail,
         orderType: getOrderType(items),
-        userId,
         coverFees: inputs.coverFees,
         feesCovered,
         items,
@@ -265,7 +280,13 @@ export function PublicCheckoutClient({
     <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* Page header */}
-        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="show"
+          custom={0}
+          className="mb-10 sm:mb-12"
+        >
           <Link
             href="/cart"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -284,13 +305,17 @@ export function PublicCheckoutClient({
             Cart
           </Link>
           <div className="flex items-center gap-3 mb-4">
-            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <span
+              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
+              aria-hidden="true"
+            />
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Little Paws Dachshund Rescue
             </p>
           </div>
           <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight">
-            Checkout <span className="font-light text-muted-light dark:text-muted-dark">& Donate</span>
+            Checkout{' '}
+            <span className="font-light text-muted-light dark:text-muted-dark">& Donate</span>
           </h1>
         </motion.div>
 
@@ -358,7 +383,13 @@ export function PublicCheckoutClient({
                   useSaved={inputs.useSavedAddress}
                   setUseSaved={(value) => patch({ useSavedAddress: value })}
                   onUseDifferentAddress={() =>
-                    patch({ addressLine1: '', addressLine2: '', city: '', state: '', zipPostalCode: '' })
+                    patch({
+                      addressLine1: '',
+                      addressLine2: '',
+                      city: '',
+                      state: '',
+                      zipPostalCode: ''
+                    })
                   }
                   onUseSavedAddress={() =>
                     patch({
