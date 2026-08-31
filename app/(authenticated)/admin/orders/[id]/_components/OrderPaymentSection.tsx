@@ -13,7 +13,10 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
           id="payment-heading"
           className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark"
         >
-          <CreditCard className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
+          <CreditCard
+            className="w-4 h-4 text-primary-light dark:text-primary-dark"
+            aria-hidden="true"
+          />
           Payment
         </h2>
       </div>
@@ -27,7 +30,10 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
         <div>
           <Label>Placed</Label>
           <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">
-            {new Date(order.createdAt).toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })}
+            {new Date(order.createdAt).toLocaleString('en-US', {
+              dateStyle: 'medium',
+              timeStyle: 'short'
+            })}
           </p>
         </div>
         {order.paymentIntentId && (

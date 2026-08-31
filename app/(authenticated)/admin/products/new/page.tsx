@@ -1,4 +1,4 @@
-import ProductForm from 'app/components/admin/product/ProductForm'
+import ProductForm from '../_components/ProductForm'
 
 export default async function CreateProductPage() {
   return <ProductForm />

@@ -6,7 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import AdminSidebar from './sidebar'
-import AdminAuctionModal from 'app/components/admin/auctions/AdminAuctionModal'
+import AdminAuctionModal from 'app/(authenticated)/admin/auctions/_components/AdminAuctionModal'
 import { Role } from '@prisma/client'
 
 export function AdminLayoutClient({

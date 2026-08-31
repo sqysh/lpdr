@@ -8,15 +8,15 @@ import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { store } from 'lib/store/store'
 import { showToast } from 'lib/store/slices/toastSlice'
-import type { IAuctionItem, SellingFormat } from 'types/_auction-item'
-import type { AuctionStatus } from 'types/_auction'
+import type { SellingFormat } from 'types/_auction-item'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'
+import { AuctionItemDangerZone } from './AuctionItemDangerZone'
+import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
+import { AuctionStatus } from '@prisma/client'
 import { AuctionItemFormHeader } from './AuctionItemFormHeader'
 import { AuctionItemFormTitleBand } from './AuctionItemFormTitleBand'
 import { AuctionItemFields } from './AuctionItemFields'
 import { AuctionItemPhotoPanel } from './AuctionItemPhotoPanel'
-import { AuctionItemDangerZone } from './AuctionItemDangerZone'
-import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 
 interface FormInputs {
   name: string
@@ -56,7 +56,18 @@ export function AuctionItemForm({
   type,
   auctionStatus
 }: {
-  auctionItem: IAuctionItem | null
+  auctionItem: {
+    id: string
+    name: string
+    description: string
+    sellingFormat: SellingFormat
+    startingPrice: number
+    buyNowPrice: number
+    totalQuantity: number
+    requiresShipping: boolean
+    shippingCosts: number
+    photos: any
+  }
   auctionId: string
   type: SellingFormat
   auctionStatus: AuctionStatus

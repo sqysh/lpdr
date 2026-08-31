@@ -7,11 +7,11 @@ import { Check, ChevronRight, Gavel, Loader2, Tag, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
-import { AuctionStatus } from 'types/_auction'
-import { IAuctionItem } from 'types/_auction-item'
+import { IAuctionItemLive } from 'types/_auction-item'
+import { AuctionStatus } from '@prisma/client'
 
 type Props = {
-  item: IAuctionItem
+  item: IAuctionItemLive
   auctionStatus: AuctionStatus
   index: number
   customAuctionLink: string

@@ -1,13 +1,13 @@
 import { SectionLabel } from 'app/components/_primitives'
 import { Zap } from 'lucide-react'
 import { AuctionItemCard } from './AuctionItemCard'
-import { IAuctionItem } from 'types/_auction-item'
+import { IAuctionItemLive } from 'types/_auction-item'
 import { IAuction } from 'types/_auction'
 import { Dispatch, SetStateAction } from 'react'
 
 type Props = {
   isActive: boolean
-  available: IAuctionItem[]
+  available: IAuctionItemLive[]
   auction: IAuction
   customAuctionLink: string
   setFilter: (filter: 'ALL' | 'AUCTION' | 'FIXED' | 'NO BIDS') => void
@@ -55,7 +55,13 @@ export function AuctionItemGrid({
                     : 'bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark'
                 }`}
               >
-                {f === 'ALL' ? 'All' : f === 'AUCTION' ? 'Auction' : f === 'NO BIDS' ? 'No Bids' : 'Buy Now'}
+                {f === 'ALL'
+                  ? 'All'
+                  : f === 'AUCTION'
+                    ? 'Auction'
+                    : f === 'NO BIDS'
+                      ? 'No Bids'
+                      : 'Buy Now'}
               </button>
             ))}
           </div>
@@ -63,7 +69,9 @@ export function AuctionItemGrid({
         {isActive && (
           <div className="hidden xs:flex items-center gap-1.5 px-3 py-2 border border-emerald-500/30 bg-emerald-500/5">
             <Zap size={10} className="text-emerald-500" aria-hidden="true" />
-            <span className="text-[9px] font-mono text-emerald-500 tracking-[0.15em] uppercase">Bidding Open</span>
+            <span className="text-[9px] font-mono text-emerald-500 tracking-[0.15em] uppercase">
+              Bidding Open
+            </span>
           </div>
         )}
       </div>

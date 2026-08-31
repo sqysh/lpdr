@@ -1,52 +1,72 @@
+import { Prisma } from '@prisma/client'
 import { IAuction } from './_auction'
-import { IAuctionBid } from './_auction-bid'
-import { IAuctionItemInstantBuyer } from './_auction-instant-buyer'
-import { IAuctionItemPhoto } from './_auction-item-photo'
-import { IAuctionWinningBidder } from './_auction-winning-bidder'
 
 export type AuctionItemStatus = 'UNSOLD' | 'SOLD' | 'ACTIVE'
 export type SellingFormat = 'AUCTION' | 'FIXED'
 
-export interface IAuctionItem {
-  id: string
-  auctionId: string
-  createdAt: Date
-  updatedAt: Date
+// Derived directly from what getAuctions() actually returns — Decimal fields
+// are already numbers, relations are already shaped correctly, and this
+// type can never drift from reality since it's not hand-maintained.
+// Use this for list views (admin auctions list, overview tab, etc.)
+// where you don't need every bid/instant-buyer loaded per item.
+export type IAuctionItem = NonNullable<IAuction['items']>[number]
 
-  // Details
-  name: string
-  description: string | null
-  retailValue: string | null
+// ── Live/detail item shape ──────────────────────────────────────────────
+// A richer include for pages that need the item's own bids, instant
+// buyers, a back-reference to its parent auction, and a bid count —
+// used by the auction-live page, item detail view, and public instant-buy
+// page. Single source of truth: change the include here, both the query
+// and the type update together.
+export const auctionItemLiveIncludes = Prisma.validator<Prisma.AuctionItemDefaultArgs>()({
+  include: {
+    photos: true,
+    bids: {
+      select: {
+        id: true,
+        bidAmount: true,
+        auctionId: true,
+        auctionItemId: true,
+        userId: true,
+        bidderId: true,
+        status: true,
+        sentWinnerEmail: true,
+        emailCount: true,
+        createdAt: true,
+        updatedAt: true
+      }
+    },
+    instantBuyers: true,
+    auction: {
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        startDate: true,
+        endDate: true,
+        customAuctionLink: true
+      }
+    },
+    _count: {
+      select: { bids: true }
+    }
+  }
+})
 
-  // Pricing (Decimal in DB — serialized to number)
-  sellingFormat: SellingFormat
-  startingPrice: number | null
-  buyNowPrice: number | null
-  currentPrice: number | null
-  currentBid: number | null
-  minimumBid: number | null
-  soldPrice: number | null
-  shippingCosts: number | null
-  totalQuantity: number | null
-  totalBids: number
+type RawAuctionItemLive = Prisma.AuctionItemGetPayload<typeof auctionItemLiveIncludes>
 
-  // Status
-  status: AuctionItemStatus
-  requiresShipping: boolean
-  isAuction: boolean
-  isFixed: boolean
-  topBidder: string | null
-  itemBtnText: string | null
+type DecimalToNumber<T> = T extends Prisma.Decimal
+  ? number
+  : T extends Prisma.Decimal | null
+    ? number | null
+    : T extends Date
+      ? T
+      : T extends (infer U)[]
+        ? DecimalToNumber<U>[]
+        : T extends object
+          ? { [K in keyof T]: DecimalToNumber<T[K]> }
+          : T
 
-  // Relations (present only when included in the query)
-  auctionWinningBidderId: string | null
-  winningBidder?: IAuctionWinningBidder | null
-  photos?: IAuctionItemPhoto[]
-  bids?: IAuctionBid[]
-  instantBuyers?: IAuctionItemInstantBuyer[]
-  auction?: Pick<IAuction, 'id' | 'title' | 'status' | 'startDate' | 'endDate' | 'customAuctionLink'>
-  _count?: { bids: number }
-}
+export type IAuctionItemLive = DecimalToNumber<RawAuctionItemLive>
 
 export interface CreateAuctionItemInput {
   auctionId: string
@@ -62,3 +82,7 @@ export interface CreateAuctionItemInput {
 }
 
 export type UpdateAuctionItemInput = CreateAuctionItemInput
+
+export type IAuctionLive = Omit<IAuction, 'items'> & {
+  items: IAuctionItemLive[]
+}

@@ -5,9 +5,9 @@ import { useAppDispatch } from 'lib/store/store'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ExternalLink, FileText, Plus, Trash2 } from 'lucide-react'
+import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeaderButton'
+import AdminTable, { Column } from 'app/(authenticated)/admin/_components/AdminTable'
 import { NewsletterIssueModal } from './NewsletterIssueModal'
-import AdminHeaderButton from 'app/components/admin/_shared/AdminHeaderButton'
-import AdminTable, { Column } from 'app/components/admin/_shared/AdminTable'
 
 export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
   const router = useRouter()

@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { IAuction } from 'types/_auction'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
 import {
@@ -13,8 +12,9 @@ import {
 } from 'app/components/features/auction'
 import { useSession } from 'next-auth/react'
 import { AuctionCountdown } from 'app/components/features/auction/page/AuctionCountdown'
+import { IAuctionLive } from 'types/_auction-item'
 
-export default function PublicAuctionClient({ auction }: { auction: IAuction }) {
+export default function PublicAuctionClient({ auction }: { auction: IAuctionLive }) {
   const session = useSession()
   const router = useRouter()
   const routerRef = useRef(router)

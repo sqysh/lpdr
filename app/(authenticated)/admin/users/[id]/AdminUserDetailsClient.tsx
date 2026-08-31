@@ -22,13 +22,13 @@ import {
 import Link from 'next/link'
 import { formatDate } from 'app/utils/_date.utils'
 import { formatRole } from 'app/utils/_user.utils'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import { StatusPill } from 'app/components/_primitives'
-import { MergeUserSection } from 'app/components/admin/user/MergeUserSection'
+import { MergeUserSection } from 'app/(authenticated)/admin/users/[id]/_components/MergeUserSection'
 import { updateUserRole } from 'lib/actions/admin/user/updateUserRole'
 import { getUserById } from 'lib/actions/admin/user/getUserById'
 import Picture from 'app/components/_common/Picture'
-import { MigrationTroubleshootPanel } from 'app/components/admin/user/MigrationTroubleShootPanel'
+import { MigrationTroubleshootPanel } from 'app/(authenticated)/admin/users/[id]/_components/MigrationTroubleShootPanel'
 
 type UserDetail = NonNullable<Awaited<ReturnType<typeof getUserById>>['data']>
 

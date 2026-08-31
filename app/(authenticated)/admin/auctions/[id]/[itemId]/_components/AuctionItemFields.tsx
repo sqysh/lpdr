@@ -22,7 +22,9 @@ type Props = {
     shippingCosts: string
   }
   errors: FormErrors
-  handleInput: (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void
+  handleInput: (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => void
   patch: (data: Record<string, unknown>) => void
   onSave: () => void
 }
@@ -92,7 +94,9 @@ export function AuctionItemFields({
         rows={3}
       />
 
-      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Pricing</p>
+      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+        Pricing
+      </p>
 
       <div className="grid grid-cols-2 gap-3">
         {type === 'AUCTION' && (
@@ -136,7 +140,9 @@ export function AuctionItemFields({
         )}
       </div>
 
-      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Shipping</p>
+      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+        Shipping
+      </p>
 
       <Toggle
         id="requiresShipping"

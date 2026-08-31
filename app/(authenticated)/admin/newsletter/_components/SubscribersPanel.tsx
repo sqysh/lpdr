@@ -3,7 +3,7 @@ import { PAGE_SIZE } from 'lib/constants/newsletter.constants'
 import { useMemo, useState } from 'react'
 import { formatDate } from 'app/utils/_date.utils'
 import { Check, Copy, Search, X } from 'lucide-react'
-import AdminTable, { Column } from 'app/components/admin/_shared/AdminTable'
+import AdminTable, { Column } from 'app/(authenticated)/admin/_components/AdminTable'
 import { Pagination } from 'app/components/_common/Pagination'
 
 export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] }) {

@@ -1,6 +1,6 @@
 import createAuctionAnomaly from 'lib/actions/super-user/createAuctionAnomaly'
 import { Anomaly, LiveBidEvent } from 'lib/mock/live-auction.mock'
-import { IAuctionItem } from 'types/_auction-item'
+import { IAuctionItemLive } from 'types/_auction-item'
 
 export async function detectAuctionAnomalies({
   event,
@@ -9,7 +9,7 @@ export async function detectAuctionAnomalies({
   userBidTimestamps
 }: {
   event: LiveBidEvent
-  updatedItems: IAuctionItem[]
+  updatedItems: IAuctionItemLive[]
   auctionId: string
   userBidTimestamps: React.RefObject<Record<string, Date[]>>
 }): Promise<Anomaly[]> {

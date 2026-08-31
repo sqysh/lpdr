@@ -2,11 +2,11 @@
 
 import { useState } from 'react'
 import { Newsletter, NewsletterIssue } from '@prisma/client'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import { Tab } from 'types/_newsletter.types'
 import { TABS } from 'lib/constants/newsletter.constants'
-import { SubscribersPanel } from 'app/components/admin/newsletter/SubscribersPanel'
-import { IssuesPanel } from 'app/components/admin/newsletter/IssuesPanel'
+import { SubscribersPanel } from 'app/(authenticated)/admin/newsletter/_components/SubscribersPanel'
+import { IssuesPanel } from 'app/(authenticated)/admin/newsletter/_components/IssuesPanel'
 
 export default function AdminNewsletterPageClient({
   newsletters,

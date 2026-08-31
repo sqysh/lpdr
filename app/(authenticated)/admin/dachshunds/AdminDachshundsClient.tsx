@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { Dog, ExternalLink } from 'lucide-react'
 import Picture from 'app/components/_common/Picture'
 import { formatDate } from 'app/utils/_date.utils'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
-import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
-import AdminTable, { type Column } from 'app/components/admin/_shared/AdminTable'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
+import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
+import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
 import { IDachshund } from 'types/_rescue-groups.types'
 
 type Tab = 'AVAILABLE' | 'HOLD'
@@ -90,7 +90,13 @@ const columns: Column<IDachshund>[] = [
   }
 ]
 
-export default function AdminDachshundsClient({ available, hold }: { available: IDachshund[]; hold: IDachshund[] }) {
+export default function AdminDachshundsClient({
+  available,
+  hold
+}: {
+  available: IDachshund[]
+  hold: IDachshund[]
+}) {
   const [activeTab, setActiveTab] = useState<Tab>('AVAILABLE')
 
   const tabData: Record<Tab, IDachshund[]> = { AVAILABLE: available, HOLD: hold }

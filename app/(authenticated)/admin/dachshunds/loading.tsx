@@ -1,4 +1,4 @@
-import { AdminSkeleton } from 'app/components/admin/_shared/AdminSkeleton'
+import { AdminSkeleton } from 'app/(authenticated)/admin/_components/AdminSkeleton'
 
 export default function DachshundsLoading() {
   return <AdminSkeleton />

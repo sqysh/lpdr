@@ -10,9 +10,9 @@ import Link from 'next/link'
 import { useSession } from 'next-auth/react'
 import { rotateBypassCode } from 'lib/actions/admin/adoption-fee/rotateBypassCode'
 import { useRouter } from 'next/navigation'
-import { RevenueBySourceChart } from 'app/components/admin/dashboard/RevenueBySourceChart'
-import { TopSupporters } from 'app/components/admin/dashboard/TopSupporters'
-import { TopProducts } from 'app/components/admin/dashboard/TopProducts'
+import { RevenueBySourceChart } from 'app/(authenticated)/admin/dashboard/_components/RevenueBySourceChart'
+import { TopSupporters } from 'app/(authenticated)/admin/dashboard/_components/TopSupporters'
+import { TopProducts } from 'app/(authenticated)/admin/dashboard/_components/TopProducts'
 
 const fmtType = (type: string) =>
   sourceMeta[type]?.label ?? type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')

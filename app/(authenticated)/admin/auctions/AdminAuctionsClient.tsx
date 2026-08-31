@@ -5,60 +5,15 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, FileText, Radio, CheckCircle, Gavel } from 'lucide-react'
 import { store } from 'lib/store/store'
 import { setOpenAuctionDrawer } from 'lib/store/slices/uiSlice'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
-import AdminHeaderButton from 'app/components/admin/_shared/AdminHeaderButton'
-import { Stat } from 'app/components/admin/_shared/Stat'
-import AdminEmptyState from 'app/components/admin/_shared/AdminEmptyState'
-import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
+import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeaderButton'
+import { Stat } from 'app/(authenticated)/admin/_components/Stat'
+import AdminEmptyState from 'app/(authenticated)/admin/_components/AdminEmptyState'
+import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import { AUCTION_FILTERS } from 'lib/constants/auction.constants'
 import { IAuction } from 'types/_auction'
-import { AdminAuctionCard } from 'app/components/admin/auctions'
-
-// ── Grouping helpers ───────────────────────────────────────────────────────
-
-function getQuarter(date: string | Date) {
-  const d = new Date(date)
-  return Math.floor(d.getMonth() / 3) + 1
-}
-
-function getYear(date: string | Date) {
-  return new Date(date).getFullYear()
-}
-
-type YearGroup = {
-  year: number
-  quarters: QuarterGroup[]
-}
-
-type QuarterGroup = {
-  quarter: number
-  auctions: IAuction[]
-}
-
-function groupByYearAndQuarter(auctions: IAuction[]): YearGroup[] {
-  const map = new Map<number, Map<number, IAuction[]>>()
-
-  for (const auction of auctions) {
-    const year = getYear(auction.startDate)
-    const quarter = getQuarter(auction.startDate)
-
-    if (!map.has(year)) map.set(year, new Map())
-    const yearMap = map.get(year)!
-    if (!yearMap.has(quarter)) yearMap.set(quarter, [])
-    yearMap.get(quarter)!.push(auction)
-  }
-
-  return [...map.entries()]
-    .sort(([a], [b]) => b - a) // newest year first
-    .map(([year, quarterMap]) => ({
-      year,
-      quarters: [...quarterMap.entries()]
-        .sort(([a], [b]) => b - a) // newest quarter first
-        .map(([quarter, auctions]) => ({ quarter, auctions }))
-    }))
-}
-
-// ── Main client ────────────────────────────────────────────────────────────
+import { AdminAuctionCard } from './_components/AdminAuctionCard'
+import { groupByYearAndQuarter } from './_lib/groupByYearAndQuarter'
 
 export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[] }) {
   const [filter, setFilter] = useState('ALL')

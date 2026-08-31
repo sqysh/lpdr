@@ -2,8 +2,8 @@
 
 import { useMemo, useState } from 'react'
 import { Search, X } from 'lucide-react'
-import { FLOWS } from 'app/components/admin/flows/flowsData'
-import { FlowCard } from 'app/components/admin/flows/FlowCard'
+import { FLOWS } from './_components/flowsData'
+import { FlowCard } from './_components/FlowCard'
 
 const STOPWORDS = new Set([
   'a',

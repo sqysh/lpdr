@@ -6,15 +6,15 @@ import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Minus, Search } from 
 import { formatDate } from 'app/utils/_date.utils'
 import { IUser, RoleFilter } from 'types/_user'
 import { formatRole } from 'app/utils/_user.utils'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
-import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
-import AdminTable, { type Column } from 'app/components/admin/_shared/AdminTable'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
+import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
+import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
 import { Pagination } from 'app/components/_common/Pagination'
 import { PAGE_SIZE, ROLE_FILTER_LABELS, ROLE_FILTERS } from 'lib/constants/user.constants'
-import { GrantAdminAccessModal } from 'app/components/admin/user/GrantAdminAccessModal'
-import { PendingAdminInvitesList } from 'app/components/admin/user/PendingListInvites'
+import { GrantAdminAccessModal } from 'app/(authenticated)/admin/users/_components/GrantAdminAccessModal'
+import { PendingAdminInvitesList } from 'app/(authenticated)/admin/users/_components/PendingListInvites'
+import { GrantAdminAccessTrigger } from 'app/(authenticated)/admin/users/_components/GrantAdminAccessTrigger'
 import { PendingAdminInvite } from '@prisma/client'
-import { GrantAdminAccessTrigger } from 'app/components/admin/user/GrantAdminAccessTrigger'
 
 const columns: Column<IUser>[] = [
   {

@@ -1,6 +1,6 @@
 import { SectionLabel } from 'app/components/_primitives'
 import { IAuction } from 'types/_auction'
-import { IAuctionItem } from 'types/_auction-item'
+import { IAuctionItemLive } from 'types/_auction-item'
 import { AuctionItemCard } from './AuctionItemCard'
 
 export function AuctionSoldGrid({
@@ -8,7 +8,7 @@ export function AuctionSoldGrid({
   auction,
   customAuctionLink
 }: {
-  sold: IAuctionItem[]
+  sold: IAuctionItemLive[]
   auction: IAuction
   customAuctionLink: string
 }) {

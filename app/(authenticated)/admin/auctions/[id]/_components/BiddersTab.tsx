@@ -12,7 +12,10 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
     <div className="border border-border-light dark:border-border-dark">
       <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
         <div className="flex items-center gap-3">
-          <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+          <span
+            className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
+            aria-hidden="true"
+          />
           <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
             Bidders <span className="ml-1">{auction.bidders.length}</span>
           </h2>
@@ -34,7 +37,12 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
               ))}
             </tr>
           </thead>
-          <motion.tbody key="bidders" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+          <motion.tbody
+            key="bidders"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.15 }}
+          >
             {auction.bidders.length > 0 ? (
               auction.bidders.map((bidder, i) => {
                 const name =
@@ -62,7 +70,9 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
                       <td className="px-5 py-3.5 w-8">
                         <button
                           onClick={() => setExpanded(isExpanded ? null : bidder.id)}
-                          aria-label={isExpanded ? 'Collapse bidder details' : 'Expand bidder details'}
+                          aria-label={
+                            isExpanded ? 'Collapse bidder details' : 'Expand bidder details'
+                          }
                           aria-expanded={isExpanded}
                           className="text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                         >
@@ -76,7 +86,9 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
 
                       {/* Bidder */}
                       <td className="px-5 py-3.5">
-                        <p className="text-xs font-semibold text-text-light dark:text-text-dark">{name}</p>
+                        <p className="text-xs font-semibold text-text-light dark:text-text-dark">
+                          {name}
+                        </p>
                         {bidder.user?.email && (
                           <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
                             {bidder.user.email}
@@ -141,10 +153,14 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
                             </p>
                             <div className="space-y-1">
                               {biddedItems.map((item) => {
-                                const itemBids = bidderBids.filter((b) => b.auctionItemId === item.id)
-                                const itemTopBid = Math.max(...itemBids.map((b) => Number(b.bidAmount)))
+                                const itemBids = bidderBids.filter(
+                                  (b) => b.auctionItemId === item.id
+                                )
+                                const itemTopBid = Math.max(
+                                  ...itemBids.map((b) => Number(b.bidAmount))
+                                )
                                 const isTopBidder =
-                                  item.topBidder === bidder.user?.anonymousBidding ? 'Anonymous' : name
+                                  item.topBidder === bidder.user?.name ? 'Anonymous' : name
                                 return (
                                   <div
                                     key={item.id}
@@ -178,7 +194,9 @@ export function BiddersTab({ auction }: { auction: IAuction }) {
             ) : (
               <tr>
                 <td colSpan={6} className="px-5 py-16 text-center">
-                  <p className="text-xs font-mono text-muted-light dark:text-muted-dark">No bidders yet.</p>
+                  <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
+                    No bidders yet.
+                  </p>
                 </td>
               </tr>
             )}

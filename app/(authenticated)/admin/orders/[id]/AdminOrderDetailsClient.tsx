@@ -1,15 +1,13 @@
 'use client'
 
-import {
-  OrderCustomerSection,
-  OrderFailureBanner,
-  OrderFulfillmentSection,
-  OrderItemsSection,
-  OrderPaymentSection,
-  OrderSubscriptionHistory,
-  OrderTopbar
-} from 'app/components/admin/orders'
 import { SerializedOrder, SerializedSubscriptionOrder } from 'types/_order.types'
+import { OrderTopbar } from './_components/OrderTopbar'
+import { OrderFailureBanner } from './_components/OrderFailureBanner'
+import { OrderItemsSection } from './_components/OrderItemsSection'
+import { OrderSubscriptionHistory } from './_components/OrderSubscriptionHistory'
+import { OrderFulfillmentSection } from './_components/OrderFulfillmentSection'
+import { OrderCustomerSection } from './_components/OrderCustomerSection'
+import { OrderPaymentSection } from './_components/OrderPaymentSection'
 
 type Props = {
   order: SerializedOrder
@@ -29,7 +27,9 @@ export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
         {/* Left */}
         <div className="space-y-6 min-w-0">
           <OrderItemsSection order={order} />
-          {hasSubscriptionHistory && <OrderSubscriptionHistory orders={subscriptionOrders} currentOrderId={order.id} />}
+          {hasSubscriptionHistory && (
+            <OrderSubscriptionHistory orders={subscriptionOrders} currentOrderId={order.id} />
+          )}
         </div>
 
         {/* Right */}

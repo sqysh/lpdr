@@ -1,14 +1,25 @@
 'use client'
 
-import { Gavel, ShoppingBag, TrendingUp, Clock, Edit2, LayoutDashboard, Lock, Tag, Truck } from 'lucide-react'
+import {
+  Gavel,
+  ShoppingBag,
+  TrendingUp,
+  Clock,
+  Edit2,
+  LayoutDashboard,
+  Lock,
+  Tag,
+  Truck
+} from 'lucide-react'
 import { formatMoney } from 'app/utils/_currency.utils'
 import Link from 'next/link'
 import { getItemStatusConfig } from 'app/utils/_auction.utils'
-import { PhotoGallery } from 'app/components/admin/auctions/PhotoGallery'
+import { PhotoGallery } from 'app/(authenticated)/admin/auctions/[id]/[itemId]/_components/PhotoGallery'
 import { AuctionItemStatus, AuctionStatus } from '@prisma/client'
 import { IAuctionBid } from 'types/_auction-bid'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'
-import { StatCard, BidsTable } from 'app/components/admin/auctions'
+import { StatCard } from './_components/StatCard'
+import { BidsTable } from './_components/BidsTable'
 
 export default function AdminAuctionItemViewClient({
   auctionItem
@@ -49,10 +60,17 @@ export default function AdminAuctionItemViewClient({
           { label: 'Minimum Bid', value: formatMoney(item.minimumBid) }
         ]
       : [{ label: 'Quantity', value: item.totalQuantity ? String(item.totalQuantity) : '—' }]),
-    ...(item.status === 'SOLD' ? [{ label: 'Sold Price', value: formatMoney(item.soldPrice) }] : []),
+    ...(item.status === 'SOLD'
+      ? [{ label: 'Sold Price', value: formatMoney(item.soldPrice) }]
+      : []),
     { label: 'Requires Shipping', value: item.requiresShipping ? 'Yes' : 'No' },
     ...(item.requiresShipping
-      ? [{ label: 'Shipping Cost', value: item.shippingCosts != null ? formatMoney(item.shippingCosts) : 'TBD' }]
+      ? [
+          {
+            label: 'Shipping Cost',
+            value: item.shippingCosts != null ? formatMoney(item.shippingCosts) : 'TBD'
+          }
+        ]
       : [])
   ]
 
@@ -65,10 +83,25 @@ export default function AdminAuctionItemViewClient({
       icon: Gavel,
       iconColor: 'text-primary-light dark:text-primary-dark'
     },
-    { label: 'High Bid', value: formatMoney(highBid), icon: TrendingUp, iconColor: 'text-emerald-500' },
+    {
+      label: 'High Bid',
+      value: formatMoney(highBid),
+      icon: TrendingUp,
+      iconColor: 'text-emerald-500'
+    },
     item.isAuction
-      ? { label: 'Starting', value: formatMoney(item.startingPrice), icon: Clock, iconColor: 'text-amber-500' }
-      : { label: 'Buy Now', value: formatMoney(item.buyNowPrice), icon: ShoppingBag, iconColor: 'text-violet-500' },
+      ? {
+          label: 'Starting',
+          value: formatMoney(item.startingPrice),
+          icon: Clock,
+          iconColor: 'text-amber-500'
+        }
+      : {
+          label: 'Buy Now',
+          value: formatMoney(item.buyNowPrice),
+          icon: ShoppingBag,
+          iconColor: 'text-violet-500'
+        },
     auctionEnded
       ? { label: 'Status', value: item.status.toLowerCase(), icon: Tag, iconColor: 'text-pink-500' }
       : {
@@ -119,7 +152,10 @@ export default function AdminAuctionItemViewClient({
           >
             Auction Items
           </Link>
-          <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+          <span
+            className="text-[9px] font-mono text-border-light dark:text-border-dark"
+            aria-hidden="true"
+          >
             /
           </span>
           <h1
@@ -144,7 +180,10 @@ export default function AdminAuctionItemViewClient({
           <div className="flex items-start justify-between gap-3 flex-wrap pt-6 pb-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <span
+                  className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                  aria-hidden="true"
+                />
                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   Auction Item
                 </p>

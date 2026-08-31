@@ -20,7 +20,7 @@ import {
   Mail,
   UserPlus
 } from 'lucide-react'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 
 const sections = [
   { id: 'getting-started', label: 'Getting Started', icon: BookOpen },

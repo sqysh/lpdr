@@ -1,16 +1,17 @@
 import { formatDateTime, getDaysRemaining } from 'app/utils/_date.utils'
 import { IAuction } from 'types/_auction'
-import { StatCard } from './StatCard'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { Clock, DollarSign, Gavel, Package, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Picture from 'app/components/_common/Picture'
 import { getDisplayRevenue } from 'app/utils/_auction.utils'
+import { StatCard } from '../[itemId]/view/_components/StatCard'
 
 export function OverviewTab({ auction }: { auction: IAuction }) {
   const isEnded = auction.status === 'ENDED'
   const displayRevenue = getDisplayRevenue(auction)
-  const pct = auction.goal > 0 ? Math.min(100, Math.round((displayRevenue / auction.goal) * 100)) : 0
+  const pct =
+    auction.goal > 0 ? Math.min(100, Math.round((displayRevenue / auction.goal) * 100)) : 0
   const daysLeft = getDaysRemaining(auction.endDate)
 
   return (
@@ -163,7 +164,9 @@ export function OverviewTab({ auction }: { auction: IAuction }) {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate">{item.name}</p>
+                      <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate">
+                        {item.name}
+                      </p>
                     </div>
                     <p className="text-[10px] font-mono tabular-nums text-muted-light dark:text-muted-dark shrink-0">
                       {item.totalBids} bids

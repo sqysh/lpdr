@@ -1,7 +1,6 @@
 import { getAuctionItemById } from 'lib/actions/admin/auction/getAuctionItemById'
 import { getUserAddress } from 'lib/actions/my-pack/getUserAddress'
 import { getUserName } from 'lib/actions/my-pack/getUserName'
-import { IAuctionItem } from 'types/_auction-item'
 import PublicAuctionInstantBuyClient from './PublicAuctionInstantBuyClient'
 import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
 import { auth } from 'lib/auth'
@@ -32,7 +31,7 @@ export default async function PublicAuctionInstantBuyPage({
 
   return (
     <PublicAuctionInstantBuyClient
-      auctionItem={itemResult.auctionItem as unknown as IAuctionItem}
+      auctionItem={itemResult.auctionItem}
       savedCards={cardsResult.success ? (cardsResult.data ?? []) : []}
       isAuthed={isAuthed}
       userEmail={session.user.email}

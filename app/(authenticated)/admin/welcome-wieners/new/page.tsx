@@ -1,4 +1,4 @@
-import { WelcomeWienerForm } from 'app/components/admin/welcome-wieners/WelcomeWienerForm'
+import { WelcomeWienerForm } from '../_components/WelcomeWienerForm'
 
 export default async function AdminWelcomeWienersNewPage() {
   return <WelcomeWienerForm welcomeWiener={null} />

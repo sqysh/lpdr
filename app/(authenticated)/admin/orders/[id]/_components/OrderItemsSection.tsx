@@ -8,7 +8,12 @@ function money(n: number) {
   return `$${n.toFixed(2)}`
 }
 
-const DONATION_TYPES = new Set(['ONE_TIME_DONATION', 'RECURRING_DONATION', 'ADOPTION_FEE', 'FEED_A_FOSTER'])
+const DONATION_TYPES = new Set([
+  'ONE_TIME_DONATION',
+  'RECURRING_DONATION',
+  'ADOPTION_FEE',
+  'FEED_A_FOSTER'
+])
 
 const TYPE_LABELS: Record<string, string> = {
   ONE_TIME_DONATION: 'One-time donation',
@@ -30,7 +35,10 @@ export function OrderItemsSection({ order }: { order: SerializedOrder }) {
           id="items-heading"
           className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark"
         >
-          <Package className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
+          <Package
+            className="w-4 h-4 text-primary-light dark:text-primary-dark"
+            aria-hidden="true"
+          />
           {order.items.length === 0 ? 'Donation' : 'Items'}
         </h2>
         {order.items.length > 0 && (
@@ -44,7 +52,10 @@ export function OrderItemsSection({ order }: { order: SerializedOrder }) {
         <div className="px-4 py-5 space-y-4">
           <div className="flex items-center gap-3">
             <div className="shrink-0 w-10 h-10 flex items-center justify-center border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/10 dark:bg-primary-dark/10">
-              <Heart className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
+              <Heart
+                className="w-4 h-4 text-primary-light dark:text-primary-dark"
+                aria-hidden="true"
+              />
             </div>
             <div>
               <p className="text-sm font-nunito text-text-light dark:text-text-dark">{typeLabel}</p>
@@ -107,7 +118,10 @@ export function OrderItemsSection({ order }: { order: SerializedOrder }) {
                 {item.itemImage ? (
                   <Image src={item.itemImage} alt="" fill sizes="48px" className="object-cover" />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
+                  <div
+                    className="w-full h-full flex items-center justify-center"
+                    aria-hidden="true"
+                  >
                     {item.isPhysical ? (
                       <Package className="w-4 h-4 text-muted-light dark:text-muted-dark" />
                     ) : (
@@ -136,8 +150,10 @@ export function OrderItemsSection({ order }: { order: SerializedOrder }) {
                     </>
                   ) : (
                     <>
-                      {(item.quantity ?? 1) > 1 ? `${item.quantity} × ${money(item.price)}` : money(item.price)} · no
-                      shipping
+                      {(item.quantity ?? 1) > 1
+                        ? `${item.quantity} × ${money(item.price)}`
+                        : money(item.price)}{' '}
+                      · no shipping
                     </>
                   )}
                 </p>

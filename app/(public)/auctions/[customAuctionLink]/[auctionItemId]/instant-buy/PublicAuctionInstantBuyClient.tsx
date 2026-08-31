@@ -13,7 +13,7 @@ import { SubmitButton } from 'app/components/_primitives/SubmitButton'
 import { Toggle } from 'app/components/_primitives/Toggle'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
-import type { IAuctionItem } from 'types/_auction-item'
+import type { IAuctionItemLive } from 'types/_auction-item'
 import type { IPaymentMethod } from 'types/_payment-method.types'
 import {
   InstantBuyAddressSection,
@@ -48,7 +48,7 @@ interface FormInputs {
 }
 
 interface Props {
-  auctionItem: IAuctionItem
+  auctionItem: IAuctionItemLive
   savedCards: IPaymentMethod[]
   // from server page — no useSession flash
   isAuthed: boolean

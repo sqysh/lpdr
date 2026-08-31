@@ -4,12 +4,12 @@ import { useMemo, useState } from 'react'
 import { DollarSign, Clock, XCircle } from 'lucide-react'
 import { formatDate } from 'app/utils/_date.utils'
 import { AdoptionFeeStatus, IAdoptionFee } from 'types/_adoption-fee'
-import { Stat } from 'app/components/admin/_shared/Stat'
+import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { FILTERS, statusStyles } from 'lib/constants/adoption-fees.constants'
 import { fmtCurrency } from 'app/utils/_currency.utils'
-import AdminPageHeader from 'app/components/admin/_shared/AdminPageHeader'
-import AdminFilterTabs from 'app/components/admin/_shared/AdminFilterTabs'
-import AdminTable, { type Column } from 'app/components/admin/_shared/AdminTable'
+import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
+import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
+import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
 
 type Props = {
   fees: IAdoptionFee[]

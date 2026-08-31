@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation'
 import prisma from 'prisma/client'
-import { AuctionItemForm } from 'app/components/admin/auctions/AuctionItemForm'
+import { AuctionItemForm } from 'app/(authenticated)/admin/auctions/[id]/[itemId]/_components/AuctionItemForm'
+import { serializeInstantBuyer } from 'lib/serializers'
 
 export default async function AdminAuctionEditItemPage({
   params
@@ -9,12 +10,15 @@ export default async function AdminAuctionEditItemPage({
 }) {
   const { id, itemId } = await params
 
-  const auction = await prisma.auction.findUnique({ where: { id }, select: { id: true, status: true } })
+  const auction = await prisma.auction.findUnique({
+    where: { id },
+    select: { id: true, status: true }
+  })
   if (!auction) notFound()
 
   const item = await prisma.auctionItem.findUnique({
     where: { id: itemId },
-    include: { photos: true, bids: { orderBy: { createdAt: 'desc' } } }
+    include: { photos: true, bids: { orderBy: { createdAt: 'desc' } }, instantBuyers: true }
   })
   if (!item || item.auctionId !== id) notFound()
 
@@ -30,7 +34,8 @@ export default async function AdminAuctionEditItemPage({
     bids: item.bids.map((b) => ({
       ...b,
       bidAmount: Number(b.bidAmount)
-    }))
+    })),
+    instantBuyers: serializeInstantBuyer(item.instantBuyers)
   }
 
   return (

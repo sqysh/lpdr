@@ -3,8 +3,8 @@
 import { fmtCurrency } from 'app/utils/_currency.utils'
 import { ChevronRight, RefreshCw } from 'lucide-react'
 import { OrderRow } from 'types/_order.types'
-import { StatusPill } from '../../_primitives'
 import { useRouter } from 'next/navigation'
+import { StatusPill } from 'app/components/_primitives'
 
 type GroupRow = { kind: 'group'; subscriptionId: string; orders: OrderRow[] }
 
@@ -18,14 +18,19 @@ function rowClass(o: OrderRow) {
 
 export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
   const router = useRouter()
-  const sorted = [...group.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+  const sorted = [...group.orders].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+  )
   const latest = sorted[0]
   const first = sorted[sorted.length - 1]
   const lifetimeValue = group.orders.reduce((s, o) => s + o.totalAmount, 0)
   const renewalCount = group.orders.length - 1
 
   return (
-    <tr className={`${rowClass(latest)} cursor-pointer`} onClick={() => router.push(`/admin/orders/${latest.id}`)}>
+    <tr
+      className={`${rowClass(latest)} cursor-pointer`}
+      onClick={() => router.push(`/admin/orders/${latest.id}`)}
+    >
       {/* Order — links to latest */}
       <td className="px-4 py-3 whitespace-nowrap">
         <div className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark">
@@ -45,8 +50,12 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
 
       {/* Customer */}
       <td className="px-4 py-3 min-w-0 max-w-50">
-        <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">{latest.customerName || '—'}</p>
-        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">{latest.customerEmail}</p>
+        <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
+          {latest.customerName || '—'}
+        </p>
+        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
+          {latest.customerEmail}
+        </p>
       </td>
 
       {/* Type */}
@@ -71,7 +80,9 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
         <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
           {fmtCurrency(lifetimeValue)}
         </p>
-        <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70 mt-0.5">lifetime</p>
+        <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70 mt-0.5">
+          lifetime
+        </p>
       </td>
 
       {/* Status — latest */}

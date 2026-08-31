@@ -1,6 +1,13 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { IAuction } from 'types/_auction'
+import { auctionItemLiveIncludes } from 'types/_auction-item'
+import {
+  serializeAuction,
+  serializeAuctionBid,
+  serializeAuctionItem,
+  serializeInstantBuyer,
+  serializeWinningBidder
+} from 'lib/serializers'
 
 export const getAuctionByCustomAuctionLink = async (link: string) => {
   try {
@@ -9,22 +16,23 @@ export const getAuctionByCustomAuctionLink = async (link: string) => {
       include: {
         items: {
           orderBy: { createdAt: 'asc' },
-          include: {
-            photos: {
-              orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }]
-            },
-            _count: { select: { bids: true } }
-          }
+          ...auctionItemLiveIncludes
         },
         bidders: {
           include: {
             user: {
-              select: { id: true, firstName: true, lastName: true, email: true, anonymousBidding: true }
+              select: {
+                id: true,
+                firstName: true,
+                lastName: true,
+                email: true,
+                anonymousBidding: true
+              }
             }
           }
         },
         bids: { orderBy: { createdAt: 'desc' } },
-        winningBidders: true,
+        winningBidders: { include: { user: true, auctionItems: true } },
         instantBuyers: true
       }
     })
@@ -34,35 +42,12 @@ export const getAuctionByCustomAuctionLink = async (link: string) => {
     return {
       success: true,
       data: {
-        ...auction,
-        goal: Number(auction.goal),
-        totalAuctionRevenue: Number(auction.totalAuctionRevenue),
-        items: auction.items.map((item) => ({
-          ...item,
-          startingPrice: item.startingPrice ? Number(item.startingPrice) : null,
-          buyNowPrice: item.buyNowPrice ? Number(item.buyNowPrice) : null,
-          currentPrice: item.currentPrice ? Number(item.currentPrice) : null,
-          currentBid: item.currentBid ? Number(item.currentBid) : null,
-          minimumBid: item.minimumBid ? Number(item.minimumBid) : null,
-          soldPrice: item.soldPrice ? Number(item.soldPrice) : null,
-          shippingCosts: item.shippingCosts ? Number(item.shippingCosts) : null
-        })),
-        bids: auction.bids.map((bid) => ({
-          ...bid,
-          bidAmount: Number(bid.bidAmount)
-        })),
-        winningBidders: auction.winningBidders.map((wb) => ({
-          ...wb,
-          processingFee: wb.processingFee ? Number(wb.processingFee) : null,
-          totalPrice: wb.totalPrice ? Number(wb.totalPrice) : null,
-          itemSoldPrice: wb.itemSoldPrice ? Number(wb.itemSoldPrice) : null,
-          shipping: wb.shipping ? Number(wb.shipping) : null
-        })),
-        instantBuyers: auction.instantBuyers.map((ib) => ({
-          ...ib,
-          totalPrice: ib.totalPrice ? Number(ib.totalPrice) : null
-        }))
-      } as unknown as IAuction
+        ...serializeAuction(auction),
+        items: auction.items.map(serializeAuctionItem),
+        bids: auction.bids.map(serializeAuctionBid),
+        winningBidders: auction.winningBidders.map(serializeWinningBidder),
+        instantBuyers: auction.instantBuyers.map(serializeInstantBuyer)
+      }
     }
   } catch (error) {
     await createLog('error', 'Failed to fetch auction by custom link', {
