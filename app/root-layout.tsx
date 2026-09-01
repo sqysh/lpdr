@@ -1,6 +1,6 @@
 'use client'
 
-import { ReactNode, Suspense, useEffect, useState } from 'react'
+import { ReactNode, Suspense } from 'react'
 import { Elements } from '@stripe/react-stripe-js'
 import { usePathname, useSelectedLayoutSegments } from 'next/navigation'
 import { Confetti3D } from 'components/_common/Confetti3D'
@@ -28,15 +28,7 @@ export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime
   const pathname = usePathname()
   const isHidden = HIDDEN_PATHS.some((path) => pathname.startsWith(path)) || isNotFound
 
-  const [burstTrigger, setBurstTrigger] = useState(0)
-
   useSyncTheme()
-
-  useEffect(() => {
-    const handler = () => setBurstTrigger((t) => t + 1)
-    window.addEventListener('confetti-burst', handler)
-    return () => window.removeEventListener('confetti-burst', handler)
-  }, [])
 
   return (
     <Elements stripe={stripePromise}>
@@ -45,7 +37,7 @@ export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime
       </Suspense>
       <CookieConsentBanner />
       <FixedDonateTab />
-      <Confetti3D burstTrigger={burstTrigger} />
+      <Confetti3D />
       <CartBar />
       <CartToast />
       <PublicContactModal />
