@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
 import { getErrorMessage } from 'app/utils/_error.utils'
 

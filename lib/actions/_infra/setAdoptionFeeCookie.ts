@@ -3,11 +3,11 @@
 import prisma from 'prisma/client'
 import { cookies } from 'next/headers'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 
 export const setAdoptionFeeCookie = async (adoptionFeeId: string) => {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   try {
     const fee = await prisma.adoptionFee.findFirst({

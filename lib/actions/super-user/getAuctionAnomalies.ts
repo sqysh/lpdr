@@ -1,11 +1,11 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireSuper, SuperFailure } from '../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 
 export default async function getAuctionAnomalies(auctionId: string) {
   const gate = await requireSuper()
-  if (gate.ok === false) return { success: false, error: (gate as SuperFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const anomalies = await prisma.auctionAnomaly.findMany({

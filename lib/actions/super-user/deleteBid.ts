@@ -2,11 +2,11 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { requireSuper, SuperFailure } from '../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 
 export default async function deleteBid(bidId: string) {
   const gate = await requireSuper()
-  if (gate.ok === false) return { success: false, error: (gate as SuperFailure).error }
+  if (gate.ok === false) return { success: false, error: gate.error }
 
   try {
     const bid = await prisma.auctionBid.findUnique({

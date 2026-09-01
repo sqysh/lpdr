@@ -5,7 +5,7 @@ import prisma from 'prisma/client'
 import { resend } from 'lib/email/resend'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { emailChangeVerificationTemplate } from 'lib/email/templates/email-change-verification.tempate'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../../auth/requireAuth'
 import { stampUserGeoFromRequest } from '../../auth/stampUserGeoFromRequest'
 import { createLog } from '../../log/createLog'
 

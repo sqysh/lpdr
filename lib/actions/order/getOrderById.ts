@@ -2,12 +2,12 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const getOrderById = async (id: string) => {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   try {
     const order = await prisma.order.findUnique({

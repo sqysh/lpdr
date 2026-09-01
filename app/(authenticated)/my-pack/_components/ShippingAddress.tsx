@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import { MapPin } from 'lucide-react'
 import { formatDate } from 'app/utils/_date.utils'
+import { UpdateAddressModal } from '../../../components/my-pack/UpdateAddressModal'
 import { EmptyState } from './EmptyState'
-import { UpdateAddressModal } from './UpdateAddressModal'
 
 export function ShippingAddress({ setAddressModalOpen, user, addressModalOpen }) {
   return (

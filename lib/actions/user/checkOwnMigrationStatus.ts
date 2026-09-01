@@ -1,13 +1,13 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { createLog } from '../log/createLog'
 
 export async function checkOwnMigrationStatus() {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   try {
     const user = await prisma.user.findUnique({

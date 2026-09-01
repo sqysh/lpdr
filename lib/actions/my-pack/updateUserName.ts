@@ -2,12 +2,18 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
-export const updateUserName = async ({ firstName, lastName }: { firstName: string; lastName: string }) => {
+export const updateUserName = async ({
+  firstName,
+  lastName
+}: {
+  firstName: string
+  lastName: string
+}) => {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   if (!firstName.trim() || !lastName.trim()) {
     return { success: false, error: 'First and last name are required', data: null }

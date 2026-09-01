@@ -3,13 +3,13 @@
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
 import { stripeClient } from 'lib/stripe/stripe-client'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const deletePaymentMethod = async (id: string) => {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   try {
     // Verify ownership

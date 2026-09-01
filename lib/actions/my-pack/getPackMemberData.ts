@@ -8,12 +8,12 @@ import {
   ParticipationItem,
   Subscription
 } from 'types/_my-pack.types'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 
 export const getPackMemberData = async () => {
   try {
     const gate = await requireAuth()
-    if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+    if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
     const userId = gate.userId
 

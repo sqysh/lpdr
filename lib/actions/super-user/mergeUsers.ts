@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { SuperFailure, requireSuper } from '../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 import { resend } from 'lib/email/resend'
 import { accountMergedTemplate } from 'lib/email/templates/account-merged.template'
 import { getErrorMessage } from 'app/utils/_error.utils'
@@ -15,7 +15,7 @@ export async function mergeUsers({
   duplicateEmail: string
 }): Promise<{ success: boolean; error?: string }> {
   const gate = await requireSuper()
-  if (!gate.ok) return { success: false, error: (gate as SuperFailure).error }
+  if (gate.ok === false) return { success: false, error: gate.error }
 
   try {
     const [primary, duplicate] = await Promise.all([

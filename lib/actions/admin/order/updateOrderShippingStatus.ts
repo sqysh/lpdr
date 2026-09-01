@@ -6,7 +6,7 @@ import { createLog } from '../../log/createLog'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import { resend } from 'lib/email/resend'
 import { orderShippedTemplate } from 'lib/email/templates/order-shipped.template'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const updateOrderShippingStatus = async ({
@@ -17,7 +17,7 @@ export const updateOrderShippingStatus = async ({
   shippingStatus: ShippingStatus
 }) => {
   const gate = await requireAdmin()
-  if (!gate.ok) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const order = await prisma.order.update({

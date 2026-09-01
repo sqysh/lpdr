@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
-import { requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from '../../../auth/requireAuth'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { sendOutbidEmail } from 'lib/email/sendOutbidEmail'
 import { PreviousTopBid } from 'types/_auction-bid'

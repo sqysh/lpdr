@@ -2,11 +2,14 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireSuper } from 'lib/auth/guards'
 
 export const deleteAuction = async (id: string) => {
-  const gate = await requireAdmin()
-  if (!gate.ok) return { success: false, error: (gate as AdminFailure).error, data: null }
+  const gate = await requireSuper()
+  if (gate.ok === false) {
+    await createLog('warn', 'Unauthorized deleteAuction attempt', { id })
+    return { success: false, error: gate.error, data: null }
+  }
 
   try {
     if (!id) return { success: false, error: 'Missing id', data: null }

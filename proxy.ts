@@ -5,7 +5,13 @@ import type { NextRequest } from 'next/server'
 // __Secure- prefix is used in production (https), plain name in dev.
 const SESSION_COOKIES = ['authjs.session-token', '__Secure-authjs.session-token']
 
-const hasSessionCookie = (req: NextRequest) => SESSION_COOKIES.some((name) => !!req.cookies.get(name)?.value)
+const PROTECTED_PREFIXES = ['/my-pack', '/admin', '/super']
+
+const hasSessionCookie = (req: NextRequest) =>
+  SESSION_COOKIES.some((name) => !!req.cookies.get(name)?.value)
+
+const isProtectedPath = (pathname: string) =>
+  PROTECTED_PREFIXES.some((base) => pathname === base || pathname.startsWith(`${base}/`))
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -19,10 +25,10 @@ export function proxy(request: NextRequest) {
     return response
   }
 
-  // Protected routes — cookie-existence check only.
-  // Authenticated layouts do the real session validation + role checks on Node.
-  const isProtected = ['/my-pack/', '/admin/'].some((r) => pathname.startsWith(r))
-  if (isProtected && !isLoggedIn) {
+  // Fast path only. No session cookie means definitely logged out, so skip the
+  // render and the session lookup. Real validation and role checks live in
+  // (authenticated)/layout.tsx, admin/layout.tsx and super/layout.tsx.
+  if (isProtectedPath(pathname) && !isLoggedIn) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
 
@@ -30,5 +36,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/my-pack/:path*', '/admin/:path*', '/auth/login', '/adopt/application']
+  matcher: ['/my-pack/:path*', '/admin/:path*', '/super/:path*', '/auth/login']
 }

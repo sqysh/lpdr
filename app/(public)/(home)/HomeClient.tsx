@@ -1,12 +1,12 @@
-import { AboutBlock } from 'app/components/features/home/AboutBlock'
-import { ApplicationsBlock } from 'app/components/features/home/ApplicationsBlock'
-import { AvailableDogsBlock } from 'app/components/features/home/AvailableDogsCarousel'
-import { DogGalleryBlock } from 'app/components/features/home/DogGalleryBlock'
-import { Hero } from 'app/components/features/home/hero/Hero'
-import InstagramBlock from 'app/components/features/home/InstagramBlock'
-import { LPDRLogo } from 'app/components/features/home/LPDRLogo'
-import { WaysToHelpBlock } from 'app/components/features/home/WaysToHelpBlock'
-import { WelcomeWienersBlock } from 'app/components/features/home/WelcomeWienersBlock'
+import { AboutBlock } from 'app/(public)/(home)/_components/AboutBlock'
+import { ApplicationsBlock } from 'app/(public)/(home)/_components/ApplicationsBlock'
+import { AvailableDogsBlock } from 'app/(public)/(home)/_components/AvailableDogsCarousel'
+import { DogGalleryBlock } from 'app/(public)/(home)/_components/DogGalleryBlock'
+import { Hero } from 'app/(public)/(home)/_components/hero/Hero'
+import InstagramBlock from 'app/(public)/(home)/_components/InstagramBlock'
+import { LPDRLogo } from 'app/(public)/(home)/_components/LPDRLogo'
+import { WaysToHelpBlock } from 'app/(public)/(home)/_components/WaysToHelpBlock'
+import { WelcomeWienersBlock } from 'app/(public)/(home)/_components/WelcomeWienersBlock'
 
 export const HomeClient = ({ dachshunds, welcomeWieners }) => {
   return (

@@ -8,31 +8,31 @@ import { MemberClientProps, MyPackTab } from 'types/_my-pack.types'
 import { showToast } from 'lib/store/slices/toastSlice'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { pusherClient } from 'lib/pusher/pusher-client'
-import { Header } from 'app/components/my-pack/Header'
-import { ShippingAddress } from 'app/components/my-pack/ShippingAddress'
-import { PaymentMethods } from 'app/components/my-pack/PaymentMethods'
-import { AdoptionFees } from 'app/components/my-pack/AdoptionFees'
-import { Subscriptions } from 'app/components/my-pack/Subscriptions'
-import { OneTimeDonations } from 'app/components/my-pack/OneTimeDonations'
-import { Auctions } from 'app/components/my-pack/Auctions'
-import { ShippedCelebration } from 'app/components/my-pack/ShippedCelebration'
+import { Header } from 'app/(authenticated)/my-pack/_components/Header'
+import { ShippingAddress } from 'app/(authenticated)/my-pack/_components/ShippingAddress'
+import { PaymentMethods } from 'app/(authenticated)/my-pack/_components/PaymentMethods'
+import { ShippedCelebration } from 'app/(authenticated)/my-pack/_components/ShippedCelebration'
 import { setDefaultPaymentMethod } from 'lib/actions/_stripe/setDefaultPaymentMethod'
 import { deletePaymentMethod } from 'lib/actions/_stripe/deletePaymentMethod'
-import { TopBar } from 'app/components/my-pack/TopBar'
-import { MultiItemOrders } from 'app/components/my-pack/MultiItemOrders'
-import { MyPackNav } from 'app/components/my-pack/MyPackNav'
-import { Settings } from 'app/components/my-pack/Settings'
-import { StatsStrip } from 'app/components/my-pack/StatsStrip'
+import { TopBar } from 'app/(authenticated)/my-pack/_components/TopBar'
+import { MyPackNav } from 'app/(authenticated)/my-pack/_components/MyPackNav'
+import { Settings } from 'app/(authenticated)/my-pack/_components/Settings'
+import { StatsStrip } from 'app/(authenticated)/my-pack/_components/StatsStrip'
 import { SectionShell } from 'app/components/_primitives/SectionShell'
 import { Dog, Gavel, Gift, Package, Pencil, Plus, Repeat } from 'lucide-react'
 import { setOpenAddPaymentMethodModal } from 'lib/store/slices/uiSlice'
 import { addCardStyles } from 'lib/constants/my-pack.constants'
 import Link from 'next/link'
-import AddPaymentMethodModal from 'app/components/my-pack/AddPaymentMethodModal'
+import AddPaymentMethodModal from 'app/(authenticated)/my-pack/_components/AddPaymentMethodModal'
 import { toggleAnonymousBidding } from 'lib/actions/user/auction/toggleAnonymousBidding'
 import { toggleAutoPay } from 'lib/actions/user/auction/toggleAutoPay'
 import { toggleAutoPayCoverFees } from 'lib/actions/user/auction/toggleAutoPayCoverFees'
-import { MigrationBanner } from 'app/components/my-pack/MigrationBanner'
+import { MigrationBanner } from './_components/MigrationBanner'
+import { MultiItemOrders } from './_components/MultiItemOrders'
+import { AdoptionFees } from './_components/AdoptionFees'
+import { Subscriptions } from './_components/Subscriptions'
+import { OneTimeDonations } from './_components/OneTimeDonations'
+import { Auctions } from './_components/Auctions'
 
 export default function MyPackClient({
   user,
@@ -240,7 +240,6 @@ export default function MyPackClient({
         id="main-content"
         className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
       >
-        {/* ── TopBar ── */}
         <TopBar />
 
         <MigrationBanner initiallyPending={hasPendingMigration} />

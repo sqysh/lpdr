@@ -2,12 +2,12 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { SuperFailure, requireSuper } from '../../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export default async function getLogs() {
   const gate = await requireSuper()
-  if (!gate.ok) return { success: false, error: (gate as SuperFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const logs = await prisma.log.findMany({

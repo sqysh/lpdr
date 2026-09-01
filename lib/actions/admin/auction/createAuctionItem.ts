@@ -3,13 +3,13 @@
 import prisma from 'prisma/client'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { CreateAuctionItemInput } from 'types/_auction-item'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const createAuctionItem = async (data: CreateAuctionItemInput) => {
   const gate = await requireAdmin()
-  if (!gate.ok) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (!data.name?.trim()) return { success: false, error: 'Name is required', data: null }
   if (!data.sellingFormat)

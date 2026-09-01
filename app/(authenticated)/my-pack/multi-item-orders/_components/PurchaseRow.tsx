@@ -3,11 +3,11 @@ import { MultiItemOrder } from 'types/_my-pack.types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatDate } from 'app/utils/_date.utils'
-import { StatusPill } from 'app/components/my-pack/StatusPill'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
 import Picture from 'app/components/_common/Picture'
 import Link from 'next/link'
+import { StatusPill } from './StatusPill'
 
 export function PurchaseRow({ order, index }: { order: MultiItemOrder; index: number }) {
   const [expanded, setExpanded] = useState(false)

@@ -1,17 +1,18 @@
 import { getPackMemberData } from 'lib/actions/my-pack/getPackMemberData'
 import MyPackClient from './MyPackClient'
 import { Suspense } from 'react'
-import { MyPackSkeleton } from 'app/components/my-pack/MyPack'
+import { MyPackSkeleton } from 'app/(authenticated)/my-pack/_components/MyPackSkeleton'
 import { checkOwnMigrationStatus } from 'lib/actions/user/checkOwnMigrationStatus'
-import { requireAuth } from 'lib/actions/auth/requireAuth'
-import { redirect } from 'next/navigation'
 
-export const dynamic = 'force-dynamic'
+export default function MyPackPage() {
+  return (
+    <Suspense fallback={<MyPackSkeleton />}>
+      <MyPackContent />
+    </Suspense>
+  )
+}
 
-export default async function MyPackPage() {
-  const gate = await requireAuth()
-  if (!gate.ok) redirect('/auth/login')
-
+async function MyPackContent() {
   const [packMemberResult, migrationResult] = await Promise.all([
     getPackMemberData(),
     checkOwnMigrationStatus()
@@ -21,18 +22,16 @@ export default async function MyPackPage() {
     : false
 
   return (
-    <Suspense fallback={<MyPackSkeleton />}>
-      <MyPackClient
-        user={packMemberResult?.data?.user}
-        donations={packMemberResult?.data?.donations}
-        subscriptions={packMemberResult?.data?.subscriptions}
-        auctionParticipation={packMemberResult?.data?.auctionParticipation}
-        paymentMethods={packMemberResult?.data?.paymentMethods}
-        adoptionFees={packMemberResult?.data?.adoptionFees}
-        multiItemOrders={packMemberResult?.data?.multiItemOrders}
-        auctionPurchases={packMemberResult.data?.auctionPurchases}
-        hasPendingMigration={hasPendingMigration}
-      />
-    </Suspense>
+    <MyPackClient
+      user={packMemberResult?.data?.user}
+      donations={packMemberResult?.data?.donations}
+      subscriptions={packMemberResult?.data?.subscriptions}
+      auctionParticipation={packMemberResult?.data?.auctionParticipation}
+      paymentMethods={packMemberResult?.data?.paymentMethods}
+      adoptionFees={packMemberResult?.data?.adoptionFees}
+      multiItemOrders={packMemberResult?.data?.multiItemOrders}
+      auctionPurchases={packMemberResult.data?.auctionPurchases}
+      hasPendingMigration={hasPendingMigration}
+    />
   )
 }

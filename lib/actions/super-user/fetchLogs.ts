@@ -2,7 +2,7 @@
 
 import { LEVELS } from 'lib/constants/log.constants'
 import prisma from 'prisma/client'
-import { requireSuper } from '../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 
 export type LogRow = {
   id: string

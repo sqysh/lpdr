@@ -4,14 +4,14 @@ import { revalidatePath } from 'next/cache'
 import { Role } from '@prisma/client'
 import prisma from 'prisma/client'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 
 const ASSIGNABLE_ROLES: Role[] = ['ADMIN', 'PACK_MEMBER']
 
 export async function updateUserRole(userId: string, role: Role) {
   const gate = await requireAdmin()
-  if (!gate.ok) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (!ASSIGNABLE_ROLES.includes(role)) {
     return { success: false, error: 'Invalid role', data: null }

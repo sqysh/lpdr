@@ -1,11 +1,11 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../../auth/requireAuth'
 
 export const getAuctionWinningBidderById = async (id: string) => {
   try {
     const gate = await requireAuth()
-    if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+    if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
     const winningBidder = await prisma.auctionWinningBidder.findUnique({
       where: { id },
@@ -37,9 +37,11 @@ export const getAuctionWinningBidderById = async (id: string) => {
       success: true,
       data: {
         ...winningBidder,
-        processingFee: winningBidder.processingFee != null ? Number(winningBidder.processingFee) : null,
+        processingFee:
+          winningBidder.processingFee != null ? Number(winningBidder.processingFee) : null,
         totalPrice: winningBidder.totalPrice != null ? Number(winningBidder.totalPrice) : null,
-        itemSoldPrice: winningBidder.itemSoldPrice != null ? Number(winningBidder.itemSoldPrice) : null,
+        itemSoldPrice:
+          winningBidder.itemSoldPrice != null ? Number(winningBidder.itemSoldPrice) : null,
         shipping: winningBidder.shipping != null ? Number(winningBidder.shipping) : null,
         auctionItems: winningBidder.auctionItems.map((item) => ({
           ...item,

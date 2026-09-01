@@ -1,38 +1,31 @@
 import './globals.css'
 import { SessionProvider } from 'next-auth/react'
 import { RootLayoutWrapper } from './root-layout'
-import { getCachedAuction } from '../lib/actions/public/auction/getCachedAuction'
-import { cookies } from 'next/headers'
 import { bebas, nunito, quicksand, workSans } from './fonts'
+import { SiteNavigationDrawer } from './components/layout/navigation-drawer/SiteNavigationDrawer'
+import { AuctionRealtime } from './components/layout/AuctionRealtime'
+import { Header } from './components/layout/header/Header'
 
 export { metadata } from './metadata'
 export { viewport } from './viewport'
 
-const fontVariables = [quicksand.variable, workSans.variable, bebas.variable, nunito.variable].join(
-  ' '
-)
+const fontVariables = [quicksand, workSans, bebas, nunito].map((f) => f.variable).join(' ')
+
+const themeScript = `if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [cookieStore, auction] = await Promise.all([cookies(), getCachedAuction()])
-
-  const hasActiveFee = cookieStore.get('lpdr_active_adoption_fee')?.value === '1'
-
-  const isAuthed = !!(
-    cookieStore.get('authjs.session-token') ?? cookieStore.get('__Secure-authjs.session-token')
-  )
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')`
-          }}
-        />
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={fontVariables}>
         <SessionProvider refetchOnWindowFocus={false}>
-          <RootLayoutWrapper auction={auction} hasActiveFee={hasActiveFee} isAuthed={isAuthed}>
+          <RootLayoutWrapper
+            header={<Header />}
+            navDrawer={<SiteNavigationDrawer />}
+            auctionRealtime={<AuctionRealtime />}
+          >
             {children}
           </RootLayoutWrapper>
         </SessionProvider>

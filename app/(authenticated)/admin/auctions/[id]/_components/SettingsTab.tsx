@@ -2,19 +2,24 @@ import { store } from 'lib/store/store'
 import { useRouter } from 'next/navigation'
 import { showToast } from 'lib/store/slices/toastSlice'
 import { IAuction } from 'types/_auction'
-import { ChangeEvent, useEffect, useState } from 'react'
+import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { toDatetimeLocal } from 'app/utils/_date.utils'
 import { Flag, Loader2, RotateCcw, Trash2, Zap } from 'lucide-react'
+import { Role } from '@prisma/client'
 import { deleteAuction } from 'lib/actions/admin/auction/deleteAuction'
 import { updateAuction } from 'lib/actions/admin/auction/updateAuction'
 import { startAuction } from 'lib/actions/super-user/startAuction'
 import { revertAuctionToDraft } from 'lib/actions/super-user/revertAuctionToDraft'
 import { endAuctionManually } from 'lib/actions/super-user/endAuctionManually'
-import { useSession } from 'next-auth/react'
 
 const inputStyles = `w-full px-3.5 py-3 text-xs font-mono border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors scheme-light dark:scheme-dark`
 
-export function SettingsTab({ auction }: { auction: IAuction }) {
+type SettingsTabProps = {
+  auction: IAuction
+  role: Role
+}
+
+export function SettingsTab({ auction, role }: SettingsTabProps) {
   const router = useRouter()
   const [inputs, setInputs] = useState(auction)
   const [loading, setLoading] = useState(false)
@@ -23,12 +28,19 @@ export function SettingsTab({ auction }: { auction: IAuction }) {
   const [reverting, setReverting] = useState(false)
   const [ending, setEnding] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
-  const session = useSession()
-  const isSuperUser = session.data?.user?.role === 'SUPER_USER'
+  const confirmEndTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const isSuperUser = role === Role.SUPER_USER
 
   useEffect(() => {
     setInputs(auction)
   }, [auction])
+
+  useEffect(() => {
+    return () => {
+      if (confirmEndTimeout.current) clearTimeout(confirmEndTimeout.current)
+    }
+  }, [])
 
   const handleInput = (
     e:
@@ -151,9 +163,11 @@ export function SettingsTab({ auction }: { auction: IAuction }) {
   const handleEndAuction = async () => {
     if (!confirmEnd) {
       setConfirmEnd(true)
-      setTimeout(() => setConfirmEnd(false), 4000)
+      confirmEndTimeout.current = setTimeout(() => setConfirmEnd(false), 4000)
       return
     }
+
+    if (confirmEndTimeout.current) clearTimeout(confirmEndTimeout.current)
 
     setEnding(true)
     const result = await endAuctionManually(auction.id)
@@ -297,7 +311,8 @@ export function SettingsTab({ auction }: { auction: IAuction }) {
           <div className="pt-2">
             <button
               onClick={handleSaveAuctionSettings}
-              className="px-5 py-2.5 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2"
+              disabled={loading}
+              className="px-5 py-2.5 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {loading ? (
                 <>

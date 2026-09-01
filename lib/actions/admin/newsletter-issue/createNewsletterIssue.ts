@@ -5,13 +5,13 @@ import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { MONTHS } from 'lib/constants/date.constants'
 import { CreateNewsletterIssueInput } from 'types/_newsletter-issue.types'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { YEAR_REGEX } from 'lib/constants/regex.constants'
 
 export default async function createNewsletterIssue(input: CreateNewsletterIssueInput) {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   const month = input.month?.trim()
   const year = input.year?.trim()

@@ -4,11 +4,11 @@ import prisma from 'prisma/client'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { createLog } from '../../log/createLog'
 import { migrateMongoUser } from '../../migrate/migrateMongoUser'
-import { requireSuper, SuperFailure } from '../../auth/requireSuper'
+import { requireSuper } from 'lib/auth/guards'
 
 export async function retriggerMigration(userId: string) {
   const gate = await requireSuper()
-  if (!gate.ok) return { success: false, error: (gate as SuperFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const user = await prisma.user.findUnique({

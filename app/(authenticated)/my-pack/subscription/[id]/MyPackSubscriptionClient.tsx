@@ -12,8 +12,8 @@ import { formatMoney } from 'app/utils/_currency.utils'
 import { formatDate } from 'app/utils/_date.utils'
 import { getSubscriptionById } from 'lib/actions/my-pack/getSubscriptionById'
 import { cancelSubscription } from 'lib/actions/_stripe/cancelSubscription'
-import { UpdateCardForm } from 'app/components/my-pack/UpdateCardForm'
-import { CancelSubscriptionModal } from 'app/components/my-pack/CancelSubscriptionModal'
+import { UpdateCardForm } from 'app/(authenticated)/my-pack/subscription/[id]/_components/UpdateCardForm'
+import { CancelSubscriptionModal } from 'app/(authenticated)/my-pack/subscription/[id]/_components/CancelSubscriptionModal'
 
 type Subscription = Awaited<ReturnType<typeof getSubscriptionById>>['data']
 

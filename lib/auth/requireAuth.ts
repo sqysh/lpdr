@@ -1,28 +1,24 @@
-'use server'
+import 'server-only'
 
 import { auth } from 'lib/auth'
 import { Role } from '@prisma/client'
 
-type SuperSession = {
+type AuthSession = {
   ok: true
   userId: string
   role: Role
   email: string | null
 }
 
-export type SuperFailure = {
+export type AuthFailure = {
   ok: false
   error: string
 }
 
-export async function requireSuper(): Promise<SuperSession | SuperFailure> {
+export async function requireAuth(): Promise<AuthSession | AuthFailure> {
   const session = await auth()
 
   if (!session?.user?.id) {
-    return { ok: false, error: 'Unauthorized' }
-  }
-
-  if (session.user.role !== 'SUPER_USER') {
     return { ok: false, error: 'Unauthorized' }
   }
 

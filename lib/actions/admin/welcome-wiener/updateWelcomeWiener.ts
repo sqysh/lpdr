@@ -4,12 +4,12 @@ import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
 import { WelcomeWienerInputs } from 'types/_welcome-wiener'
 import { createLog } from '../../log/createLog'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const updateWelcomeWiener = async (id: string, input: Partial<WelcomeWienerInputs>) => {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (input.name != null && !input.name.trim()) {
     return { success: false, error: 'Name is required', data: null }

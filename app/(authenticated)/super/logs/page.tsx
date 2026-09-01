@@ -1,4 +1,3 @@
-import { requireSuper } from 'lib/actions/auth/requireSuper'
 import { SuperLogsClient } from './SuperLogsClient'
 import { fetchLogs } from 'lib/actions/super-user/fetchLogs'
 import Link from 'next/link'
@@ -6,8 +5,6 @@ import Link from 'next/link'
 export const metadata = { title: 'Logs — LPDR Super' }
 
 export default async function SuperLogsPage() {
-  await requireSuper()
-
   const result = await fetchLogs({})
   const initialData = result.success ? result.data : []
   const initialTotal = result.success ? result.total : 0

@@ -1,12 +1,12 @@
 import prisma from 'prisma/client'
 import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 
 export const getSubscriptionById = async (id: string) => {
   try {
     const gate = await requireAuth()
-    if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+    if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
     const order = await prisma.order.findFirst({
       where: {
@@ -58,7 +58,9 @@ export const getSubscriptionById = async (id: string) => {
         customerName: order.customerName,
         stripeSubscriptionId: order.stripeSubscriptionId,
         paymentMethodId: order.paymentMethodId,
-        cancelledAt: stripeSubscription?.canceled_at ? new Date(stripeSubscription.canceled_at * 1000) : null,
+        cancelledAt: stripeSubscription?.canceled_at
+          ? new Date(stripeSubscription.canceled_at * 1000)
+          : null,
         cancelAtPeriodEnd: stripeSubscription?.cancel_at_period_end ?? false,
         paymentMethod: stripePaymentMethod
           ? {

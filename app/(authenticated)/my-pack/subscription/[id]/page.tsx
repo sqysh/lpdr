@@ -1,5 +1,5 @@
 import MyPackSubscriptionClient from 'app/(authenticated)/my-pack/subscription/[id]/MyPackSubscriptionClient'
-import { MyPackSubscriptionSkeleton } from 'app/components/my-pack/MyPackSubscriptionSkeleton'
+import { MyPackSubscriptionSkeleton } from 'app/(authenticated)/my-pack/subscription/[id]/_components/MyPackSubscriptionSkeleton'
 import { getSubscriptionById } from 'lib/actions/my-pack/getSubscriptionById'
 import { Suspense } from 'react'
 

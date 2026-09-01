@@ -27,13 +27,11 @@ export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps)
         animate={{ height: 'auto', opacity: 1 }}
         exit={{ height: 0, opacity: 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
-        className="overflow-hidden w-full px-4 xs:px-5 sm:px-6 "
         role="banner"
         aria-label={isActive ? 'Auction is live' : 'Upcoming auction announcement'}
+        className="auction-strip relative overflow-hidden w-full px-4 xs:px-5 sm:px-6"
+        data-state={isActive ? 'active' : 'upcoming'}
         style={{
-          background: isActive
-            ? 'linear-gradient(90deg, #7c3aed, #db2777, #ea580c, #db2777, #7c3aed)'
-            : 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4, #0891b2, #0e7490)',
           backgroundSize: '200% 100%',
           animation: 'stripScroll 4s linear infinite'
         }}
@@ -83,7 +81,11 @@ export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps)
           <div className="flex items-center gap-3 shrink-0 ml-4">
             <Link
               href={`/auctions/${auction?.customAuctionLink}`}
-              aria-label={isActive ? `Bid now on ${auction?.title}` : `View upcoming auction: ${auction?.title}`}
+              aria-label={
+                isActive
+                  ? `Bid now on ${auction?.title}`
+                  : `View upcoming auction: ${auction?.title}`
+              }
               className="group inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-white border border-white/40 hover:border-white hover:bg-white/10 px-3 py-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-transparent whitespace-nowrap"
             >
               {isActive ? 'Bid Now' : 'Learn More'}
@@ -97,12 +99,24 @@ export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps)
         </div>
 
         <style>{`
-            @keyframes stripScroll {
-              0% { background-position: 0% 50%; }
-              50% { background-position: 100% 50%; }
-              100% { background-position: 0% 50%; }
-            }
-          `}</style>
+          @keyframes stripScroll {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+          }
+
+          .auction-strip[data-state='active'] {
+            background-image: linear-gradient(90deg, #7c3aed, #db2777, #ea580c, #db2777, #7c3aed);
+          }
+
+          .auction-strip[data-state='upcoming'] {
+            background-image: linear-gradient(90deg, #0e7490, #0891b2, #06b6d4, #0891b2, #0e7490);
+          }
+
+          .dark .auction-strip[data-state='upcoming'] {
+            background-image: linear-gradient(90deg, #4c1d95, #6d28d9, #8b5cf6, #6d28d9, #4c1d95);
+          }
+        `}</style>
       </motion.div>
     </AnimatePresence>
   )

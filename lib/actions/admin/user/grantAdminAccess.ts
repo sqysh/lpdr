@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { AdminFailure, requireAdmin } from '../../auth/requireAdmin'
+import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { promoteUserToAdmin } from './promoteUserToAdmin'
@@ -10,7 +10,7 @@ import { preProvisionAdminUser } from './preProvisionAdminUser'
 
 export async function grantAdminAccess({ email }: { email: string }) {
   const gate = await requireAdmin()
-  if (!gate.ok) return { success: false, error: (gate as AdminFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   const normalizedEmail = email.toLowerCase().trim()
 

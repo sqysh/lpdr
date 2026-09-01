@@ -2,13 +2,13 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../auth/requireAuth'
+import { AuthFailure, requireAuth } from '../../auth/requireAuth'
 import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const setDefaultPaymentMethod = async (id: string) => {
   const gate = await requireAuth()
-  if (!gate.ok) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
 
   try {
     const paymentMethod = await prisma.paymentMethod.findUnique({
