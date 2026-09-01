@@ -1,6 +1,7 @@
 import { User, MapPin } from 'lucide-react'
 import { SerializedOrder } from 'types/_order.types'
 import { Label } from './OrderLabel'
+import Link from 'next/link'
 
 export function OrderCustomerSection({ order }: { order: SerializedOrder }) {
   return (
@@ -18,10 +19,12 @@ export function OrderCustomerSection({ order }: { order: SerializedOrder }) {
         </h2>
       </div>
       <div className="px-4 py-4 space-y-3">
-        <div>
+        <Link href={`/admin/users/${order.userId}`}>
           <Label>Name</Label>
-          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">{order.customerName || '—'}</p>
-        </div>
+          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1 hover:text-primary-light dark:hover:text-primary-dark">
+            {order.customerName || '—'}
+          </p>
+        </Link>
         <div>
           <Label>Email</Label>
           <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1 break-all">
@@ -32,7 +35,10 @@ export function OrderCustomerSection({ order }: { order: SerializedOrder }) {
           <div>
             <Label>Location at purchase</Label>
             <p className="flex items-center gap-1.5 text-xs font-mono text-text-light dark:text-text-dark mt-1">
-              <MapPin className="w-3 h-3 text-muted-light dark:text-muted-dark" aria-hidden="true" />
+              <MapPin
+                className="w-3 h-3 text-muted-light dark:text-muted-dark"
+                aria-hidden="true"
+              />
               {[order.geoCity, order.geoRegion, order.geoCountry].filter(Boolean).join(', ')}
             </p>
           </div>

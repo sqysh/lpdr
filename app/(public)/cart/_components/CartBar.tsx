@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag, ArrowRight, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { store, useCartSelector } from 'lib/store/store'
-import { clearCart, removeFromCart } from 'lib/store/slices/cartSlice'
 import { usePathname } from 'next/navigation'
 import Picture from 'components/_common/Picture'
+import { useCartStore } from 'stores/cart.store'
 
 export function CartBar() {
-  const { items } = useCartSelector()
+  const items = useCartStore((s) => s.items)
+  const removeFromCart = useCartStore((s) => s.removeFromCart)
+  const clearCart = useCartStore((s) => s.clearCart)
   const pathname = usePathname()
   const isWienerPage = pathname === '/welcomewieners' || pathname.startsWith('/welcomewieners/')
 
@@ -103,7 +104,7 @@ export function CartBar() {
                     {/* Remove */}
                     <button
                       type="button"
-                      onClick={() => store.dispatch(removeFromCart(item.id))}
+                      onClick={() => removeFromCart({ id: item.id, size: item.size })}
                       aria-label={`Remove ${item.name} from cart`}
                       className="shrink-0 text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark p-1"
                     >
@@ -117,7 +118,7 @@ export function CartBar() {
               <div className="px-4 py-2.5 border-t border-border-light dark:border-border-dark flex items-center justify-end">
                 <button
                   type="button"
-                  onClick={() => store.dispatch(clearCart())}
+                  onClick={() => clearCart()}
                   className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:underline"
                 >
                   Clear cart

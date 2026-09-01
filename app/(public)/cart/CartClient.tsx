@@ -5,14 +5,13 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ShoppingBag } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { useAppDispatch, useCartSelector } from 'lib/store/store'
-import { CartItem, clearCart } from 'lib/store/slices/cartSlice'
 import { CartItemRow } from 'app/(public)/cart/_components/CartItemRow'
 import { useRouter } from 'next/navigation'
+import { CartItem, useCartStore } from 'stores/cart.store'
 
 export default function CartClient() {
-  const { items } = useCartSelector()
-  const dispatch = useAppDispatch()
+  const items = useCartStore((s) => s.items)
+  const clearCart = useCartStore((s) => s.clearCart)
   const router = useRouter()
 
   const subtotal = items.reduce(
@@ -21,11 +20,8 @@ export default function CartClient() {
   )
   const shipping = items
     .filter((i: { isPhysicalProduct: boolean }) => i.isPhysicalProduct)
-    .reduce(
-      (sum: number, i: { shippingPrice: number; quantity: number }) =>
-        sum + i.shippingPrice * i.quantity,
-      0
-    )
+    .reduce((sum: number, i) => sum + i.shippingPrice * i.quantity, 0)
+
   const total = subtotal + shipping
   const itemCount = items.reduce((s: any, i: { quantity: number }) => s + i.quantity, 0)
   const isEmpty = items?.length === 0
@@ -161,7 +157,7 @@ export default function CartClient() {
                 {/* Clear cart */}
                 <div className="mt-3 flex justify-end">
                   <button
-                    onClick={() => dispatch(clearCart())}
+                    onClick={() => clearCart()}
                     className="text-[10px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
                   >
                     Clear Cart

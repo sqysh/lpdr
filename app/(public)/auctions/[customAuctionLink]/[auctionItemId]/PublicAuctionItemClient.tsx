@@ -4,8 +4,6 @@ import { useEffect, useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Clock, Gavel } from 'lucide-react'
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
-import { store } from 'lib/store/store'
-import { setOpenAuctionBidModal } from 'lib/store/slices/uiSlice'
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { StickyBar } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/_components/StickyBar'
@@ -17,8 +15,10 @@ import { AuctionBidModal } from 'app/(public)/auctions/[customAuctionLink]/[auct
 import { CountUnit } from 'components/_primitives'
 import { AuctionItemPhotoGallery } from './_components/AuctionItemPhotoGallery'
 import { BidHistory } from './_components/BidHistory'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 
 export default function PublicAuctionItemClient({ item, auctionItems }) {
+  const openBidModal = useAuctionUiStore((s) => s.openBidModal)
   const session = useSession()
   const searchParams = useSearchParams()
   const router = useRouter()
@@ -37,11 +37,11 @@ export default function PublicAuctionItemClient({ item, auctionItems }) {
 
   useEffect(() => {
     if (searchParams.get('bidModal') === 'true' && session?.data?.user) {
-      store.dispatch(setOpenAuctionBidModal(item))
+      openBidModal()
       // clear the param from the URL so it doesn't persist on refresh
       router.replace(`/auctions/${customAuctionLink}/${item.id}`, { scroll: false })
     }
-  }, [customAuctionLink, item, router, searchParams, session])
+  }, [customAuctionLink, item, openBidModal, router, searchParams, session])
 
   return (
     <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark">

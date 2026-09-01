@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
-import { useUiSelector } from 'lib/store/store'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
@@ -16,6 +15,7 @@ import { IPaymentMethod } from 'types/_payment-method.types'
 import { ordinal } from 'lib/utils/date.utils'
 import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { CardElementField } from 'components/features/payment/CardElementField'
+import { useThemeStore } from 'stores/theme.store'
 
 type PaymentInputs = {
   firstName: string
@@ -54,7 +54,7 @@ export function SubscriptionPaymentForm({
 }: Props) {
   const stripe = useStripe()
   const elements = useElements()
-  const { isDark: storeDark } = useUiSelector()
+  const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
   const { setupPusherListenerRecurring } = usePaymentProcessor()
 

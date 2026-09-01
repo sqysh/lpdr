@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut } from 'next-auth/react'
-import { LogOut } from 'lucide-react'
+import { LogOut, ShieldCheck } from 'lucide-react'
 import { ADMIN_NAV_GROUPS } from 'lib/constants/navigation.constants'
 import { Role } from '@prisma/client'
 import { formatRole } from 'lib/utils/user.utils'
@@ -85,6 +85,29 @@ export default function AdminSidebar({ onClose, email, role }: Props) {
           </div>
         ))}
       </div>
+
+      {role === Role.SUPER_USER && (
+        <div className="pt-4 mt-4 border-t border-border-light dark:border-border-dark shrink-0">
+          <Link
+            href="/super"
+            onClick={() => {
+              setPending('/super')
+              onClose?.()
+            }}
+            aria-current={isActive('/super') ? 'page' : undefined}
+            className={rowClass(isActive('/super') || pending === '/super')}
+          >
+            {isActive('/super') && (
+              <span
+                className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-light dark:bg-primary-dark"
+                aria-hidden="true"
+              />
+            )}
+            <ShieldCheck className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+            <span className="font-mono text-[11px] tracking-widest uppercase">Super</span>
+          </Link>
+        </div>
+      )}
 
       {/* Identity + Logout — pinned to bottom */}
       <div className="pt-4 border-t border-border-light dark:border-border-dark shrink-0">

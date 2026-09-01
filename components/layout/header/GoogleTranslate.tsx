@@ -3,9 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { usePathname } from 'next/navigation'
 import { ChevronDown } from 'lucide-react'
-import { store } from 'lib/store/store'
 import { motion } from 'framer-motion'
-import { setIsNotSpanish, setIsSpanish } from 'lib/store/slices/uiSlice'
 
 const LANGUAGES = [
   { code: 'en', name: 'English' },
@@ -41,15 +39,7 @@ export default function GoogleTranslate() {
 
   // Sync state with Google Translate
   const syncLanguageState = useCallback(() => {
-    const lang = getCurrentLanguage()
-    setCurrentLang(lang)
-
-    // Update Redux state
-    if (lang === 'es') {
-      store.dispatch(setIsSpanish())
-    } else {
-      store.dispatch(setIsNotSpanish())
-    }
+    setCurrentLang(getCurrentLanguage())
   }, [])
 
   useEffect(() => {
@@ -112,12 +102,6 @@ export default function GoogleTranslate() {
     setIsTranslating(true)
     setCurrentLang(langCode)
     setIsOpen(false)
-
-    if (langCode === 'es') {
-      store.dispatch(setIsSpanish())
-    } else {
-      store.dispatch(setIsNotSpanish())
-    }
 
     // Retry mechanism with increasing delays
     const attemptTranslation = async (attempt: number = 0): Promise<boolean> => {

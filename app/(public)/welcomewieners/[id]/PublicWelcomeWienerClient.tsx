@@ -7,17 +7,17 @@ import Link from 'next/link'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
 import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from 'components/_common/Picture'
-import { useAppDispatch } from 'lib/store/store'
-import { addToCart } from 'lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import { WELCOME_WIENER_CATEGORY_LABELS } from 'lib/constants/welcome-wiener.constants'
+import { useCartStore } from 'stores/cart.store'
+import { useModalsStore } from 'stores/modals.store'
 
 export default function PublicWelcomeWienerClient({
   welcomeWiener
 }: {
   welcomeWiener: IWelcomeWiener
 }) {
-  const dispatch = useAppDispatch()
+  const addToCart = useCartStore((s) => s.addToCart)
+  const showCartToast = useModalsStore((s) => s.showCartToast)
   const [photoIndex, setPhotoIndex] = useState(0)
   const [added, setAdded] = useState<string[]>([])
   const [copied, setCopied] = useState(false)
@@ -50,8 +50,8 @@ export default function PublicWelcomeWienerClient({
       isPhysicalProduct: false,
       welcomeWienerId: welcomeWiener.id
     }
-    dispatch(setOpenCartToast(cartItem))
-    dispatch(addToCart(cartItem))
+    showCartToast(cartItem)
+    addToCart(cartItem)
 
     setTimeout(() => setAdded((prev) => prev.filter((id) => id !== product.id)), 2000)
   }

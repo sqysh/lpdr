@@ -1,18 +1,15 @@
 import { fadeUp } from 'lib/constants/motion.constants'
-import {
-  CartItem,
-  decrementQuantity,
-  incrementQuantity,
-  removeFromCart
-} from 'lib/store/slices/cartSlice'
 import { motion } from 'framer-motion'
 import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
-import { useAppDispatch } from 'lib/store/store'
 import { formatMoney } from 'lib/utils/currency.utils'
 import Picture from 'components/_common/Picture'
+import { CartItem, useCartStore } from 'stores/cart.store'
 
 export function CartItemRow({ item, index }: { item: CartItem; index: number }) {
-  const dispatch = useAppDispatch()
+  const removeFromCart = useCartStore((s) => s.removeFromCart)
+  const incrementQuantity = useCartStore((s) => s.incrementQuantity)
+  const decrementQuantity = useCartStore((s) => s.decrementQuantity)
+
   return (
     <motion.li
       layout
@@ -68,7 +65,7 @@ export function CartItemRow({ item, index }: { item: CartItem; index: number }) 
           aria-label={`Quantity for ${item.name}${item.size ? `, size ${item.size}` : ''}`}
         >
           <button
-            onClick={() => dispatch(decrementQuantity({ id: item.id, size: item.size }))}
+            onClick={() => decrementQuantity({ id: item.id, size: item.size })}
             aria-label={`Decrease quantity of ${item.name}`}
             disabled={item.quantity <= 1}
             className="w-8 h-8 flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:bg-surface-light dark:hover:bg-surface-dark transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark border-r border-border-light dark:border-border-dark"
@@ -83,7 +80,7 @@ export function CartItemRow({ item, index }: { item: CartItem; index: number }) 
             {item.quantity}
           </span>
           <button
-            onClick={() => dispatch(incrementQuantity({ id: item.id, size: item.size }))}
+            onClick={() => incrementQuantity({ id: item.id, size: item.size })}
             aria-label={`Increase quantity of ${item.name}`}
             disabled={item.maxQuantity != null && item.quantity >= item.maxQuantity}
             className="w-8 h-8 flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:bg-surface-light dark:hover:bg-surface-dark transition-colors duration-150 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark border-l border-border-light dark:border-border-dark"
@@ -96,7 +93,7 @@ export function CartItemRow({ item, index }: { item: CartItem; index: number }) 
       {/* Price + remove */}
       <div className="flex flex-col items-end justify-between">
         <button
-          onClick={() => dispatch(removeFromCart({ id: item.id, size: item.size }))}
+          onClick={() => removeFromCart({ id: item.id, size: item.size })}
           aria-label={`Remove ${item.name} from cart`}
           className="p-1 text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
         >

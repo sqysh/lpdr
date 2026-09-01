@@ -2,19 +2,21 @@
 
 import { useState, useEffect, useRef } from 'react'
 import { X, Zap, DollarSign, Loader2, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react'
-import { store } from 'lib/store/store'
-import { setCloseAuctionBidModal, setShowConfetti } from 'lib/store/slices/uiSlice'
 import { placeBid } from 'lib/actions/user/auction/placeBid'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { useRouter } from 'next/navigation'
 import { pusherClient } from 'lib/pusher/pusher-client'
-import { useSelector } from 'react-redux'
 import { IAuctionItem } from 'types/_auction-item'
 import { useSounds } from 'lib/hooks/useSounds.hook'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
+import { useConfettiStore } from 'stores/confetti.store'
 
 export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) {
+  const isOpen = useAuctionUiStore((s) => s.bidModalOpen)
+  const closeBidModal = useAuctionUiStore((s) => s.closeBidModal)
+  const showConfetti = useConfettiStore((s) => s.show)
+
   const router = useRouter()
-  const auctionBidModal = useSelector((state: any) => state.ui.auctionBidModal)
   const [placedBidAmount, setPlacedBidAmount] = useState<number | null>(null)
   const [customAmount, setCustomAmount] = useState('')
   const [isPlacingBid, setIsPlacingBid] = useState(false)
@@ -40,7 +42,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
   const itemName = auctionItem?.name ?? 'Item'
 
   const onClose = () => {
-    store.dispatch(setCloseAuctionBidModal())
+    closeBidModal()
     setCustomAmount('')
     setError(null)
     setMode('default')
@@ -52,10 +54,10 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
     }
   }, [mode])
 
-  useEscapeKey(auctionBidModal, onClose)
+  useEscapeKey(isOpen, onClose)
 
   useEffect(() => {
-    if (!auctionBidModal || !auctionItem?.id) return
+    if (!isOpen || !auctionItem?.id) return
 
     const channel = pusherClient.subscribe(`auction-item-${auctionItem.id}`)
 
@@ -68,7 +70,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
       channel.unbind_all()
       pusherClient.unsubscribe(`auction-item-${auctionItem.id}`)
     }
-  }, [auctionBidModal, auctionItem?.id])
+  }, [isOpen, auctionItem?.id])
 
   const handleQuickBid = async () => {
     setError(null)
@@ -93,7 +95,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
     }
 
     router.refresh()
-    store.dispatch(setShowConfetti())
+    showConfetti()
     setPlacedBidAmount(quickBidAmount)
     setMode('success')
   }
@@ -131,7 +133,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
     }
 
     router.refresh()
-    store.dispatch(setShowConfetti())
+    showConfetti()
     setPlacedBidAmount(amount)
     setMode('success')
   }
@@ -143,7 +145,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
     setMode('default')
   }
 
-  if (!auctionBidModal) return null
+  if (!isOpen) return null
 
   return (
     <div

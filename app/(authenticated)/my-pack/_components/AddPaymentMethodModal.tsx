@@ -1,24 +1,35 @@
 'use client'
 
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { X, CreditCard, ShieldCheck, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
-import { store, useUiSelector } from 'lib/store/store'
-import { setCloseAddPaymentMethodModal } from 'lib/store/slices/uiSlice'
+import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { useRemoveScroll } from 'lib/hooks/useRemoveScroll.hook'
-import { showToast } from 'lib/store/slices/toastSlice'
 import { extractErrorMessage } from 'lib/utils/log.client.utils'
 import { getSetupIntentClientSecret } from 'lib/actions/_stripe/getSetupIntentClientSecret'
 import { createPaymentMethod } from 'lib/actions/_stripe/createPaymentMethod'
+import { useThemeStore } from 'stores/theme.store'
+
+const accentText = 'text-cyan-600 dark:text-violet-400'
+const accentBg = 'bg-cyan-600 dark:bg-violet-400'
+const accentRing =
+  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
+
+const fieldLabel = `block text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2`
+
+const fieldShell =
+  'border-l-2 border-l-cyan-600 dark:border-l-violet-400 border-t border-r border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-[#13131f]'
 
 export default function AddPaymentMethodModal() {
-  const { addPaymentMethodModal, isDark } = useUiSelector()
+  const isOpen = usePaymentMethodModal((s) => s.isOpen)
+  const closeModal = usePaymentMethodModal((s) => s.close)
+  const isDark = useThemeStore((s) => s.isDark)
+
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
-  const overlayRef = useRef<HTMLDivElement>(null)
 
   const [cardholderName, setCardholderName] = useState('')
   const [cardComplete, setCardComplete] = useState(false)
@@ -28,7 +39,7 @@ export default function AddPaymentMethodModal() {
   const [success, setSuccess] = useState(false)
 
   const onClose = () => {
-    store.dispatch(setCloseAddPaymentMethodModal())
+    closeModal()
     setCardholderName('')
     setCardComplete(false)
     setIsDefault(false)
@@ -36,24 +47,19 @@ export default function AddPaymentMethodModal() {
     setSuccess(false)
   }
 
-  useEscapeKey(addPaymentMethodModal, onClose)
-  useRemoveScroll(addPaymentMethodModal)
+  useEscapeKey(isOpen, onClose)
+  useRemoveScroll(isOpen)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
     if (!stripe || !elements) {
-      store.dispatch(
-        showToast({
-          type: 'error',
-          message: 'Stripe not loaded',
-          description: 'Please try again later.'
-        })
-      )
+      setError('Payment form is still loading. Please try again in a moment.')
       return
     }
 
     setIsSubmitting(true)
+    setError(null)
 
     try {
       const setupRes = await getSetupIntentClientSecret()
@@ -62,20 +68,20 @@ export default function AddPaymentMethodModal() {
         throw new Error(setupRes.error || 'Failed to get client secret')
       }
 
-      // Confirm card setup
       const cardElement = elements.getElement(CardElement)
       if (!cardElement) throw new Error('Card element not found')
 
-      const { setupIntent, error } = await stripe.confirmCardSetup(setupRes.clientSecret, {
-        payment_method: {
-          card: cardElement,
-          billing_details: {
-            name: cardholderName || undefined
+      const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
+        setupRes.clientSecret,
+        {
+          payment_method: {
+            card: cardElement,
+            billing_details: { name: cardholderName || undefined }
           }
         }
-      })
+      )
 
-      if (error) throw error
+      if (stripeError) throw stripeError
 
       const paymentMethodId =
         typeof setupIntent?.payment_method === 'string'
@@ -102,26 +108,17 @@ export default function AddPaymentMethodModal() {
         setSuccess(false)
         onClose()
       }, 1200)
-    } catch (error: unknown) {
-      const errorMessage = extractErrorMessage(error)
-
-      store.dispatch(
-        showToast({
-          type: 'error',
-          message: 'Failed to Add Payment Method',
-          description: errorMessage
-        })
-      )
+    } catch (err: unknown) {
+      setError(extractErrorMessage(err))
     } finally {
       setIsSubmitting(false)
     }
   }
 
-  if (!addPaymentMethodModal) return null
+  if (!isOpen) return null
 
   return (
     <div
-      ref={overlayRef}
       role="dialog"
       aria-modal="true"
       aria-labelledby="add-card-title"
@@ -134,26 +131,26 @@ export default function AddPaymentMethodModal() {
       >
         {/* ── Corner tick marks ── */}
         <div className="absolute top-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
-          <div className="absolute top-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
-          <div className="absolute top-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
+          <div className={`absolute top-0 left-0 w-full h-px ${accentBg}`} />
+          <div className={`absolute top-0 left-0 w-px h-full ${accentBg}`} />
         </div>
         <div className="absolute top-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
-          <div className="absolute top-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
-          <div className="absolute top-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
+          <div className={`absolute top-0 right-0 w-full h-px ${accentBg}`} />
+          <div className={`absolute top-0 right-0 w-px h-full ${accentBg}`} />
         </div>
         <div
           className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10"
           aria-hidden="true"
         >
-          <div className="absolute bottom-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
-          <div className="absolute bottom-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
+          <div className={`absolute bottom-0 left-0 w-full h-px ${accentBg}`} />
+          <div className={`absolute bottom-0 left-0 w-px h-full ${accentBg}`} />
         </div>
         <div
           className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10"
           aria-hidden="true"
         >
-          <div className="absolute bottom-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
-          <div className="absolute bottom-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
+          <div className={`absolute bottom-0 right-0 w-full h-px ${accentBg}`} />
+          <div className={`absolute bottom-0 right-0 w-px h-full ${accentBg}`} />
         </div>
 
         {/* ── Top accent bar ── */}
@@ -166,14 +163,14 @@ export default function AddPaymentMethodModal() {
         <div className="flex items-start justify-between p-5 430:p-6 pb-4">
           <div>
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-4 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
-              <span className="  text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400">
+              <div className={`w-4 h-px ${accentBg}`} aria-hidden="true" />
+              <span className={`text-[10px] uppercase tracking-[0.25em] ${accentText}`}>
                 Payment Method
               </span>
             </div>
             <h2
               id="add-card-title"
-              className="  text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark"
+              className="text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark"
             >
               Add New Card
             </h2>
@@ -182,7 +179,7 @@ export default function AddPaymentMethodModal() {
             type="button"
             onClick={onClose}
             aria-label="Close modal"
-            className="shrink-0 p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:text-muted-dark/50 dark:hover:text-text-dark dark:hover:bg-white/5 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
+            className={`shrink-0 p-1.5 text-zinc-400 hover:text-zinc-700 hover:bg-zinc-100 dark:text-muted-dark/50 dark:hover:text-text-dark dark:hover:bg-white/5 transition-colors ${accentRing}`}
           >
             <X className="w-4 h-4" aria-hidden="true" />
           </button>
@@ -190,30 +187,23 @@ export default function AddPaymentMethodModal() {
 
         {/* ── Body ── */}
         <div className="px-5 430:px-6 pb-6 space-y-5">
-          {/* Success */}
           {success ? (
             <div className="flex flex-col items-center justify-center py-8 gap-3">
               <div className="w-12 h-12 flex items-center justify-center bg-cyan-600/10 dark:bg-violet-400/10">
-                <CheckCircle
-                  className="w-6 h-6 text-cyan-600 dark:text-violet-400"
-                  aria-hidden="true"
-                />
+                <CheckCircle className={`w-6 h-6 ${accentText}`} aria-hidden="true" />
               </div>
-              <p className="  text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+              <p className="text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">
                 Card Added
               </p>
               <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
-                Your card has been saved successfully.
+                Your card has been saved.
               </p>
             </div>
           ) : (
             <>
               {/* Cardholder name */}
               <div>
-                <label
-                  htmlFor="cardholder-name"
-                  className="block   text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2"
-                >
+                <label htmlFor="cardholder-name" className={fieldLabel}>
                   Cardholder Name
                 </label>
                 <input
@@ -223,28 +213,24 @@ export default function AddPaymentMethodModal() {
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value)}
                   placeholder="Name on card"
-                  className="w-full px-3.5 py-3 border-l-2 border-l-cyan-600 dark:border-l-violet-400 border-t border-r border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-[#13131f] text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40 font-lato text-sm outline-none transition-all focus:border-cyan-600 dark:focus:border-violet-400"
+                  className={`w-full px-3.5 py-3 ${fieldShell} text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40 font-lato text-sm outline-none transition-all focus:border-cyan-600 dark:focus:border-violet-400`}
                 />
               </div>
 
               {/* Card element */}
               <div>
-                <label
-                  id="card-details-label"
-                  className="block   text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2"
-                >
+                <label id="card-details-label" className={fieldLabel}>
                   Card Details
                 </label>
                 <div
                   role="group"
                   aria-labelledby="card-details-label"
-                  className="px-3.5 py-3.5 border-l-2 border-l-cyan-600 dark:border-l-violet-400 border-t border-r border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-[#13131f] transition-colors duration-200 focus-within:border-cyan-600 dark:focus-within:border-violet-400"
+                  className={`px-3.5 py-3.5 ${fieldShell} transition-colors duration-200 focus-within:border-cyan-600 dark:focus-within:border-violet-400`}
                 >
                   <CardElement
                     onChange={(e) => {
                       setCardComplete(e.complete)
-                      if (e.error) setError(e.error.message ?? null)
-                      else setError(null)
+                      setError(e.error?.message ?? null)
                     }}
                     options={{
                       style: {
@@ -266,10 +252,7 @@ export default function AddPaymentMethodModal() {
 
               {/* Set as default toggle */}
               <div>
-                <label
-                  id="options-label"
-                  className="block   text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2"
-                >
+                <label id="options-label" className={fieldLabel}>
                   Options
                 </label>
                 <button
@@ -278,7 +261,7 @@ export default function AddPaymentMethodModal() {
                   aria-checked={isDefault}
                   aria-label="Set as default payment method"
                   onClick={() => setIsDefault(!isDefault)}
-                  className="w-full flex items-center justify-between p-4 border border-zinc-200 dark:border-border-dark hover:border-cyan-600/40 dark:hover:border-violet-400/40 bg-zinc-50 dark:bg-[#13131f] transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
+                  className={`w-full flex items-center justify-between p-4 border border-zinc-200 dark:border-border-dark hover:border-cyan-600/40 dark:hover:border-violet-400/40 bg-zinc-50 dark:bg-[#13131f] transition-colors ${accentRing}`}
                 >
                   <div className="flex items-center gap-3">
                     <CreditCard
@@ -286,7 +269,7 @@ export default function AddPaymentMethodModal() {
                       aria-hidden="true"
                     />
                     <div className="text-left">
-                      <p className="  text-sm uppercase tracking-wide leading-none mb-0.5 text-zinc-950 dark:text-text-dark">
+                      <p className="text-sm uppercase tracking-wide leading-none mb-0.5 text-zinc-950 dark:text-text-dark">
                         Set as default
                       </p>
                       <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">
@@ -340,7 +323,7 @@ export default function AddPaymentMethodModal() {
                 onClick={handleSubmit}
                 disabled={!cardComplete || isSubmitting}
                 aria-disabled={!cardComplete || isSubmitting}
-                className="group relative w-full overflow-hidden   uppercase tracking-widest disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-bg-dark"
+                className={`group relative w-full overflow-hidden uppercase tracking-widest disabled:cursor-not-allowed ${accentRing} focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-bg-dark`}
               >
                 <span
                   className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/20 to-transparent group-hover:animate-[shimmer_1.4s_ease_infinite] pointer-events-none z-10"
@@ -353,7 +336,7 @@ export default function AddPaymentMethodModal() {
                     <span className="sr-only">Please wait</span>
                   </div>
                 ) : (
-                  <div className={`flex disabled:opacity-40 ${!cardComplete ? 'opacity-40' : ''}`}>
+                  <div className={`flex ${!cardComplete ? 'opacity-40' : ''}`}>
                     <div className="flex-1 flex items-center justify-center px-6 py-3.5 bg-cyan-600 hover:bg-cyan-500 dark:bg-violet-500 dark:hover:bg-violet-400 text-white text-sm transition-colors duration-200">
                       Save Card
                     </div>
@@ -365,7 +348,7 @@ export default function AddPaymentMethodModal() {
               <button
                 type="button"
                 onClick={onClose}
-                className="w-full px-6 py-3   text-[10px] uppercase tracking-widest border border-zinc-200 hover:border-cyan-600/30 hover:bg-zinc-50 dark:border-border-dark dark:hover:border-violet-400/30 dark:hover:bg-white/5 text-zinc-500 dark:text-muted-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
+                className={`w-full px-6 py-3 text-[10px] uppercase tracking-widest border border-zinc-200 hover:border-cyan-600/30 hover:bg-zinc-50 dark:border-border-dark dark:hover:border-violet-400/30 dark:hover:bg-white/5 text-zinc-500 dark:text-muted-dark transition-colors ${accentRing}`}
               >
                 Cancel
               </button>

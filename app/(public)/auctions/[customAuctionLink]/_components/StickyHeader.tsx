@@ -1,6 +1,5 @@
 import Link from 'next/link'
-import { setOpenAuctionSignInModal } from 'lib/store/slices/uiSlice'
-import { useAppDispatch } from 'lib/store/store'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { IAuction } from 'types/_auction'
 
 type Props = {
@@ -26,8 +25,7 @@ export function StickyHeader({
   isEnded,
   isAuthed
 }: Props) {
-  const dispatch = useAppDispatch()
-
+  const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   return (
     <div className="sticky top-0 z-40 border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm">
       {isActive && (
@@ -50,9 +48,7 @@ export function StickyHeader({
                 Sign in to place bids and track your items
               </p>
               <button
-                onClick={() =>
-                  dispatch(setOpenAuctionSignInModal(`/auctions/${auction.customAuctionLink}`))
-                }
+                onClick={() => openSignInModal(`/auctions/${auction.customAuctionLink}`)}
                 className="shrink-0 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors"
               >
                 Sign in →

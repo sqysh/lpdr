@@ -1,8 +1,6 @@
 'use client'
 
 import { mainNavigationLinks } from 'lib/constants/navigation.constants'
-import { setCloseMobileNavigation, setOpenMobileNavigation } from 'lib/store/slices/uiSlice'
-import { store, useCartSelector, useUiSelector } from 'lib/store/store'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -13,23 +11,27 @@ import { DrawerAuthSection } from './DrawerAuthSection'
 import { DrawerCartLink } from './DrawerCartLink'
 import { DrawerNewsletterForm } from './DrawerNewsletterForm'
 import { DrawerNavSection } from './DrawerNavSection'
+import { useNavigationStore } from 'stores/navigation.store'
+import { useCartStore } from 'stores/cart.store'
 
 export default function NavigationDrawer({ auction, hasActiveFee }) {
-  const { mobileNavigation } = useUiSelector()
+  const mobileNavigation = useNavigationStore((s) => s.mobileNavOpen)
+  const closeMobileNav = useNavigationStore((s) => s.closeMobileNav)
+  const openMobileNav = useNavigationStore((s) => s.openMobileNav)
   const pathname = usePathname()
   const session = useSession()
-  const { items } = useCartSelector()
+  const items = useCartStore((s) => s.items)
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
   const searchParams = useSearchParams()
 
-  const onClose = () => store.dispatch(setCloseMobileNavigation())
+  const onClose = () => closeMobileNav()
   const isLinkActive = (link: string) => pathname === link
 
   useEffect(() => {
     if (searchParams.get('auth') === 'success') {
-      store.dispatch(setOpenMobileNavigation())
+      openMobileNav()
     }
-  }, [searchParams])
+  }, [openMobileNav, searchParams])
 
   return (
     <AnimatePresence>

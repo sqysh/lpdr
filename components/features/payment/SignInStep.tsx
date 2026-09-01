@@ -1,16 +1,16 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useUiSelector } from 'lib/store/store'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { MagicLink } from 'components/features/auth/MagicLink'
 import { fadeUp } from 'lib/constants/motion.constants'
+import { useThemeStore } from 'stores/theme.store'
 
 export function StepSignIn({ redirectTo, isDark }: { redirectTo: string; isDark?: boolean }) {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
-  const { isDark: storeDark } = useUiSelector()
+  const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
 
   const c = {

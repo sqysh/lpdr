@@ -1,18 +1,16 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateAuctionItem } from 'lib/actions/admin/auction/updateAuctionItem'
 import { deleteAuctionItem } from 'lib/actions/admin/auction/deleteAuctionItem'
+import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { store } from 'lib/store/store'
-import { showToast } from 'lib/store/slices/toastSlice'
 import type { SellingFormat } from 'types/_auction-item'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'
-import { AuctionItemDangerZone } from './AuctionItemDangerZone'
-import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 import { AuctionStatus } from '@prisma/client'
+import { AuctionItemDangerZone } from './AuctionItemDangerZone'
 import { AuctionItemFormHeader } from './AuctionItemFormHeader'
 import { AuctionItemFormTitleBand } from './AuctionItemFormTitleBand'
 import { AuctionItemFields } from './AuctionItemFields'
@@ -37,6 +35,11 @@ export interface FormErrors {
   form?: string
 }
 
+export interface FormSuccess {
+  message: string
+  description?: string
+}
+
 interface PendingPhoto {
   file: File
   previewUrl: string
@@ -48,6 +51,43 @@ function validate(inputs: FormInputs, type: SellingFormat): FormErrors {
   if (type === 'AUCTION' && !inputs.startingPrice) errs.startingPrice = 'Starting price is required'
   if (type === 'FIXED' && !inputs.buyNowPrice) errs.buyNowPrice = 'Buy now price is required'
   return errs
+}
+
+function buildSummary(
+  payload: {
+    sellingFormat: SellingFormat
+    startingPrice: number | null
+    buyNowPrice: number | null
+    requiresShipping: boolean
+    shippingCosts: number | null
+  },
+  photoCount: number
+) {
+  const price =
+    payload.sellingFormat === 'AUCTION'
+      ? payload.startingPrice != null
+        ? `starting at ${formatMoney(payload.startingPrice)}`
+        : null
+      : payload.buyNowPrice != null
+        ? `${formatMoney(payload.buyNowPrice)} each`
+        : null
+
+  const shipping = payload.requiresShipping
+    ? payload.shippingCosts != null
+      ? `+${formatMoney(payload.shippingCosts)} shipping`
+      : 'shipping TBD'
+    : 'no shipping'
+
+  return (
+    [
+      payload.sellingFormat === 'AUCTION' ? 'Auction item' : 'Instant buy',
+      price,
+      shipping,
+      photoCount > 0 ? `${photoCount} photo${photoCount === 1 ? '' : 's'} added` : null
+    ]
+      .filter(Boolean)
+      .join(' · ') || undefined
+  )
 }
 
 export function AuctionItemForm({
@@ -66,7 +106,7 @@ export function AuctionItemForm({
     totalQuantity: number
     requiresShipping: boolean
     shippingCosts: number
-    photos: any
+    photos: IAuctionItemPhoto[]
   }
   auctionId: string
   type: SellingFormat
@@ -97,11 +137,26 @@ export function AuctionItemForm({
   ) => patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
 
   const [errors, setErrors] = useState<FormErrors>({})
+  const [success, setSuccess] = useState<FormSuccess | null>(null)
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
   const [confirmDel, setConfirmDel] = useState(false)
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([])
   const [uploadProgress, setUploadProgress] = useState<number>(0)
+
+  const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (successTimeout.current) clearTimeout(successTimeout.current)
+    }
+  }, [])
+
+  const flashSuccess = (next: FormSuccess) => {
+    if (successTimeout.current) clearTimeout(successTimeout.current)
+    setSuccess(next)
+    successTimeout.current = setTimeout(() => setSuccess(null), 6000)
+  }
 
   const handleSave = async () => {
     const errs = validate(inputs, type)
@@ -112,6 +167,7 @@ export function AuctionItemForm({
 
     setLoading(true)
     setErrors({})
+    setSuccess(null)
 
     let photos: string[] = []
     if (pendingPhotos.length > 0) {
@@ -151,48 +207,19 @@ export function AuctionItemForm({
       return
     }
 
-    const price =
-      payload.sellingFormat === 'AUCTION'
-        ? payload.startingPrice != null
-          ? `starting at ${formatMoney(payload.startingPrice)}`
-          : null
-        : payload.buyNowPrice != null
-          ? `${formatMoney(payload.buyNowPrice)} each`
-          : null
-
-    const shipping = payload.requiresShipping
-      ? payload.shippingCosts != null
-        ? `+${formatMoney(payload.shippingCosts)} shipping`
-        : 'shipping TBD'
-      : 'no shipping'
-
-    store.dispatch(
-      showToast({
-        type: 'success',
-        message: `${payload.name} ${isUpdating ? 'updated' : 'created'}`,
-        description:
-          [
-            payload.sellingFormat === 'AUCTION' ? 'Auction item' : 'Instant buy',
-            price,
-            shipping,
-            photos.length > 0
-              ? `${photos.length} photo${photos.length === 1 ? '' : 's'} added`
-              : null
-          ]
-            .filter(Boolean)
-            .join(' · ') || undefined,
-        duration: 5000
-      })
-    )
-
     if (isUpdating) {
+      flashSuccess({
+        message: `${payload.name} updated`,
+        description: buildSummary(payload, photos.length)
+      })
       router.refresh()
       setLoading(false)
       setUploadProgress(0)
       setPendingPhotos([])
-    } else {
-      router.push(`/admin/auctions/${auctionId}?tab=items&type=${result.data.sellingFormat}`)
+      return
     }
+
+    router.push(`/admin/auctions/${auctionId}?tab=items&type=${result.data.sellingFormat}`)
   }
 
   const handleDelete = async () => {
@@ -211,7 +238,6 @@ export function AuctionItemForm({
       return
     }
 
-    store.dispatch(showToast({ type: 'success', message: `${auctionItem!.name} deleted` }))
     router.push(`/admin/auctions/${auctionId}?tab=items&type=${auctionItem!.sellingFormat}`)
   }
 
@@ -246,6 +272,7 @@ export function AuctionItemForm({
               showBuyNow={showBuyNow}
               inputs={inputs}
               errors={errors}
+              success={success}
               handleInput={handleInput}
               patch={patch}
               onSave={handleSave}

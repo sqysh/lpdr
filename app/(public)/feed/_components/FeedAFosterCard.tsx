@@ -1,22 +1,21 @@
 import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { useState } from 'react'
-import { useAppDispatch } from 'lib/store/store'
-import { addToCart } from 'lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import { Check, Utensils } from 'lucide-react'
 import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
+import { useCartStore } from 'stores/cart.store'
+import { useModalsStore } from 'stores/modals.store'
 
-export function FeedAFosterCard({
-  i,
-  item,
-  isAvailable
-}: {
+type Props = {
   i: number
   item: { id: string; title: string; amount: number; textKey: string }
   isAvailable: boolean
-}) {
-  const dispatch = useAppDispatch()
+}
+
+export function FeedAFosterCard({ i, item, isAvailable }: Props) {
+  const addToCart = useCartStore((s) => s.addToCart)
+  const showCartToast = useModalsStore((s) => s.showCartToast)
+
   const [added, setAdded] = useState(false)
   const Icon = ITEM_ICONS[item.id] ?? Utensils
 
@@ -32,8 +31,8 @@ export function FeedAFosterCard({
       feedAFosterId: item.id
     }
 
-    dispatch(addToCart(cartItem))
-    dispatch(setOpenCartToast(cartItem))
+    addToCart(cartItem)
+    showCartToast(cartItem)
 
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)

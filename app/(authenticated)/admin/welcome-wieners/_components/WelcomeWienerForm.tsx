@@ -7,18 +7,32 @@ import {
   WELCOME_WIENER_CATEGORIES,
   WELCOME_WIENER_CATEGORY_LABELS
 } from 'lib/constants/welcome-wiener.constants'
-import { store } from 'lib/store/store'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
-import { showToast } from 'lib/store/slices/toastSlice'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateWelcomeWiener } from 'lib/actions/admin/welcome-wiener/updateWelcomeWiener'
+import { createWelcomeWiener } from 'lib/actions/admin/welcome-wiener/createWelcomeWiener'
+import { deleteWelcomeWiener } from 'lib/actions/admin/welcome-wiener/deleteWelcomeWiener'
 import Link from 'next/link'
 import { FormField, SectionLabel, Toggle } from 'components/_primitives'
+import { StatusMessage } from 'components/_primitives/StatusMessage'
+import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import Picture from 'components/_common/Picture'
-import { createWelcomeWiener } from 'lib/actions/admin/welcome-wiener/createWelcomeWiener'
 import { DangerZone } from './DangerZone'
-import { deleteWelcomeWiener } from 'lib/actions/admin/welcome-wiener/deleteWelcomeWiener'
+
+const crumb =
+  'text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+
+const crumbSep = 'text-[9px] font-mono text-border-light dark:text-muted-dark/70'
+
+const panel =
+  'border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
+
+const panelHead =
+  'px-4 py-2.5 border-b border-border-light dark:border-border-dark text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark'
+
+const thumb =
+  'relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden'
 
 type FormState = {
   name: string
@@ -51,6 +65,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
   const [loading, setLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [pendingPhotos, setPendingPhotos] = useState<File[]>([])
+  const { status, flash, clear } = useStatusMessage()
 
   const patch = (data: Partial<FormState>) => setForm((prev) => ({ ...prev, ...data }))
 
@@ -68,15 +83,17 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
         : [...associated, product]
     })
   }
+
   const handleSave = async () => {
     if (!form.name.trim()) {
       setErrors({ name: 'Required' })
       return
     }
+
     setLoading(true)
     setErrors({})
+    clear()
 
-    // Upload pending images
     let uploaded: string[] = []
     if (pendingPhotos.length > 0) {
       try {
@@ -109,24 +126,22 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
       return
     }
 
-    store.dispatch(
-      showToast({
-        type: 'success',
-        message: `${payload.name} ${isUpdating ? 'updated' : 'created'}`,
+    if (isUpdating) {
+      flash({
+        tone: 'success',
+        message: `${payload.name} updated`,
         description: [
           `${associated.length} donation product${associated.length === 1 ? '' : 's'}`,
           payload.isLive ? 'Live' : 'Draft'
         ].join(' · ')
       })
-    )
-
-    if (isUpdating) {
       router.refresh()
       setLoading(false)
       setPendingPhotos([])
-    } else {
-      router.push('/admin/welcome-wieners')
+      return
     }
+
+    router.push('/admin/welcome-wieners')
   }
 
   return (
@@ -136,27 +151,18 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
           <Link
             href="/admin/dashboard"
-            className="hidden sm:inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className={`hidden sm:inline-flex items-center gap-1.5 ${crumb}`}
           >
             <LayoutDashboard className="w-3 h-3" aria-hidden="true" />
             Dashboard
           </Link>
-          <span
-            className="hidden sm:inline text-[9px] font-mono text-border-light dark:text-muted-dark/70"
-            aria-hidden="true"
-          >
+          <span className={`hidden sm:inline ${crumbSep}`} aria-hidden="true">
             /
           </span>
-          <Link
-            href="/admin/welcome-wieners"
-            className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark shrink-0"
-          >
+          <Link href="/admin/welcome-wieners" className={`${crumb} shrink-0`}>
             Welcome Wieners
           </Link>
-          <span
-            className="text-[9px] font-mono text-border-light dark:text-muted-dark/70"
-            aria-hidden="true"
-          >
+          <span className={crumbSep} aria-hidden="true">
             /
           </span>
           <h1
@@ -193,14 +199,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
           <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-6 xl:gap-8 items-start pb-6">
             {/* ════ Left — profile, settings, products ════ */}
             <div className="space-y-5 min-w-0">
-              {errors?.form && (
-                <p
-                  role="alert"
-                  className="px-4 py-3 border border-red-500/30 bg-red-500/10 text-red-500 text-xs font-mono"
-                >
-                  {errors.form}
-                </p>
-              )}
+              <StatusMessage status={status} />
 
               {/* ── Profile ── */}
               <SectionLabel>Profile</SectionLabel>
@@ -315,21 +314,16 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                 onToggle={() => patch({ isLive: !form.isLive })}
               />
 
-              <section className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
-                <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark">
-                  <h3 className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                    Photos
-                  </h3>
+              <section className={panel}>
+                <div className={panelHead}>
+                  <h3>Photos</h3>
                 </div>
                 <div className="px-4 py-4 flex flex-col gap-1.5">
                   {/* Existing photos (edit mode) */}
                   {isUpdating && form?.images?.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mb-2">
                       {form?.images.map((photo: string, i: number) => (
-                        <div
-                          key={photo}
-                          className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden"
-                        >
+                        <div key={photo} className={thumb}>
                           <Picture
                             priority={true}
                             src={photo}
@@ -355,10 +349,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                   {pendingPhotos.length > 0 && (
                     <div className="grid grid-cols-3 gap-2 mb-2">
                       {pendingPhotos.map((file, i) => (
-                        <div
-                          key={`${file.name}-${i}`}
-                          className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden"
-                        >
+                        <div key={`${file.name}-${i}`} className={thumb}>
                           <Picture
                             priority={false}
                             src={URL.createObjectURL(file)}
@@ -432,69 +423,64 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
 
               {/* Selected summary card */}
               {associated.length > 0 && (
-                <section className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
-                  <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
-                    <h3 className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                      Selected
-                    </h3>
-                    <span className="text-[9px] font-mono tabular-nums text-primary-light dark:text-primary-dark">
+                <section className={panel}>
+                  <div className={`${panelHead} flex items-center justify-between`}>
+                    <h3>Selected</h3>
+                    <span className="tabular-nums text-primary-light dark:text-primary-dark">
                       {associated.length}
                     </span>
                   </div>
                   <div className="px-4 py-3 space-y-1.5">
-                    <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-3">
-                      Selected
-                    </p>
-                    <div className="space-y-1.5">
-                      {associated.map((p) => (
-                        <div key={p.id} className="flex items-center justify-between">
-                          <span className="text-[11px] font-mono text-text-light dark:text-text-dark">
-                            {p.name}
+                    {associated.map((p) => (
+                      <div key={p.id} className="flex items-center justify-between">
+                        <span className="text-[11px] font-mono text-text-light dark:text-text-dark">
+                          {p.name}
+                        </span>
+                        <div className="flex items-center gap-3">
+                          <span className="text-[11px] font-mono text-primary-light dark:text-primary-dark tabular-nums">
+                            ${p.price}
                           </span>
-                          <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-mono text-primary-light dark:text-primary-dark tabular-nums">
-                              ${p.price}
-                            </span>
-                            <button
-                              type="button"
-                              onClick={() => toggleProduct(p)}
-                              aria-label={`Remove ${p.name}`}
-                              className="text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-                            >
-                              <Minus className="w-3 h-3" aria-hidden="true" />
-                            </button>
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => toggleProduct(p)}
+                            aria-label={`Remove ${p.name}`}
+                            className="text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                          >
+                            <Minus className="w-3 h-3" aria-hidden="true" />
+                          </button>
                         </div>
-                      ))}
-                      <div className="pt-2 border-t border-border-light dark:border-border-dark flex items-center justify-between">
-                        <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-                          Total
-                        </span>
-                        <span className="text-sm font-mono font-bold text-primary-light dark:text-primary-dark tabular-nums">
-                          ${associated.reduce((sum, p) => sum + p.price, 0)}
-                        </span>
                       </div>
+                    ))}
+                    <div className="pt-2 border-t border-border-light dark:border-border-dark flex items-center justify-between">
+                      <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
+                        Total
+                      </span>
+                      <span className="text-sm font-mono font-bold text-primary-light dark:text-primary-dark tabular-nums">
+                        ${associated.reduce((sum, p) => sum + p.price, 0)}
+                      </span>
                     </div>
                   </div>
                 </section>
               )}
 
-              <DangerZone
-                label="Delete Welcome Wiener"
-                description="Permanently removes this entry."
-                confirmText="Delete this Welcome Wiener? This can't be undone."
-                onDelete={() => deleteWelcomeWiener(welcomeWiener.id)}
-                onDeleted={() => {
-                  router.push('/admin/welcome-wieners')
-                  router.refresh()
-                }}
-              />
+              {isUpdating && (
+                <DangerZone
+                  label="Delete Welcome Wiener"
+                  description="Permanently removes this entry."
+                  confirmText="Delete this Welcome Wiener? This can't be undone."
+                  onDelete={() => deleteWelcomeWiener(welcomeWiener!.id)}
+                  onDeleted={() => {
+                    router.push('/admin/welcome-wieners')
+                    router.refresh()
+                  }}
+                />
+              )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* ── Sticky action bar — replaces the in-column Actions block ── */}
+      {/* ── Sticky action bar ── */}
       <div className="fixed bottom-0 inset-x-0 z-20 w-full border-t border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 sm:px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-end gap-3">
           {errors?.form && (

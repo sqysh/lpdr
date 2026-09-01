@@ -1,8 +1,7 @@
 'use client'
 
-import { setHideConfetti } from 'lib/store/slices/uiSlice'
-import { store, useUiSelector } from 'lib/store/store'
 import React, { useRef, useEffect } from 'react'
+import { useConfettiStore } from 'stores/confetti.store'
 import * as THREE from 'three'
 
 interface Confetti3DProps {
@@ -23,7 +22,8 @@ const COLORS: number[] = [
 ]
 
 export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
-  const { confetti: trigger } = useUiSelector()
+  const trigger = useConfettiStore((s) => s.show)
+  const hide = useConfettiStore((s) => s.hide)
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
@@ -280,7 +280,7 @@ export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
       const t2 = setTimeout(() => confettiPiecesRef.current.push(...createConfetti(80)), 400)
       const reset = setTimeout(() => {
         isActiveRef.current = false
-        store.dispatch(setHideConfetti())
+        hide()
       }, duration)
 
       return () => {
@@ -289,7 +289,7 @@ export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
         clearTimeout(reset)
       }
     }
-  }, [trigger])
+  }, [hide, trigger])
 
   // Burst — quick bid success
   useEffect(() => {

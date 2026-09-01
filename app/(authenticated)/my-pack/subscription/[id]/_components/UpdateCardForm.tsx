@@ -1,9 +1,17 @@
+'use client'
+
 import { updateSubscriptionPaymentMethod } from 'lib/actions/_stripe/updateSubscriptionPaymentMethod'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { useAppDispatch, useUiSelector } from 'lib/store/store'
+import { useThemeStore } from 'stores/theme.store'
 import { useState } from 'react'
-import { showToast } from 'lib/store/slices/toastSlice'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
+import { FormError } from 'components/_primitives'
+
+const fieldLabel =
+  'block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2'
+
+const buttonBase =
+  'py-3 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 export function UpdateCardForm({
   subscriptionId,
@@ -14,10 +22,10 @@ export function UpdateCardForm({
   onSuccess: () => void
   onCancel: () => void
 }) {
-  const dispatch = useAppDispatch()
   const stripe = useStripe()
   const elements = useElements()
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
+
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)
@@ -47,13 +55,6 @@ export function UpdateCardForm({
 
       if (!result.success) throw new Error(result.error ?? 'Failed to update card')
 
-      dispatch(
-        showToast({
-          message: 'Card updated',
-          description: 'Your payment method has been updated.',
-          type: 'success'
-        })
-      )
       onSuccess()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Something went wrong')
@@ -65,10 +66,7 @@ export function UpdateCardForm({
   return (
     <form onSubmit={handleSubmit} noValidate className="space-y-4">
       <div>
-        <label
-          id="update-card-label"
-          className="block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2"
-        >
+        <label id="update-card-label" className={fieldLabel}>
           New Card Details
         </label>
         <div
@@ -79,8 +77,7 @@ export function UpdateCardForm({
           <CardElement
             onChange={(e) => {
               setCardComplete(e.complete)
-              if (e.error) setError(e.error.message ?? null)
-              else setError(null)
+              setError(e.error?.message ?? null)
             }}
             options={{
               style: {
@@ -98,28 +95,14 @@ export function UpdateCardForm({
         </div>
       </div>
 
-      <AnimatePresence>
-        {error && (
-          <motion.p
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            role="alert"
-            className="text-[11px] text-red-500 dark:text-red-400 font-mono flex items-start gap-2"
-          >
-            <span aria-hidden="true" className="shrink-0 mt-0.5">
-              ✕
-            </span>
-            {error}
-          </motion.p>
-        )}
-      </AnimatePresence>
+      <FormError error={error} />
 
       <div className="flex gap-3">
         <button
           type="button"
           onClick={onCancel}
-          className="px-5 py-3 text-[10px] font-mono tracking-[0.2em] uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          disabled={loading}
+          className={`${buttonBase} px-5 border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark disabled:opacity-40 disabled:cursor-not-allowed`}
         >
           Cancel
         </button>
@@ -128,12 +111,11 @@ export function UpdateCardForm({
           disabled={!cardComplete || loading}
           whileHover={!loading ? { scale: 1.02 } : {}}
           whileTap={!loading ? { scale: 0.98 } : {}}
-          className={`flex-1 py-3 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2
-            ${
-              loading
-                ? 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border-2 border-border-light dark:border-border-dark cursor-not-allowed'
-                : 'bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white cursor-pointer'
-            }`}
+          className={`${buttonBase} flex-1 flex items-center justify-center gap-2 ${
+            loading
+              ? 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border-2 border-border-light dark:border-border-dark cursor-not-allowed'
+              : 'bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white cursor-pointer'
+          }`}
         >
           {loading ? (
             <span className="flex items-center gap-2">

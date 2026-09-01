@@ -1,8 +1,8 @@
 'use client'
 
 import { fadeUp } from 'lib/constants/motion.constants'
-import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
+import { useThemeStore } from 'stores/theme.store'
 
 const surrenderStatesData = [
   'Maine',
@@ -43,7 +43,7 @@ const SECTIONS = [
 ]
 
 export default function SurrenderPage() {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
 
   return (
     <main

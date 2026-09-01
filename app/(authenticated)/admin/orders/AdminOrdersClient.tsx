@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Package, DollarSign, Truck, XCircle, ChevronRight } from 'lucide-react'
+import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle } from 'lucide-react'
 import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/_order.types'
 import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
@@ -12,8 +12,12 @@ import { StatusPill } from 'components/_primitives'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SubscriptionGroupRow } from './_components/SubscriptionGroupRow'
+import { formatDate } from 'lib/utils/date.utils'
 
 export function rowClass(o: OrderRow) {
+  if (!o.userId && !o.customerName && !o.customerEmail)
+    return 'group border-l-2 border-l-red-500 bg-red-500/10 hover:bg-red-500/15 transition-colors'
+
   if (o.status === 'FAILED')
     return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
   if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
@@ -22,6 +26,8 @@ export function rowClass(o: OrderRow) {
 }
 
 const COL_COUNT = 9
+
+const isAnonymous = (o: OrderRow) => !o.userId && !o.customerName && !o.customerEmail
 
 export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
   const router = useRouter()
@@ -172,20 +178,24 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
                       </Link>
                     </td>
                     <td className="px-4 py-3 text-xs font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
-                      {new Date(row.order.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric',
-                        year: 'numeric',
-                        timeZone: 'America/New_York'
-                      })}
+                      {formatDate(row.order.createdAt, true)}
                     </td>
                     <td className="px-4 py-3 min-w-0 max-w-50">
-                      <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
-                        {row.order.customerName || '—'}
-                      </p>
-                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
-                        {row.order.customerEmail}
-                      </p>
+                      {isAnonymous(row.order) ? (
+                        <span className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-red-500 dark:text-red-400">
+                          <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden="true" />
+                          No customer data
+                        </span>
+                      ) : (
+                        <>
+                          <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
+                            {row.order.customerName || '—'}
+                          </p>
+                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
+                            {row.order.customerEmail || '—'}
+                          </p>
+                        </>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
                       {FILTER_LABELS[row.order.type as Filter] ??

@@ -3,11 +3,10 @@
 import { X, Loader2, Send } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useState } from 'react'
-import { setCloseContactModal } from 'lib/store/slices/uiSlice'
-import { store, useUiSelector } from 'lib/store/store'
 import sendContactEmail from 'lib/email/sendContactEmail'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { FormField } from 'components/_primitives'
+import { useModalsStore } from 'stores/modals.store'
 
 interface FormInputs {
   name: string
@@ -36,7 +35,8 @@ function validate(inputs: FormInputs): FormErrors {
 }
 
 export default function PublicContactModal() {
-  const { contactModal } = useUiSelector()
+  const closeContact = useModalsStore((s) => s.closeContact)
+  const contactOpen = useModalsStore((s) => s.contactOpen)
 
   const [inputs, setInputs] = useState<FormInputs>(EMPTY)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -49,13 +49,13 @@ export default function PublicContactModal() {
     patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
 
   const handleClose = () => {
-    store.dispatch(setCloseContactModal())
+    closeContact()
     setInputs(EMPTY)
     setErrors({})
     setSuccess(false)
   }
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
     const errs = validate(inputs)
@@ -82,7 +82,7 @@ export default function PublicContactModal() {
 
   return (
     <AnimatePresence>
-      {contactModal && (
+      {contactOpen && (
         <>
           <motion.div
             key="backdrop"

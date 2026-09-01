@@ -1,5 +1,6 @@
 'use client'
 
+import { AuctionStatus } from '@prisma/client'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
@@ -8,7 +9,7 @@ type AuctionStripProps = {
   auction: {
     id: string
     title: string
-    status: 'UPCOMING' | 'ACTIVE'
+    status: AuctionStatus
     startDate?: Date | null
     endDate?: Date | null
     customAuctionLink: string

@@ -11,13 +11,13 @@ import Link from 'next/link'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
-import { RootState, useAppSelector } from 'lib/store/store'
 import { IAddress } from 'types/_address.types'
 import { StepIndicator } from 'components/features/payment/StepIndicator'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { OrderSummary, Step2Name, Step3Address, Step4Payment } from './_components'
 import { getOrderType } from './_lib/getOrderType'
+import { useCartStore } from 'stores/cart.store'
 
 interface CheckoutFormInputs {
   // identity
@@ -92,7 +92,7 @@ export function PublicCheckoutClient({
   const stripe = useStripe()
   const elements = useElements()
   const { setupPusherListenerOneTime } = usePaymentProcessor()
-  const items = useAppSelector((state: RootState) => state.cart.items)
+  const items = useCartStore((s) => s.items)
 
   // ── Local form state ──────────────────────────────────────────────────────
   const [inputs, setInputs] = useState<CheckoutFormInputs>({

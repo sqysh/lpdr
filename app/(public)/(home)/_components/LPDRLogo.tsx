@@ -1,10 +1,10 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { useUiSelector } from 'lib/store/store'
+import { useThemeStore } from 'stores/theme.store'
 
 export const LPDRLogo = () => {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
 
   const gradient = isDark
     ? 'linear-gradient(135deg, #38bdf8, #a78bfa, #38bdf8, #7c3aed)'

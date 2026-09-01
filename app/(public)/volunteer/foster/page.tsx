@@ -1,8 +1,8 @@
 'use client'
 
 import { fadeUp } from 'lib/constants/motion.constants'
-import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
+import { useThemeStore } from 'stores/theme.store'
 
 const STEPS = [
   'We receive your application and contact your veterinarian and personal references.',
@@ -12,7 +12,8 @@ const STEPS = [
 ]
 
 export default function FosterApplication() {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
+
   return (
     <main
       id="main-content"

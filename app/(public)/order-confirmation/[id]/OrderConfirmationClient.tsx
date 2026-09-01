@@ -16,30 +16,30 @@ import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from 'components/_common/Picture'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
-import { clearCart } from 'lib/store/slices/cartSlice'
 import { ORDER_TYPE_CONFIG } from 'lib/constants/order.constants'
 import { formatWithCommas } from 'lib/utils/currency.utils'
-import { useAppDispatch } from 'lib/store/store'
-import { setShowConfetti } from 'lib/store/slices/uiSlice'
 import { useSearchParams } from 'next/navigation'
 import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
+import { useCartStore } from 'stores/cart.store'
+import { useConfettiStore } from 'stores/confetti.store'
 
 export default function OrderConfirmationClient({ order }) {
+  const clearCart = useCartStore((s) => s.clearCart)
+  const showConfetti = useConfettiStore((s) => s.show)
   const config = ORDER_TYPE_CONFIG[order?.type] ?? ORDER_TYPE_CONFIG['ONE_TIME_DONATION']
   const subtotal = Number(order?.totalAmount) - Number(order?.coverFees ? order?.feesCovered : 0)
   const session = useSession()
-  const dispatch = useAppDispatch()
   const searchParams = useSearchParams()
   const isNewOrder = searchParams.get('ref') === 'new'
   const isAdminView = searchParams.get('ref') === 'admin'
   const myPackTab = !isNewOrder && !isAdminView ? searchParams.get('ref') : ''
 
   useEffect(() => {
-    dispatch(clearCart())
+    clearCart()
     if (isNewOrder) {
-      dispatch(setShowConfetti())
+      showConfetti()
     }
-  }, [dispatch, order.id, isNewOrder])
+  }, [clearCart, isNewOrder, showConfetti])
 
   const typeCode = order?.type === 'RECURRING_DONATION' ? 'RD' : 'DN'
 

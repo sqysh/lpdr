@@ -14,7 +14,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 
 type PaymentItem = {
-  id: string
+  id?: string
   name: string
   price: number
   quantity: number

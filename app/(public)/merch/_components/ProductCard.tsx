@@ -3,16 +3,17 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Plus, Check, ShoppingBag } from 'lucide-react'
 import Link from 'next/link'
 import { IProduct } from 'types/_product'
-import { store, useCartSelector } from 'lib/store/store'
-import { addToCart } from 'lib/store/slices/cartSlice'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import Picture from 'components/_common/Picture'
+import { useCartStore } from 'stores/cart.store'
+import { useModalsStore } from 'stores/modals.store'
 
 export function ProductCard({ product, index }: { product: IProduct; index: number }) {
   const [added, setAdded] = useState(false)
-  const { items: cartItems } = useCartSelector()
+  const cartItems = useCartStore((s) => s.items)
+  const addToCart = useCartStore((s) => s.addToCart)
+  const showCartToast = useModalsStore((s) => s.showCartToast)
 
   const outOfStock = product?.countInStock === 0
   const inCart = cartItems.find((i) => i.id === product.id)?.quantity ?? 0
@@ -38,8 +39,8 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
       shippingPrice: product.shippingPrice
     }
 
-    store.dispatch(addToCart(cartItem))
-    store.dispatch(setOpenCartToast(cartItem))
+    addToCart(cartItem)
+    showCartToast(cartItem)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }

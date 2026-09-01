@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Package, Zap } from 'lucide-react'
 import { FormField, Toggle } from 'components/_primitives'
-import { FormErrors } from './AuctionItemForm'
+import { FormErrors, FormSuccess } from './AuctionItemForm'
 
 type Props = {
   auctionId: string
@@ -22,6 +22,7 @@ type Props = {
     shippingCosts: string
   }
   errors: FormErrors
+  success: FormSuccess
   handleInput: (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => void
@@ -39,6 +40,7 @@ export function AuctionItemFields({
   showBuyNow,
   inputs,
   errors,
+  success,
   handleInput,
   patch,
   onSave
@@ -53,6 +55,25 @@ export function AuctionItemFields({
           </p>
         </div>
       )}
+
+      <AnimatePresence>
+        {success && (
+          <div
+            role="status"
+            aria-live="polite"
+            className="border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/5 dark:bg-primary-dark/5 px-4 py-3"
+          >
+            <p className="text-xs font-mono text-text-light dark:text-text-dark font-medium">
+              {success.message}
+            </p>
+            {success.description && (
+              <p className="mt-0.5 text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                {success.description}
+              </p>
+            )}
+          </div>
+        )}
+      </AnimatePresence>
 
       <AnimatePresence>
         {errors.form && (

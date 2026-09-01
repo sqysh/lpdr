@@ -4,13 +4,12 @@ import { useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
 import { verifyBypassCode } from 'lib/actions/my-pack/adoption-fee/verifyBypassCode'
-import { store } from 'lib/store/store'
-import { setShowConfetti } from 'lib/store/slices/uiSlice'
 import { updateAdoptionFee } from 'lib/actions/my-pack/adoption-fee/updateAdoptionFee'
 import { STEPS } from 'lib/constants/adoption-application.constants'
 import { STEPS_TYPES } from 'types/_adoption-application.types'
 import { Header, Progress, Step0SignIn, Step1Terms, Step2Info, Step3Payment } from './_components'
 import { IPaymentMethod } from 'types/_payment-method.types'
+import { useConfettiStore } from 'stores/confetti.store'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -25,6 +24,7 @@ export const PreApplicationFlowClient = ({
   isAuthed,
   email
 }: Props & { isAuthed: boolean; email: string | null }) => {
+  const showConfetti = useConfettiStore((s) => s.show)
   const router = useRouter()
 
   const [step, setStep] = useState<STEPS_TYPES>(isAuthed ? 'terms' : 'sign-in')
@@ -64,7 +64,7 @@ export const PreApplicationFlowClient = ({
       if (result.isValid) {
         setBypassPayment(true)
         setAdoptionFeeId(result.data.adoptionFeeId)
-        store.dispatch(setShowConfetti())
+        showConfetti()
       } else {
         setBypassPayment(false)
         setBypassError(result.error ?? 'Invalid bypass code')

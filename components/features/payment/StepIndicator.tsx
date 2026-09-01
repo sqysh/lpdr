@@ -1,5 +1,5 @@
-import { useUiSelector } from 'lib/store/store'
 import { Check } from 'lucide-react'
+import { useThemeStore } from 'stores/theme.store'
 
 export function StepIndicator({
   current,
@@ -11,7 +11,7 @@ export function StepIndicator({
   labels: string[]
   isDark?: boolean
 }) {
-  const { isDark: storeDark } = useUiSelector()
+  const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
 
   const c = {

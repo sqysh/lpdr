@@ -48,7 +48,7 @@ export function AdminDashboardHero({ data }) {
           <span
             className={`font-mono text-[10px] tracking-[0.15em] uppercase ${monthlyUp ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
           >
-            {monthlyUp ? 'Up' : 'Down'} {Math.abs(data.monthlyChange)}% vs last month
+            {monthlyUp ? 'Up' : 'Down'} {Math.abs(data.monthlyChange).toFixed(2)}% vs last month
           </span>
         </div>
       </div>

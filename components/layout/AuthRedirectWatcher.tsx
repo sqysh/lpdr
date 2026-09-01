@@ -2,17 +2,17 @@
 
 import { useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { store } from 'lib/store/store'
-import { setOpenMobileNavigation } from 'lib/store/slices/uiSlice'
+import { useNavigationStore } from 'stores/navigation.store'
 
 export function AuthRedirectWatcher() {
   const searchParams = useSearchParams()
+  const openMobileNav = useNavigationStore((s) => s.openMobileNav)
 
   useEffect(() => {
     if (searchParams.get('ref') === 'navdrawer') {
-      store.dispatch(setOpenMobileNavigation())
+      openMobileNav()
     }
-  }, [searchParams])
+  }, [openMobileNav, searchParams])
 
   return null
 }

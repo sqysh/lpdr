@@ -1,13 +1,13 @@
 import { NewsletterIssue } from '@prisma/client'
 import deleteNewsletterIssue from 'lib/actions/admin/newsletter-issue/deleteNewsletterIssue'
-import { showToast } from 'lib/store/slices/toastSlice'
-import { useAppDispatch } from 'lib/store/store'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { ExternalLink, FileText, Plus, Trash2 } from 'lucide-react'
 import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeaderButton'
 import AdminTable, { Column } from 'app/(authenticated)/admin/_components/AdminTable'
+import { StatusMessage } from 'components/_primitives/StatusMessage'
 import { NewsletterIssueModal } from './NewsletterIssueModal'
+import { useStatusMessage } from '@hooks/useStatusMessage.hook'
 
 export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
   const router = useRouter()
@@ -15,7 +15,8 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
   const onClose = () => setToggleNewsletterIssueModal(false)
   const [confirmId, setConfirmId] = useState<string | null>(null)
   const [deletingId, setDeletingId] = useState<string | null>(null)
-  const dispatch = useAppDispatch()
+
+  const { status, flash } = useStatusMessage()
 
   const handleDelete = async (id: string) => {
     setDeletingId(id)
@@ -23,18 +24,17 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
     setDeletingId(null)
     setConfirmId(null)
 
-    if (result.success) {
-      dispatch(
-        showToast({
-          type: 'success',
-          message: 'Issue deleted',
-          description: result.data ? `${result.data.month} ${result.data.year}` : undefined
-        })
-      )
-      router.refresh()
-    } else {
-      dispatch(showToast({ type: 'error', message: result.error ?? 'Failed to delete issue' }))
+    if (!result.success) {
+      flash({ tone: 'error', message: result.error ?? 'Failed to delete issue' })
+      return
     }
+
+    flash({
+      tone: 'success',
+      message: 'Issue deleted',
+      description: result.data ? `${result.data.month} ${result.data.year}` : undefined
+    })
+    router.refresh()
   }
 
   const columns: Column<NewsletterIssue>[] = [
@@ -125,9 +125,18 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
         key={toggleNewsletterIssueModal ? 'open' : 'closed'}
         isOpen={toggleNewsletterIssueModal}
         onClose={onClose}
+        onCreated={(issue) =>
+          flash({
+            tone: 'success',
+            message: `${issue.month} ${issue.year} added`,
+            description: issue.isLive ? 'Live' : 'Draft'
+          })
+        }
       />
 
       <div className="w-full px-4 sm:px-6 py-6 space-y-6">
+        <StatusMessage status={status} />
+
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
             {issues.length} issue{issues.length !== 1 ? 's' : ''}

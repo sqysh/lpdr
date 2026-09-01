@@ -1,10 +1,12 @@
-import { setOpenAuctionBidModal, setOpenAuctionSignInModal } from 'lib/store/slices/uiSlice'
-import { store } from 'lib/store/store'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { ChevronLeft, ChevronRight, Gavel, Zap } from 'lucide-react'
 import Link from 'next/link'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 
 export function FixedFooterNav({ auctionItems, item, customAuctionLink, isFixed, isAuthed }) {
+  const openBidModal = useAuctionUiStore((s) => s.openBidModal)
+  const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
+
   return (
     <nav
       aria-label="Auction item navigation"
@@ -42,12 +44,8 @@ export function FixedFooterNav({ auctionItems, item, customAuctionLink, isFixed,
             <button
               onClick={() =>
                 isAuthed
-                  ? store.dispatch(setOpenAuctionBidModal(item))
-                  : store.dispatch(
-                      setOpenAuctionSignInModal(
-                        `/auctions/${customAuctionLink}/${item.id}?bidModal=true`
-                      )
-                    )
+                  ? openBidModal()
+                  : openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`)
               }
               type="button"
               className="group w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -82,11 +80,7 @@ export function FixedFooterNav({ auctionItems, item, customAuctionLink, isFixed,
               <button
                 type="button"
                 onClick={() =>
-                  store.dispatch(
-                    setOpenAuctionSignInModal(
-                      `/auctions/${customAuctionLink}/${item.id}/instant-buy`
-                    )
-                  )
+                  openSignInModal(`/auctions/${customAuctionLink}/${item.id}/instant-buy`)
                 }
                 className="w-full flex items-center justify-center gap-2 px-5 py-3 bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 aria-label={`Buy ${item?.name} now for ${formatMoney(item.buyNowPrice)}`}

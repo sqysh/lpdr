@@ -7,7 +7,6 @@ import {
   AdminDashboardWelcomeWienerSection,
   PendingShipments,
   RevenueBySourceChart,
-  TopProducts,
   TopSupporters
 } from './_components'
 import { AdminDashboardHero } from './_components/AdminDashboardHero'
@@ -39,15 +38,8 @@ export default function AdminDashboardClient({ stats }) {
         {/* ── Hero  ── */}
         <AdminDashboardHero data={data} />
 
-        {/* ── Revenue by source ── */}
-        {sources.length > 0 && (
-          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={2}>
-            <RevenueBySourceChart sources={sources} />
-          </motion.div>
-        )}
-
-        {/* ── Top Supporters + Top Products side by side ── */}
-        {(data.topSupporters?.length > 0 || data.topProducts?.length > 0) && (
+        {/* ── Top Supporters + Revenue By Source side by side ── */}
+        {(data.topSupporters?.length > 0 || sources.length > 0) && (
           <motion.div
             variants={fadeUp}
             initial="hidden"
@@ -55,8 +47,12 @@ export default function AdminDashboardClient({ stats }) {
             custom={3}
             className="grid grid-cols-1 lg:grid-cols-2 gap-5"
           >
+            {sources.length > 0 && (
+              <motion.div variants={fadeUp} initial="hidden" animate="show" custom={2}>
+                <RevenueBySourceChart sources={sources} />
+              </motion.div>
+            )}
             {data.topSupporters?.length > 0 && <TopSupporters supporters={data.topSupporters} />}
-            {data.topProducts?.length > 0 && <TopProducts products={data.topProducts} />}
           </motion.div>
         )}
 

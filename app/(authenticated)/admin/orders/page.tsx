@@ -14,6 +14,7 @@ export default async function AdminOrdersPage() {
 
   const serialized = orders.map((o) => ({
     id: o.id,
+    userId: o.userId,
     type: o.type,
     status: o.status,
     shippingStatus: o.shippingStatus,

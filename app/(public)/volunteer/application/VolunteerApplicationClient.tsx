@@ -1,12 +1,13 @@
 'use client'
 
 import { fadeUp } from 'lib/constants/motion.constants'
-import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import { useThemeStore } from 'stores/theme.store'
 
 export function VolunteerApplicationClient() {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
+
   return (
     <main
       id="main-content"

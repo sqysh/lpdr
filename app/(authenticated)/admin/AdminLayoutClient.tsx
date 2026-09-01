@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Link from 'next/link'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import AdminSidebar from './sidebar'
-import AdminAuctionModal from 'app/(authenticated)/admin/auctions/_components/AdminAuctionModal'
 import { Role } from '@prisma/client'
 
 export function AdminLayoutClient({
@@ -24,8 +23,6 @@ export function AdminLayoutClient({
 
   return (
     <div className="min-h-screen flex bg-bg-light dark:bg-bg-dark">
-      <AdminAuctionModal />
-
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
         <AdminSidebar onClose={() => setMobileNavOpen(false)} email={email} role={role} />

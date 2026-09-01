@@ -1,17 +1,17 @@
 'use client'
 
-import { useUiSelector } from 'lib/store/store'
 import { signOut, useSession } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
+import { useThemeStore } from 'stores/theme.store'
 
 export function SignedInRow({ isDark }: { isDark?: boolean }) {
   const session = useSession()
   const router = useRouter()
   const [signingOut, setSigningOut] = useState(false)
-  const { isDark: storeDark } = useUiSelector()
+  const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
 
   if (!session.data?.user?.id) return null

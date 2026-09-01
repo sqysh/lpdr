@@ -4,8 +4,6 @@ import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Gavel, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { useAppDispatch, useUiSelector } from 'lib/store/store'
-import { setCloseAuctionDrawer } from 'lib/store/slices/uiSlice'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormField } from 'components/_primitives/FormField'
 import { FormError } from 'components/_primitives/FormError'
@@ -68,10 +66,8 @@ function validate(inputs: FormInputs): FormErrors {
   return errs
 }
 
-export default function AdminAuctionModal() {
+export default function AdminAuctionModal({ isOpen, onClose }) {
   const router = useRouter()
-  const { auctionDrawer } = useUiSelector()
-  const dispatch = useAppDispatch()
 
   const [inputs, setInputs] = useState<FormInputs>(EMPTY)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -81,9 +77,7 @@ export default function AdminAuctionModal() {
 
   const clearError = (key: keyof FormErrors) => setErrors((prev) => ({ ...prev, [key]: undefined }))
 
-  const onClose = () => dispatch(setCloseAuctionDrawer())
-
-  useEscapeKey(auctionDrawer, onClose)
+  useEscapeKey(isOpen, onClose)
 
   const handleSubmit = async () => {
     const errs = validate(inputs)
@@ -117,7 +111,7 @@ export default function AdminAuctionModal() {
 
   return (
     <AnimatePresence>
-      {auctionDrawer && (
+      {isOpen && (
         <>
           {/* Backdrop */}
           <motion.div

@@ -2,16 +2,16 @@
 
 import { AdoptionFeeWelcomeModal } from 'app/(public)/adopt/application/_components/AdoptionFeeModal'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
 import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
 import { ApplicationExpiryTimer } from './_components/ApplicationExpiryTimer'
+import { useThemeStore } from 'stores/theme.store'
 
 export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Date | null }) {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
   const [modalOpen, setModalOpen] = useState(true)
   const params = useSearchParams()
   const myPackTab = params.get('ref')

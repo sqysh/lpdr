@@ -1,11 +1,9 @@
 'use client'
 
 import { useSession } from 'next-auth/react'
-import { useAppDispatch } from 'lib/store/store'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { MemberClientProps, MyPackTab } from 'types/_my-pack.types'
-import { showToast } from 'lib/store/slices/toastSlice'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { Header } from 'app/(authenticated)/my-pack/_components/Header'
@@ -20,8 +18,10 @@ import { Settings } from 'app/(authenticated)/my-pack/_components/Settings'
 import { StatsStrip } from 'app/(authenticated)/my-pack/_components/StatsStrip'
 import { SectionShell } from 'app/(authenticated)/my-pack/_components/SectionShell'
 import { Dog, Gavel, Gift, Package, Pencil, Plus, Repeat } from 'lucide-react'
-import { setOpenAddPaymentMethodModal } from 'lib/store/slices/uiSlice'
+import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
 import { addCardStyles } from 'lib/constants/my-pack.constants'
+import { StatusMessage } from 'components/_primitives/StatusMessage'
+import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import Link from 'next/link'
 import AddPaymentMethodModal from 'app/(authenticated)/my-pack/_components/AddPaymentMethodModal'
 import { toggleAnonymousBidding } from 'lib/actions/user/auction/toggleAnonymousBidding'
@@ -47,7 +47,8 @@ export default function MyPackClient({
 }: MemberClientProps) {
   const router = useRouter()
   const session = useSession()
-  const dispatch = useAppDispatch()
+  const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
+  const { status, flash } = useStatusMessage()
 
   const [shippedOrderId, setShippedOrderId] = useState<string | null>(null)
   const [addressModalOpen, setAddressModalOpen] = useState(false)
@@ -60,7 +61,7 @@ export default function MyPackClient({
   const [anonymousBidding, setAnonymousBidding] = useState(user.anonymousBidding)
   const [autoPay, setAutoPay] = useState(user.autoPay)
   const [autoPayCoverFees, setAutoPayCoverFees] = useState(user.autoPayCoverFees)
-  const [autoPayError, setAutoPayError] = useState('')
+  const [autoPayError, setAutoPayError] = useState<string | null>(null)
   const [highlightPaymentMethod, setHighlightPaymentMethod] = useState(false)
   const [highlightAddress, setHighlightAddress] = useState(false)
 
@@ -93,56 +94,51 @@ export default function MyPackClient({
     const result = await deletePaymentMethod(id)
     if (!result.success) {
       setDeleteError((prev) => ({ ...prev, [id]: result.error ?? 'Failed to delete card' }))
-    } else {
-      router.refresh()
+      return
     }
+    router.refresh()
   }
 
   const handleUpdateName = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
     setNameLoading(true)
-    try {
-      const result = await updateUserName({
-        firstName: firstNameInput.trim(),
-        lastName: lastNameInput.trim()
-      })
 
-      if (!result.success) throw new Error(result.error ?? 'Failed to update name')
-      dispatch(
-        showToast({
-          message: 'Name updated',
-          description: `Your name is now ${firstNameInput.trim()} ${lastNameInput.trim()}.`,
-          type: 'success'
-        })
-      )
-      setEditingName(false)
-      router.refresh()
-    } catch (err) {
-      dispatch(
-        showToast({
-          message: 'Failed to update name',
-          description:
-            err instanceof Error ? err.message : 'Something went wrong. Please try again.',
-          type: 'error'
-        })
-      )
-    } finally {
-      setNameLoading(false)
+    const result = await updateUserName({
+      firstName: firstNameInput.trim(),
+      lastName: lastNameInput.trim()
+    })
+
+    setNameLoading(false)
+
+    if (!result.success) {
+      flash({
+        tone: 'error',
+        message: 'Failed to update name',
+        description: result.error ?? 'Something went wrong. Please try again.'
+      })
+      return
     }
+
+    flash({
+      tone: 'success',
+      message: 'Name updated',
+      description: `Your name is now ${firstNameInput.trim()} ${lastNameInput.trim()}.`
+    })
+    setEditingName(false)
+    router.refresh()
   }
 
   const handleToggleAnonymousBidding = async () => {
     const prev = anonymousBidding
-    setAnonymousBidding(!prev) // optimistic
+    setAnonymousBidding(!prev)
     const result = await toggleAnonymousBidding()
     if (!result.success) {
-      setAnonymousBidding(prev) // revert on failure
-      dispatch(
-        showToast({
-          message: 'Failed to update setting',
-          description: result.error ?? 'Something went wrong.'
-        })
-      )
+      setAnonymousBidding(prev)
+      flash({
+        tone: 'error',
+        message: 'Failed to update setting',
+        description: result.error ?? 'Something went wrong.'
+      })
     }
   }
 
@@ -152,11 +148,9 @@ export default function MyPackClient({
         setAutoPayError('A saved payment method is required to enable auto-pay.')
         setTimeout(() => {
           router.push(`/my-pack?tab=account`, { scroll: false })
+          setTimeout(() => setHighlightPaymentMethod(true), 750)
           setTimeout(() => {
-            setHighlightPaymentMethod(true)
-          }, 750)
-          setTimeout(() => {
-            dispatch(setOpenAddPaymentMethodModal())
+            openPaymentMethodModal()
             setHighlightPaymentMethod(false)
           }, 1500)
         }, 1750)
@@ -166,9 +160,7 @@ export default function MyPackClient({
         setAutoPayError('A shipping address is required to enable auto-pay.')
         setTimeout(() => {
           router.push(`/my-pack?tab=account`, { scroll: false })
-          setTimeout(() => {
-            setHighlightAddress(true)
-          }, 750)
+          setTimeout(() => setHighlightAddress(true), 750)
           setTimeout(() => {
             setAddressModalOpen(true)
             setHighlightAddress(false)
@@ -184,34 +176,33 @@ export default function MyPackClient({
     const result = await toggleAutoPay()
     if (!result.success) {
       setAutoPay(prev)
-      dispatch(
-        showToast({
-          type: 'error',
-          message: 'Failed to update setting',
-          description: result.error ?? 'Something went wrong.'
-        })
-      )
+      flash({
+        tone: 'error',
+        message: 'Failed to update setting',
+        description: result.error ?? 'Something went wrong.'
+      })
     }
   }
+
   const handleToggleAutoPayCoverFees = async () => {
     const prev = autoPayCoverFees
     setAutoPayCoverFees(!prev)
     const result = await toggleAutoPayCoverFees()
     if (!result.success) {
       setAutoPayCoverFees(prev)
-      dispatch(
-        showToast({
-          message: 'Failed to update setting',
-          description: result.error ?? 'Something went wrong.'
-        })
-      )
+      flash({
+        tone: 'error',
+        message: 'Failed to update setting',
+        description: result.error ?? 'Something went wrong.'
+      })
     }
   }
 
   useEffect(() => {
     if (!isAuthed || !session.data?.user?.id) return
 
-    const channel = pusherClient.subscribe(`user-${session.data.user.id}`)
+    const userId = session.data.user.id
+    const channel = pusherClient.subscribe(`user-${userId}`)
 
     channel.bind('order-shipped', (data: { orderId: string }) => {
       setShippedOrderId(data.orderId)
@@ -220,7 +211,7 @@ export default function MyPackClient({
 
     return () => {
       channel.unbind('order-shipped')
-      pusherClient.unsubscribe(`user-${session.data.user.id}`)
+      pusherClient.unsubscribe(`user-${userId}`)
     }
   }, [isAuthed, router, session.data?.user?.id])
 
@@ -257,6 +248,10 @@ export default function MyPackClient({
             user={user}
           />
 
+          <div className="mt-4">
+            <StatusMessage status={status} />
+          </div>
+
           <div className="mt-6">
             <StatsStrip
               totalGiven={totalGiven}
@@ -279,7 +274,7 @@ export default function MyPackClient({
                   action={
                     <button
                       type="button"
-                      onClick={() => dispatch(setOpenAddPaymentMethodModal())}
+                      onClick={openPaymentMethodModal}
                       className={`${addCardStyles} ${highlightPaymentMethod ? 'border-primary-light dark:border-primary-dark' : ''}`}
                     >
                       <Plus className="w-3 h-3 shrink-0" aria-hidden="true" />

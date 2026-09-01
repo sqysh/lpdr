@@ -1,12 +1,12 @@
 import { CardElement } from '@stripe/react-stripe-js'
-import { useUiSelector } from 'lib/store/store'
+import { useThemeStore } from 'stores/theme.store'
 
 type Props = {
   onChange: (state: { complete: boolean; error: string | null }) => void
 }
 
 export function CardElementField({ onChange }: Props) {
-  const { isDark } = useUiSelector()
+  const isDark = useThemeStore((s) => s.isDark)
 
   return (
     <div>

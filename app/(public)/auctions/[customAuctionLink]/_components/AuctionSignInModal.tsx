@@ -3,26 +3,27 @@
 import { useState } from 'react'
 import { X, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { store, useUiSelector } from 'lib/store/store'
-import { setCloseAuctionSignInModal } from 'lib/store/slices/uiSlice'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { MagicLink } from 'components/features/auth/MagicLink'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 
 export function AuctionSignInModal() {
-  const { auctionSignInModal, auctionSignInRedirectTo } = useUiSelector()
   const [email, setEmail] = useState('')
   const [magicLinkSent, setMagicLinkSent] = useState(false)
+  const closeSignInModal = useAuctionUiStore((s) => s.closeSignInModal)
+  const signInRedirectTo = useAuctionUiStore((s) => s.signInRedirectTo)
+  const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
 
   const onClose = () => {
-    store.dispatch(setCloseAuctionSignInModal())
+    closeSignInModal()
     setEmail('')
     setMagicLinkSent(false)
   }
 
   return (
     <AnimatePresence>
-      {auctionSignInModal && (
+      {openSignInModal && (
         <>
           {/* Backdrop */}
           <motion.div
@@ -114,8 +115,8 @@ export function AuctionSignInModal() {
                 </p>
 
                 <div className="flex flex-col gap-2">
-                  <GoogleButton redirectTo={auctionSignInRedirectTo ?? '/'} />
-                  <FacebookButton redirectTo={auctionSignInRedirectTo ?? '/'} />
+                  <GoogleButton redirectTo={signInRedirectTo ?? '/'} />
+                  <FacebookButton redirectTo={signInRedirectTo ?? '/'} />
                 </div>
 
                 <div className="flex items-center gap-2.5" aria-hidden="true">
@@ -128,7 +129,7 @@ export function AuctionSignInModal() {
 
                 <MagicLink
                   email={email}
-                  redirectTo={auctionSignInRedirectTo ?? '/'}
+                  redirectTo={signInRedirectTo ?? '/'}
                   setEmail={setEmail}
                   setSent={setMagicLinkSent}
                 />

@@ -5,26 +5,19 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Minus, Plus } from 'lucide-react'
 import Picture from 'components/_common/Picture'
-import { store, useCartSelector } from 'lib/store/store'
-import { addToCart } from 'lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'lib/store/slices/uiSlice'
+import { useCartStore } from 'stores/cart.store'
+import { useModalsStore } from 'stores/modals.store'
+import { fadeUp } from 'lib/constants/motion.constants'
 
 export interface ISize {
   size: string
   quantity: number
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 14 },
-  show: (i: number) => ({
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.4, delay: i * 0.08, easing: [0.22, 1, 0.36, 1] }
-  })
-}
-
 export default function PublicMerchItemDetailsClient({ product }: { product: any }) {
-  const { items: cartItems } = useCartSelector()
+  const cartItems = useCartStore((s) => s.items)
+  const addToCart = useCartStore((s) => s.addToCart)
+  const showCartToast = useModalsStore((s) => s.showCartToast)
 
   const images: string[] = product?.images ?? []
   const sizes: ISize[] = product?.sizes ?? []
@@ -68,8 +61,8 @@ export default function PublicMerchItemDetailsClient({ product }: { product: any
       maxQuantity: stockForSelection
     }
 
-    store.dispatch(addToCart(cartItem))
-    store.dispatch(setOpenCartToast(cartItem))
+    addToCart(cartItem)
+    showCartToast(cartItem)
     setAdded(true)
     setTimeout(() => setAdded(false), 2000)
   }

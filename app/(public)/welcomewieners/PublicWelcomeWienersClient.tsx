@@ -4,18 +4,18 @@ import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { useAppDispatch } from 'lib/store/store'
-import { addToCart } from 'lib/store/slices/cartSlice'
-import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import { FILTERS, FilterValue } from 'lib/constants/welcome-wiener.constants'
 import { WelcomeWienerCard } from 'app/(public)/welcomewieners/_components/WelcomeWienerCard'
+import { useCartStore } from 'stores/cart.store'
+import { useModalsStore } from 'stores/modals.store'
 
-type Props = {
+export function PublicWelcomeWienersClient({
+  welcomeWieners
+}: {
   welcomeWieners: IWelcomeWiener[]
-}
-
-export function PublicWelcomeWienersClient({ welcomeWieners }: Props) {
-  const dispatch = useAppDispatch()
+}) {
+  const addToCart = useCartStore((s) => s.addToCart)
+  const showCartToast = useModalsStore((s) => s.showCartToast)
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
   const [added, setAdded] = useState<Record<string, string[]>>({})
 
@@ -48,8 +48,8 @@ export function PublicWelcomeWienersClient({ welcomeWieners }: Props) {
       isPhysicalProduct: false,
       type: 'WELCOME_WIENER'
     }
-    dispatch(addToCart(cartItem))
-    dispatch(setOpenCartToast(cartItem))
+    addToCart(cartItem)
+    showCartToast(cartItem)
     setAdded((prev) => ({ ...prev, [dog.id]: [...(prev[dog.id] ?? []), product.id] }))
     setTimeout(
       () =>

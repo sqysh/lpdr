@@ -1,23 +1,19 @@
 'use client'
 
 import { ReactNode, Suspense, useEffect, useState } from 'react'
-import { Provider } from 'react-redux'
 import { Elements } from '@stripe/react-stripe-js'
 import { usePathname, useSelectedLayoutSegments } from 'next/navigation'
 import { Confetti3D } from 'components/_common/Confetti3D'
-import { Toast } from 'components/_common/Toast'
 import Footer from 'components/layout/footer/Footer'
 import { CartBar } from './(public)/cart/_components/CartBar'
 import { CartToast } from './(public)/cart/_components/CartToast'
-import { CartPersistence } from './(public)/cart/_components/CartPersistence'
 import { AuthRedirectWatcher } from 'components/layout/AuthRedirectWatcher'
 import { CookieConsentBanner } from 'components/layout/CookieConsentBanner'
 import { FixedDonateTab } from 'components/layout/FixedDonateTab'
 import PublicContactModal from './(public)/(home)/_components/PublicContactModal'
 import { HIDDEN_PATHS } from 'lib/constants/navigation.constants'
-import { store } from 'lib/store/store'
-import { ThemeProvider } from 'lib/providers/theme.provider'
 import { stripePromise } from 'lib/stripe/stripe-promise'
+import { useSyncTheme } from 'stores/theme.store'
 
 interface Props {
   children: ReactNode
@@ -34,6 +30,8 @@ export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime
 
   const [burstTrigger, setBurstTrigger] = useState(0)
 
+  useSyncTheme()
+
   useEffect(() => {
     const handler = () => setBurstTrigger((t) => t + 1)
     window.addEventListener('confetti-burst', handler)
@@ -41,27 +39,21 @@ export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime
   }, [])
 
   return (
-    <Provider store={store}>
-      <ThemeProvider>
-        <Elements stripe={stripePromise}>
-          <Suspense fallback={null}>
-            <AuthRedirectWatcher />
-          </Suspense>
-          <CookieConsentBanner />
-          <FixedDonateTab />
-          <Toast />
-          <Confetti3D burstTrigger={burstTrigger} />
-          <CartBar />
-          <CartToast />
-          <PublicContactModal />
-          <Suspense fallback={null}>{navDrawer}</Suspense>
-          <Suspense fallback={null}>{auctionRealtime}</Suspense>
-          <CartPersistence />
-          {!isHidden && header}
-          {children}
-          {!isHidden && <Footer />}
-        </Elements>
-      </ThemeProvider>
-    </Provider>
+    <Elements stripe={stripePromise}>
+      <Suspense fallback={null}>
+        <AuthRedirectWatcher />
+      </Suspense>
+      <CookieConsentBanner />
+      <FixedDonateTab />
+      <Confetti3D burstTrigger={burstTrigger} />
+      <CartBar />
+      <CartToast />
+      <PublicContactModal />
+      <Suspense fallback={null}>{navDrawer}</Suspense>
+      <Suspense fallback={null}>{auctionRealtime}</Suspense>
+      {!isHidden && header}
+      {children}
+      {!isHidden && <Footer />}
+    </Elements>
   )
 }

@@ -1,10 +1,10 @@
-import { setOpenWinningBidderDrawer } from 'lib/store/slices/uiSlice'
 import { IAuction } from 'types/_auction'
 import { motion } from 'framer-motion'
 import { Copy } from 'lucide-react'
-import { store } from 'lib/store/store'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 
 export function WinningBiddersTab({ auction }: { auction: IAuction }) {
+  const openWinningBidderDrawer = useAuctionUiStore((s) => s.openWinningBidderDrawer)
   return (
     <div className="border border-border-light dark:border-border-dark">
       <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
@@ -47,7 +47,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuction }) {
                   'Guest'
                 return (
                   <tr
-                    onClick={() => store.dispatch(setOpenWinningBidderDrawer(bidder))}
+                    onClick={() => openWinningBidderDrawer(bidder)}
                     key={bidder.id}
                     className="border-b border-border-light dark:border-border-dark last:border-0 hover:bg-surface-light dark:hover:bg-surface-dark transition-colors"
                   >

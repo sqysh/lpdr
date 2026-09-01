@@ -68,6 +68,7 @@ export type OrderRow = {
   createdAt: string
   recurringFrequency: string
   tierName: string
+  userId: string
 }
 
 export type Filter = (typeof FILTERS)[number]
@@ -114,6 +115,7 @@ export type SerializedOrder = {
   updatedAt: string
   paidAt: string | null
   items: SerializedOrderItem[]
+  userId: string | null
   user: {
     id: string
     email: string | null

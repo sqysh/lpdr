@@ -5,15 +5,26 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowLeft, CreditCard, RefreshCw, Check } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { store } from 'lib/store/store'
-import { showToast } from 'lib/store/slices/toastSlice'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
 import { getSubscriptionById } from 'lib/actions/my-pack/getSubscriptionById'
 import { cancelSubscription } from 'lib/actions/_stripe/cancelSubscription'
+import { StatusMessage } from 'components/_primitives/StatusMessage'
+import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import { UpdateCardForm } from 'app/(authenticated)/my-pack/subscription/[id]/_components/UpdateCardForm'
 import { CancelSubscriptionModal } from 'app/(authenticated)/my-pack/subscription/[id]/_components/CancelSubscriptionModal'
+
+const panel = 'border border-border-light dark:border-border-dark'
+
+const panelHead =
+  'px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
+
+const panelLabel =
+  'text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark'
+
+const rowLabel =
+  'text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark shrink-0'
 
 type Subscription = Awaited<ReturnType<typeof getSubscriptionById>>['data']
 
@@ -23,6 +34,7 @@ export default function MyPackSubscriptionClient({
   subscription: NonNullable<Subscription>
 }) {
   const router = useRouter()
+  const { status, flash } = useStatusMessage()
 
   const [showCancelModal, setShowCancelModal] = useState(false)
   const [showUpdateCard, setShowUpdateCard] = useState(false)
@@ -34,26 +46,104 @@ export default function MyPackSubscriptionClient({
 
   const handleCancel = async () => {
     setCancelLoading(true)
-    try {
-      const result = await cancelSubscription({
-        subscriptionId: subscription.stripeSubscriptionId!
+
+    const result = await cancelSubscription({
+      subscriptionId: subscription.stripeSubscriptionId!
+    })
+
+    setCancelLoading(false)
+
+    if (!result.success) {
+      flash({
+        tone: 'error',
+        message: 'Failed to cancel subscription',
+        description: result.error ?? 'Something went wrong. Please try again.'
       })
-      if (!result.success) throw new Error(result.error ?? 'Failed to cancel')
-      store.dispatch(
-        showToast({
-          message: 'Subscription cancelled',
-          description: 'Your subscription will not renew.',
-          type: 'success'
-        })
-      )
-      setShowCancelModal(false)
-      router.refresh()
-    } catch (err) {
-      store.dispatch(showToast({ message: 'Failed to cancel subscription', type: 'error' }))
-    } finally {
-      setCancelLoading(false)
+      return
     }
+
+    setShowCancelModal(false)
+    flash({
+      tone: 'success',
+      message: 'Subscription cancelled',
+      description: 'Your membership stays active until the end of the current billing period.'
+    })
+    router.refresh()
   }
+
+  const overviewRows = [
+    {
+      label: 'Amount',
+      value: (
+        <span className="font-quicksand font-black text-lg text-primary-light dark:text-primary-dark tabular-nums">
+          {formatMoney(subscription.totalAmount)}
+          <span className="text-[10px] font-mono font-normal text-muted-light dark:text-muted-dark ml-1">
+            /{frequencyShort}
+          </span>
+        </span>
+      )
+    },
+    {
+      label: 'Frequency',
+      value: (
+        <span className="text-sm font-mono text-text-light dark:text-text-dark">
+          {frequencyLabel}
+        </span>
+      )
+    },
+    {
+      label: 'Status',
+      value: (
+        <span
+          className={`text-[10px] font-mono tracking-[0.15em] uppercase ${
+            isCancelled
+              ? 'text-red-500 dark:text-red-400'
+              : 'text-primary-light dark:text-primary-dark'
+          }`}
+        >
+          {isCancelled ? 'Cancelled' : (subscription.stripeStatus ?? subscription.status)}
+        </span>
+      )
+    },
+    {
+      label: 'Member since',
+      value: (
+        <span className="text-sm font-mono text-text-light dark:text-text-dark">
+          {formatDate(subscription.createdAt, true)}
+        </span>
+      )
+    },
+    {
+      label: 'Last payment',
+      value: (
+        <span className="text-sm font-mono text-text-light dark:text-text-dark">
+          {subscription.paidAt ? formatDate(subscription.paidAt) : '—'}
+        </span>
+      )
+    },
+    {
+      label: isCancelled ? 'Active until' : 'Next billing',
+      value: (
+        <span
+          className={`text-sm font-mono ${isCancelled ? 'text-red-500 dark:text-red-400' : 'text-text-light dark:text-text-dark'}`}
+        >
+          {subscription.nextBillingDate ? formatDate(subscription.nextBillingDate) : '—'}
+        </span>
+      )
+    },
+    ...(subscription.coverFees
+      ? [
+          {
+            label: 'Fees covered',
+            value: (
+              <span className="text-sm font-mono text-text-light dark:text-text-dark">
+                {formatMoney(subscription.feesCovered)}
+              </span>
+            )
+          }
+        ]
+      : [])
+  ]
 
   return (
     <main
@@ -64,7 +154,7 @@ export default function MyPackSubscriptionClient({
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
           <Link
-            href=" /my-pack"
+            href="/my-pack"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mb-8"
           >
             <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
@@ -94,98 +184,26 @@ export default function MyPackSubscriptionClient({
           </div>
         </motion.div>
 
+        <div className="mb-6">
+          <StatusMessage status={status} />
+        </div>
+
         {/* ── Overview card ── */}
         <motion.div
           variants={fadeUp}
           initial="hidden"
           animate="show"
           custom={1}
-          className="border border-border-light dark:border-border-dark mb-6"
+          className={`${panel} mb-6`}
         >
-          <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Overview
-            </p>
+          <div className={panelHead}>
+            <p className={panelLabel}>Overview</p>
           </div>
 
           <div className="divide-y divide-border-light dark:divide-border-dark">
-            {[
-              {
-                label: 'Amount',
-                value: (
-                  <span className="font-quicksand font-black text-lg text-primary-light dark:text-primary-dark tabular-nums">
-                    {formatMoney(subscription.totalAmount)}
-                    <span className="text-[10px] font-mono font-normal text-muted-light dark:text-muted-dark ml-1">
-                      /{frequencyShort}
-                    </span>
-                  </span>
-                )
-              },
-              {
-                label: 'Frequency',
-                value: (
-                  <span className="text-sm font-mono text-text-light dark:text-text-dark">
-                    {frequencyLabel}
-                  </span>
-                )
-              },
-              {
-                label: 'Status',
-                value: (
-                  <span
-                    className={`text-[10px] font-mono tracking-[0.15em] uppercase ${
-                      isCancelled
-                        ? 'text-red-500 dark:text-red-400'
-                        : 'text-primary-light dark:text-primary-dark'
-                    }`}
-                  >
-                    {isCancelled ? 'Cancelled' : (subscription.stripeStatus ?? subscription.status)}
-                  </span>
-                )
-              },
-              {
-                label: 'Member since',
-                value: (
-                  <span className="text-sm font-mono text-text-light dark:text-text-dark">
-                    {formatDate(subscription.createdAt, true)}
-                  </span>
-                )
-              },
-              {
-                label: 'Last payment',
-                value: (
-                  <span className="text-sm font-mono text-text-light dark:text-text-dark">
-                    {subscription.paidAt ? formatDate(subscription.paidAt) : '—'}
-                  </span>
-                )
-              },
-              {
-                label: isCancelled ? 'Active until' : 'Next billing',
-                value: (
-                  <span
-                    className={`text-sm font-mono ${isCancelled ? 'text-red-500 dark:text-red-400' : 'text-text-light dark:text-text-dark'}`}
-                  >
-                    {subscription.nextBillingDate ? formatDate(subscription.nextBillingDate) : '—'}
-                  </span>
-                )
-              },
-              ...(subscription.coverFees
-                ? [
-                    {
-                      label: 'Fees covered',
-                      value: (
-                        <span className="text-sm font-mono text-text-light dark:text-text-dark">
-                          {formatMoney(subscription.feesCovered)}
-                        </span>
-                      )
-                    }
-                  ]
-                : [])
-            ].map(({ label, value }) => (
+            {overviewRows.map(({ label, value }) => (
               <div key={label} className="flex items-center justify-between px-5 py-3.5 gap-4">
-                <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark shrink-0">
-                  {label}
-                </span>
+                <span className={rowLabel}>{label}</span>
                 <div className="text-right">{value}</div>
               </div>
             ))}
@@ -198,12 +216,10 @@ export default function MyPackSubscriptionClient({
           initial="hidden"
           animate="show"
           custom={2}
-          className="border border-border-light dark:border-border-dark mb-6"
+          className={`${panel} mb-6`}
         >
-          <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center justify-between">
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Payment Method
-            </p>
+          <div className={`${panelHead} flex items-center justify-between`}>
+            <p className={panelLabel}>Payment Method</p>
             {!isCancelled && !showUpdateCard && (
               <button
                 type="button"
@@ -227,6 +243,7 @@ export default function MyPackSubscriptionClient({
                   subscriptionId={subscription.stripeSubscriptionId!}
                   onSuccess={() => {
                     setShowUpdateCard(false)
+                    flash({ tone: 'success', message: 'Card updated' })
                     router.refresh()
                   }}
                   onCancel={() => setShowUpdateCard(false)}
@@ -262,21 +279,18 @@ export default function MyPackSubscriptionClient({
           initial="hidden"
           animate="show"
           custom={3}
-          className="border border-border-light dark:border-border-dark mb-8"
+          className={`${panel} mb-8`}
         >
-          <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Billing History
-            </p>
+          <div className={panelHead}>
+            <p className={panelLabel}>Billing History</p>
           </div>
 
           {subscription.billingHistory?.length > 0 ? (
-            <ul className="divide-y divide-border-light dark:divide-border-dark" role="list">
+            <ul className="divide-y divide-border-light dark:divide-border-dark">
               {subscription.billingHistory.map((payment) => (
                 <li
                   key={payment.id}
                   className="flex items-center justify-between px-5 py-3.5 gap-4"
-                  role="listitem"
                 >
                   <div className="flex items-center gap-3">
                     <Check

@@ -8,6 +8,7 @@ import { OrderSubscriptionHistory } from './_components/OrderSubscriptionHistory
 import { OrderFulfillmentSection } from './_components/OrderFulfillmentSection'
 import { OrderCustomerSection } from './_components/OrderCustomerSection'
 import { OrderPaymentSection } from './_components/OrderPaymentSection'
+import { OrderAnomalyBanner } from './_components/OrderAnomalyBanner'
 
 type Props = {
   order: SerializedOrder
@@ -21,6 +22,7 @@ export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
       <OrderTopbar order={order} />
+      <OrderAnomalyBanner order={order} />
       <OrderFailureBanner order={order} />
 
       <div className="w-full px-4 sm:px-6 py-6 grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">

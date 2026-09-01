@@ -1,7 +1,7 @@
 import Picture from 'components/_common/Picture'
 import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
-import { CartItem } from 'lib/store/slices/cartSlice'
 import { Utensils } from 'lucide-react'
+import { CartItem } from 'stores/cart.store'
 
 interface IOrderSummary {
   items: CartItem[]

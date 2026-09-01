@@ -56,7 +56,7 @@ export function RevenueBySourceChart({ sources }: { sources: { type: string; tot
   }, [])
 
   return (
-    <div className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-5">
+    <div className="h-full bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-5">
       <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-4">
         Revenue By Source
       </p>

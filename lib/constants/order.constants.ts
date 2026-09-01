@@ -1,7 +1,8 @@
 export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string }> = {
   ONE_TIME_DONATION: {
     label: 'Donation Confirmed',
-    message: 'Your generosity helps rescued dachshunds find their forever homes. Every dollar makes a real difference.'
+    message:
+      'Your generosity helps rescued dachshunds find their forever homes. Every dollar makes a real difference.'
   },
   RECURRING_DONATION: {
     label: 'Recurring Donation Active',
@@ -49,4 +50,18 @@ export const STATUS_STYLES: Record<string, string> = {
   CONFIRMED: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
   PENDING: 'border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5',
   FAILED: 'border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/5'
+}
+
+export const DECLINE_EXPLANATIONS: Record<string, string> = {
+  card_declined: 'The bank turned down the card. The donor would need to try a different one.',
+  insufficient_funds: 'Not enough money in the account.',
+  expired_card: 'The card has expired.',
+  incorrect_cvc: 'The security code on the back of the card was wrong.',
+  incorrect_number: 'The card number was typed wrong.',
+  processing_error: "A temporary problem on the bank's end. Trying again usually works.",
+  card_velocity_exceeded: 'The card was used too many times in a row and the bank paused it.',
+  fraudulent: 'The bank flagged this as suspicious and stopped it.',
+  lost_card: 'The card was reported lost.',
+  stolen_card: 'The card was reported stolen.',
+  authentication_required: 'The bank wanted extra verification that was never completed.'
 }
