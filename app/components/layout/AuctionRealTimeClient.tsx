@@ -1,11 +1,11 @@
-// app/_components/AuctionRealtimeClient.tsx
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { AuctionEndedData, AuctionStartedData } from 'types/_auction'
 import { pusherClient } from 'lib/pusher/pusher-client'
-import { AuctionEndedModal, AuctionStartedModal } from '../features/auction'
+import { AuctionStartedModal } from './AuctionStartedModal'
+import { AuctionEndedModal } from './AuctionEndedModal'
 
 export const AuctionRealtimeClient = ({ auctionId }: { auctionId: string }) => {
   const router = useRouter()

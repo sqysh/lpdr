@@ -12,13 +12,9 @@ import { fadeUp } from 'lib/constants/motion.constants'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
-import { AuctionReceipt, WinnerOrderSummary } from 'app/components/features/auction/winner-payment'
-import {
-  PaymentHandlers,
-  PaymentState,
-  WinnerPaymentForm
-} from 'app/components/features/auction/winner-payment/WinnerPaymentForm'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
+import { AuctionReceipt, WinnerOrderSummary } from './_components'
+import { PaymentHandlers, PaymentState, WinnerPaymentForm } from './_components/WinnerPaymentForm'
 
 type WinnerFormInputs = {
   selectedCardId: string | null

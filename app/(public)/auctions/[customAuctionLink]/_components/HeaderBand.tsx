@@ -22,7 +22,17 @@ type Props = {
   trigger: number
 }
 
-export function HeaderBand({ auction, isActive, isEnded, days, hours, minutes, seconds, done, trigger }: Props) {
+export function HeaderBand({
+  auction,
+  isActive,
+  isEnded,
+  days,
+  hours,
+  minutes,
+  seconds,
+  done,
+  trigger
+}: Props) {
   const headerRef = useRef(null)
 
   const headerInView = useInView(headerRef, { once: true })
@@ -72,7 +82,9 @@ export function HeaderBand({ auction, isActive, isEnded, days, hours, minutes, s
                 aria-hidden="true"
               />
               <div className="flex items-center gap-2">
-                {isActive && <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />}
+                {isActive && (
+                  <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />
+                )}
                 <span
                   className={`text-[10px] font-mono tracking-[0.2em] uppercase ${isActive ? 'text-emerald-500' : 'text-primary-light dark:text-primary-dark'}`}
                 >
@@ -116,7 +128,11 @@ export function HeaderBand({ auction, isActive, isEnded, days, hours, minutes, s
             {isActive && !done && (
               <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-5">
                 <div className="flex items-center gap-2 mb-4">
-                  <Clock size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                  <Clock
+                    size={11}
+                    className="text-muted-light dark:text-muted-dark"
+                    aria-hidden="true"
+                  />
                   <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
                     Closing In
                   </span>
@@ -145,10 +161,19 @@ export function HeaderBand({ auction, isActive, isEnded, days, hours, minutes, s
                   slot: true
                 },
                 { icon: Package, label: 'Items', value: String(auction.items.length), slot: false },
-                { icon: Users, label: 'Bidders', value: String(auction.bidders.length), slot: false }
+                {
+                  icon: Users,
+                  label: 'Bidders',
+                  value: String(auction.bidders.length),
+                  slot: false
+                }
               ].map(({ icon: Icon, label, value, slot }) => (
                 <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 xs:px-4 py-4">
-                  <Icon size={11} className="text-muted-light dark:text-muted-dark mb-2" aria-hidden="true" />
+                  <Icon
+                    size={11}
+                    className="text-muted-light dark:text-muted-dark mb-2"
+                    aria-hidden="true"
+                  />
                   {slot ? (
                     <SlotValue value={value} trigger={trigger} />
                   ) : (
@@ -166,7 +191,9 @@ export function HeaderBand({ auction, isActive, isEnded, days, hours, minutes, s
             {/* Goal progress */}
             <div>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">Goal Progress</span>
+                <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+                  Goal Progress
+                </span>
                 <span className="text-[10px] font-mono font-black text-primary-light dark:text-primary-dark">
                   {pct}%
                 </span>

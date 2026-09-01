@@ -21,7 +21,7 @@ import {
   InstantBuyItemCard,
   InstantBuyNameSection,
   InstantBuyOrderSummary
-} from 'app/components/features/auction/instant-buy'
+} from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/instant-buy/_components'
 import { CoverFeesToggle } from 'app/components/features/payment/CoverFeesToggle'
 import { SavedCardSelector } from 'app/components/features/payment/SavedCardSelector'
 

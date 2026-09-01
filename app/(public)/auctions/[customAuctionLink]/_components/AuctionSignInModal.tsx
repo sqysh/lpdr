@@ -5,9 +5,9 @@ import { X, Mail } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { store, useUiSelector } from 'lib/store/store'
 import { setCloseAuctionSignInModal } from 'lib/store/slices/uiSlice'
-import { MagicLink } from '../../login/MagicLink'
-import { GoogleButton } from '../../login/GoogleButton'
-import { FacebookButton } from '../../login/FacebookButton'
+import { GoogleButton } from 'app/components/features/login/GoogleButton'
+import { FacebookButton } from 'app/components/features/login/FacebookButton'
+import { MagicLink } from 'app/components/features/login/MagicLink'
 
 export function AuctionSignInModal() {
   const { auctionSignInModal, auctionSignInRedirectTo } = useUiSelector()

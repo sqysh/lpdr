@@ -5,8 +5,6 @@ import PublicAuctionInstantBuyClient from './PublicAuctionInstantBuyClient'
 import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
 import { auth } from 'lib/auth'
 
-export const dynamic = 'force-dynamic'
-
 export default async function PublicAuctionInstantBuyPage({
   params
 }: {

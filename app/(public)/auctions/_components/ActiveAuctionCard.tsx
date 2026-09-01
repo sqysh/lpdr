@@ -3,16 +3,21 @@ import { useRef } from 'react'
 import { IAuction } from 'types/_auction'
 import { motion } from 'framer-motion'
 import { ChevronRight, Clock, Package, TrendingUp, Users } from 'lucide-react'
-import { Countdown } from '../page/Countdown'
 import { formatMoney } from 'app/utils/_currency.utils'
-import { ItemStrip } from '../page/ItemStrip'
 import Link from 'next/link'
+import { Countdown } from './Countdown'
+import { ItemStrip } from './ItemStrip'
 
 export function ActiveAuctionCard({ auction, index }: { auction: IAuction; index: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-60px' })
-  const pct = auction.goal > 0 ? Math.min(100, Math.round((auction.totalAuctionRevenue / auction.goal) * 100)) : 0
-  const href = auction.customAuctionLink ? `/auctions/${auction.customAuctionLink}` : `/auctions/${auction.id}`
+  const pct =
+    auction.goal > 0
+      ? Math.min(100, Math.round((auction.totalAuctionRevenue / auction.goal) * 100))
+      : 0
+  const href = auction.customAuctionLink
+    ? `/auctions/${auction.customAuctionLink}`
+    : `/auctions/${auction.id}`
 
   return (
     <motion.article
@@ -37,7 +42,9 @@ export function ActiveAuctionCard({ auction, index }: { auction: IAuction; index
           </div>
           <div className="flex items-center gap-1.5 px-2.5 py-1.5 border border-emerald-500/30 bg-emerald-500/10">
             <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />
-            <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-emerald-500 font-black">Live</span>
+            <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-emerald-500 font-black">
+              Live
+            </span>
           </div>
         </div>
 
@@ -62,8 +69,14 @@ export function ActiveAuctionCard({ auction, index }: { auction: IAuction; index
             { icon: Users, label: 'Bidders', value: String(auction.bidders.length) }
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 py-3">
-              <Icon size={12} className="text-muted-light dark:text-muted-dark mb-1.5" aria-hidden="true" />
-              <p className="text-base font-black font-mono text-text-light dark:text-text-dark leading-none">{value}</p>
+              <Icon
+                size={12}
+                className="text-muted-light dark:text-muted-dark mb-1.5"
+                aria-hidden="true"
+              />
+              <p className="text-base font-black font-mono text-text-light dark:text-text-dark leading-none">
+                {value}
+              </p>
               <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-0.5">
                 {label}
               </p>
@@ -74,8 +87,12 @@ export function ActiveAuctionCard({ auction, index }: { auction: IAuction; index
         {/* Goal progress */}
         <div className="mb-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">Goal Progress</span>
-            <span className="text-[10px] font-mono font-black text-primary-light dark:text-primary-dark">{pct}%</span>
+            <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+              Goal Progress
+            </span>
+            <span className="text-[10px] font-mono font-black text-primary-light dark:text-primary-dark">
+              {pct}%
+            </span>
           </div>
           <div className="h-1.5 bg-surface-light dark:bg-surface-dark overflow-hidden">
             <motion.div
@@ -108,7 +125,9 @@ export function ActiveAuctionCard({ auction, index }: { auction: IAuction; index
           className="group/btn mt-auto flex items-center justify-between px-6 py-4 bg-emerald-500 hover:bg-emerald-600 text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-500"
           aria-label={`View ${auction.title} auction`}
         >
-          <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Place a Bid</span>
+          <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
+            Place a Bid
+          </span>
           <ChevronRight
             size={16}
             className="group-hover/btn:translate-x-1 transition-transform duration-150"

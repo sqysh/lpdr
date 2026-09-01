@@ -1,7 +1,6 @@
 'use client'
 
-import { ApplicationExpiryTimer } from 'app/components/features/adoption-application'
-import { AdoptionFeeWelcomeModal } from 'app/components/features/adoption-application/AdoptionFeeModal'
+import { AdoptionFeeWelcomeModal } from 'app/(public)/adopt/application/_components/AdoptionFeeModal'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { useUiSelector } from 'lib/store/store'
 import { motion } from 'framer-motion'
@@ -9,6 +8,7 @@ import { ChevronLeft } from 'lucide-react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { useState } from 'react'
+import { ApplicationExpiryTimer } from './_components/ApplicationExpiryTimer'
 
 export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Date | null }) {
   const { isDark } = useUiSelector()

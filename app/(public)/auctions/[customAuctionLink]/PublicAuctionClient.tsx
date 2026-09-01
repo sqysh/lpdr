@@ -3,16 +3,16 @@
 import { useEffect, useRef, useState } from 'react'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { IAuctionLive } from 'types/_auction-item'
 import {
+  AuctionCountdown,
   AuctionEmptyState,
   AuctionHowItWorks,
   AuctionItemGrid,
   AuctionSignInModal,
   AuctionSoldGrid
-} from 'app/components/features/auction'
-import { useSession } from 'next-auth/react'
-import { AuctionCountdown } from 'app/components/features/auction/page/AuctionCountdown'
-import { IAuctionLive } from 'types/_auction-item'
+} from './_components'
 
 export default function PublicAuctionClient({ auction }: { auction: IAuctionLive }) {
   const session = useSession()

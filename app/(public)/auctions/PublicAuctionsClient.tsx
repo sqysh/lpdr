@@ -4,9 +4,9 @@ import { motion, useInView } from 'framer-motion'
 import { Users, Package, Zap } from 'lucide-react'
 import { useRef } from 'react'
 import { formatMoney } from 'app/utils/_currency.utils'
-import { ActiveAuctionCard } from 'app/components/features/auction/cards/ActiveAuctionCard'
-import { EmptyState } from 'app/components/features/auction/shared/EmptyState'
-import { PastAuctionCard } from 'app/components/features/auction/cards/PastAuctionCard'
+import { EmptyState } from 'app/(public)/auctions/_components/EmptyState'
+import { PastAuctionCard } from 'app/(public)/auctions/_components/PastAuctionCard'
+import { ActiveAuctionCard } from './_components/ActiveAuctionCard'
 
 export default function PublicAuctionsClient({ auctions }) {
   const active = auctions.filter((a) => a.status === 'ACTIVE')
@@ -26,7 +26,10 @@ export default function PublicAuctionsClient({ auctions }) {
             transition={{ duration: 0.4 }}
             className="flex items-center gap-3 mb-4"
           >
-            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <span
+              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+              aria-hidden="true"
+            />
             <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Little Paws Dachshund Rescue
             </span>
@@ -48,8 +51,8 @@ export default function PublicAuctionsClient({ auctions }) {
             transition={{ duration: 0.45, delay: 0.15 }}
             className="text-base sm:text-lg font-mono text-muted-light dark:text-muted-dark max-w-xl leading-relaxed"
           >
-            Bid on incredible items and experiences — every dollar goes directly to rescuing and rehabilitating
-            dachshunds in need.
+            Bid on incredible items and experiences — every dollar goes directly to rescuing and
+            rehabilitating dachshunds in need.
           </motion.p>
 
           {/* Impact strip */}
@@ -71,10 +74,21 @@ export default function PublicAuctionsClient({ auctions }) {
                   label: 'Items Auctioned',
                   value: String(auctions.reduce((s, a) => s + a.items.length, 0))
                 },
-                { icon: Users, label: 'Bidders', value: String(auctions.reduce((s, a) => s + a.bidders.length, 0)) }
+                {
+                  icon: Users,
+                  label: 'Bidders',
+                  value: String(auctions.reduce((s, a) => s + a.bidders.length, 0))
+                }
               ].map(({ icon: Icon, label, value }) => (
-                <div key={label} className="bg-bg-light dark:bg-bg-dark px-5 py-3.5 flex items-center gap-3">
-                  <Icon size={13} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
+                <div
+                  key={label}
+                  className="bg-bg-light dark:bg-bg-dark px-5 py-3.5 flex items-center gap-3"
+                >
+                  <Icon
+                    size={13}
+                    className="text-primary-light dark:text-primary-dark"
+                    aria-hidden="true"
+                  />
                   <div>
                     <p className="text-sm font-black font-mono text-text-light dark:text-text-dark leading-none">
                       {value}
@@ -93,7 +107,10 @@ export default function PublicAuctionsClient({ auctions }) {
         {active.length > 0 && (
           <section aria-labelledby="active-heading" className="mb-16 sm:mb-24">
             <div className="flex items-center gap-3 mb-6">
-              <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+              <span
+                className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
+                aria-hidden="true"
+              />
               <h2
                 id="active-heading"
                 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
@@ -117,7 +134,10 @@ export default function PublicAuctionsClient({ auctions }) {
         {past.length > 0 && (
           <section aria-labelledby="past-heading">
             <div className="flex items-center gap-3 mb-6">
-              <span className="block w-6 h-px bg-border-light dark:bg-border-dark shrink-0" aria-hidden="true" />
+              <span
+                className="block w-6 h-px bg-border-light dark:bg-border-dark shrink-0"
+                aria-hidden="true"
+              />
               <h2
                 id="past-heading"
                 className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"

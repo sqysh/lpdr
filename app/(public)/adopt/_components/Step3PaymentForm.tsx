@@ -4,13 +4,13 @@ import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { OrderType } from '@prisma/client'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { SavedCardSelector } from '../payment/SavedCardSelector'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { AdoptionSaveCardToggle } from './AdoptionSaveCardToggle'
 import { CardElementField, FormError, SubmitButton } from 'app/components/_primitives'
-import { CoverFeesToggle } from '../payment/CoverFeesToggle'
+import { SavedCardSelector } from 'app/components/features/payment/SavedCardSelector'
+import { CoverFeesToggle } from 'app/components/features/payment/CoverFeesToggle'
 
 type PaymentInputs = {
   selectedCardId: string | null

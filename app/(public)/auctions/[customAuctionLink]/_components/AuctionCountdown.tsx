@@ -1,9 +1,8 @@
 'use client'
 
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
-import { StickyHeader } from './StickyHeader'
-import { HeaderBand } from './HeaderBand'
 import { IAuction } from 'types/_auction'
+import { StickyHeader, HeaderBand } from './index'
 
 export function AuctionCountdown({
   auction,
