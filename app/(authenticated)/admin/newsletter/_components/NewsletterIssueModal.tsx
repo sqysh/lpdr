@@ -10,7 +10,7 @@ import { MONTHS, YEARS, CURRENT_YEAR } from 'lib/constants/date.constants'
 import createNewsletterIssue from 'lib/actions/admin/newsletter-issue/createNewsletterIssue'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormState } from 'types/_newsletter-issue.types'
-import { Toggle } from 'app/components/_primitives'
+import { Toggle } from 'components/_primitives'
 
 const initialState = (): FormState => ({
   month: MONTHS[new Date().getMonth()],

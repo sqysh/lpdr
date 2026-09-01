@@ -4,7 +4,7 @@ import { fmtCurrency } from 'app/utils/_currency.utils'
 import { ChevronRight, RefreshCw } from 'lucide-react'
 import { OrderRow } from 'types/_order.types'
 import { useRouter } from 'next/navigation'
-import { StatusPill } from 'app/components/_primitives'
+import { StatusPill } from 'components/_primitives'
 
 type GroupRow = { kind: 'group'; subscriptionId: string; orders: OrderRow[] }
 

@@ -7,7 +7,7 @@ import { setCloseContactModal } from 'lib/store/slices/uiSlice'
 import { store, useUiSelector } from 'lib/store/store'
 import sendContactEmail from 'lib/email/sendContactEmail'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { FormField } from 'app/components/_primitives'
+import { FormField } from 'components/_primitives'
 
 interface FormInputs {
   name: string

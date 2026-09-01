@@ -1,4 +1,4 @@
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { Gavel, TrendingUp, Users } from 'lucide-react'
 import { BidRow } from './BidRow'

@@ -1,4 +1,4 @@
-import { Toggle } from 'app/components/_primitives'
+import { Toggle } from 'components/_primitives'
 import { TERMS_AND_CONDITIONS } from 'lib/constants/adoption-application.constants'
 import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'

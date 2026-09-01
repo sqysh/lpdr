@@ -1,6 +1,6 @@
 'use client'
 
-import { FeedAFosterCard } from 'app/components/features/feed-a-foster/FeedAFosterCard'
+import { FeedAFosterCard } from 'app/(public)/feed/_components/FeedAFosterCard'
 import { FEED_A_FOSTER_CONTENT } from 'lib/constants/feed-a-foster.constants'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'

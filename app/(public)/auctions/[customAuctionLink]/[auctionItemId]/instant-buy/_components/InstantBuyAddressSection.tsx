@@ -1,5 +1,5 @@
 import { Loader2 } from 'lucide-react'
-import { FormField } from 'app/components/_primitives'
+import { FormField } from 'components/_primitives'
 import { STATES } from 'lib/constants/location.constants'
 
 type AddressErrors = {

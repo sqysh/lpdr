@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Dog, ExternalLink } from 'lucide-react'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { formatDate } from 'app/utils/_date.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'

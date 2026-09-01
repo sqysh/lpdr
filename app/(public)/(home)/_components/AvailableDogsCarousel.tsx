@@ -5,8 +5,8 @@ import Link from 'next/link'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { card, cardContainer } from 'lib/constants/motion.constants'
-import { ArrowLink } from 'app/components/_primitives/ArrowLink'
-import Picture from 'app/components/_common/Picture'
+import { ArrowLink } from 'components/_primitives/ArrowLink'
+import Picture from 'components/_common/Picture'
 
 export const AvailableDogsBlock = ({ data }) => {
   const [atStart, setAtStart] = useState(true)

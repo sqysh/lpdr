@@ -1,5 +1,5 @@
 import PublicDonateClient from 'app/(public)/donate/PublicDonateClient'
-import { PublicDonateSkeleton } from 'app/components/features/donate/PublicDonateSkeleton'
+import { PublicDonateSkeleton } from './_components/PublicDonateSkeleton'
 import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
 import { getUserName } from 'lib/actions/my-pack/getUserName'
 import { auth } from 'lib/auth'

@@ -1,9 +1,9 @@
 import { CheckCircle, ChevronRight, CreditCard, Gavel, Receipt, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { EmptyState } from './EmptyState'
-import { StatusPill } from 'app/components/_primitives/StatusPill'
+import { StatusPill } from 'components/_primitives/StatusPill'
 import { formatDate } from 'app/utils/_date.utils'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { AuctionParticipation, AuctionPurchase } from 'types/_my-pack.types'
 

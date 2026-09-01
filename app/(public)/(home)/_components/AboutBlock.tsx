@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { container, imageReveal, item } from 'lib/constants/motion.constants'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 
 export const AboutBlock = () => {
   return (

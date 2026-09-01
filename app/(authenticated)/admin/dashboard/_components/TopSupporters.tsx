@@ -1,5 +1,5 @@
 import { formatMoney } from 'app/utils/_currency.utils'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import Link from 'next/link'
 
 type Supporter = {

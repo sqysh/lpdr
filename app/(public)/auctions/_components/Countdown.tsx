@@ -1,5 +1,5 @@
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
-import { CountUnit } from 'app/components/_primitives'
+import { CountUnit } from 'components/_primitives'
 
 export function Countdown({ endDate }: { endDate: Date }) {
   const { days, hours, minutes, seconds, done } = useCountdown(endDate)

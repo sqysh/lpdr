@@ -3,11 +3,11 @@
 import { motion } from 'framer-motion'
 import { Pencil } from 'lucide-react'
 import { Dispatch, SetStateAction } from 'react'
-import { FormField } from 'app/components/_primitives/FormField'
+import { FormField } from 'components/_primitives/FormField'
 import { PackMember } from 'types/_my-pack.types'
 import { formatRole } from 'app/utils/_user.utils'
 import { EmailChangeSection } from './EmailChangeSection'
-import Picture from '../../../components/_common/Picture'
+import Picture from 'components/_common/Picture'
 
 interface HeaderProps {
   user: PackMember

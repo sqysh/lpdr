@@ -8,13 +8,13 @@ import { useAppDispatch } from 'lib/store/store'
 import { addToCart } from 'lib/store/slices/cartSlice'
 import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import { FILTERS, FilterValue } from 'lib/constants/welcome-wiener.constants'
-import { WelcomeWienerCard } from 'app/components/features/welcome-wieners/WelcomeWienerCard'
+import { WelcomeWienerCard } from 'app/(public)/welcomewieners/_components/WelcomeWienerCard'
 
-export function PublicWelcomeWienersClient({
-  welcomeWieners
-}: {
+type Props = {
   welcomeWieners: IWelcomeWiener[]
-}) {
+}
+
+export function PublicWelcomeWienersClient({ welcomeWieners }: Props) {
   const dispatch = useAppDispatch()
   const [activeFilter, setActiveFilter] = useState<FilterValue>('all')
   const [added, setAdded] = useState<Record<string, string[]>>({})

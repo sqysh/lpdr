@@ -1,6 +1,6 @@
 'use client'
 
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 import {
   ADOPTION_GUIDELINES_AND_REQUIREMENTS,
   FIVE_STEP_PROCESS,

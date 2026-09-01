@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Merge, AlertTriangle, Loader2 } from 'lucide-react'
 import { mergeUsers } from 'lib/actions/super-user/mergeUsers'
-import { FormField } from 'app/components/_primitives'
+import { FormField } from 'components/_primitives'
 
 type Props = {
   userId: string

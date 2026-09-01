@@ -7,10 +7,10 @@ import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { updateAddress } from 'lib/actions/my-pack/updateAddress'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
-import { CardElementField } from 'app/components/_primitives/CardElementField'
-import { FormError } from 'app/components/_primitives/FormError'
-import { SubmitButton } from 'app/components/_primitives/SubmitButton'
-import { Toggle } from 'app/components/_primitives/Toggle'
+import { CardElementField } from 'components/_primitives/CardElementField'
+import { FormError } from 'components/_primitives/FormError'
+import { SubmitButton } from 'components/_primitives/SubmitButton'
+import { Toggle } from 'components/_primitives/Toggle'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import type { IAuctionItemLive } from 'types/_auction-item'
@@ -22,8 +22,8 @@ import {
   InstantBuyNameSection,
   InstantBuyOrderSummary
 } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/instant-buy/_components'
-import { CoverFeesToggle } from 'app/components/features/payment/CoverFeesToggle'
-import { SavedCardSelector } from 'app/components/features/payment/SavedCardSelector'
+import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
+import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 
 interface FormInputs {
   // identity

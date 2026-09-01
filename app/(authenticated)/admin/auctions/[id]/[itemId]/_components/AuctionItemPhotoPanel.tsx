@@ -1,6 +1,6 @@
 'use client'
 
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { deleteAuctionItemPhoto } from 'lib/actions/admin/auction/deleteAuctionItemPhoto'
 import { setPrimaryAuctionItemPhoto } from 'lib/actions/admin/auction/setPrimaryAuctionItemPhoto'
 import { convertIfHeic } from 'app/utils/_common.utils'

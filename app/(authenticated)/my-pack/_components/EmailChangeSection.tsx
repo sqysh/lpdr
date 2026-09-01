@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Check, Loader2, Pencil, X } from 'lucide-react'
-import { FormField } from 'app/components/_primitives'
+import { FormField } from 'components/_primitives'
 import { requestEmailChange } from 'lib/actions/my-pack/email-change/requestEmailChange'
 import { motion } from 'framer-motion'
 type Props = {

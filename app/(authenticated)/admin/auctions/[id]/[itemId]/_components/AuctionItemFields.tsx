@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Loader2, Package, Zap } from 'lucide-react'
-import { FormField, Toggle } from 'app/components/_primitives'
+import { FormField, Toggle } from 'components/_primitives'
 import { FormErrors } from './AuctionItemForm'
 
 type Props = {

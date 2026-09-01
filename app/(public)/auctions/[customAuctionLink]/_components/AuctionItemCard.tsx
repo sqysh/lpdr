@@ -1,5 +1,5 @@
 import { useSounds } from 'lib/hooks/useSounds.hook'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { placeBid } from 'lib/actions/user/auction/placeBid'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { useInView, motion } from 'framer-motion'

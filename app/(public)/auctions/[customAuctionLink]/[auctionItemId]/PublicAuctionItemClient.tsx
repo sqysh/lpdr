@@ -14,7 +14,7 @@ import { FixedFooterNav } from 'app/(public)/auctions/[customAuctionLink]/[aucti
 import { PriceBlock } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/_components/PriceBlock'
 import { ItemDetails } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/_components/ItemDetails'
 import { AuctionBidModal } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/_components/AuctionBidModal'
-import { CountUnit } from 'app/components/_primitives'
+import { CountUnit } from 'components/_primitives'
 import { AuctionItemPhotoGallery } from './_components/AuctionItemPhotoGallery'
 import { BidHistory } from './_components/BidHistory'
 

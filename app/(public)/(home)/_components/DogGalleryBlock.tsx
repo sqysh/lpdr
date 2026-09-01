@@ -1,6 +1,6 @@
 'use client'
 
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { motion, AnimatePresence } from 'framer-motion'
 import Link from 'next/link'
 

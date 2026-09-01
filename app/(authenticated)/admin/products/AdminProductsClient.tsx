@@ -5,7 +5,7 @@ import { Plus } from 'lucide-react'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeaderButton'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { Product } from 'types/_product'
 
 const columns: Column<Product>[] = [

@@ -14,15 +14,10 @@ import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { RootState, useAppSelector } from 'lib/store/store'
 import { IAddress } from 'types/_address.types'
-import { StepIndicator } from 'app/components/features/payment/StepIndicator'
-import { SignedInRow } from 'app/components/features/payment/SignedInRow'
-import { StepSignIn } from 'app/components/features/payment/SignInStep'
-import {
-  OrderSummary,
-  Step2Name,
-  Step3Address,
-  Step4Payment
-} from 'app/components/features/checkout'
+import { StepIndicator } from 'components/features/payment/StepIndicator'
+import { SignedInRow } from 'components/features/payment/SignedInRow'
+import { StepSignIn } from 'components/features/payment/SignInStep'
+import { OrderSummary, Step2Name, Step3Address, Step4Payment } from './_components'
 
 interface CheckoutFormInputs {
   // identity

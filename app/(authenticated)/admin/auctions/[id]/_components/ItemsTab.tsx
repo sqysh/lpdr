@@ -5,7 +5,7 @@ import { formatMoney } from 'app/utils/_currency.utils'
 import Link from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getItemStatusConfig } from 'app/utils/_auction.utils'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 
 export function ItemsTab({ auction }: { auction: IAuction }) {
   const router = useRouter()

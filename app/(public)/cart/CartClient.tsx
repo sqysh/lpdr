@@ -7,7 +7,7 @@ import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { useAppDispatch, useCartSelector } from 'lib/store/store'
 import { CartItem, clearCart } from 'lib/store/slices/cartSlice'
-import { CartItemRow } from 'app/components/features/cart/CartItemRow'
+import { CartItemRow } from 'app/(public)/cart/_components/CartItemRow'
 import { useRouter } from 'next/navigation'
 
 export default function CartClient() {

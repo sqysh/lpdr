@@ -1,4 +1,4 @@
-import { StatusPill } from 'app/components/_primitives/StatusPill'
+import { StatusPill } from 'components/_primitives/StatusPill'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { formatDate } from 'app/utils/_date.utils'
 import Link from 'next/link'

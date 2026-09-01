@@ -1,4 +1,4 @@
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 import { IAuction } from 'types/_auction'
 import { IAuctionItemLive } from 'types/_auction-item'
 import { AuctionItemCard } from './AuctionItemCard'

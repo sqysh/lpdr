@@ -13,7 +13,7 @@ import {
   Utensils
 } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
-import Picture from '../../../components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { clearCart } from 'lib/store/slices/cartSlice'

@@ -1,4 +1,4 @@
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 import { Zap } from 'lucide-react'
 import { AuctionItemCard } from './AuctionItemCard'
 import { IAuctionItemLive } from 'types/_auction-item'

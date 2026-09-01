@@ -2,7 +2,7 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { containerVariants } from 'lib/constants/motion.constants'
-import { DogCard } from 'app/components/features/dachshunds/DogCard'
+import { DogCard } from 'components/features/dachshunds/DogCard'
 
 export default function PublicDachshundsClient({ data }) {
   return (

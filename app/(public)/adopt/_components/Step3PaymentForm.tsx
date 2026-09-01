@@ -8,9 +8,9 @@ import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { AdoptionSaveCardToggle } from './AdoptionSaveCardToggle'
-import { CardElementField, FormError, SubmitButton } from 'app/components/_primitives'
-import { SavedCardSelector } from 'app/components/features/payment/SavedCardSelector'
-import { CoverFeesToggle } from 'app/components/features/payment/CoverFeesToggle'
+import { CardElementField, FormError, SubmitButton } from 'components/_primitives'
+import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
+import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 
 type PaymentInputs = {
   selectedCardId: string | null

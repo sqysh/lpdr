@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Upload, Loader2, X } from 'lucide-react'
 import { useState } from 'react'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { createLog } from 'lib/actions/log/createLog'
 import { FormState, SectionHeader } from './productForm.utils'

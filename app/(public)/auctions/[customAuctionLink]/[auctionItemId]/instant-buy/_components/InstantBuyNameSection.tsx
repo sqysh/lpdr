@@ -1,4 +1,4 @@
-import { FormField } from 'app/components/_primitives'
+import { FormField } from 'components/_primitives'
 import { Loader2 } from 'lucide-react'
 
 type NameErrors = {

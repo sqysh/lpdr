@@ -3,7 +3,7 @@ import { AddressSectionProps } from 'types/_address.types'
 import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { MapPin, Pencil } from 'lucide-react'
-import { UpdateAddressModal } from 'app/components/_common/UpdateAddressModal'
+import { UpdateAddressModal } from 'components/_common/UpdateAddressModal'
 
 export function AuctionWinnerAddressSection({ address }: AddressSectionProps) {
   const [modalOpen, setModalOpen] = useState(false)

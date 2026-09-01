@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { formatDate } from 'app/utils/_date.utils'
 import { Check, Copy, Search, X } from 'lucide-react'
 import AdminTable, { Column } from 'app/(authenticated)/admin/_components/AdminTable'
-import { Pagination } from 'app/components/_common/Pagination'
+import { Pagination } from 'components/_common/Pagination'
 
 export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] }) {
   const [page, setPage] = useState(1)

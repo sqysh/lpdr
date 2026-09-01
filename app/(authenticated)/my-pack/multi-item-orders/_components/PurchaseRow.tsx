@@ -5,7 +5,7 @@ import { fadeUp } from 'lib/constants/motion.constants'
 import { formatDate } from 'app/utils/_date.utils'
 import { formatMoney } from 'app/utils/_currency.utils'
 import { ChevronDown, ChevronUp } from 'lucide-react'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import Link from 'next/link'
 import { StatusPill } from './StatusPill'
 

@@ -1,6 +1,6 @@
 'use client'
 
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 

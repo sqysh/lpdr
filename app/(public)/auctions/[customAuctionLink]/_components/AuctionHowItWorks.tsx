@@ -1,4 +1,4 @@
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 import { Eye, Gavel, ShoppingCart } from 'lucide-react'
 
 export function AuctionHowItWorks({ isActive }: { isActive: boolean }) {

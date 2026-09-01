@@ -1,4 +1,4 @@
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import { Package } from 'lucide-react'
 import { IAuctionItem } from 'types/_auction-item'
 

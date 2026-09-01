@@ -1,4 +1,4 @@
-import { Toggle } from 'app/components/_primitives'
+import { Toggle } from 'components/_primitives'
 
 type Props = {
   checked: boolean

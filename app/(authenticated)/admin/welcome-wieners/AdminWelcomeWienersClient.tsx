@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
 import { getWelcomeWieners } from 'lib/actions/admin/welcome-wiener/getWelcomeWieners'
-import Picture from 'app/components/_common/Picture'
+import Picture from 'components/_common/Picture'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeaderButton'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'

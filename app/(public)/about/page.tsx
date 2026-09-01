@@ -4,7 +4,7 @@ import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Heart, Home, Shield, Users, ArrowRight, Dog, Star } from 'lucide-react'
 import Link from 'next/link'
-import { SectionLabel } from 'app/components/_primitives'
+import { SectionLabel } from 'components/_primitives'
 
 // ─── Fade up animation helper ─────────────────────────────────────────────────
 function FadeUp({
