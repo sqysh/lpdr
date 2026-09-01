@@ -1,4 +1,4 @@
-import { RequestDetails } from './_log.server.utils'
+import { RequestDetails } from './log.server.utils'
 
 export function buildLogMessage(action: string, actor: string, context: RequestDetails) {
   const time = new Date().toLocaleString('en-US', {

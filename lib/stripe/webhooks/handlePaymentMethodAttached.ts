@@ -2,7 +2,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function handlePaymentMethodAttached(paymentMethod: Stripe.PaymentMethod) {
   try {

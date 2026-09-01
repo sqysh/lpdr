@@ -6,7 +6,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { MONTHS } from 'lib/constants/date.constants'
 import { CreateNewsletterIssueInput } from 'types/_newsletter-issue.types'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { YEAR_REGEX } from 'lib/constants/regex.constants'
 
 export default async function createNewsletterIssue(input: CreateNewsletterIssueInput) {

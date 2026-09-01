@@ -9,14 +9,15 @@ import { OrderType } from '@prisma/client'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
-import { formatWithCommas } from 'app/utils/_currency.utils'
+import { formatWithCommas } from 'lib/utils/currency.utils'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { PresetAmounts } from './PresetAmounts'
 import { DonateSaveCardToggle } from './DonateSaveCardToggle'
-import { CardElementField, FormError, FormField, SubmitButton } from 'components/_primitives'
+import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
+import { CardElementField } from 'components/features/payment/CardElementField'
 
 export interface PaymentInputs {
   // amount

@@ -1,6 +1,6 @@
 'use server'
 
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { getPendingShipments } from './queries/getPendingShipments'
 import { getTotalRevenue } from './queries/getTotalRevenue'
 import { getOrderMetrics } from './queries/getOrderMetrics'

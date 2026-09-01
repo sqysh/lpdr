@@ -1,4 +1,4 @@
-import { RequestGeo } from 'app/utils/_log.server.utils'
+import { RequestGeo } from 'lib/utils/log.server.utils'
 import prisma from 'prisma/client'
 
 export async function stampUserGeo(userId: string | null | undefined, geo: RequestGeo) {

@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
 
 function generateBypassCode(): string {

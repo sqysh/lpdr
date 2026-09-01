@@ -5,7 +5,7 @@ import { createLog } from '../log/createLog'
 import { requireSuper } from 'lib/auth/guards'
 import { resend } from 'lib/email/resend'
 import { accountMergedTemplate } from 'lib/email/templates/account-merged.template'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function mergeUsers({
   primaryUserId,

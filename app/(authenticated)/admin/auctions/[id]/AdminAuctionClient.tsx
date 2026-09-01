@@ -2,9 +2,9 @@
 
 import { motion } from 'framer-motion'
 import { IAuction, Tab } from 'types/_auction'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { getAuctionStatusConfig } from 'app/utils/_auction.utils'
+import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
 import { TABS } from 'lib/constants/auction.constants'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useState } from 'react'

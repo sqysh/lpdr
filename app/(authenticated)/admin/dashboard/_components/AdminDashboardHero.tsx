@@ -1,4 +1,4 @@
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { motion } from 'framer-motion'
 import { HISTORICAL_TOTAL } from 'lib/constants/dashboard.constants'
 import { fadeUp } from 'lib/constants/motion.constants'

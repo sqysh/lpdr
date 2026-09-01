@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 const AUCTION_INCLUDE = {
   items: {

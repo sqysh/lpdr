@@ -1,6 +1,6 @@
 import type { User, Account, Profile } from 'next-auth'
 import { createLog } from '../actions/log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import { stampUserGeoFromRequest } from '../actions/_infra/stampUserGeoFromRequest'

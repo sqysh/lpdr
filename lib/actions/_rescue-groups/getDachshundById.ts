@@ -1,8 +1,8 @@
 import { createLog } from '../log/createLog'
-import { getPicturesAndVideos } from '../../../app/utils/_rescue-group.utils'
+import { getPicturesAndVideos } from '../../utils/rescue-group.utils'
 import { Dog } from 'types/_rescue-groups.types'
 import { RESCUE_GROUPS_BASE_URL } from 'lib/constants/paths.constants'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function getDachshundById(
   id: string

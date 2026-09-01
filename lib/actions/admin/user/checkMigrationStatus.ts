@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { createLog } from '../../log/createLog'
 
 export async function checkMigrationStatus(email: string) {

@@ -1,7 +1,7 @@
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { auctionOutBidTemplate } from './templates/out-bid.template'
 
 type SendOutbidEmailParams = {

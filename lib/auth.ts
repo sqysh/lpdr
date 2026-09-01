@@ -8,7 +8,6 @@ import { handleMagicLinkCallback } from './callbacks/magic-link.callback'
 import { handleGoogleCallback } from './callbacks/google.callback'
 import { createLog } from './actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
-import { cache } from 'react'
 import { migrateMongoUser } from './actions/migrate/migrateMongoUser'
 import { handleFacebookCallback } from './callbacks/facebook.callback'
 import { googleProvider, facebookProvider, magicLinkProvider } from './auth/index'
@@ -153,5 +152,3 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }
   }
 })
-
-export const getSession = cache(auth)

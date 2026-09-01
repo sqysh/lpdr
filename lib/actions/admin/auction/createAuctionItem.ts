@@ -5,7 +5,7 @@ import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { CreateAuctionItemInput } from 'types/_auction-item'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export const createAuctionItem = async (data: CreateAuctionItemInput) => {
   const gate = await requireAdmin()

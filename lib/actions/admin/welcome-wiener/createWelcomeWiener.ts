@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { WelcomeWienerInputs } from 'types/_welcome-wiener'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireAdmin } from 'lib/auth/guards'
 
 const MAX_NAME = 100

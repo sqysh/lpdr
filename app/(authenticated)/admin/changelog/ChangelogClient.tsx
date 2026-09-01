@@ -1,5 +1,5 @@
 import { CHANGELOG, ChangeType } from 'lib/constants/changelog.constants'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { Sparkles, Wrench, TrendingUp, Package } from 'lucide-react'
 
 export const metadata = { title: 'Changelog — LPDR Admin' }

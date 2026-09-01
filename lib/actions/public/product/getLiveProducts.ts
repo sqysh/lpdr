@@ -1,6 +1,6 @@
-import { serializeProduct } from 'app/utils/_product.utils'
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
+import { serializeProduct } from 'lib/utils/serializers.utils'
 
 export const getLiveProducts = async () => {
   try {

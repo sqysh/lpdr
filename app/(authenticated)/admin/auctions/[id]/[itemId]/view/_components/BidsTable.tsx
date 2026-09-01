@@ -1,5 +1,5 @@
-import { formatMoney } from 'app/utils/_currency.utils'
-import { formatDateTime } from 'app/utils/_date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { formatDateTime } from 'lib/utils/date.utils'
 import { IAuctionBid } from 'types/_auction-bid'
 import { motion } from 'framer-motion'
 
@@ -16,7 +16,10 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
           id="bid-history"
           className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
         >
-          Bid History <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">{bids.length}</span>
+          Bid History{' '}
+          <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">
+            {bids.length}
+          </span>
         </h3>
       </div>
 

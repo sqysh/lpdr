@@ -2,7 +2,7 @@
 
 import { fetchLogs } from 'lib/actions/super-user/fetchLogs'
 import { LEVEL_STYLES, LEVELS } from 'lib/constants/log.constants'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { useState, useTransition, useCallback } from 'react'
 import { Level, LogRow } from 'types/_log.types'
 

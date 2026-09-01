@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import {
   AuctionParticipation,
   AuctionPurchase,

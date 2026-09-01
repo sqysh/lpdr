@@ -7,7 +7,7 @@ import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import { resend } from 'lib/email/resend'
 import { orderShippedTemplate } from 'lib/email/templates/order-shipped.template'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export const updateOrderShippingStatus = async ({
   id,

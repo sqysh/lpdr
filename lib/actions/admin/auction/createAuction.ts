@@ -4,8 +4,8 @@ import prisma from 'prisma/client'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
-import { validateAuctionHour } from 'app/utils/_auction.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
+import { validateAuctionHour } from 'lib/utils/auction.utils'
 
 type CreateAuctionInput = {
   title: string

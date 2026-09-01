@@ -3,7 +3,7 @@
 import { randomBytes } from 'crypto'
 import prisma from 'prisma/client'
 import { resend } from 'lib/email/resend'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { emailChangeVerificationTemplate } from 'lib/email/templates/email-change-verification.tempate'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'

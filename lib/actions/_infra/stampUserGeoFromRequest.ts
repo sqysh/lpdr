@@ -1,4 +1,4 @@
-import { getRequestDetails } from 'app/utils/_log.server.utils'
+import { getRequestDetails } from 'lib/utils/log.server.utils'
 import { stampUserGeo } from './stampUserGeo'
 
 export async function stampUserGeoFromRequest(userId: string | undefined) {

@@ -1,6 +1,6 @@
 'use client'
 
-import { fmtCurrency } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { ChevronRight, RefreshCw } from 'lucide-react'
 import { OrderRow } from 'types/_order.types'
 import { useRouter } from 'next/navigation'
@@ -78,7 +78,7 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
       {/* Lifetime value */}
       <td className="px-4 py-3 whitespace-nowrap">
         <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
-          {fmtCurrency(lifetimeValue)}
+          {formatMoney(lifetimeValue)}
         </p>
         <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70 mt-0.5">
           lifetime

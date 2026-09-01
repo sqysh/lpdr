@@ -1,6 +1,6 @@
 'use server'
 
-import { formatLastRan, formatNextRun } from 'app/utils/_time.utils'
+import { formatLastRan, formatNextRun } from 'lib/utils/time.utils'
 import prisma from 'prisma/client'
 
 export type CronStatus = 'success' | 'error' | 'skipped' | 'never'
@@ -41,7 +41,12 @@ export async function getCronJobs(): Promise<CronJob[]> {
   // Dedupe to most recent per cron name
   const latest = new Map<string, (typeof logs)[number]>()
   for (const log of logs) {
-    const meta = log.metadata as { cronName?: string; status?: string; durationMs?: number; detail?: string } | null
+    const meta = log.metadata as {
+      cronName?: string
+      status?: string
+      durationMs?: number
+      detail?: string
+    } | null
     const name = meta?.cronName
     if (name && !latest.has(name)) {
       latest.set(name, log)
@@ -50,7 +55,11 @@ export async function getCronJobs(): Promise<CronJob[]> {
 
   return Object.entries(CRON_DEFINITIONS).map(([name, def]) => {
     const log = latest.get(name)
-    const meta = log?.metadata as { status?: CronStatus; durationMs?: number; detail?: string } | null
+    const meta = log?.metadata as {
+      status?: CronStatus
+      durationMs?: number
+      detail?: string
+    } | null
 
     return {
       id: `cron_${name}`,

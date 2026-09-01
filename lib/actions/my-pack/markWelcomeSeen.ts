@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function markWelcomeSeen() {
   const gate = await requireAuth()

@@ -1,7 +1,7 @@
 import { useSounds } from 'lib/hooks/useSounds.hook'
 import Picture from 'components/_common/Picture'
 import { placeBid } from 'lib/actions/user/auction/placeBid'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { useInView, motion } from 'framer-motion'
 import { Check, ChevronRight, Gavel, Loader2, Tag, Zap } from 'lucide-react'
 import Link from 'next/link'

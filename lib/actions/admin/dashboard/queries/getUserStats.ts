@@ -1,5 +1,5 @@
 import prisma from 'prisma/client'
-import { monthRange } from 'app/utils/_date.utils'
+import { monthRange } from 'lib/utils/date.utils'
 
 export async function getUserStats() {
   const now = new Date()

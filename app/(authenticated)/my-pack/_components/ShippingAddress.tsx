@@ -1,6 +1,6 @@
 import { motion } from 'framer-motion'
 import { MapPin } from 'lucide-react'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { UpdateAddressModal } from 'components/_common/UpdateAddressModal'
 import { EmptyState } from './EmptyState'
 

@@ -1,8 +1,8 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { EmptyState } from './EmptyState'
-import { formatDate } from 'app/utils/_date.utils'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatDate } from 'lib/utils/date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { StatusPill } from 'components/_primitives/StatusPill'
 
 export function OneTimeDonations({ donations }) {

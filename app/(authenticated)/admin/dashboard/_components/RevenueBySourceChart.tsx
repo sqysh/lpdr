@@ -1,4 +1,4 @@
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { sourceMeta } from 'lib/constants/dashboard.constants'
 
 const COLORS = [

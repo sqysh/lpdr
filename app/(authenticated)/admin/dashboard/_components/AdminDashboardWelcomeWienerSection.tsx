@@ -1,4 +1,4 @@
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 
 export function AdminDashboardWelcomeWienerSection({ data }) {
   const wieners = [...(data.welcomeWienerRevenue ?? [])].sort(

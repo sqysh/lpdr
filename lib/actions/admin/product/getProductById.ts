@@ -1,8 +1,8 @@
-import { serializeProduct } from 'app/utils/_product.utils'
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
+import { serializeProduct } from 'lib/utils/serializers.utils'
 
 export const getProductById = async (id: string) => {
   const gate = await requireAdmin()

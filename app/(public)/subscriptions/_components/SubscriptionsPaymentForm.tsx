@@ -13,8 +13,9 @@ import { createSubscriptionWithSavedCard } from 'lib/actions/_stripe/createSubsc
 import { createSetupIntentForSubscription } from 'lib/actions/_stripe/createSetupIntentForSubscription'
 import { createSubscriptionAfterSetup } from 'lib/actions/_stripe/createSubscriptionAfterSetup'
 import { IPaymentMethod } from 'types/_payment-method.types'
-import { ordinal } from 'app/utils/_date.utils'
-import { CardElementField, FormError, FormField, SubmitButton } from 'components/_primitives'
+import { ordinal } from 'lib/utils/date.utils'
+import { FormError, FormField, SubmitButton } from 'components/_primitives'
+import { CardElementField } from 'components/features/payment/CardElementField'
 
 type PaymentInputs = {
   firstName: string

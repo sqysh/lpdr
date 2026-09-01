@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
-import { sendWinnerEmail } from 'app/utils/_end-auction.utils'
+import { sendWinnerEmail } from 'lib/utils/end-auction.utils'
 
 const MAX_REMINDERS = 5
 const REMINDER_WINDOW_DAYS = 5

@@ -6,10 +6,11 @@ import { useSession } from 'next-auth/react'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { IAuctionWinningBidder } from 'types/_auction-winning-bidder'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { CardElementField, FormError, SubmitButton, Toggle } from 'components/_primitives'
+import { FormError, SubmitButton, Toggle } from 'components/_primitives'
 import { AuctionWinnerAddressSection } from './AuctionWinnerAddressSection'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
+import { CardElementField } from 'components/features/payment/CardElementField'
 
 export type PaymentState = {
   selectedCardId: string | null

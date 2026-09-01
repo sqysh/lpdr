@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { promoteUserToAdmin } from './promoteUserToAdmin'
 import { preProvisionAdminUser } from './preProvisionAdminUser'

@@ -9,7 +9,7 @@ import { setCloseAddPaymentMethodModal } from 'lib/store/slices/uiSlice'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { useRemoveScroll } from 'lib/hooks/useRemoveScroll.hook'
 import { showToast } from 'lib/store/slices/toastSlice'
-import { extractErrorMessage } from 'app/utils/_log.client.utils'
+import { extractErrorMessage } from 'lib/utils/log.client.utils'
 import { getSetupIntentClientSecret } from 'lib/actions/_stripe/getSetupIntentClientSecret'
 import { createPaymentMethod } from 'lib/actions/_stripe/createPaymentMethod'
 

@@ -1,6 +1,6 @@
 import { StatusPill } from 'components/_primitives/StatusPill'
-import { formatMoney } from 'app/utils/_currency.utils'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import Link from 'next/link'
 import { EmptyState } from './EmptyState'
 

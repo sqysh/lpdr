@@ -11,9 +11,9 @@ import {
   Tag,
   Truck
 } from 'lucide-react'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import Link from 'next/link'
-import { getItemStatusConfig } from 'app/utils/_auction.utils'
+import { getItemStatusConfig } from 'lib/utils/auction.utils'
 import { PhotoGallery } from 'app/(authenticated)/admin/auctions/[id]/[itemId]/_components/PhotoGallery'
 import { AuctionItemStatus, AuctionStatus } from '@prisma/client'
 import { IAuctionBid } from 'types/_auction-bid'

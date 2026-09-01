@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { ProductCreateInputs } from 'types/_product'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 

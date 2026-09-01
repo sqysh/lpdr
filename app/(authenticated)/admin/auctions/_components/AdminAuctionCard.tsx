@@ -1,10 +1,10 @@
 import Link from 'next/link'
-import { formatMoney } from 'app/utils/_currency.utils'
-import { formatDate, getDaysRemaining } from 'app/utils/_date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { formatDate, getDaysRemaining } from 'lib/utils/date.utils'
 import { Gavel, Calendar, Users, ChevronRight, Clock, Package as Package2 } from 'lucide-react'
 import { motion } from 'framer-motion'
-import { getAuctionStatusConfig } from 'app/utils/_auction.utils'
-import { getProgressPct } from 'app/utils/_math.utils'
+import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
+import { getProgressPct } from 'lib/utils/math.utils'
 import { IAuction } from 'types/_auction'
 
 export function AdminAuctionCard({ auction, index }: { auction: IAuction; index: number }) {

@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { createLog } from '../../log/createLog'
 import { migrateMongoUser } from '../../migrate/migrateMongoUser'
 import { requireSuper } from 'lib/auth/guards'

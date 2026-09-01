@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 const AUCTION_ITEM_INCLUDE = {
   photos: {
@@ -26,7 +26,14 @@ const AUCTION_ITEM_INCLUDE = {
     }
   },
   auction: {
-    select: { id: true, title: true, status: true, startDate: true, endDate: true, customAuctionLink: true }
+    select: {
+      id: true,
+      title: true,
+      status: true,
+      startDate: true,
+      endDate: true,
+      customAuctionLink: true
+    }
   }
 } satisfies Parameters<typeof prisma.auctionItem.findUnique>[0]['include']
 

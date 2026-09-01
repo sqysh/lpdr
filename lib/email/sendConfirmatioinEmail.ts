@@ -5,7 +5,7 @@ import {
 } from 'lib/email/templates/order-confirmation.template'
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 type OrderWithItems = Order & { items: OrderItem[] }
 

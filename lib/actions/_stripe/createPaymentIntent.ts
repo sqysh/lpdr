@@ -10,7 +10,7 @@ import { WelcomeWienerProduct } from 'types/_welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 
 type PaymentItem = {

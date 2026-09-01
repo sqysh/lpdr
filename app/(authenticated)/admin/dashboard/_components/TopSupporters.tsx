@@ -1,4 +1,4 @@
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import Picture from 'components/_common/Picture'
 import Link from 'next/link'
 

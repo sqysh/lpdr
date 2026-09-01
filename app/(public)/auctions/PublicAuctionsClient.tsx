@@ -3,7 +3,7 @@
 import { motion, useInView } from 'framer-motion'
 import { Users, Package, Zap } from 'lucide-react'
 import { useRef } from 'react'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { EmptyState } from 'app/(public)/auctions/_components/EmptyState'
 import { PastAuctionCard } from 'app/(public)/auctions/_components/PastAuctionCard'
 import { ActiveAuctionCard } from './_components/ActiveAuctionCard'

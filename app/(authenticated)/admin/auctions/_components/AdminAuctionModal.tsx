@@ -10,7 +10,7 @@ import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormField } from 'components/_primitives/FormField'
 import { FormError } from 'components/_primitives/FormError'
 import { createAuction } from 'lib/actions/admin/auction/createAuction'
-import { AUCTION_HOUR_OPTIONS, validateAuctionHour } from 'app/utils/_auction.utils'
+import { AUCTION_HOUR_OPTIONS, validateAuctionHour } from 'lib/utils/auction.utils'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 

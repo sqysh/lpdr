@@ -4,7 +4,7 @@ import { stripeClient } from 'lib/stripe/stripe-client'
 import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function getSetupIntentClientSecret() {
   const gate = await requireAuth()

@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { RefreshCw, ChevronRight } from 'lucide-react'
 import { SerializedSubscriptionOrder } from 'types/_order.types'
 import { STATUS_STYLES } from 'lib/constants/order.constants'
-import { fmtCurrency } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 
 export function OrderSubscriptionHistory({
   orders,
@@ -32,7 +32,7 @@ export function OrderSubscriptionHistory({
         </h2>
         <div className="text-right">
           <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
-            {fmtCurrency(lifetimeValue)}
+            {formatMoney(lifetimeValue)}
           </p>
           <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70">
             {renewalCount} renewal{renewalCount !== 1 ? 's' : ''}
@@ -93,7 +93,7 @@ export function OrderSubscriptionHistory({
 
               {/* Amount */}
               <p className="text-[10px] font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
-                {fmtCurrency(o.totalAmount)}
+                {formatMoney(o.totalAmount)}
               </p>
 
               {/* Status */}

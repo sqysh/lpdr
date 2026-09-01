@@ -5,7 +5,7 @@ import { Prisma } from '@prisma/client'
 import { WelcomeWienerInputs } from 'types/_welcome-wiener'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export const updateWelcomeWiener = async (id: string, input: Partial<WelcomeWienerInputs>) => {
   const gate = await requireAdmin()
@@ -37,6 +37,10 @@ export const updateWelcomeWiener = async (id: string, input: Partial<WelcomeWien
       welcomeWienerId: id,
       updatedBy: gate.userId
     })
-    return { success: false, error: 'Failed to update welcome wiener. Please try again.', data: null }
+    return {
+      success: false,
+      error: 'Failed to update welcome wiener. Please try again.',
+      data: null
+    }
   }
 }

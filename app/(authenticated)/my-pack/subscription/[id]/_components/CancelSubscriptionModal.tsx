@@ -1,4 +1,4 @@
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { motion } from 'framer-motion'
 import { AlertTriangle, X } from 'lucide-react'
 

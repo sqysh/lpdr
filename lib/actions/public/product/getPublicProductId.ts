@@ -1,4 +1,4 @@
-import { serializeProduct } from 'app/utils/_product.utils'
+import { serializeProduct } from 'lib/utils/serializers.utils'
 import prisma from 'prisma/client'
 
 export const getPublicProductById = async (id: string) => {

@@ -8,7 +8,7 @@ import {
 import { motion } from 'framer-motion'
 import { Minus, Plus, ShoppingBag, X } from 'lucide-react'
 import { useAppDispatch } from 'lib/store/store'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import Picture from 'components/_common/Picture'
 
 export function CartItemRow({ item, index }: { item: CartItem; index: number }) {

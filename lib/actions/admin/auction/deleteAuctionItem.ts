@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export const deleteAuctionItem = async (id: string, auctionId: string) => {
   const gate = await requireAdmin()
@@ -17,7 +17,11 @@ export const deleteAuctionItem = async (id: string, auctionId: string) => {
     if (!item) return { success: false, error: 'Item not found', data: null }
 
     if (item.auction.status === 'ACTIVE') {
-      return { success: false, error: 'Items cannot be deleted while the auction is live', data: null }
+      return {
+        success: false,
+        error: 'Items cannot be deleted while the auction is live',
+        data: null
+      }
     }
 
     await prisma.auctionItem.delete({ where: { id } })

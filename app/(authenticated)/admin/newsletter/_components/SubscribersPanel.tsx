@@ -1,7 +1,7 @@
 import { Newsletter } from '@prisma/client'
 import { PAGE_SIZE } from 'lib/constants/newsletter.constants'
 import { useMemo, useState } from 'react'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { Check, Copy, Search, X } from 'lucide-react'
 import AdminTable, { Column } from 'app/(authenticated)/admin/_components/AdminTable'
 import { Pagination } from 'components/_common/Pagination'

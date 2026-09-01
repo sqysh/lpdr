@@ -5,14 +5,21 @@ import { Package, DollarSign, Truck, XCircle, ChevronRight } from 'lucide-react'
 import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/_order.types'
 import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
-import { fmtCurrency } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import { StatusPill } from 'components/_primitives'
 import Link from 'next/link'
-import { rowClass } from 'app/utils/_order.utils'
 import { useRouter } from 'next/navigation'
 import { SubscriptionGroupRow } from './_components/SubscriptionGroupRow'
+
+export function rowClass(o: OrderRow) {
+  if (o.status === 'FAILED')
+    return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
+  if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
+    return 'group border-l-2 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/8 transition-colors'
+  return 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
+}
 
 const COL_COUNT = 9
 
@@ -97,7 +104,7 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
 
       <div className="w-full px-4 sm:px-6 py-6 space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Stat icon={DollarSign} label="Revenue" value={fmtCurrency(stats.revenue)} accent />
+          <Stat icon={DollarSign} label="Revenue" value={formatMoney(stats.revenue)} accent />
           <Stat icon={Package} label="Confirmed Orders" value={String(stats.confirmedCount)} />
           <Stat icon={Truck} label="Needs Shipping" value={String(stats.needsShipping)} />
           <Stat icon={XCircle} label="Failed" value={String(stats.failed)} />
@@ -188,7 +195,7 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
                       {row.order.itemCount || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
-                      {fmtCurrency(row.order.totalAmount)}
+                      {formatMoney(row.order.totalAmount)}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
                       <StatusPill status={row.order.status} />

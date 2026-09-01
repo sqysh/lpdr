@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Dog, ExternalLink } from 'lucide-react'
 import Picture from 'components/_common/Picture'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'

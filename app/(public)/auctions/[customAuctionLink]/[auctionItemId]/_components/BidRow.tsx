@@ -1,6 +1,6 @@
-import { bidderDisplay } from 'app/utils/_auction.utils'
-import { formatMoney } from 'app/utils/_currency.utils'
-import { formatDateTime } from 'app/utils/_date.utils'
+import { bidderDisplay } from 'lib/utils/auction.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { formatDateTime } from 'lib/utils/date.utils'
 import { useInView, motion } from 'framer-motion'
 import { Trophy } from 'lucide-react'
 import { useRef } from 'react'
@@ -26,7 +26,11 @@ export function BidRow({ bid, rank, delay }: { bid: IAuctionBid; rank: number; d
           #{rank}
         </span>
         {isTop && (
-          <Trophy size={11} className="text-primary-light dark:text-primary-dark shrink-0" aria-hidden="true" />
+          <Trophy
+            size={11}
+            className="text-primary-light dark:text-primary-dark shrink-0"
+            aria-hidden="true"
+          />
         )}
         <div className="min-w-0">
           <p className="text-xs font-mono font-black text-text-light dark:text-text-dark truncate">

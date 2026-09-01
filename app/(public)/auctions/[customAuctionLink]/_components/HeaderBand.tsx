@@ -1,13 +1,13 @@
-import { getProgressPct } from 'app/utils/_math.utils'
+import { getProgressPct } from 'lib/utils/math.utils'
 import { useRef } from 'react'
 import Link from 'next/link'
-import { formatMoney } from 'app/utils/_currency.utils'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { Clock, TrendingUp, Users, Package, ArrowLeft } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { CountUnit } from 'components/_primitives'
 import { IAuction } from 'types/_auction'
-import { getDisplayRevenue } from 'app/utils/_auction.utils'
+import { getDisplayRevenue } from 'lib/utils/auction.utils'
 import { SlotValue } from './SlotValue'
 
 type Props = {

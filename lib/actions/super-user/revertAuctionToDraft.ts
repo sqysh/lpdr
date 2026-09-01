@@ -3,7 +3,7 @@
 import { revalidateTag } from 'next/cache'
 import { createLog } from 'lib/actions/log/createLog'
 import prisma from 'prisma/client'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
 
 export async function revertAuctionToDraft(auctionId: string) {

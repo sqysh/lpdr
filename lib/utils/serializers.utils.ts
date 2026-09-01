@@ -34,3 +34,9 @@ export const serializeInstantBuyer = (b: any) => ({
   ...b,
   totalPrice: serializeDecimal(b.totalPrice)
 })
+
+export const serializeProduct = (p: any) => ({
+  ...p,
+  price: Number(p.price),
+  shippingPrice: Number(p.shippingPrice)
+})

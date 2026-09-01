@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
-import { monthRange, lastNMonths } from 'app/utils/_date.utils'
-import { sumAmount } from 'app/utils/_math.utils'
+import { monthRange, lastNMonths } from 'lib/utils/date.utils'
+import { sumAmount } from 'lib/utils/math.utils'
 
 export async function getOrderMetrics() {
   const now = new Date()

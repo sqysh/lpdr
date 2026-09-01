@@ -7,7 +7,7 @@ import {
   serializeAuctionItem,
   serializeInstantBuyer,
   serializeWinningBidder
-} from 'lib/serializers'
+} from 'lib/utils/serializers.utils'
 
 export const getAuctionByCustomAuctionLink = async (link: string) => {
   try {

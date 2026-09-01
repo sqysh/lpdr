@@ -5,7 +5,7 @@ import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export const cancelSubscription = async ({ subscriptionId }: { subscriptionId: string }) => {
   const gate = await requireAuth()

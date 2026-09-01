@@ -3,7 +3,7 @@
 import { contactEmailTemplate } from './templates/contact-email.template'
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export default async function sendContactEmail({
   name,

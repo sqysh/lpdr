@@ -5,7 +5,7 @@ import { stripeClient } from '../../stripe/stripe-client'
 import { RecurringFrequency } from '@prisma/client'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 interface SetupIntentParams {
   userId?: string

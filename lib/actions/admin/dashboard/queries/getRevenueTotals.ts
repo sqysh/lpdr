@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
-import { monthRange } from 'app/utils/_date.utils'
-import { sumAmount } from 'app/utils/_math.utils'
+import { monthRange } from 'lib/utils/date.utils'
+import { sumAmount } from 'lib/utils/math.utils'
 
 export async function getRevenueTotals() {
   const now = new Date()

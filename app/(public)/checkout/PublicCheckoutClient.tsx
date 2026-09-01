@@ -8,7 +8,6 @@ import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import Link from 'next/link'
-import { getOrderType } from 'app/utils/_order.utils'
 import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
@@ -18,6 +17,7 @@ import { StepIndicator } from 'components/features/payment/StepIndicator'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { OrderSummary, Step2Name, Step3Address, Step4Payment } from './_components'
+import { getOrderType } from './_lib/getOrderType'
 
 interface CheckoutFormInputs {
   // identity

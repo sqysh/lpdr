@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from 'react'
 import { DollarSign, Clock, XCircle } from 'lucide-react'
-import { formatDate } from 'app/utils/_date.utils'
+import { formatDate } from 'lib/utils/date.utils'
 import { AdoptionFeeStatus, IAdoptionFee } from 'types/_adoption-fee'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { FILTERS, statusStyles } from 'lib/constants/adoption-fees.constants'
-import { fmtCurrency } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
@@ -62,7 +62,7 @@ const columns: Column<IAdoptionFee>[] = [
     header: 'Amount',
     className:
       'font-quicksand font-black text-sm text-text-light dark:text-text-dark whitespace-nowrap',
-    cell: (f) => (f.feeAmount != null ? fmtCurrency(Number(f.feeAmount)) : '—')
+    cell: (f) => (f.feeAmount != null ? formatMoney(Number(f.feeAmount)) : '—')
   },
   {
     header: 'Bypass code',
@@ -124,9 +124,9 @@ export default function AdminAdoptionFeesClient({ fees }: Props) {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Stat
             label="Total collected"
-            value={fmtCurrency(stats.siteTotal)}
+            value={formatMoney(stats.siteTotal)}
             icon={DollarSign}
-            sublabel={`${fmtCurrency(stats.siteTotal)} on site + ${fmtCurrency(HISTORICAL_ADOPTION_FEE_TOTAL)} historical`}
+            sublabel={`${formatMoney(stats.siteTotal)} on site + ${formatMoney(HISTORICAL_ADOPTION_FEE_TOTAL)} historical`}
           />
           <Stat label="Active" value={String(stats.active)} icon={Clock} />
           <Stat label="Expired" value={String(stats.expired)} icon={XCircle} />

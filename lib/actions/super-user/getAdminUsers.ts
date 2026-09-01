@@ -1,6 +1,6 @@
 'use server'
 
-import { getInitials } from 'app/utils/_user.utils'
+import { getInitials } from 'lib/utils/user.utils'
 import prisma from 'prisma/client'
 
 export interface AdminUser {

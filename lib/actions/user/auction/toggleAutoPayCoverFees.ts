@@ -4,7 +4,7 @@ import prisma from 'prisma/client'
 import { revalidatePath } from 'next/cache'
 import { requireAuth } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
-import { getErrorMessage } from 'app/utils/_error.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function toggleAutoPayCoverFees() {
   const gate = await requireAuth()

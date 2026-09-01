@@ -6,7 +6,7 @@ import { IProduct } from 'types/_product'
 import { store, useCartSelector } from 'lib/store/store'
 import { addToCart } from 'lib/store/slices/cartSlice'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { formatMoney } from 'app/utils/_currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { setOpenCartToast } from 'lib/store/slices/uiSlice'
 import Picture from 'components/_common/Picture'
 

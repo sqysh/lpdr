@@ -3,7 +3,7 @@
 import Picture from 'components/_common/Picture'
 import { deleteAuctionItemPhoto } from 'lib/actions/admin/auction/deleteAuctionItemPhoto'
 import { setPrimaryAuctionItemPhoto } from 'lib/actions/admin/auction/setPrimaryAuctionItemPhoto'
-import { convertIfHeic } from 'app/utils/_common.utils'
+import { convertIfHeic } from 'lib/utils/image.utils'
 import { ImagePlus, Star, Trash2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'

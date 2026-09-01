@@ -20,8 +20,8 @@ import {
   CreditCard
 } from 'lucide-react'
 import Link from 'next/link'
-import { formatDate } from 'app/utils/_date.utils'
-import { formatRole } from 'app/utils/_user.utils'
+import { formatDate } from 'lib/utils/date.utils'
+import { formatRole } from 'lib/utils/user.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import { StatusPill } from 'components/_primitives'
 import { MergeUserSection } from 'app/(authenticated)/admin/users/[id]/_components/MergeUserSection'

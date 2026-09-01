@@ -6,7 +6,7 @@ import { signOut } from 'next-auth/react'
 import { LogOut } from 'lucide-react'
 import { ADMIN_NAV_GROUPS } from 'lib/constants/navigation.constants'
 import { Role } from '@prisma/client'
-import { formatRole } from 'app/utils/_user.utils'
+import { formatRole } from 'lib/utils/user.utils'
 import { useState } from 'react'
 
 type Props = {

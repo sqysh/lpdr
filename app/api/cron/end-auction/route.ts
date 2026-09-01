@@ -1,10 +1,6 @@
 import { createLog } from 'lib/actions/log/createLog'
 import { pusherTrigger } from 'lib/pusher/pusher.utils'
-import {
-  processAutoPay,
-  resolveAuctionWinners,
-  sendWinnerEmail
-} from 'app/utils/_end-auction.utils'
+import { processAutoPay, resolveAuctionWinners, sendWinnerEmail } from 'lib/utils/end-auction.utils'
 import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'

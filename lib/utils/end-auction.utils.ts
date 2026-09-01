@@ -299,7 +299,7 @@ export async function resolveAuctionWinners(auctionId: string) {
   }))
 }
 
-export const sendWinnerEmail = async ({
+export async function sendWinnerEmail({
   email,
   firstName,
   auctionId,
@@ -313,7 +313,7 @@ export const sendWinnerEmail = async ({
   winningBidderId: string
   items: { name: string; soldPrice: number }[]
   totalPrice: number
-}) => {
+}) {
   const BASE =
     process.env.NODE_ENV === 'development' ? 'http://localhost:3000' : 'https://littlepawsdr.org'
   const url = `${BASE}/auctions/winner/${winningBidderId}`
