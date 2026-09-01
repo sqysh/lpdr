@@ -21,16 +21,17 @@ const COLORS: number[] = [
   0xe879f9, 0x818cf8, 0xf9a8d4
 ]
 
-export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
-  const trigger = useConfettiStore((s) => s.show)
+export const Confetti3D: React.FC = () => {
+  const isActive = useConfettiStore((s) => s.isActive)
+  const burstTrigger = useConfettiStore((s) => s.burstTrigger)
   const hide = useConfettiStore((s) => s.hide)
+
   const mountRef = useRef<HTMLDivElement>(null)
   const sceneRef = useRef<THREE.Scene | null>(null)
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null)
   const animationIdRef = useRef<number | null>(null)
   const confettiPiecesRef = useRef<THREE.Mesh[]>([])
-  const isActiveRef = useRef(false)
-  const prevBurstTrigger = useRef(burstTrigger)
+  const isRunningRef = useRef(false)
   const duration = 3000
 
   const createConfetti = (count: number = 100): THREE.Mesh[] => {
@@ -271,31 +272,28 @@ export const Confetti3D: React.FC<Confetti3DProps> = ({ burstTrigger = 0 }) => {
 
   // Original falling confetti — auction ended
   useEffect(() => {
-    if (trigger && !isActiveRef.current && sceneRef.current) {
-      isActiveRef.current = true
+    if (!isActive || isRunningRef.current || !sceneRef.current) return
 
-      confettiPiecesRef.current.push(...createConfetti(150))
+    isRunningRef.current = true
+    confettiPiecesRef.current.push(...createConfetti(150))
 
-      const t1 = setTimeout(() => confettiPiecesRef.current.push(...createConfetti(100)), 200)
-      const t2 = setTimeout(() => confettiPiecesRef.current.push(...createConfetti(80)), 400)
-      const reset = setTimeout(() => {
-        isActiveRef.current = false
-        hide()
-      }, duration)
+    const t1 = setTimeout(() => confettiPiecesRef.current.push(...createConfetti(100)), 200)
+    const t2 = setTimeout(() => confettiPiecesRef.current.push(...createConfetti(80)), 400)
+    const reset = setTimeout(() => {
+      isRunningRef.current = false
+      hide()
+    }, duration)
 
-      return () => {
-        clearTimeout(t1)
-        clearTimeout(t2)
-        clearTimeout(reset)
-      }
+    return () => {
+      clearTimeout(t1)
+      clearTimeout(t2)
+      clearTimeout(reset)
     }
-  }, [hide, trigger])
+  }, [hide, isActive])
 
   // Burst — quick bid success
   useEffect(() => {
-    if (burstTrigger === prevBurstTrigger.current) return
-    prevBurstTrigger.current = burstTrigger
-    if (!sceneRef.current) return
+    if (burstTrigger === 0 || !sceneRef.current) return
 
     confettiPiecesRef.current.push(...createBurst(120, { x: 0, y: -1, z: 0 }))
     confettiPiecesRef.current.push(...createBurstText({ x: 0, y: -1, z: 0 }))
