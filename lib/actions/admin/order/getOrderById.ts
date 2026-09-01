@@ -1,13 +1,13 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { createLog } from '../../log/createLog'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export const getOrderById = async (id: string) => {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const order = await prisma.order.findUnique({

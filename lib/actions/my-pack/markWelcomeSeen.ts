@@ -2,12 +2,12 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export async function markWelcomeSeen() {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error }
+  if (gate.ok === false) return { success: false, error: gate.error }
 
   try {
     await prisma.user.update({

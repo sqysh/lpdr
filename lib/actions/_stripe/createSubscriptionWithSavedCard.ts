@@ -3,9 +3,9 @@
 import { RecurringFrequency } from '@prisma/client'
 import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
+import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 
 interface CreateSubscriptionWithSavedCardParams {
   userId: string
@@ -31,7 +31,7 @@ export async function createSubscriptionWithSavedCard({
   tierName
 }: CreateSubscriptionWithSavedCardParams) {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const paymentMethod = await stripeClient.paymentMethods.retrieve(savedCardId)

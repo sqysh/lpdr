@@ -3,11 +3,11 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
-import { requireAuth } from '../../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { sendOutbidEmail } from 'lib/email/sendOutbidEmail'
 import { PreviousTopBid } from 'types/_auction-bid'
-import { stampUserGeoFromRequest } from '../../auth/stampUserGeoFromRequest'
+import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
 
 export async function placeBid(auctionItemId: string, bidAmount: number) {
   const gate = await requireAuth()

@@ -3,9 +3,9 @@
 import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
 import { RecurringFrequency } from '@prisma/client'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
+import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 
 interface CreateSubscriptionParams {
   setupIntentId: string
@@ -29,7 +29,7 @@ export async function createSubscriptionAfterSetup({
   tierName
 }: CreateSubscriptionParams) {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const setupIntent = await stripeClient.setupIntents.retrieve(setupIntentId)

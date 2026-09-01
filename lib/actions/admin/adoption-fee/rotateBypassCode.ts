@@ -3,7 +3,7 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireSuper } from 'lib/auth/guards'
 
 function generateBypassCode(): string {
   const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+'
@@ -27,7 +27,7 @@ export async function rotateBypassCodeCore() {
 }
 
 export async function rotateBypassCode() {
-  const gate = await requireAdmin()
+  const gate = await requireSuper()
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

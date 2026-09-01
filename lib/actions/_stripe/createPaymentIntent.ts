@@ -9,9 +9,9 @@ import { ProductSizeEntry } from 'types/_product'
 import { WelcomeWienerProduct } from 'types/_welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
+import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 
 type PaymentItem = {
   id: string
@@ -57,7 +57,7 @@ export async function createPaymentIntent({
   auctionItemId
 }: CreatePaymentIntentParams) {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   const userId = gate.userId
   const verifiedEmail = gate.email ?? email // fall back to client email only for display purposes, never for identity/auth logic

@@ -4,7 +4,7 @@ import { createLog } from '../log/createLog'
 import { stripeClient } from '../../stripe/stripe-client'
 import { RecurringFrequency } from '@prisma/client'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 interface SetupIntentParams {
@@ -29,7 +29,7 @@ export async function createSetupIntentForSubscription({
   tierName
 }: SetupIntentParams) {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (amount < 500) return { success: false, error: 'Minimum donation is $5', data: null }
   if (!userId)

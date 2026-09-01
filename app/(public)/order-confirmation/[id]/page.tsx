@@ -1,5 +1,5 @@
 import OrderConfirmationClient from 'app/(public)/order-confirmation/[id]/OrderConfirmationClient'
-import { getOrderById } from 'lib/actions/order/getOrderById'
+import { getOrderById } from 'lib/actions/admin/order/getOrderById'
 
 export default async function OrderConfirmationPage({
   params

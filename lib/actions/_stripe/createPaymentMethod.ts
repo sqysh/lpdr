@@ -3,8 +3,8 @@
 import prisma from 'prisma/client'
 import { stripeClient } from '../../stripe/stripe-client'
 import { createLog } from '../log/createLog'
-import { AuthFailure, requireAuth } from '../../auth/requireAuth'
-import { stampUserGeoFromRequest } from '../auth/stampUserGeoFromRequest'
+import { requireAuth } from 'lib/auth/guards'
+import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { getErrorMessage } from 'app/utils/_error.utils'
 
 export async function createPaymentMethod({
@@ -17,7 +17,7 @@ export async function createPaymentMethod({
   cardholderName: string
 }) {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error, data: null }
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {
     const [paymentMethod, details] = await Promise.all([

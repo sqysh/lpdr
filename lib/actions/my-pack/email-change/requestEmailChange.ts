@@ -5,8 +5,8 @@ import prisma from 'prisma/client'
 import { resend } from 'lib/email/resend'
 import { getErrorMessage } from 'app/utils/_error.utils'
 import { emailChangeVerificationTemplate } from 'lib/email/templates/email-change-verification.tempate'
-import { AuthFailure, requireAuth } from '../../../auth/requireAuth'
-import { stampUserGeoFromRequest } from '../../auth/stampUserGeoFromRequest'
+import { requireAuth } from 'lib/auth/guards'
+import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
 import { createLog } from '../../log/createLog'
 
 const TOKEN_EXPIRY_HOURS = 24
@@ -16,7 +16,7 @@ export async function requestEmailChange(newEmail: string): Promise<{
   error?: string
 }> {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: (gate as AuthFailure).error }
+  if (gate.ok === false) return { success: false, error: gate.error }
 
   const normalizedEmail = newEmail.toLowerCase().trim()
 

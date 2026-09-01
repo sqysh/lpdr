@@ -3,7 +3,7 @@ import prisma from 'prisma/client'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { createLog } from '../actions/log/createLog'
 import { getErrorMessage } from 'app/utils/_error.utils'
-import { stampUserGeoFromRequest } from '../actions/auth/stampUserGeoFromRequest'
+import { stampUserGeoFromRequest } from '../actions/_infra/stampUserGeoFromRequest'
 
 export async function handleMagicLinkCallback(user: User): Promise<boolean | string> {
   const existingUser = await prisma.user.findUnique({
