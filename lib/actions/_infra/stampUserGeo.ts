@@ -3,12 +3,15 @@ import prisma from 'prisma/client'
 
 export async function stampUserGeo(userId: string | null | undefined, geo: RequestGeo) {
   if (!userId || geo.geoLatitude == null) return
+
+  const STORES_COORDINATES = geo.geoCountry === 'US'
+
   await prisma.user
     .update({
       where: { id: userId },
       data: {
-        lastGeoLatitude: geo.geoLatitude,
-        lastGeoLongitude: geo.geoLongitude,
+        lastGeoLatitude: STORES_COORDINATES ? geo.geoLatitude : null,
+        lastGeoLongitude: STORES_COORDINATES ? geo.geoLongitude : null,
         lastGeoCity: geo.geoCity,
         lastGeoRegion: geo.geoRegion,
         lastGeoCountry: geo.geoCountry
