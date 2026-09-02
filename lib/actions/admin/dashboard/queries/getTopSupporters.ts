@@ -1,6 +1,10 @@
 import prisma from 'prisma/client'
+import { requireAdmin } from 'lib/auth/guards'
 
 export async function getTopSupporters(limit = 5) {
+  const gate = await requireAdmin()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+
   const grouped = await prisma.order.groupBy({
     by: ['userId'],
     where: { status: 'CONFIRMED', source: 'SITE', userId: { not: null } },
@@ -28,15 +32,19 @@ export async function getTopSupporters(limit = 5) {
 
   const userMap = new Map(users.map((u) => [u.id, u]))
 
-  return grouped.map((g) => {
-    const user = userMap.get(g.userId!)
-    return {
-      userId: g.userId,
-      name: [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Unknown',
-      location: [user?.lastGeoCity, user?.lastGeoRegion].filter(Boolean).join(', ') || null,
-      image: user?.image ?? null,
-      totalGiven: Number(g._sum.totalAmount ?? 0),
-      orderCount: g._count.id
-    }
-  })
+  return {
+    success: true,
+    data: grouped.map((g) => {
+      const user = userMap.get(g.userId!)
+      return {
+        userId: g.userId,
+        name: [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Unknown',
+        location: [user?.lastGeoCity, user?.lastGeoRegion].filter(Boolean).join(', ') || null,
+        image: user?.image ?? null,
+        totalGiven: Number(g._sum.totalAmount ?? 0),
+        orderCount: g._count.id
+      }
+    }),
+    error: null
+  }
 }

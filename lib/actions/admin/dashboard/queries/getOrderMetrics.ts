@@ -1,8 +1,12 @@
 import prisma from 'prisma/client'
 import { monthRange, lastNMonths } from 'lib/utils/date.utils'
 import { sumAmount } from 'lib/utils/math.utils'
+import { requireAdmin } from 'lib/auth/guards'
 
 export async function getOrderMetrics() {
+  const gate = await requireAdmin()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+
   const now = new Date()
   const thisMonth = monthRange(now.getFullYear(), now.getMonth())
   const lastMonth = monthRange(now.getFullYear(), now.getMonth() - 1)
@@ -58,39 +62,12 @@ export async function getOrderMetrics() {
     .map(([type, { count, total }]) => ({ type, count, total }))
     .sort((a, b) => b.total - a.total)
 
-  const totalAdoptionRevenue = ordersByType.find((o) => o.type === 'ADOPTION_FEE')?.total ?? 0
-
-  // ── Monthly chart (all sources, matches original scope) ────────────────
-
-  const monthlyData = months.map(({ label, start, end }) => ({
-    label,
-    total: sumAmount(
-      orders.filter((o) => {
-        const t = o.createdAt.getTime()
-        return t >= start.getTime() && t <= end.getTime()
-      })
-    )
-  }))
-
-  // ── Recent orders (site-only, latest 8) ─────────────────────────────────
-
-  const recentOrders = siteOrders.slice(0, 8).map((o) => ({
-    id: o.id,
-    total: Number(o.totalAmount),
-    createdAt: o.createdAt.toISOString(),
-    name:
-      o.user?.firstName && o.user?.lastName
-        ? `${o.user.firstName} ${o.user.lastName}`
-        : (o.user?.email ?? 'Unknown')
-  }))
-
   return {
-    thisMonthRevenue,
-    lastMonthRevenue,
-    monthlyChange,
-    ordersByType,
-    totalAdoptionRevenue,
-    monthlyData,
-    recentOrders
+    success: true,
+    data: {
+      monthlyChange,
+      ordersByType
+    },
+    error: null
   }
 }

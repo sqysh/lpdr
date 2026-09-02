@@ -8,14 +8,23 @@ import { ADMIN_NAV_GROUPS } from 'lib/constants/navigation.constants'
 import { Role } from '@prisma/client'
 import { formatRole } from 'lib/utils/user.utils'
 import { useState } from 'react'
+import { BypassCode } from './_components/BypassCode'
 
 type Props = {
   onClose?: () => void
   email: string
   role: Role
+  bypassCode: string
+  bypassCodeRotatesAt: string
 }
 
-export default function AdminSidebar({ onClose, email, role }: Props) {
+export default function AdminSidebar({
+  onClose,
+  email,
+  role,
+  bypassCode,
+  bypassCodeRotatesAt
+}: Props) {
   const pathname = usePathname()
   const [pending, setPending] = useState<string | null>(null)
 
@@ -110,25 +119,29 @@ export default function AdminSidebar({ onClose, email, role }: Props) {
       )}
 
       {/* Identity + Logout — pinned to bottom */}
-      <div className="pt-4 border-t border-border-light dark:border-border-dark shrink-0">
-        {email && (
-          <div className="px-4 pb-3">
-            <p className="font-mono text-[10px] text-text-light dark:text-text-dark truncate">
-              {email}
-            </p>
-            <p className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark mt-0.5">
-              {formatRole(role)}
-            </p>
-          </div>
-        )}
-        <button
-          type="button"
-          onClick={() => signOut({ redirectTo: '/' })}
-          className="w-full flex items-center gap-3 px-4 py-2 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-        >
-          <LogOut className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
-          <span className="font-mono text-[11px] tracking-widest uppercase">Sign Out</span>
-        </button>
+      <div className="shrink-0">
+        <BypassCode code={bypassCode} rotatesAt={bypassCodeRotatesAt} role={role} />
+
+        <div className="pt-4 border-t border-border-light dark:border-border-dark shrink-0">
+          {email && (
+            <div className="px-4 pb-3">
+              <p className="font-mono text-[10px] text-text-light dark:text-text-dark truncate">
+                {email}
+              </p>
+              <p className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark mt-0.5">
+                {formatRole(role)}
+              </p>
+            </div>
+          )}
+          <button
+            type="button"
+            onClick={() => signOut({ redirectTo: '/' })}
+            className="w-full flex items-center gap-3 px-4 py-2 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-bg-light dark:hover:bg-bg-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          >
+            <LogOut className="w-4.5 h-4.5 shrink-0" aria-hidden="true" />
+            <span className="font-mono text-[11px] tracking-widest uppercase">Sign Out</span>
+          </button>
+        </div>
       </div>
     </nav>
   )

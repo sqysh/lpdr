@@ -11,11 +11,15 @@ import { Role } from '@prisma/client'
 export function AdminLayoutClient({
   children,
   email,
-  role
+  role,
+  bypassCode,
+  bypassCodeRotatesAt
 }: {
   children: ReactNode
   email: string
   role: Role
+  bypassCode: string
+  bypassCodeRotatesAt: string
 }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
@@ -25,7 +29,13 @@ export function AdminLayoutClient({
     <div className="min-h-screen flex bg-bg-light dark:bg-bg-dark">
       {/* Desktop sidebar */}
       <div className="hidden lg:block">
-        <AdminSidebar onClose={() => setMobileNavOpen(false)} email={email} role={role} />
+        <AdminSidebar
+          onClose={() => setMobileNavOpen(false)}
+          email={email}
+          role={role}
+          bypassCode={bypassCode}
+          bypassCodeRotatesAt={bypassCodeRotatesAt}
+        />
       </div>
 
       {/* Mobile nav drawer */}
@@ -50,7 +60,13 @@ export function AdminLayoutClient({
               transition={{ type: 'spring', stiffness: 320, damping: 32 }}
               className="fixed inset-y-0 left-0 z-100 lg:hidden"
             >
-              <AdminSidebar onClose={() => setMobileNavOpen(false)} email={email} role={role} />
+              <AdminSidebar
+                onClose={() => setMobileNavOpen(false)}
+                email={email}
+                role={role}
+                bypassCode={bypassCode}
+                bypassCodeRotatesAt={bypassCodeRotatesAt}
+              />
             </motion.div>
           </>
         )}

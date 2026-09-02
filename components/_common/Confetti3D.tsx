@@ -4,10 +4,6 @@ import React, { useRef, useEffect } from 'react'
 import { useConfettiStore } from 'stores/confetti.store'
 import * as THREE from 'three'
 
-interface Confetti3DProps {
-  burstTrigger?: number
-}
-
 interface ConfettiUserData {
   velocity: { x: number; y: number; z: number }
   rotationSpeed: { x: number; y: number; z: number }
