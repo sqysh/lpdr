@@ -1,6 +1,6 @@
-import { T, TIERS } from 'lib/constants/subscriptions.constants'
+import { T, SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BillingInterval } from 'types/_my-pack.types'
+import { BillingInterval } from 'types/_subscriptions.types'
 
 export function MobileTierCard({
   tier,
@@ -9,7 +9,7 @@ export function MobileTierCard({
   onSelect,
   index
 }: {
-  tier: (typeof TIERS)[0]
+  tier: (typeof SUBSCRIPTION_TIERS)[number]
   billing: BillingInterval
   selected: boolean
   onSelect: () => void
@@ -148,9 +148,7 @@ export function MobileTierCard({
           >
             ${price}
           </motion.span>
-          <span className={`font-mono text-[9px] ${s.darkRank}`}>
-            /{billing === 'MONTHLY' ? 'mo' : 'yr'}
-          </span>
+          <span className={`font-mono text-[9px] ${s.darkRank}`}>/{billing === 'MONTHLY' ? 'mo' : 'yr'}</span>
         </div>
       </motion.button>
     </motion.div>

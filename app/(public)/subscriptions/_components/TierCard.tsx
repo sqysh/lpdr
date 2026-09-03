@@ -1,22 +1,16 @@
-import { useSounds } from 'lib/hooks/useSounds.hook'
-import { T, TIERS } from 'lib/constants/subscriptions.constants'
+import { T, SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BillingInterval } from 'types/_my-pack.types'
+import { BillingInterval } from 'types/_subscriptions.types'
 
-export function TierCard({
-  tier,
-  billing,
-  selected,
-  onSelect,
-  index
-}: {
-  tier: (typeof TIERS)[0]
+type Props = {
+  tier: (typeof SUBSCRIPTION_TIERS)[number]
   billing: BillingInterval
   selected: boolean
   onSelect: () => void
   index: number
-}) {
-  const { play } = useSounds({ enabled: true })
+}
+
+export function TierCard({ tier, billing, selected, onSelect, index }: Props) {
   const s = T[tier.tier]
   const price = tier.price[billing]
 
@@ -32,7 +26,6 @@ export function TierCard({
 
   return (
     <motion.div
-      onClick={() => play('se1')}
       key={tier.name}
       initial={{ opacity: 0, rotateY: 90 }}
       animate={{ opacity: 1, rotateY: 0 }}
@@ -150,10 +143,7 @@ export function TierCard({
         )}
 
         {/* ── Text ── */}
-        <span
-          className={`font-mono text-[9px] tracking-[.2em] uppercase pointer-events-none ${s.darkRank}`}
-          aria-hidden="true"
-        >
+        <span className={`font-mono text-[9px] tracking-[.2em] uppercase pointer-events-none ${s.darkRank}`} aria-hidden="true">
           {String(index + 1).padStart(2, '0')}
         </span>
 
@@ -165,9 +155,7 @@ export function TierCard({
           ${price}
         </motion.span>
 
-        <span className={`font-mono text-[9px] pointer-events-none ${s.darkRank}`}>
-          /{billing === 'MONTHLY' ? 'mo' : 'yr'}
-        </span>
+        <span className={`font-mono text-[9px] pointer-events-none ${s.darkRank}`}>/{billing === 'MONTHLY' ? 'mo' : 'yr'}</span>
 
         <span
           className={`font-bebas font-bold text-[10px] md:text-2xl lg:text-3xl text-center leading-tight px-2 pointer-events-none transition-colors duration-200 ${name_c}`}

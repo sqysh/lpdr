@@ -102,9 +102,8 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   useDefaultCard(savedCards, setDefaultCard)
 
   // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
 
   const handlePresetSelect = (amount: number) =>
     patch({ selectedAmount: amount, useCustom: false, customAmount: '' })
@@ -169,12 +168,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      aria-label="One-time donation form"
-      className="w-full space-y-5"
-    >
+    <form onSubmit={handleSubmit} noValidate aria-label="One-time donation form" className="w-full space-y-5">
       {/* Preset amounts */}
       <PresetAmounts inputs={inputs} onSelect={handlePresetSelect} />
 
@@ -266,13 +260,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
       <SignedInRow />
 
       {isAuthed && (
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={1.25}
-          className="space-y-5"
-        >
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={1.25} className="space-y-5">
           {/* ── Name + Email ── */}
           <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
             <FormField
@@ -329,9 +317,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
           {/* ── Card element ── */}
           {enteringNewCard && (
             <CardElementField
-              onChange={({ complete, error }) =>
-                patch({ cardComplete: complete, error: error ?? null })
-              }
+              onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })}
             />
           )}
 

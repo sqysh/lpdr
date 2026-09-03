@@ -1,7 +1,9 @@
-import { TIERS } from 'lib/constants/subscriptions.constants'
+import { useEffect, useRef, useState } from 'react'
+import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { motion } from 'framer-motion'
-import { ArrowLeft } from 'lucide-react'
+import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
+import { BillingInterval } from 'types/_subscriptions.types'
 
 export function StickyHeader({
   billing,
@@ -9,15 +11,33 @@ export function StickyHeader({
   onSubscribe,
   view
 }: {
-  billing: 'monthly' | 'yearly'
+  billing: BillingInterval
   selected: string | null
   onSubscribe: () => void
   view: string
 }) {
   const router = useRouter()
-  const selectedTier = TIERS.find((t) => t.id === selected)
+  const [loading, setLoading] = useState(false)
+  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  if (view !== 'select') return
+  const selectedTier = SUBSCRIPTION_TIERS.find((t) => t.id === selected)
+
+  useEffect(() => {
+    return () => {
+      if (timeout.current) clearTimeout(timeout.current)
+    }
+  }, [])
+
+  const handleSubscribe = () => {
+    if (loading) return
+    setLoading(true)
+    timeout.current = setTimeout(() => {
+      onSubscribe()
+      setLoading(false)
+    }, 1000)
+  }
+
+  if (view !== 'select') return null
 
   return (
     <motion.div
@@ -37,9 +57,7 @@ export function StickyHeader({
             <ArrowLeft size={14} aria-hidden="true" />
           </button>
           <span className="block w-4 h-px bg-primary-dark shrink-0" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">
-            Subscriptions
-          </p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">Subscriptions</p>
         </div>
 
         {/* Center — selected tier */}
@@ -54,29 +72,31 @@ export function StickyHeader({
             >
               {selectedTier.name}&nbsp;
               <span className="text-primary-dark">
-                ${selectedTier.price[billing]}/{billing === 'monthly' ? 'mo' : 'yr'}
+                ${selectedTier.price[billing]}/{billing === 'MONTHLY' ? 'mo' : 'yr'}
               </span>
             </motion.p>
           ) : (
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark">
-              Select a tier
-            </p>
+            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark">Select a tier</p>
           )}
         </div>
 
         {/* Right — CTA */}
-        {view === 'select' && (
-          <button
-            onClick={onSubscribe}
-            disabled={!selected}
-            aria-label={
-              selectedTier ? `Subscribe to ${selectedTier.name}` : 'Select a tier to subscribe'
-            }
-            className="shrink-0 px-4 py-1.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-dark text-bg-dark hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed"
-          >
-            Subscribe
-          </button>
-        )}
+        <button
+          onClick={handleSubscribe}
+          disabled={!selected || loading}
+          aria-busy={loading}
+          aria-label={selectedTier ? `Subscribe to ${selectedTier.name}` : 'Select a tier to subscribe'}
+          className="shrink-0 flex items-center gap-2 px-4 py-1.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-dark text-bg-dark hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed"
+        >
+          {loading ? (
+            <>
+              <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" />
+              Loading
+            </>
+          ) : (
+            'Subscribe'
+          )}
+        </button>
       </div>
     </motion.div>
   )

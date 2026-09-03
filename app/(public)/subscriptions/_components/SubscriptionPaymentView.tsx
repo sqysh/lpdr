@@ -74,7 +74,6 @@ export function SubscriptionPaymentView({
                   billing={billing}
                   savedCards={savedPaymentMethods}
                   isAuthed={isAuthed}
-                  userId={session.data.user.id}
                   firstName={userName.firstName}
                   lastName={userName.lastName}
                   email={session.data.user.email}

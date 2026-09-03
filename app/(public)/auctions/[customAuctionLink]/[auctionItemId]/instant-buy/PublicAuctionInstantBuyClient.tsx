@@ -121,23 +121,13 @@ export default function PublicAuctionInstantBuyClient({
   const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
 
   const hasName = !!inputs.firstName && !!inputs.lastName && !editingName
-  const hasAddress =
-    !!inputs.addressLine1 &&
-    !!inputs.city &&
-    !!inputs.state &&
-    !!inputs.zipPostalCode &&
-    !editingAddress
+  const hasAddress = !!inputs.addressLine1 && !!inputs.city && !!inputs.state && !!inputs.zipPostalCode && !editingAddress
 
   const addressRequired = !!auctionItem?.requiresShipping
   const addressReady = !addressRequired || hasAddress
 
   const isValid =
-    hasName &&
-    addressReady &&
-    !inputs.loading &&
-    !!stripe &&
-    !!elements &&
-    (usingSavedCard ? true : inputs.cardComplete)
+    hasName && addressReady && !inputs.loading && !!stripe && !!elements && (usingSavedCard ? true : inputs.cardComplete)
 
   // ── Cover photo ───────────────────────────────────────────────────────────
   const coverPhoto = auctionItem?.photos?.sort((a, b) => a.sortOrder - b.sortOrder)[0]?.url
@@ -282,9 +272,7 @@ export default function PublicAuctionInstantBuyClient({
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <span className="  text-f10 uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">
-              Instant Buy
-            </span>
+            <span className="  text-f10 uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">Instant Buy</span>
           </div>
           <h1 className="  text-2xl sm:text-3xl uppercase tracking-widest text-text-light dark:text-text-dark">
             Complete Purchase
@@ -369,11 +357,7 @@ export default function PublicAuctionInstantBuyClient({
 
               {enteringNewCard && (
                 <>
-                  <CardElementField
-                    onChange={({ complete, error }) =>
-                      patch({ cardComplete: complete, error: error ?? null })
-                    }
-                  />
+                  <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })} />
                   <Toggle
                     id="instant-buy-save-card"
                     label="Save card for future purchases"
@@ -392,16 +376,10 @@ export default function PublicAuctionInstantBuyClient({
 
               <FormError error={inputs.error} />
 
-              <SubmitButton
-                loading={inputs.loading}
-                isValid={isValid}
-                label="Buy Now"
-                price={`$${finalAmount.toFixed(2)}`}
-              />
+              <SubmitButton loading={inputs.loading} isValid={isValid} label="Buy Now" price={`$${finalAmount.toFixed(2)}`} />
 
               <p className="font-lato text-xs text-muted-light dark:text-muted-dark text-center leading-relaxed">
-                Your payment is secured by Stripe. Little Paws Dachshund Rescue will never store
-                your card details.
+                Your payment is secured by Stripe. Little Paws Dachshund Rescue will never store your card details.
               </p>
             </form>
           </section>

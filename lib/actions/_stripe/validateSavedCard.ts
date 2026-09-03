@@ -1,3 +1,5 @@
+import 'server-only'
+
 import { stripeClient } from 'lib/stripe/stripe-client'
 import prisma from 'prisma/client'
 

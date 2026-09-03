@@ -1,18 +1,10 @@
-import type {
-  Address,
-  OrderItemType,
-  OrderStatus,
-  OrderType,
-  PaymentStatus,
-  ShippingStatus
-} from '@prisma/client'
+import type { Address, OrderItemType, OrderStatus, OrderType, PaymentStatus, ShippingStatus } from '@prisma/client'
 import { IAdoptionFee } from './_adoption-fee'
 import { IPaymentMethod } from './_payment-method.types'
 import { IUser } from './_user'
-import { TIERS } from 'lib/constants/subscriptions.constants'
+import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { Dispatch, SetStateAction } from 'react'
-
-export type BillingInterval = 'MONTHLY' | 'YEARLY'
+import { BillingInterval } from './_subscriptions.types'
 
 export interface Donation {
   id: string
@@ -113,14 +105,14 @@ export interface MemberClientProps {
   hasPendingMigration: boolean
 }
 
-export type Tier = (typeof TIERS)[number]
+export type Tier = (typeof SUBSCRIPTION_TIERS)[number]
 export type TierId = Tier['id']
 
 export interface SubscriptionSelectorProps {
   billing: BillingInterval
   setBilling: Dispatch<SetStateAction<BillingInterval>>
   selected: TierId | null
-  setSelected: Dispatch<SetStateAction<TierId | null>>
+  setSelected: (value: TierId | null) => void
 }
 
 export interface AuctionPurchase {

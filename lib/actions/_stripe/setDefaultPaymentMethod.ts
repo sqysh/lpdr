@@ -5,25 +5,29 @@ import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import type { ActionResult } from 'types/_action.types'
 
-export const setDefaultPaymentMethod = async (id: string) => {
+export const setDefaultPaymentMethod = async (id: string): Promise<ActionResult<null>> => {
   const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
+
+  const { userId } = gate
 
   try {
-    const paymentMethod = await prisma.paymentMethod.findUnique({
-      where: { id },
-      select: { userId: true }
+    const paymentMethod = await prisma.paymentMethod.findFirst({
+      where: { id, userId },
+      select: { id: true }
     })
 
-    if (!paymentMethod) return { success: false, error: 'Payment method not found' }
-    if (paymentMethod.userId !== gate.userId) return { success: false, error: 'Unauthorized' }
+    if (!paymentMethod) {
+      return { success: false, data: null, error: 'Payment method not found' }
+    }
 
     const [details] = await Promise.all([
-      stampUserGeoFromRequest(gate.userId),
+      stampUserGeoFromRequest(userId),
       prisma.$transaction([
         prisma.paymentMethod.updateMany({
-          where: { userId: gate.userId },
+          where: { userId },
           data: { isDefault: false }
         }),
         prisma.paymentMethod.update({
@@ -34,7 +38,7 @@ export const setDefaultPaymentMethod = async (id: string) => {
     ])
 
     await createLog('info', 'Default payment method updated', {
-      userId: gate.userId,
+      userId,
       paymentMethodId: id,
       ip: details?.ip,
       device: details?.device,
@@ -42,13 +46,13 @@ export const setDefaultPaymentMethod = async (id: string) => {
       country: details?.geoCountry
     })
 
-    return { success: true }
+    return { success: true, data: null }
   } catch (error) {
     await createLog('error', 'Failed to set default payment method', {
-      userId: gate.userId,
+      userId,
       paymentMethodId: id,
       error: getErrorMessage(error)
     })
-    return { success: false, error: 'Failed to update payment method' }
+    return { success: false, data: null, error: 'Failed to update payment method' }
   }
 }

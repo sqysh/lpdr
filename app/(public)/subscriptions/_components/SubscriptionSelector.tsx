@@ -1,4 +1,4 @@
-import { T, TIERS } from 'lib/constants/subscriptions.constants'
+import { T, SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { motion } from 'framer-motion'
 import { TierCard } from './TierCard'
 import { MobileTierCard } from './MobileTierCard'
@@ -25,9 +25,7 @@ export function SubscriptionSelector({
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-dark" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">
-              Memberships
-            </p>
+            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">Memberships</p>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>
@@ -74,17 +72,14 @@ export function SubscriptionSelector({
         </div>
 
         {/* ── Tier grid — md+ ── */}
-        <div
-          className="hidden md:block"
-          style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}
-        >
+        <div className="hidden md:block" style={{ perspective: '1200px', transformStyle: 'preserve-3d' }}>
           <div
             role="list"
             aria-label="Subscription tiers"
             className="grid grid-rows-4 grid-flow-col gap-2 sm:gap-3 mb-10"
             style={{ transformStyle: 'preserve-3d' }}
           >
-            {TIERS.map((tier, i) => (
+            {SUBSCRIPTION_TIERS.map((tier, i) => (
               <div key={tier.id} role="listitem">
                 <TierCard
                   tier={tier}
@@ -101,7 +96,7 @@ export function SubscriptionSelector({
         {/* ── Tier list — mobile ── */}
         <div className="md:hidden mb-10">
           <ul role="list" aria-label="Subscription tiers" className="space-y-2">
-            {TIERS.map((tier, i) => (
+            {SUBSCRIPTION_TIERS.map((tier, i) => (
               <li key={tier.id} role="listitem">
                 <MobileTierCard
                   tier={tier}
@@ -118,10 +113,7 @@ export function SubscriptionSelector({
         {/* ── Trust bar ── */}
         <div className="flex items-center justify-center gap-6 sm:gap-10 flex-wrap">
           {['Cancel anytime', 'Secure payment', '100% goes to rescue'].map((item) => (
-            <span
-              key={item}
-              className="flex items-center gap-2 text-[11px] text-muted-dark font-mono"
-            >
+            <span key={item} className="flex items-center gap-2 text-[11px] text-muted-dark font-mono">
               <span className="w-1 h-1 bg-primary-dark" aria-hidden="true" />
               {item}
             </span>

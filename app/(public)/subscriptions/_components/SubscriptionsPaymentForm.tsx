@@ -6,7 +6,7 @@ import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
-import { Tier } from 'types/_subscriptions.types'
+import { BillingInterval, Tier } from 'types/_subscriptions.types'
 import { createSubscriptionWithSavedCard } from 'lib/actions/_stripe/createSubscriptionWithSavedCard'
 import { createSetupIntentForSubscription } from 'lib/actions/_stripe/createSetupIntentForSubscription'
 import { createSubscriptionAfterSetup } from 'lib/actions/_stripe/createSubscriptionAfterSetup'
@@ -31,10 +31,9 @@ type PaymentInputs = {
 
 type Props = {
   tier: Tier
-  billing: 'MONTHLY' | 'YEARLY'
+  billing: BillingInterval
   savedCards: IPaymentMethod[]
   isAuthed: boolean
-  userId: string | null
   firstName: string
   lastName: string
   email: string
@@ -46,7 +45,6 @@ export function SubscriptionPaymentForm({
   billing,
   savedCards,
   isAuthed,
-  userId,
   firstName: initialFirstName,
   lastName: initialLastName,
   email: initialEmail,
@@ -80,18 +78,13 @@ export function SubscriptionPaymentForm({
   })
 
   const patch = (data: Partial<PaymentInputs>) => setInputs((prev) => ({ ...prev, ...data }))
-  const handleInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => {
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
   }
   // ── Derived ──
   const baseAmount = tier.price[billing]
   const processingFee = calculateStripeFees(baseAmount)
-  const finalAmount = inputs.coverFees
-    ? Math.round((baseAmount + processingFee) * 100) / 100
-    : baseAmount
-  const feesCovered = inputs.coverFees ? processingFee : 0
+  const finalAmount = inputs.coverFees ? Math.round((baseAmount + processingFee) * 100) / 100 : baseAmount
   const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && isAuthed
   const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
 
@@ -113,17 +106,11 @@ export function SubscriptionPaymentForm({
     try {
       const name = `${inputs.firstName.trim()} ${inputs.lastName.trim()}`
       const email = inputs.email.trim()
-      const amountInCents = Math.round(finalAmount * 100)
 
       const basePayload = {
-        userId,
-        email,
-        name,
-        amount: amountInCents,
+        tierId: tier.id,
         frequency: billing,
-        coverFees: inputs.coverFees,
-        feesCovered,
-        tierName: tier.name
+        coverFees: inputs.coverFees
       }
 
       if (inputs.selectedCardId && !inputs.useNewCard) {
@@ -132,16 +119,15 @@ export function SubscriptionPaymentForm({
           savedCardId: inputs.selectedCardId
         })
         if (!result.success) throw new Error(result.error ?? 'Failed to create subscription')
-        setupPusherListenerRecurring({ subscriptionId: result.subscriptionId })
+        setupPusherListenerRecurring({ subscriptionId: result.data.subscriptionId })
       } else {
         const setupResult = await createSetupIntentForSubscription(basePayload)
-        if (!setupResult.success)
-          throw new Error(setupResult.error ?? 'Failed to create setup intent')
+        if (!setupResult.success) throw new Error(setupResult.error ?? 'Failed to create setup intent')
 
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) throw new Error('Card element not found')
 
-        const { error: stripeError } = await stripe.confirmCardSetup(setupResult.clientSecret!, {
+        const { error: stripeError } = await stripe.confirmCardSetup(setupResult.data.clientSecret, {
           payment_method: { card: cardElement, billing_details: { email, name } }
         })
 
@@ -152,12 +138,13 @@ export function SubscriptionPaymentForm({
 
         const subscriptionResult = await createSubscriptionAfterSetup({
           ...basePayload,
-          setupIntentId: setupResult.setupIntentId!
+          setupIntentId: setupResult.data.setupIntentId
         })
-        if (!subscriptionResult.success)
-          throw new Error(subscriptionResult.error ?? 'Failed to create subscription')
+        if (!subscriptionResult.success) throw new Error(subscriptionResult.error ?? 'Failed to create subscription')
 
-        setupPusherListenerRecurring({ subscriptionId: subscriptionResult.subscriptionId })
+        setupPusherListenerRecurring({
+          subscriptionId: subscriptionResult.data.subscriptionId
+        })
       }
     } catch (err) {
       patch({
@@ -168,27 +155,16 @@ export function SubscriptionPaymentForm({
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      aria-label="Subscription payment form"
-      className="dark space-y-5 max-w-lg"
-    >
+    <form onSubmit={handleSubmit} noValidate aria-label="Subscription payment form" className="dark space-y-5 max-w-lg">
       {/* ── Plan summary ── */}
       <div className={`flex items-center justify-between px-4 py-3 border ${c.box}`}>
         <div>
-          <p className={`text-[10px] font-mono tracking-[0.2em] uppercase mb-0.5 ${c.muted}`}>
-            {billing} plan
-          </p>
+          <p className={`text-[10px] font-mono tracking-[0.2em] uppercase mb-0.5 ${c.muted}`}>{billing} plan</p>
           <p className={`font-quicksand font-black text-sm ${c.text}`}>{tier.name}</p>
         </div>
         <div className="text-right">
-          <p className={`font-quicksand font-black text-xl tabular-nums ${c.primary}`}>
-            ${baseAmount}
-          </p>
-          <p className={`text-[10px] font-mono ${c.muted}`}>
-            /{billing === 'MONTHLY' ? 'mo' : 'yr'}
-          </p>
+          <p className={`font-quicksand font-black text-xl tabular-nums ${c.primary}`}>${baseAmount}</p>
+          <p className={`text-[10px] font-mono ${c.muted}`}>/{billing === 'MONTHLY' ? 'mo' : 'yr'}</p>
         </div>
       </div>
 
@@ -237,31 +213,23 @@ export function SubscriptionPaymentForm({
           useNewCard={inputs.useNewCard}
           onSelectCard={(id) => patch({ selectedCardId: id })}
           onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-          onUseSavedCard={() =>
-            patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
-          }
+          onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
         />
       )}
 
       {/* Card element */}
       {enteringNewCard && (
-        <CardElementField
-          onChange={({ complete, error }) => patch({ cardComplete: complete, error })}
-        />
+        <CardElementField isDark={dark} onChange={({ complete, error }) => patch({ cardComplete: complete, error })} />
       )}
 
       {/* Cover fees */}
-      <CoverFeesToggle
-        checked={inputs.coverFees}
-        onChange={(v) => patch({ coverFees: v })}
-        processingFee={processingFee}
-      />
+      <CoverFeesToggle checked={inputs.coverFees} onChange={(v) => patch({ coverFees: v })} processingFee={processingFee} />
 
       {/* ── Card storage note (replaces SaveCardToggle — saving is required for subscriptions) ── */}
       {enteringNewCard && (
         <p className={`text-[10px] font-mono leading-relaxed ${c.muted}`}>
-          Your card will be securely saved with Stripe to process your recurring{' '}
-          {billing === 'MONTHLY' ? 'monthly' : 'yearly'} payments.
+          Your card will be securely saved with Stripe to process your recurring {billing === 'MONTHLY' ? 'monthly' : 'yearly'}{' '}
+          payments.
         </p>
       )}
 

@@ -105,21 +105,13 @@ export function Step4Payment({
       {enteringNewCard && (
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4} className="mb-6">
           <CardElementField
-            onChange={({ complete, error }) =>
-              patch({ cardComplete: complete, error: error ?? null })
-            }
+            onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })}
           />
         </motion.div>
       )}
 
       {/* Options */}
-      <motion.div
-        variants={fadeUp}
-        initial="hidden"
-        animate="show"
-        custom={4.5}
-        className="mb-6 space-y-2"
-      >
+      <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4.5} className="mb-6 space-y-2">
         <CoverFeesToggle
           checked={inputs.coverFees}
           onChange={() => patch({ coverFees: !inputs.coverFees })}

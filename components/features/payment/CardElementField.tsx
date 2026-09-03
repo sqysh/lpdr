@@ -3,10 +3,12 @@ import { useThemeStore } from 'stores/theme.store'
 
 type Props = {
   onChange: (state: { complete: boolean; error: string | null }) => void
+  isDark?: boolean
 }
 
-export function CardElementField({ onChange }: Props) {
-  const isDark = useThemeStore((s) => s.isDark)
+export function CardElementField({ onChange, isDark }: Props) {
+  const storeDark = useThemeStore((s) => s.isDark)
+  const dark = isDark ?? storeDark
 
   return (
     <div>
@@ -26,11 +28,11 @@ export function CardElementField({ onChange }: Props) {
           options={{
             style: {
               base: {
-                color: isDark ? '#f1f0ff' : '#09090b',
+                color: dark ? '#f1f0ff' : '#09090b',
                 backgroundColor: 'transparent',
                 fontSize: '14px',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                '::placeholder': { color: isDark ? '#4a4a6a' : '#a1a1aa' }
+                '::placeholder': { color: dark ? '#4a4a6a' : '#a1a1aa' }
               },
               invalid: { color: '#ef4444' }
             }

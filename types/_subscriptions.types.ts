@@ -1,3 +1,6 @@
+import { RecurringFrequency } from '@prisma/client'
+import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
+
 export type Tier = {
   id: string
   name: string
@@ -7,3 +10,8 @@ export type Tier = {
 }
 
 export type TierKey = 'bronze' | 'silver' | 'gold' | 'elite'
+
+export type SubscriptionTier = (typeof SUBSCRIPTION_TIERS)[number]
+export type SubscriptionTierId = SubscriptionTier['id']
+
+export type BillingInterval = RecurringFrequency

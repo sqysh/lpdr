@@ -1,42 +1,59 @@
 'use server'
 
+import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
 import { stripeClient } from '../../stripe/stripe-client'
-import { RecurringFrequency } from '@prisma/client'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { grossUpCents } from 'lib/utils/fees.utils'
+import { parseInput } from 'lib/utils/validate.utils'
+import { createSetupIntentForSubscriptionSchema } from 'lib/schemas/subscription.schema'
+import type { ActionResult } from 'types/_action.types'
+import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 
-interface SetupIntentParams {
-  userId?: string
-  email: string
-  name: string
-  amount: number
-  frequency: RecurringFrequency
-  coverFees?: boolean
-  feesCovered?: number
-  tierName: string
+type SetupIntentData = {
+  clientSecret: string
+  setupIntentId: string
+  customerId: string
 }
 
-export async function createSetupIntentForSubscription({
-  userId,
-  email,
-  name,
-  amount,
-  frequency,
-  coverFees = false,
-  feesCovered = 0,
-  tierName
-}: SetupIntentParams) {
-  const gate = await requireAuth()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+const fail = (error: string): ActionResult<SetupIntentData> => ({
+  success: false,
+  data: null,
+  error
+})
 
-  if (amount < 500) return { success: false, error: 'Minimum donation is $5', data: null }
-  if (!userId)
-    return { success: false, error: 'Please sign in to start a subscription.', data: null }
+export async function createSetupIntentForSubscription(
+  input: unknown
+): Promise<ActionResult<SetupIntentData>> {
+  const gate = await requireAuth()
+  if (gate.ok === false) return fail(gate.error)
+
+  const parsed = parseInput(createSetupIntentForSubscriptionSchema, input)
+  if (parsed.ok === false) return parsed.result
+
+  const { tierId, frequency, coverFees } = parsed.data
+  const { userId } = gate
 
   try {
-    const customerId = await getOrCreateStripeCustomer({ userId, email })
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { firstName: true, lastName: true, email: true }
+    })
+
+    if (!user?.email) return fail('Your account is missing an email address.')
+
+    const tier = SUBSCRIPTION_TIERS.find((t) => t.id === tierId)
+    if (!tier) return fail('That membership tier is no longer available.')
+
+    const baseCents = Math.round(tier.price[frequency] * 100)
+    const amountCents = coverFees ? grossUpCents(baseCents) : baseCents
+    const feesCoveredCents = amountCents - baseCents
+
+    const displayName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.email
+
+    const customerId = await getOrCreateStripeCustomer({ userId, email: user.email })
 
     const setupIntent = await stripeClient.setupIntents.create({
       customer: customerId,
@@ -44,33 +61,36 @@ export async function createSetupIntentForSubscription({
       usage: 'off_session',
       metadata: {
         userId,
-        email,
-        name,
+        email: user.email,
+        name: displayName,
         frequency,
-        amount: amount.toString(),
+        tierId: tier.id,
+        tierName: tier.name,
+        amount: amountCents.toString(),
         type: 'RECURRING_DONATION',
         coverFees: coverFees ? 'true' : 'false',
-        feesCovered: feesCovered.toString(),
-        tierName
+        feesCovered: (feesCoveredCents / 100).toFixed(2)
       }
     })
 
+    if (!setupIntent.client_secret) {
+      return fail('Could not start card setup. Please try again.')
+    }
+
     return {
       success: true,
-      clientSecret: setupIntent.client_secret,
-      setupIntentId: setupIntent.id,
-      customerId
+      data: {
+        clientSecret: setupIntent.client_secret,
+        setupIntentId: setupIntent.id,
+        customerId
+      }
     }
   } catch (error) {
     await createLog('error', 'SetupIntent creation failed', {
       error: getErrorMessage(error),
-      userId,
-      email
+      userId
     })
 
-    return {
-      success: false,
-      error: getErrorMessage(error)
-    }
+    return fail('Could not start card setup. Please try again.')
   }
 }

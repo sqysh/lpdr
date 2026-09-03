@@ -51,9 +51,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
 
   // ── Derived values ───
   const processingFee = calculateStripeFees(ADOPTION_FEE_DOLLARS)
-  const finalAmount = payment.coverFees
-    ? ADOPTION_FEE_DOLLARS + processingFee
-    : ADOPTION_FEE_DOLLARS
+  const finalAmount = payment.coverFees ? ADOPTION_FEE_DOLLARS + processingFee : ADOPTION_FEE_DOLLARS
   const usingSavedCard = !!payment.selectedCardId && !payment.useNewCard && isAuthed
 
   const isValid = usingSavedCard ? true : payment.cardComplete
@@ -140,9 +138,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
 
       {/* ── Card element ── */}
       {(!isAuthed || savedCards.length === 0 || payment.useNewCard) && (
-        <CardElementField
-          onChange={({ complete, error }) => patch({ cardComplete: complete, error })}
-        />
+        <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error })} />
       )}
 
       {/* ── Cover fees ── */}
@@ -184,8 +180,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
           <rect x="3" y="11" width="18" height="11" />
           <path d="M7 11V7a5 5 0 0110 0v4" />
         </svg>
-        Secured by Stripe. We never store your card details. All donations are final and
-        non-refundable.
+        Secured by Stripe. We never store your card details. All donations are final and non-refundable.
       </p>
     </form>
   )
