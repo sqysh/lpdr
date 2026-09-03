@@ -4,7 +4,6 @@ import { useCallback, useState } from 'react'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { Tier } from 'types/_subscriptions.types'
@@ -16,6 +15,7 @@ import { ordinal } from 'lib/utils/date.utils'
 import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { CardElementField } from 'components/features/payment/CardElementField'
 import { useThemeStore } from 'stores/theme.store'
+import { calculateStripeFees } from 'lib/utils/fees.utils'
 
 type PaymentInputs = {
   firstName: string

@@ -20,7 +20,7 @@ export default function CartClient() {
   )
   const shipping = items
     .filter((i: { isPhysicalProduct: boolean }) => i.isPhysicalProduct)
-    .reduce((sum: number, i) => sum + i.shippingPrice * i.quantity, 0)
+    .reduce((sum: number, i) => sum + (i.shippingPrice ?? 0), 0)
 
   const total = subtotal + shipping
   const itemCount = items.reduce((s: any, i: { quantity: number }) => s + i.quantity, 0)

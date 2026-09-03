@@ -119,7 +119,7 @@ export default function ProductForm({ product }: { product?: IProduct }) {
         <div className="1000:col-span-4 flex flex-col gap-6">
           <ProductSettingsSection form={form} set={set} />
           <ProductSummarySection form={form} countInStock={countInStock} />
-          <ProductDangerSection productId={product.id} productName={form.name ?? ''} />
+          <ProductDangerSection productId={product?.id ?? null} productName={form.name ?? ''} />
         </div>
       </div>
     </div>

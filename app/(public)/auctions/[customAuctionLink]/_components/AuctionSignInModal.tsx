@@ -13,7 +13,8 @@ export function AuctionSignInModal() {
   const [magicLinkSent, setMagicLinkSent] = useState(false)
   const closeSignInModal = useAuctionUiStore((s) => s.closeSignInModal)
   const signInRedirectTo = useAuctionUiStore((s) => s.signInRedirectTo)
-  const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
+
+  const isOpen = signInRedirectTo !== null
 
   const onClose = () => {
     closeSignInModal()
@@ -23,7 +24,7 @@ export function AuctionSignInModal() {
 
   return (
     <AnimatePresence>
-      {openSignInModal && (
+      {isOpen && (
         <>
           {/* Backdrop */}
           <motion.div

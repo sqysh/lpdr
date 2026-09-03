@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { X, CreditCard, ShieldCheck, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
+import { X, ShieldCheck, Loader2, AlertCircle, CheckCircle } from 'lucide-react'
 import { CardElement, useStripe, useElements } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
 import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
@@ -33,7 +33,6 @@ export default function AddPaymentMethodModal() {
 
   const [cardholderName, setCardholderName] = useState('')
   const [cardComplete, setCardComplete] = useState(false)
-  const [isDefault, setIsDefault] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
@@ -42,7 +41,6 @@ export default function AddPaymentMethodModal() {
     closeModal()
     setCardholderName('')
     setCardComplete(false)
-    setIsDefault(false)
     setError(null)
     setSuccess(false)
   }
@@ -64,7 +62,7 @@ export default function AddPaymentMethodModal() {
     try {
       const setupRes = await getSetupIntentClientSecret()
 
-      if (!setupRes.success || !setupRes.clientSecret) {
+      if (!setupRes.success || !setupRes.data.clientSecret) {
         throw new Error(setupRes.error || 'Failed to get client secret')
       }
 
@@ -72,7 +70,7 @@ export default function AddPaymentMethodModal() {
       if (!cardElement) throw new Error('Card element not found')
 
       const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
-        setupRes.clientSecret,
+        setupRes.data.clientSecret,
         {
           payment_method: {
             card: cardElement,
@@ -92,7 +90,7 @@ export default function AddPaymentMethodModal() {
 
       const result = await createPaymentMethod({
         stripePaymentMethodId: paymentMethodId,
-        isDefault,
+        isDefault: true,
         cardholderName: cardholderName || undefined
       })
 
@@ -100,8 +98,13 @@ export default function AddPaymentMethodModal() {
         throw new Error(result.error || 'Failed to save payment method')
       }
 
+      if (result.data.alreadySaved) {
+        setError('That card is already saved to your account.')
+        setIsSubmitting(false)
+        return
+      }
+
       router.refresh()
-      setIsDefault(false)
       setCardholderName('')
       setSuccess(true)
       setTimeout(() => {
@@ -248,50 +251,6 @@ export default function AddPaymentMethodModal() {
                     }}
                   />
                 </div>
-              </div>
-
-              {/* Set as default toggle */}
-              <div>
-                <label id="options-label" className={fieldLabel}>
-                  Options
-                </label>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={isDefault}
-                  aria-label="Set as default payment method"
-                  onClick={() => setIsDefault(!isDefault)}
-                  className={`w-full flex items-center justify-between p-4 border border-zinc-200 dark:border-border-dark hover:border-cyan-600/40 dark:hover:border-violet-400/40 bg-zinc-50 dark:bg-[#13131f] transition-colors ${accentRing}`}
-                >
-                  <div className="flex items-center gap-3">
-                    <CreditCard
-                      className="w-4 h-4 text-zinc-400 dark:text-muted-dark/50 shrink-0"
-                      aria-hidden="true"
-                    />
-                    <div className="text-left">
-                      <p className="text-sm uppercase tracking-wide leading-none mb-0.5 text-zinc-950 dark:text-text-dark">
-                        Set as default
-                      </p>
-                      <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">
-                        Use this card for future payments
-                      </p>
-                    </div>
-                  </div>
-                  <div
-                    aria-hidden="true"
-                    className={`relative w-10 h-5 transition-colors duration-200 shrink-0 ${
-                      isDefault
-                        ? 'bg-cyan-600 dark:bg-violet-500'
-                        : 'bg-zinc-300 dark:bg-border-dark'
-                    }`}
-                  >
-                    <span
-                      className={`absolute top-0.5 w-4 h-4 bg-white transition-transform duration-200 ${
-                        isDefault ? 'translate-x-0.5' : '-translate-x-4.5'
-                      }`}
-                    />
-                  </div>
-                </button>
               </div>
 
               {/* Security note */}

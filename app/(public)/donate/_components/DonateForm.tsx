@@ -6,7 +6,6 @@ import { useCallback, useState } from 'react'
 import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { OrderType } from '@prisma/client'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
 import { formatWithCommas } from 'lib/utils/currency.utils'
@@ -18,6 +17,9 @@ import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { CardElementField } from 'components/features/payment/CardElementField'
+import { calculateStripeFees } from 'lib/utils/fees.utils'
+import { useSearchParams } from 'next/navigation'
+import { DONATION_PRESETS } from 'lib/constants/donation.constants'
 
 export interface PaymentInputs {
   // amount
@@ -52,18 +54,17 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   const elements = useElements()
   const { setupPusherListenerOneTime } = usePaymentProcessor()
 
-  // ── URL param: pre-fill amount (e.g. from StepSignIn redirect) ────────────
-  // Resolved once on mount via useSearchParams — keeps seeding synchronous.
-  const searchParams = new URLSearchParams(
-    typeof window !== 'undefined' ? window.location.search : ''
-  )
+  const searchParams = useSearchParams()
   const donationAmountFromUrl = searchParams.get('donationAmount')
+  const parsed = Number(donationAmountFromUrl)
+  const seededAmount = Number.isFinite(parsed) && parsed > 0 ? parsed : 25
+  const seeded = Number.isFinite(parsed) && parsed > 0 ? parsed : null
+  const seededIsPreset = seeded !== null && DONATION_PRESETS.includes(seeded)
 
-  // ── Local state ───────────────────────────────────────────────────────────
   const [inputs, setInputs] = useState<PaymentInputs>({
-    selectedAmount: donationAmountFromUrl ? Number(donationAmountFromUrl) : 25,
-    useCustom: false,
-    customAmount: '',
+    selectedAmount: seededAmount,
+    useCustom: seeded !== null && !seededIsPreset,
+    customAmount: seeded !== null && !seededIsPreset ? String(seeded) : '',
     coverFees: false,
     cardComplete: false,
     selectedCardId: savedCards[0]?.stripePaymentId ?? null,
@@ -82,10 +83,9 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
 
   // ── Derived values ────────────────────────────────────────────────────────
   const donationAmount = inputs.useCustom
-    ? Math.max(5, parseFloat(inputs.customAmount) || 0)
+    ? parseFloat(inputs.customAmount) || 0
     : (inputs.selectedAmount ?? 0)
   const processingFee = calculateStripeFees(donationAmount)
-  const feesCovered = inputs.coverFees ? processingFee : 0
   const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && isAuthed
   const finalAmount = inputs.coverFees ? donationAmount + processingFee : donationAmount
   const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
@@ -119,14 +119,10 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
     try {
       const name = `${inputs?.firstName?.trim()} ${inputs?.lastName?.trim()}`
       const trimmedEmail = inputs.email.trim()
-      const amountInCents = Math.round(finalAmount * 100)
 
       const basePayload = {
-        email: trimmedEmail,
-        name,
-        amount: amountInCents,
+        amount: Math.round(donationAmount * 100),
         coverFees: inputs?.coverFees,
-        feesCovered,
         orderType: 'ONE_TIME_DONATION' as OrderType
       }
 
@@ -151,7 +147,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
 
         if (!intentResult.success) throw new Error(intentResult.error)
 
-        const result = await stripe.confirmCardPayment(intentResult.clientSecret!, {
+        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
           payment_method: {
             card: cardElement,
             billing_details: { name, email: trimmedEmail }
@@ -244,7 +240,6 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
       </motion.div>
 
       {/* ── Amount display ── */}
-
       {donationAmount >= 5 && (
         <motion.div
           key={donationAmount}
@@ -266,7 +261,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
         </motion.div>
       )}
 
-      {!isAuthed && <StepSignIn redirectTo={`/donate?donationAmount=${inputs?.selectedAmount}`} />}
+      {!isAuthed && <StepSignIn redirectTo={`/donate?donationAmount=${donationAmount}`} />}
 
       <SignedInRow />
 

@@ -1,9 +1,7 @@
 import { useCallback, useState } from 'react'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { OrderType } from '@prisma/client'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
-import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
@@ -12,6 +10,8 @@ import { FormError, SubmitButton } from 'components/_primitives'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { CardElementField } from 'components/features/payment/CardElementField'
+import { ADOPTION_FEE_DOLLARS } from 'lib/constants/adoption-fees.constants'
+import { calculateStripeFees } from 'lib/utils/fees.utils'
 
 type PaymentInputs = {
   selectedCardId: string | null
@@ -50,17 +50,13 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
   const patch = (data: Partial<PaymentInputs>) => setPayment((prev) => ({ ...prev, ...data }))
 
   // ── Derived values ───
-  const feeAmount = 15
-  const processingFee = calculateStripeFees(feeAmount)
-  const feesCovered = payment.coverFees ? processingFee : 0
-  const finalAmount = payment.coverFees ? feeAmount + processingFee : feeAmount
+  const processingFee = calculateStripeFees(ADOPTION_FEE_DOLLARS)
+  const finalAmount = payment.coverFees
+    ? ADOPTION_FEE_DOLLARS + processingFee
+    : ADOPTION_FEE_DOLLARS
   const usingSavedCard = !!payment.selectedCardId && !payment.useNewCard && isAuthed
 
-  const isValid =
-    !!firstName.trim() &&
-    !!lastName.trim() &&
-    EMAIL_REGEX.test(email) &&
-    (usingSavedCard ? true : payment.cardComplete)
+  const isValid = usingSavedCard ? true : payment.cardComplete
 
   // ── Hooks ─────────────────────────────────────────────────────────────────
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
@@ -76,15 +72,10 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
     try {
       const name = `${firstName.trim()} ${lastName.trim()}`
       const trimmedEmail = email.trim()
-      const amountInCents = Math.round(finalAmount * 100)
 
       const basePayload = {
-        email: trimmedEmail,
-        name,
-        amount: amountInCents,
-        coverFees: payment.coverFees,
-        feesCovered,
-        orderType: 'ADOPTION_FEE' as OrderType
+        orderType: 'ADOPTION_FEE' as OrderType,
+        coverFees: payment.coverFees
       }
 
       if (usingSavedCard) {
@@ -93,7 +84,9 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
           savedCardId: payment.selectedCardId
         })
 
-        if (!result.success) throw new Error(result.error)
+        if (!result.success) {
+          throw new Error(result.error)
+        }
 
         setupPusherListenerOneTime()
       } else {
@@ -102,18 +95,13 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
         if (!cardElement) throw new Error('Card element not found')
 
         const intentResult = await createPaymentIntent({
-          amount: amountInCents,
-          name,
-          email: trimmedEmail,
-          orderType: 'ADOPTION_FEE',
-          saveCard: payment.saveCard,
-          coverFees: payment.coverFees,
-          feesCovered
+          ...basePayload,
+          saveCard: payment.saveCard
         })
 
         if (!intentResult.success) throw new Error(intentResult.error)
 
-        const result = await stripe.confirmCardPayment(intentResult.clientSecret!, {
+        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
           payment_method: {
             card: cardElement,
             billing_details: { name, email: trimmedEmail }
@@ -180,7 +168,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
       <SubmitButton
         loading={payment.loading}
         isValid={isValid}
-        label={`Pay $${payment.coverFees ? finalAmount.toFixed(2) : feeAmount.toFixed(2)}`}
+        label={`Pay $${payment.coverFees ? finalAmount.toFixed(2) : ADOPTION_FEE_DOLLARS.toFixed(2)}`}
       />
 
       <p className="flex items-center justify-center gap-2 text-[10px] font-mono text-muted-light dark:text-muted-dark">

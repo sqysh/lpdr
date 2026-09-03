@@ -125,7 +125,7 @@ export default function PublicDonateClient({
               initial="hidden"
               animate="show"
               custom={0.5}
-              className="lg:sticky lg:top-8 space-y-8"
+              className="lg:sticky lg:top-14 space-y-8"
               aria-label="About Little Paws Dachshund Rescue"
             >
               {/* Mission */}

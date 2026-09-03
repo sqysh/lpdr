@@ -1,13 +1,12 @@
 import { fadeUp } from 'lib/constants/motion.constants'
 import { AnimatePresence, motion } from 'framer-motion'
 import { PaymentInputs } from './DonateForm'
+import { DONATION_PRESETS } from 'lib/constants/donation.constants'
 
 interface PresetAmountsProps {
   inputs: PaymentInputs
   onSelect: (amount: number) => void
 }
-
-const PRESET_AMOUNTS = [10, 25, 50, 100, 250, 500]
 
 export function PresetAmounts({ inputs, onSelect }: PresetAmountsProps) {
   return (
@@ -22,7 +21,7 @@ export function PresetAmounts({ inputs, onSelect }: PresetAmountsProps) {
         Select Amount
       </legend>
       <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset donation amounts">
-        {PRESET_AMOUNTS.map((amount) => {
+        {DONATION_PRESETS.map((amount) => {
           const isSelected = !inputs.useCustom && inputs.selectedAmount === amount
           return (
             <motion.button

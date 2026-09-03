@@ -17,11 +17,12 @@ import Picture from 'components/_common/Picture'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 import { ORDER_TYPE_CONFIG } from 'lib/constants/order.constants'
-import { formatWithCommas } from 'lib/utils/currency.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 import { useSearchParams } from 'next/navigation'
 import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
 import { useCartStore } from 'stores/cart.store'
 import { useConfettiStore } from 'stores/confetti.store'
+import { OrderItem } from '@prisma/client'
 
 export default function OrderConfirmationClient({ order }) {
   const clearCart = useCartStore((s) => s.clearCart)
@@ -160,7 +161,7 @@ export default function OrderConfirmationClient({ order }) {
           {/* Items */}
           {order?.items.length > 0 ? (
             <div className="divide-y divide-zinc-200 dark:divide-border-dark">
-              {order?.items.map((item) => {
+              {order?.items.map((item: OrderItem) => {
                 const Icon = item.iconKey ? (ITEM_ICONS[item.iconKey] ?? Utensils) : null
                 return (
                   <div key={item.id} className="flex items-center gap-4 px-5 py-4">
@@ -197,6 +198,11 @@ export default function OrderConfirmationClient({ order }) {
                           Qty: {item.quantity}
                         </p>
                       )}
+                      {item.shippingPrice != null && Number(item.shippingPrice) > 0 && (
+                        <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50 mt-0.5">
+                          + {formatMoney(Number(item.shippingPrice))} shipping
+                        </p>
+                      )}
                       {item.isPhysical && (
                         <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50 mt-0.5">
                           Shipping details to follow
@@ -204,7 +210,7 @@ export default function OrderConfirmationClient({ order }) {
                       )}
                     </div>
                     <span className="shrink-0 text-sm tabular-nums text-zinc-950 dark:text-text-dark">
-                      ${(item.totalPrice ?? item.price).toFixed(2)}
+                      {formatMoney(Number(item.totalPrice))}
                     </span>
                   </div>
                 )
@@ -241,7 +247,7 @@ export default function OrderConfirmationClient({ order }) {
                     Subtotal
                   </span>
                   <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
-                    ${formatWithCommas(subtotal.toFixed(2))}
+                    {formatMoney(subtotal)}
                   </span>
                 </div>
                 <div className="flex justify-between items-center">
@@ -276,7 +282,7 @@ export default function OrderConfirmationClient({ order }) {
                 Total
               </span>
               <span className="  text-2xl tabular-nums text-cyan-600 dark:text-violet-400">
-                ${formatWithCommas(order?.totalAmount.toFixed(2))}
+                {formatMoney(order?.totalAmount)}
               </span>
             </div>
           </div>

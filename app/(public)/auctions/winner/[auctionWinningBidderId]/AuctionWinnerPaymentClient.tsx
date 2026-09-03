@@ -12,9 +12,9 @@ import { fadeUp } from 'lib/constants/motion.constants'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { AuctionReceipt, WinnerOrderSummary } from './_components'
 import { PaymentHandlers, PaymentState, WinnerPaymentForm } from './_components/WinnerPaymentForm'
+import { calculateStripeFees } from 'lib/utils/fees.utils'
 
 type WinnerFormInputs = {
   selectedCardId: string | null
@@ -57,9 +57,9 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
   const alreadyPaid = winningBidder?.winningBidPaymentStatus === 'PAID'
   const total = winningBidder.auctionItems.reduce((sum, item) => sum + item.soldPrice, 0)
   const shipping = winningBidder.shipping ?? 0
-  const processingFee = calculateStripeFees(total)
-  const feesCovered = inputs.coverFees ? processingFee : 0
-  const finalAmount = inputs.coverFees ? total + shipping + processingFee : total + shipping
+  const subtotal = total + shipping
+  const processingFee = calculateStripeFees(subtotal)
+  const finalAmount = inputs.coverFees ? subtotal + processingFee : subtotal
   const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && !!session.data?.user
   const isValid = usingSavedCard ? true : inputs.cardComplete
 
@@ -75,14 +75,9 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
     patch({ loading: true, error: null })
 
     try {
-      const finalAmountInCents = Math.round(finalAmount * 100)
       const basePayload = {
-        amount: finalAmountInCents,
-        name,
-        email,
         orderType: 'AUCTION_PURCHASE' as const,
         coverFees: inputs.coverFees,
-        feesCovered,
         winningBidderId: winningBidder.id
       }
 
@@ -103,7 +98,7 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
         })
         if (!intentResult.success) throw new Error(intentResult.error)
 
-        const result = await stripe.confirmCardPayment(intentResult.clientSecret!, {
+        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
           payment_method: { card: cardElement, billing_details: { name, email } }
         })
 
@@ -159,7 +154,7 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards }
               </span>
             </div>
             <Link
-              href=" /my-pack"
+              href="/my-pack"
               className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors"
             >
               <User className="w-3 h-3" aria-hidden="true" />

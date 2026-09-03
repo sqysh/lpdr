@@ -63,7 +63,15 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
             <p className="text-base text-muted-light dark:text-muted-dark leading-relaxed">
               Thank you for taking the next step toward adopting a Little Paws dachshund. Please
               complete the application below. Our team will review your submission and be in touch
-              within 3–5 business days.
+              within 3–5 business days. If you need to step away, you can pick this back up any time
+              from{' '}
+              <Link
+                href="/my-pack"
+                className="text-primary-light dark:text-primary-dark hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              >
+                My Pack
+              </Link>
+              .
             </p>
           </motion.div>
 

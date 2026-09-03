@@ -8,7 +8,6 @@ import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import Link from 'next/link'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/_payment-method.types'
 import { IAddress } from 'types/_address.types'
@@ -18,6 +17,7 @@ import { StepSignIn } from 'components/features/payment/SignInStep'
 import { OrderSummary, Step2Name, Step3Address, Step4Payment } from './_components'
 import { getOrderType } from './_lib/getOrderType'
 import { useCartStore } from 'stores/cart.store'
+import { calculateStripeFees } from 'lib/utils/fees.utils'
 
 interface CheckoutFormInputs {
   // identity
@@ -126,7 +126,7 @@ export function PublicCheckoutClient({
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0)
   const shipping = items
     .filter((i) => i.isPhysicalProduct)
-    .reduce((sum, i) => sum + (i.shippingPrice ?? 0) * i.quantity, 0)
+    .reduce((sum, i) => sum + (i.shippingPrice ?? 0), 0)
   const baseAmount = total + shipping
   const processingFee = calculateStripeFees(baseAmount)
   const feesCovered = inputs.coverFees ? processingFee : 0
@@ -250,7 +250,7 @@ export function PublicCheckoutClient({
         })
         if (!intentResult.success) throw new Error(intentResult.error)
 
-        const result = await stripe.confirmCardPayment(intentResult.clientSecret!, {
+        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
           payment_method: {
             card: cardElement,
             billing_details: { name, email: trimmedEmail }

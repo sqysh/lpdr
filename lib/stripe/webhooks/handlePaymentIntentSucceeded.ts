@@ -165,7 +165,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
               shippingPrice: shipping,
               quantity: line.q,
               subtotal: price * line.q,
-              totalPrice: (price + shipping) * line.q,
+              totalPrice: price * line.q + shipping,
               isPhysical: product.isPhysicalProduct,
               size: line.s ?? null
             }
@@ -371,12 +371,12 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
           data: {
             userId,
             orderId: order.id,
-            feeAmount: paymentIntent.amount / 100,
+            feeAmount: amount / 100,
             status: 'ACTIVE',
             expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
             email: metadata.email,
-            firstName: geoUser.firstName,
-            lastName: geoUser.lastName
+            firstName: geoUser?.firstName ?? null,
+            lastName: geoUser?.lastName ?? null
           }
         })
       }

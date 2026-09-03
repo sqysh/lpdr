@@ -2,9 +2,9 @@ import { createLog } from 'lib/actions/log/createLog'
 import { resend } from 'lib/email/resend'
 import sendConfirmationEmail from 'lib/email/sendConfirmatioinEmail'
 import { auctionWinningBidderTemplate } from 'lib/email/templates/winning-bidder.template'
-import { calculateStripeFees } from 'lib/stripe/calculateStripeFees'
 import { stripeClient } from 'lib/stripe/stripe-client'
 import prisma from 'prisma/client'
+import { calculateStripeFees } from './fees.utils'
 
 async function getWinnerUser(userId: string) {
   return prisma.user.findUnique({
@@ -258,23 +258,23 @@ export async function resolveAuctionWinners(auctionId: string) {
         })
       }
 
-      // 5. Any item that wasn't just set to SOLD in the winner loop gets marked UNSOLD in one shot
-      await tx.auctionItem.updateMany({
-        where: {
-          auctionId,
-          status: { not: 'SOLD' }
-        },
-        data: { status: 'UNSOLD' }
-      })
-
-      // 6. Update winner's AuctionBidder status to ACTIVE (they won)
+      // 5. Update winner's AuctionBidder status to ACTIVE (they won)
       await tx.auctionBidder.updateMany({
         where: { auctionId, userId },
         data: { status: 'WINNER' }
       })
     }
 
-    // 6. Set all non-winning bidders to LOST
+    // 6. Any item that wasn't just set to SOLD in the winner loop gets marked UNSOLD in one shot
+    await tx.auctionItem.updateMany({
+      where: {
+        auctionId,
+        status: { not: 'SOLD' }
+      },
+      data: { status: 'UNSOLD' }
+    })
+
+    // 7. Set all non-winning bidders to LOST
     const winnerIds = Object.keys(byUser)
     await tx.auctionBidder.updateMany({
       where: {
@@ -286,17 +286,28 @@ export async function resolveAuctionWinners(auctionId: string) {
   })
 
   // 8. Return winners grouped for email sending
-  return Object.entries(byUser).map(([userId, bids]) => ({
-    userId,
-    winningBidderId: winningBidderMap[userId],
-    user: bids[0].user,
-    items: bids.map((b) => ({
-      id: b.auctionItemId,
-      name: b.auctionItem.name,
-      soldPrice: Number(b.bidAmount)
-    })),
-    totalPrice: bids.reduce((sum, b) => sum + Number(b.bidAmount), 0)
-  }))
+  return Object.entries(byUser).map(([userId, bids]) => {
+    const itemsTotal = bids.reduce((sum, b) => sum + Number(b.bidAmount), 0)
+    const shipping = bids.reduce(
+      (sum, b) =>
+        sum + (b.auctionItem.requiresShipping ? Number(b.auctionItem.shippingCosts ?? 0) : 0),
+      0
+    )
+
+    return {
+      userId,
+      winningBidderId: winningBidderMap[userId],
+      user: bids[0].user,
+      items: bids.map((b) => ({
+        id: b.auctionItemId,
+        name: b.auctionItem.name,
+        soldPrice: Number(b.bidAmount)
+      })),
+      itemsTotal,
+      shipping,
+      totalPrice: itemsTotal + shipping
+    }
+  })
 }
 
 export async function sendWinnerEmail({

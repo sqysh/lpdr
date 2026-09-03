@@ -44,7 +44,8 @@ export const getOrderById = async (id: string) => {
             subtotal: true,
             totalPrice: true,
             isPhysical: true,
-            iconKey: true
+            iconKey: true,
+            shippingPrice: true
           }
         },
         user: {
@@ -77,7 +78,8 @@ export const getOrderById = async (id: string) => {
           ...item,
           price: Number(item.price),
           subtotal: item.subtotal ? Number(item.subtotal) : null,
-          totalPrice: item.totalPrice ? Number(item.totalPrice) : null
+          totalPrice: item.totalPrice ? Number(item.totalPrice) : null,
+          shippingPrice: item.shippingPrice ? Number(item.shippingPrice) : null
         }))
       }
     }
