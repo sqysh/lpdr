@@ -55,7 +55,7 @@ export const getPackMemberData = async () => {
               }
             }
           },
-          orderBy: { createdAt: 'desc' }
+          orderBy: { createdAt: 'asc' }
         }),
         prisma.auctionBid.findMany({
           where: { userId },
@@ -125,16 +125,32 @@ export const getPackMemberData = async () => {
         status: o.status
       }))
 
-    const subscriptions: Subscription[] = orders
-      .filter((o) => o.type === 'RECURRING_DONATION' && o.status === 'CONFIRMED')
-      .map((o) => ({
-        id: o.id,
-        tierName: o.tierName ?? 'Recurring Donation',
-        amount: Number(o.totalAmount),
-        interval: o.recurringFrequency ?? 'MONTHLY',
-        status: o.status,
-        nextBillingDate: o.nextBillingDate
-      }))
+    const subscriptions: Subscription[] = Object.values(
+      orders
+        .filter((o) => o.type === 'RECURRING_DONATION' && o.status === 'CONFIRMED')
+        .reduce<Record<string, Subscription & { cycles: number }>>((acc, o) => {
+          const key = o.stripeSubscriptionId ?? o.id
+          const existing = acc[key]
+
+          if (!existing) {
+            acc[key] = {
+              id: o.id,
+              tierName: o.tierName ?? 'Recurring Donation',
+              amount: Number(o.totalAmount),
+              interval: o.recurringFrequency ?? 'MONTHLY',
+              status: o.status,
+              nextBillingDate: o.nextBillingDate,
+              cycles: 1
+            }
+            return acc
+          }
+
+          existing.cycles += 1
+
+          // orders are sorted asc, so the first one seen is the most recent
+          return acc
+        }, {})
+    )
 
     const multiItemOrders: MultiItemOrder[] = orders
       .filter((o) => o.type === 'PURCHASE' && o.status === 'CONFIRMED')

@@ -36,6 +36,18 @@ export const getSubscriptionById = async (id: string) => {
       stripePaymentMethod = await stripeClient.paymentMethods.retrieve(order.paymentMethodId)
     }
 
+    const billingHistory = order.stripeSubscriptionId
+      ? await prisma.order.findMany({
+          where: {
+            userId: gate.userId,
+            stripeSubscriptionId: order.stripeSubscriptionId,
+            status: 'CONFIRMED'
+          },
+          orderBy: { createdAt: 'desc' },
+          select: { id: true, totalAmount: true, paidAt: true, createdAt: true }
+        })
+      : [order]
+
     return {
       success: true,
       error: null,
@@ -70,7 +82,13 @@ export const getSubscriptionById = async (id: string) => {
               expYear: stripePaymentMethod.card?.exp_year ?? null
             }
           : null,
-        user: order.user
+        user: order.user,
+        billingHistory: billingHistory.map((p) => ({
+          id: p.id,
+          totalAmount: Number(p.totalAmount),
+          paidAt: p.paidAt,
+          createdAt: p.createdAt
+        }))
       }
     }
   } catch (error) {
