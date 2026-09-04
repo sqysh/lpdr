@@ -17,7 +17,8 @@ export default async function getDraftOrActiveAuction() {
         status: true,
         startDate: true,
         endDate: true,
-        customAuctionLink: true
+        customAuctionLink: true,
+        isPubliclyVisible: true
       }
     })
 

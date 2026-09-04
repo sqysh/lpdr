@@ -21,13 +21,13 @@ type HeaderClientProps = {
     startDate?: Date | null
     endDate?: Date | null
     customAuctionLink: string
+    isPubliclyVisible: boolean
   }
   hasActiveFee: boolean
   isAuthed: boolean
 }
 
-const focusRing =
-  'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 const topBarLink =
   'text-on-dark text-[10px] font-mono tracking-[0.15em] uppercase hover:text-primary-light dark:hover:text-primary-dark transition-colors'
@@ -53,9 +53,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
 
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
-  const cartLabel = `View shopping cart${
-    totalItems > 0 ? ` — ${totalItems} item${totalItems !== 1 ? 's' : ''}` : ''
-  }`
+  const cartLabel = `View shopping cart${totalItems > 0 ? ` — ${totalItems} item${totalItems !== 1 ? 's' : ''}` : ''}`
 
   return (
     <>
@@ -92,9 +90,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
                 >
                   lpdr@littlepawsdr.org
                 </button>
-                <span className={`hidden md:inline ${infoText}`}>
-                  P.O. Box 108 · Brookfield, CT 06804
-                </span>
+                <span className={`hidden md:inline ${infoText}`}>P.O. Box 108 · Brookfield, CT 06804</span>
                 <span className={`hidden lg:inline ${infoText}`}>EIN 46-3079501</span>
               </address>
             </div>
@@ -139,10 +135,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
         </header>
 
         {/* ── Mobile nav: burger / logo / cart + donate ── */}
-        <nav
-          aria-label="Main navigation"
-          className="sm:hidden bg-navbar-light dark:bg-navbar-dark relative z-40 h-16 px-4"
-        >
+        <nav aria-label="Main navigation" className="sm:hidden bg-navbar-light dark:bg-navbar-dark relative z-40 h-16 px-4">
           <div className="grid grid-cols-3 items-center h-full">
             <div className="flex justify-start">
               <button

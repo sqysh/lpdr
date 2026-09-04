@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 
-type AuctionStripProps = {
+type Props = {
   auction: {
     id: string
     title: string
@@ -13,14 +13,15 @@ type AuctionStripProps = {
     startDate?: Date | null
     endDate?: Date | null
     customAuctionLink: string
+    isPubliclyVisible: boolean
   }
 }
 
-export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps) {
+export default function AuctionAnnouncementStrip({ auction }: Props) {
   const status = auction?.status
   const isActive = status === 'ACTIVE'
 
-  if (!auction) return
+  if (!auction && !auction.isPubliclyVisible) return
 
   return (
     <AnimatePresence>
