@@ -59,8 +59,8 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
 
     const result = await updateAuction(inputs.id, {
       title: inputs.title,
-      goal: inputs.goal,
-      customAuctionLink: inputs.customAuctionLink ?? '',
+      goal: Number(inputs.goal),
+      customAuctionLink: inputs.customAuctionLink || undefined,
       startDate: new Date(inputs.startDate),
       endDate: new Date(inputs.endDate)
     })
@@ -71,7 +71,11 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
       flash({
         tone: 'error',
         message: 'Failed to save changes',
-        description: result.error ?? 'Something went wrong. Please try again.'
+        description: result.fieldErrors
+          ? Object.entries(result.fieldErrors)
+              .map(([field, msgs]) => `${field}: ${msgs[0]}`)
+              .join(' · ')
+          : (result.error ?? 'Something went wrong. Please try again.')
       })
       return
     }
