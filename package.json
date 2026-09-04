@@ -28,7 +28,7 @@
     "firebase": "^11.9.1",
     "framer-motion": "^12.4.3",
     "heic2any": "^0.0.4",
-    "lucide-react": "^0.511.0",
+    "lucide-react": "^1.24.0",
     "next": "^16.1.6",
     "next-auth": "^5.0.0-beta.30",
     "next-sitemap": "^4.2.3",
