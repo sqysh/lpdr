@@ -1,59 +1,25 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { auctionItemLiveIncludes } from 'types/_auction-item'
-import {
-  serializeAuction,
-  serializeAuctionBid,
-  serializeAuctionItem,
-  serializeInstantBuyer,
-  serializeWinningBidder
-} from 'lib/utils/serializers.utils'
+import { serialize } from 'lib/utils/serializers.utils'
+import { getErrorMessage } from 'lib/utils/error.utils'
+import { auctionLiveArgs, type IAuctionLive } from 'types/auction-item.types'
+import type { ActionResult } from 'types/_action.types'
 
-export const getAuctionByCustomAuctionLink = async (link: string) => {
+export const getAuctionByCustomAuctionLink = async (link: string): Promise<ActionResult<IAuctionLive>> => {
   try {
     const auction = await prisma.auction.findUnique({
       where: { customAuctionLink: link },
-      include: {
-        items: {
-          orderBy: { createdAt: 'asc' },
-          ...auctionItemLiveIncludes
-        },
-        bidders: {
-          include: {
-            user: {
-              select: {
-                id: true,
-                firstName: true,
-                lastName: true,
-                email: true,
-                anonymousBidding: true
-              }
-            }
-          }
-        },
-        bids: { orderBy: { createdAt: 'desc' } },
-        winningBidders: { include: { user: true, auctionItems: true } },
-        instantBuyers: true
-      }
+      ...auctionLiveArgs
     })
 
-    if (!auction) return { success: false, data: null }
+    if (!auction) return { success: false, data: null, error: 'Auction not found' }
 
-    return {
-      success: true,
-      data: {
-        ...serializeAuction(auction),
-        items: auction.items.map(serializeAuctionItem),
-        bids: auction.bids.map(serializeAuctionBid),
-        winningBidders: auction.winningBidders.map(serializeWinningBidder),
-        instantBuyers: auction.instantBuyers.map(serializeInstantBuyer)
-      }
-    }
+    return { success: true, data: serialize(auction) }
   } catch (error) {
     await createLog('error', 'Failed to fetch auction by custom link', {
       link,
-      error: error instanceof Error ? error.message : 'Unknown error'
+      error: getErrorMessage(error)
     })
-    return { success: false, data: null }
+    return { success: false, data: null, error: 'Failed to load auction' }
   }
 }

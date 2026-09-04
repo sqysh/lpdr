@@ -1,5 +1,5 @@
 import { Package } from 'lucide-react'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 
 export function AuctionEmptyState({ auction }: { auction: IAuction }) {
   if (auction.items.length > 0) return
@@ -12,9 +12,7 @@ export function AuctionEmptyState({ auction }: { auction: IAuction }) {
       </div>
       <div>
         <p className="font-quicksand font-black text-base text-text-light dark:text-text-dark mb-1.5">No items yet</p>
-        <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
-          Items will appear here once the auction opens.
-        </p>
+        <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Items will appear here once the auction opens.</p>
       </div>
     </div>
   )

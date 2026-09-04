@@ -1,57 +1,22 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { AuctionStatus } from '@prisma/client'
-import {
-  serializeAuction,
-  serializeAuctionBid,
-  serializeAuctionItem,
-  serializeInstantBuyer,
-  serializeWinningBidder
-} from 'lib/utils/serializers.utils'
+import { serialize } from 'lib/utils/serializers.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import type { ActionResult } from 'types/_action.types'
+import { auctionListArgs, IAuction } from 'types/auction.types'
 
-export default async function getAuctions({ status }: { status: AuctionStatus[] }) {
+export default async function getAuctions({ status }: { status: AuctionStatus[] }): Promise<ActionResult<IAuction[]>> {
   try {
     const auctions = await prisma.auction.findMany({
       where: { status: { in: status } },
-      include: {
-        items: {
-          include: { photos: true }
-        },
-        bids: {
-          select: {
-            id: true,
-            bidAmount: true,
-            auctionId: true,
-            auctionItemId: true,
-            userId: true,
-            bidderId: true,
-            status: true,
-            sentWinnerEmail: true,
-            emailCount: true,
-            createdAt: true,
-            updatedAt: true
-          }
-        },
-        bidders: true,
-        instantBuyers: true,
-        winningBidders: true
-      },
+      ...auctionListArgs,
       orderBy: { createdAt: 'desc' }
     })
 
-    return auctions.map((a) => ({
-      ...serializeAuction(a),
-      items: a.items.map(serializeAuctionItem),
-      bids: a.bids.map(serializeAuctionBid),
-      winningBidders: a.winningBidders.map(serializeWinningBidder),
-      instantBuyers: a.instantBuyers.map(serializeInstantBuyer)
-    }))
+    return { success: true, data: serialize(auctions) }
   } catch (error) {
-    await createLog('error', 'Failed to get auctions', {
-      status,
-      error: getErrorMessage(error)
-    })
-    return []
+    await createLog('error', 'Failed to get auctions', { status, error: getErrorMessage(error) })
+    return { success: false, data: null, error: 'Failed to load auctions' }
   }
 }

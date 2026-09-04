@@ -1,5 +1,5 @@
 import { formatDateTime, getDaysRemaining } from 'lib/utils/date.utils'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { Clock, DollarSign, Gavel, Package, Users } from 'lucide-react'
 import { motion } from 'framer-motion'
@@ -10,8 +10,7 @@ import { StatCard } from '../[itemId]/view/_components/StatCard'
 export function OverviewTab({ auction }: { auction: IAuction }) {
   const isEnded = auction.status === 'ENDED'
   const displayRevenue = getDisplayRevenue(auction)
-  const pct =
-    auction.goal > 0 ? Math.min(100, Math.round((displayRevenue / auction.goal) * 100)) : 0
+  const pct = auction.goal > 0 ? Math.min(100, Math.round((displayRevenue / auction.goal) * 100)) : 0
   const daysLeft = getDaysRemaining(auction.endDate)
 
   return (
@@ -25,27 +24,9 @@ export function OverviewTab({ auction }: { auction: IAuction }) {
           iconColor="text-primary-light dark:text-primary-dark"
           delay={0}
         />
-        <StatCard
-          label="Items"
-          value={String(auction.items.length)}
-          icon={Package}
-          iconColor="text-violet-500"
-          delay={0.06}
-        />
-        <StatCard
-          label="Bidders"
-          value={String(auction.bidders.length)}
-          icon={Users}
-          iconColor="text-pink-500"
-          delay={0.12}
-        />
-        <StatCard
-          label="Total Bids"
-          value={String(auction.bids.length)}
-          icon={Gavel}
-          iconColor="text-amber-500"
-          delay={0.18}
-        />
+        <StatCard label="Items" value={String(auction.items.length)} icon={Package} iconColor="text-violet-500" delay={0.06} />
+        <StatCard label="Bidders" value={String(auction.bidders.length)} icon={Users} iconColor="text-pink-500" delay={0.12} />
+        <StatCard label="Total Bids" value={String(auction.bids.length)} icon={Gavel} iconColor="text-amber-500" delay={0.18} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
@@ -73,9 +54,7 @@ export function OverviewTab({ auction }: { auction: IAuction }) {
                   goal {formatMoney(auction.goal)}
                 </p>
               </div>
-              <p className="text-xl font-black font-mono tabular-nums text-primary-light dark:text-primary-dark">
-                {pct}%
-              </p>
+              <p className="text-xl font-black font-mono tabular-nums text-primary-light dark:text-primary-dark">{pct}%</p>
             </div>
 
             <div
@@ -96,17 +75,13 @@ export function OverviewTab({ auction }: { auction: IAuction }) {
 
             <dl className="grid grid-cols-2 gap-px bg-border-light dark:bg-border-dark border border-border-light dark:border-border-dark">
               <div className="bg-bg-light dark:bg-bg-dark px-3 py-2">
-                <dt className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-                  Start
-                </dt>
+                <dt className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">Start</dt>
                 <dd className="text-[11px] font-mono text-text-light dark:text-text-dark mt-0.5">
                   {formatDateTime(auction.startDate)}
                 </dd>
               </div>
               <div className="bg-bg-light dark:bg-bg-dark px-3 py-2">
-                <dt className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-                  End
-                </dt>
+                <dt className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">End</dt>
                 <dd className="text-[11px] font-mono text-text-light dark:text-text-dark mt-0.5">
                   {formatDateTime(auction.endDate)}
                 </dd>
@@ -164,9 +139,7 @@ export function OverviewTab({ auction }: { auction: IAuction }) {
                       </div>
                     )}
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate">
-                        {item.name}
-                      </p>
+                      <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate">{item.name}</p>
                     </div>
                     <p className="text-[10px] font-mono tabular-nums text-muted-light dark:text-muted-dark shrink-0">
                       {item.totalBids} bids

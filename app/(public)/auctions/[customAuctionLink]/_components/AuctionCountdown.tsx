@@ -1,7 +1,7 @@
 'use client'
 
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { StickyHeader, HeaderBand } from './index'
 
 export function AuctionCountdown({
@@ -9,15 +9,17 @@ export function AuctionCountdown({
   isActive,
   isEnded,
   trigger,
-  isAuthed
+  isAuthed,
+  isDraft
 }: {
   auction: IAuction
   isActive: boolean
   isEnded: boolean
   trigger: number
   isAuthed: boolean
+  isDraft: boolean
 }) {
-  const { days, hours, minutes, seconds, done } = useCountdown(new Date(auction.endDate))
+  const { days, hours, minutes, seconds, done } = useCountdown(new Date(isDraft ? auction.startDate : auction.endDate))
 
   return (
     <>
@@ -31,6 +33,7 @@ export function AuctionCountdown({
         minutes={minutes}
         seconds={seconds}
         isAuthed={isAuthed}
+        isDraft={isDraft}
       />
       <HeaderBand
         auction={auction}
@@ -42,6 +45,7 @@ export function AuctionCountdown({
         minutes={minutes}
         seconds={seconds}
         trigger={trigger}
+        isDraft={isDraft}
       />
     </>
   )

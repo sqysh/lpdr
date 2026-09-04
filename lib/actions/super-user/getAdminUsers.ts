@@ -2,6 +2,9 @@
 
 import { getInitials } from 'lib/utils/user.utils'
 import prisma from 'prisma/client'
+import { requireSuper } from 'lib/auth/guards'
+import { getErrorMessage } from 'lib/utils/error.utils'
+import { createLog } from '../log/createLog'
 
 export interface AdminUser {
   id: string
@@ -35,40 +38,47 @@ function formatLastActive(date: Date | null): string {
 }
 
 function formatGrantedAt(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    timeZone: 'America/New_York'
+  })
 }
 
-export async function getAdminUsers(): Promise<AdminUser[]> {
-  const admins = await prisma.user.findMany({
-    where: {
-      role: { in: ['SUPER_USER', 'ADMIN'] }
-    },
-    select: {
-      id: true,
-      email: true,
-      firstName: true,
-      lastName: true,
-      role: true,
-      lastLoginAt: true,
-      createdAt: true
-    },
-    orderBy: [
-      { role: 'asc' }, // ADMIN before SUPER_USER alphabetically — adjust if needed
-      { createdAt: 'asc' }
-    ]
-  })
+export async function getAdminUsers() {
+  const gate = await requireSuper()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
-  return admins.map((user) => ({
-    id: user.id,
-    initials: getInitials(user.firstName, user.lastName, user.email),
-    name:
-      user.firstName && user.lastName
-        ? `${user.firstName} ${user.lastName}`
-        : (user.firstName ?? user.email.split('@')[0]),
-    email: user.email,
-    role: user.role as 'SUPER_USER' | 'ADMIN',
-    grantedAt: formatGrantedAt(user.createdAt),
-    avatarColor: getAvatarColor(user.id),
-    lastActive: formatLastActive(user.lastLoginAt)
-  }))
+  try {
+    const admins = await prisma.user.findMany({
+      where: { role: { in: ['SUPER_USER', 'ADMIN'] } },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        lastLoginAt: true,
+        createdAt: true
+      },
+      orderBy: [{ role: 'asc' }, { createdAt: 'asc' }]
+    })
+
+    const data: AdminUser[] = admins.map((user) => ({
+      id: user.id,
+      initials: getInitials(user.firstName, user.lastName, user.email),
+      name: user.firstName && user.lastName ? `${user.firstName} ${user.lastName}` : (user.firstName ?? user.email.split('@')[0]),
+      email: user.email,
+      role: user.role as 'SUPER_USER' | 'ADMIN',
+      grantedAt: formatGrantedAt(user.createdAt),
+      avatarColor: getAvatarColor(user.id),
+      lastActive: formatLastActive(user.lastLoginAt)
+    }))
+
+    return { success: true, error: null, data }
+  } catch (error) {
+    await createLog('error', 'Failed to fetch admin users', { error: getErrorMessage(error) })
+    return { success: false, error: 'Failed to fetch admin users', data: null }
+  }
 }

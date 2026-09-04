@@ -7,7 +7,7 @@ import { Check, ChevronRight, Gavel, Loader2, Tag, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
-import { IAuctionItemLive } from 'types/_auction-item'
+import { IAuctionItemLive } from 'types/auction-item.types'
 import { AuctionStatus } from '@prisma/client'
 
 type Props = {
@@ -18,13 +18,7 @@ type Props = {
   onBidSuccess?: () => void
 }
 
-export function AuctionItemCard({
-  item,
-  auctionStatus,
-  index,
-  customAuctionLink,
-  onBidSuccess
-}: Props) {
+export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink, onBidSuccess }: Props) {
   const router = useRouter()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -37,12 +31,13 @@ export function AuctionItemCard({
 
   const photo = item.photos.find((p) => p.isPrimary) ?? item.photos[0]
   const isEnded = auctionStatus === 'ENDED'
+  const isUpcoming = auctionStatus === 'DRAFT'
   const isSold = item.status === 'SOLD'
 
-  const displayPrice =
-    item.sellingFormat === 'FIXED' ? item.buyNowPrice : (item.currentBid ?? item.startingPrice)
-
+  const displayPrice = item.sellingFormat === 'FIXED' ? item.buyNowPrice : (item.currentBid ?? item.startingPrice)
   const bidCount = item._count?.bids ?? 0
+
+  const ribbonLabel = isSold ? 'Sold' : isEnded ? 'Ended' : isUpcoming ? 'Upcoming' : null
 
   const handleQuickBid = async () => {
     if (!confirming) {
@@ -82,40 +77,40 @@ export function AuctionItemCard({
       aria-label={item.name}
       className="group relative bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark overflow-hidden flex flex-col h-full"
     >
-      {/* Status ribbon */}
-      {(isSold || isEnded) && (
-        <div className="absolute top-3 left-3 z-10 px-2.5 py-1 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark">
+      {/* Badge strip */}
+      <div className="absolute top-3 left-3 z-10 flex items-stretch bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark">
+        <div className="px-2 py-1 flex items-center gap-1.5">
+          {item.sellingFormat === 'FIXED' ? (
+            <Tag size={9} aria-hidden="true" className="text-muted-light dark:text-muted-dark" />
+          ) : (
+            <Gavel size={9} aria-hidden="true" className="text-primary-light dark:text-primary-dark" />
+          )}
           <span
-            className={`text-[9px] font-mono tracking-[0.2em] uppercase font-black ${isSold ? 'text-emerald-500' : 'text-muted-light dark:text-muted-dark'}`}
+            className={`text-[9px] font-mono tracking-[0.2em] uppercase font-black ${
+              item.sellingFormat === 'FIXED'
+                ? 'text-muted-light dark:text-muted-dark'
+                : 'text-primary-light dark:text-primary-dark'
+            }`}
           >
-            {isSold ? 'Sold' : 'Ended'}
+            {item.sellingFormat === 'FIXED' ? 'Buy Now' : 'Auction'}
           </span>
         </div>
-      )}
 
-      {/* Format badge */}
-      <div className="absolute top-3 right-3 z-10">
-        <div className="px-2 py-1 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark flex items-center gap-1.5">
-          {item.sellingFormat === 'FIXED' ? (
-            <>
-              <Tag size={9} aria-hidden="true" className="text-muted-light dark:text-muted-dark" />
-              <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
-                Buy Now
-              </span>
-            </>
-          ) : (
-            <>
-              <Gavel
-                size={9}
-                aria-hidden="true"
-                className="text-primary-light dark:text-primary-dark"
-              />
-              <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark">
-                Auction
-              </span>
-            </>
-          )}
-        </div>
+        {ribbonLabel && (
+          <div className="px-2 py-1 flex items-center border-l border-border-light dark:border-border-dark">
+            <span
+              className={`text-[9px] font-mono tracking-[0.2em] uppercase font-black ${
+                isSold
+                  ? 'text-emerald-500'
+                  : isUpcoming
+                    ? 'text-primary-light dark:text-primary-dark'
+                    : 'text-muted-light dark:text-muted-dark'
+              }`}
+            >
+              {ribbonLabel}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Photo */}
@@ -156,32 +151,31 @@ export function AuctionItemCard({
         </div>
 
         <div className="space-y-2">
-          {/* Bid count */}
-          {item.sellingFormat !== 'FIXED' && (
+          {/* Bid count, hidden before the auction opens */}
+          {item.sellingFormat !== 'FIXED' && !isUpcoming && (
             <div className="flex items-center justify-between">
-              <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-                Bids
-              </span>
-              <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                {bidCount}
-              </span>
+              <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">Bids</span>
+              <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{bidCount}</span>
             </div>
           )}
 
           {/* Price */}
-          {displayPrice != null && (
+          {!isUpcoming && displayPrice != null && (
             <div className="flex items-center justify-between">
               <span className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-                {item.sellingFormat === 'FIXED'
-                  ? 'Price'
-                  : item.currentBid
-                    ? 'Current Bid'
-                    : 'Starting'}
+                {item.sellingFormat === 'FIXED' ? 'Price' : isUpcoming || !item.currentBid ? 'Starting' : 'Current Bid'}
               </span>
               <span className="font-mono font-black text-sm text-text-light dark:text-text-dark">
                 {formatMoney(displayPrice)}
               </span>
             </div>
+          )}
+
+          {/* Upcoming: preview only, no bidding path */}
+          {isUpcoming && (
+            <p className="mt-2 px-3.5 py-2.5 border border-border-light dark:border-border-dark text-[9px] font-mono tracking-[0.2em] uppercase font-black text-muted-light dark:text-muted-dark text-center">
+              {item.sellingFormat === 'FIXED' ? 'Available Soon' : 'Bidding Opens Soon'}
+            </p>
           )}
 
           {auctionStatus === 'ACTIVE' && !isSold && (
@@ -194,9 +188,7 @@ export function AuctionItemCard({
                     onClick={handleQuickBid}
                     disabled={quickBidLoading}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-400 text-[9px] font-mono tracking-[0.2em] uppercase font-black disabled:opacity-50 disabled:cursor-not-allowed ${
-                      confirming
-                        ? 'bg-amber-400 text-amber-950'
-                        : 'bg-amber-500 hover:bg-amber-400 text-white'
+                      confirming ? 'bg-amber-400 text-amber-950' : 'bg-amber-500 hover:bg-amber-400 text-white'
                     }`}
                   >
                     <span>
@@ -215,11 +207,7 @@ export function AuctionItemCard({
                     )}
                   </button>
 
-                  {quickBidError && (
-                    <p className="text-[9px] font-mono text-red-500 dark:text-red-400">
-                      {quickBidError}
-                    </p>
-                  )}
+                  {quickBidError && <p className="text-[9px] font-mono text-red-500 dark:text-red-400">{quickBidError}</p>}
                 </>
               )}
 

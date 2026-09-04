@@ -3,13 +3,14 @@
 import { useMemo, useState } from 'react'
 import { DollarSign, Clock, XCircle } from 'lucide-react'
 import { formatDate } from 'lib/utils/date.utils'
-import { AdoptionFeeStatus, IAdoptionFee } from 'types/_adoption-fee'
+import { IAdoptionFee } from 'types/_adoption-fee'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { FILTERS, statusStyles } from 'lib/constants/adoption-fees.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
+import { AdoptionFeeStatus } from '@prisma/client'
 
 type Props = {
   fees: IAdoptionFee[]
@@ -19,9 +20,7 @@ type FeeFilter = AdoptionFeeStatus | 'ALL'
 
 function StatusBadge({ status }: { status: AdoptionFeeStatus }) {
   return (
-    <span
-      className={`inline-block font-mono text-[10px] tracking-[0.15em] uppercase px-2 py-1 border ${statusStyles[status]}`}
-    >
+    <span className={`inline-block font-mono text-[10px] tracking-[0.15em] uppercase px-2 py-1 border ${statusStyles[status]}`}>
       {status}
     </span>
   )
@@ -38,11 +37,7 @@ const columns: Column<IAdoptionFee>[] = [
     cell: (f) => (
       <>
         <p className="text-sm font-bold text-text-light dark:text-text-dark">{fullName(f)}</p>
-        {f.email && (
-          <p className="font-mono text-[11px] text-muted-light dark:text-muted-dark mt-0.5">
-            {f.email}
-          </p>
-        )}
+        {f.email && <p className="font-mono text-[11px] text-muted-light dark:text-muted-dark mt-0.5">{f.email}</p>}
       </>
     )
   },
@@ -54,23 +49,18 @@ const columns: Column<IAdoptionFee>[] = [
   {
     header: 'State',
     className: 'font-mono text-[13px] text-muted-light dark:text-muted-dark',
-    cell: (f) => (
-      <>{f.order?.geoRegion ?? <span className="text-muted-light dark:text-muted-dark">—</span>}</>
-    )
+    cell: (f) => <>{f?.geoRegion ?? <span className="text-muted-light dark:text-muted-dark">—</span>}</>
   },
   {
     header: 'Amount',
-    className:
-      'font-quicksand font-black text-sm text-text-light dark:text-text-dark whitespace-nowrap',
+    className: 'font-quicksand font-black text-sm text-text-light dark:text-text-dark whitespace-nowrap',
     cell: (f) => (f.feeAmount != null ? formatMoney(Number(f.feeAmount)) : '—')
   },
   {
     header: 'Bypass code',
     cell: (f) =>
       f.bypassCode ? (
-        <span className="font-mono text-[12px] tracking-[0.08em] text-primary-light dark:text-primary-dark">
-          {f.bypassCode}
-        </span>
+        <span className="font-mono text-[12px] tracking-[0.08em] text-primary-light dark:text-primary-dark">{f.bypassCode}</span>
       ) : (
         <span className="text-muted-light dark:text-muted-dark">—</span>
       )
@@ -110,10 +100,7 @@ export default function AdminAdoptionFeesClient({ fees }: Props) {
     return base
   }, [fees])
 
-  const visible = useMemo(
-    () => (filter === 'ALL' ? fees : fees.filter((f) => f.status === filter)),
-    [fees, filter]
-  )
+  const visible = useMemo(() => (filter === 'ALL' ? fees : fees.filter((f) => f.status === filter)), [fees, filter])
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">

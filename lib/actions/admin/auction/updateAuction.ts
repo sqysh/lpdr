@@ -1,45 +1,81 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { createLog } from '../../log/createLog'
+import { Prisma } from '@prisma/client'
 import { requireAdmin } from 'lib/auth/guards'
+import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { parseInput } from 'lib/utils/validate.utils'
+import { updateAuctionSchema } from 'lib/schemas/auction.schema'
+import type { ActionResult } from 'types/_action.types'
 
-export const updateAuction = async (
-  id: string,
-  data: { startDate: Date; endDate: Date; title: string; goal: number; customAuctionLink: string }
-) => {
+export const updateAuction = async (id: string, input: unknown): Promise<ActionResult<null>> => {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
-  if (!id) {
-    return { success: false, error: 'Missing id', data: null }
-  }
+  if (!id) return { success: false, data: null, error: 'Missing id' }
 
-  if (data.startDate && data.endDate && data.startDate >= data.endDate) {
-    return { success: false, error: 'Start date must be before end date', data: null }
-  }
+  const parsed = parseInput(updateAuctionSchema, input)
+  if (parsed.ok === false) return parsed.result
+
+  const { title, startDate, endDate, goal, customAuctionLink } = parsed.data
 
   try {
+    const existing = await prisma.auction.findUnique({
+      where: { id },
+      select: { startDate: true, endDate: true }
+    })
+
+    if (!existing) return { success: false, data: null, error: 'Auction not found' }
+
+    // Only one date may be sent, so compare against what is stored
+    const nextStart = startDate ?? existing.startDate
+    const nextEnd = endDate ?? existing.endDate
+
+    if (nextStart && nextEnd && nextStart >= nextEnd) {
+      return { success: false, data: null, error: 'End date must be after start date' }
+    }
+
+    if (customAuctionLink) {
+      const taken = await prisma.auction.findFirst({
+        where: { customAuctionLink, id: { not: id } },
+        select: { id: true }
+      })
+
+      if (taken) {
+        return { success: false, data: null, error: 'That auction link is already in use' }
+      }
+    }
+
     await prisma.auction.update({
       where: { id },
       data: {
-        ...(data.title && { title: data.title.trim() }),
-        ...(data.goal && { goal: data.goal }),
-        ...(data.customAuctionLink && { customAuctionLink: data.customAuctionLink.trim() }),
-        ...(data.startDate && { startDate: data.startDate }),
-        ...(data.endDate && { endDate: data.endDate })
+        ...(title != null && { title }),
+        ...(goal != null && { goal }),
+        ...(customAuctionLink != null && { customAuctionLink }),
+        ...(startDate != null && { startDate }),
+        ...(endDate != null && { endDate })
       }
     })
 
-    return { success: true, error: null, data: null }
+    await createLog('info', 'Auction updated', {
+      auctionId: id,
+      updatedBy: gate.userId,
+      fields: Object.keys(parsed.data)
+    })
+
+    return { success: true, data: null }
   } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { success: false, data: null, error: 'That auction link is already in use' }
+    }
+
     await createLog('error', 'Failed to update auction', {
       auctionId: id,
       updatedBy: gate.userId,
       error: getErrorMessage(error)
     })
 
-    return { success: false, error: 'Failed to update auction. Please try again.', data: null }
+    return { success: false, data: null, error: 'Failed to update auction. Please try again.' }
   }
 }

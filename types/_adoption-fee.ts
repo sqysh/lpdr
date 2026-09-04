@@ -1,18 +1,17 @@
-import { Decimal } from '@prisma/client/runtime/client'
+import type { AdoptionFeeStatus } from '@prisma/client'
 
 export interface IAdoptionFee {
   id: string
   firstName: string | null
   lastName: string | null
-  feeAmount: number | Decimal | null
-  email: string
-  state?: string
-  bypassCode?: string
+  feeAmount: number | null
+  email: string | null
+  state: string | null
+  bypassCode: string | null
   status: AdoptionFeeStatus
   expiresAt: Date | null
   createdAt: Date
-
-  order?: { geoRegion: string | null } | null
+  geoRegion: string | null
 }
 
 export interface UpdateAdoptionFeeInputs {
@@ -22,5 +21,3 @@ export interface UpdateAdoptionFeeInputs {
   email: string
   state: string
 }
-
-export type AdoptionFeeStatus = 'ACTIVE' | 'EXPIRED' | 'APPROVED' | 'REJECTED'

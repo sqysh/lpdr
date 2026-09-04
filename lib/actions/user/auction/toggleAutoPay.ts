@@ -16,7 +16,7 @@ export async function toggleAutoPay() {
       select: { autoPay: true }
     })
 
-    if (!user) return { success: false, error: 'User not found' }
+    if (!user) return { success: false, error: 'User not found', data: null }
 
     await prisma.user.update({
       where: { id: gate.userId },
@@ -24,12 +24,12 @@ export async function toggleAutoPay() {
     })
 
     revalidatePath('/my-pack')
-    return { success: true, autoPay: !user.autoPay }
+    return { success: true, error: null, data: null }
   } catch (error) {
     await createLog('error', 'Failed to toggle auto-pay', {
       userId: gate.userId,
       error: getErrorMessage(error)
     })
-    return { success: false, error: 'Failed to update setting' }
+    return { success: false, error: 'Failed to update setting', data: null }
   }
 }

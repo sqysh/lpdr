@@ -1,4 +1,4 @@
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 
 export type YearGroup = {
   year: number

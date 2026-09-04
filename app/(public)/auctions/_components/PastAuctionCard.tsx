@@ -1,6 +1,6 @@
 import { useInView } from 'framer-motion'
 import { useRef } from 'react'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { motion } from 'framer-motion'
 import { Gavel, Package, TrendingUp, Users } from 'lucide-react'
 import { formatMoney } from 'lib/utils/currency.utils'
@@ -9,13 +9,9 @@ import Picture from 'components/_common/Picture'
 export function PastAuctionCard({ auction, index }: { auction: IAuction; index: number }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
-  const pct =
-    auction.goal > 0
-      ? Math.min(100, Math.round((auction.totalAuctionRevenue / auction.goal) * 100))
-      : 0
+  const pct = auction.goal > 0 ? Math.min(100, Math.round((auction.totalAuctionRevenue / auction.goal) * 100)) : 0
 
-  const featuredPhoto =
-    auction.items.flatMap((i) => i.photos).find((p) => p.isPrimary) ?? auction.items[0]?.photos?.[0]
+  const featuredPhoto = auction.items.flatMap((i) => i.photos).find((p) => p.isPrimary) ?? auction.items[0]?.photos?.[0]
 
   return (
     <motion.article
@@ -37,11 +33,7 @@ export function PastAuctionCard({ auction, index }: { auction: IAuction; index: 
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <Gavel
-              size={32}
-              className="text-border-light dark:text-border-dark"
-              aria-hidden="true"
-            />
+            <Gavel size={32} className="text-border-light dark:text-border-dark" aria-hidden="true" />
           </div>
         )}
         <div className="absolute top-3 left-3 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm px-2.5 py-1 border border-border-light dark:border-border-dark">
@@ -60,30 +52,18 @@ export function PastAuctionCard({ auction, index }: { auction: IAuction; index: 
         {/* Mini stats */}
         <div className="flex items-center gap-4 mb-3">
           <div className="flex items-center gap-1.5">
-            <TrendingUp
-              size={11}
-              className="text-primary-light dark:text-primary-dark"
-              aria-hidden="true"
-            />
+            <TrendingUp size={11} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
             <span className="text-xs font-mono font-black text-text-light dark:text-text-dark">
               {formatMoney(auction.totalAuctionRevenue)}
             </span>
           </div>
           <div className="flex items-center gap-1.5">
-            <Package
-              size={11}
-              className="text-muted-light dark:text-muted-dark"
-              aria-hidden="true"
-            />
-            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">
-              {auction.items.length} items
-            </span>
+            <Package size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
+            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">{auction.items.length} items</span>
           </div>
           <div className="flex items-center gap-1.5">
             <Users size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
-            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">
-              {auction.bidders.length} bidders
-            </span>
+            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">{auction.bidders.length} bidders</span>
           </div>
         </div>
 

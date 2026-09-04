@@ -1,7 +1,7 @@
 import { ChangeEvent } from 'react'
 import { Loader2 } from 'lucide-react'
 import { toDatetimeLocal } from 'lib/utils/date.utils'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 
 const inputStyles = `w-full px-3.5 py-3 text-xs font-mono border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors scheme-light dark:scheme-dark`
 
@@ -26,14 +26,7 @@ export function AuctionSettingsForm({
         <label htmlFor="title" className={labelStyles}>
           Title
         </label>
-        <input
-          id="title"
-          name="title"
-          type="text"
-          onChange={onInput}
-          value={inputs?.title || ''}
-          className={inputStyles}
-        />
+        <input id="title" name="title" type="text" onChange={onInput} value={inputs?.title || ''} className={inputStyles} />
       </div>
 
       <div className="grid grid-cols-2 gap-3">
@@ -61,13 +54,19 @@ export function AuctionSettingsForm({
             End Date
           </label>
           <input
+            disabled={isActive}
             name="endDate"
             id="endDate"
             type="datetime-local"
             onChange={onInput}
             value={toDatetimeLocal(inputs?.endDate) || ''}
-            className={inputStyles}
+            className={`${inputStyles} disabled:opacity-50 disabled:cursor-not-allowed`}
           />
+          {isActive && (
+            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+              End date cannot be changed once the auction is live
+            </p>
+          )}
         </div>
       </div>
 
@@ -91,14 +90,20 @@ export function AuctionSettingsForm({
           Custom Link
         </label>
         <input
+          disabled={isActive}
           name="customAuctionLink"
           id="customAuctionLink"
           type="text"
           onChange={onInput}
           value={inputs?.customAuctionLink ?? ''}
           placeholder="e.g. spring-2026"
-          className={`${inputStyles} placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50`}
+          className={`${inputStyles} placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 disabled:opacity-50 disabled:cursor-not-allowed`}
         />
+        {isActive && (
+          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+            The link cannot be changed once the auction is live
+          </p>
+        )}
       </div>
 
       <div className="pt-2">

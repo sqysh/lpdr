@@ -1,11 +1,22 @@
-import { Eye, Package, Pencil, Plus } from 'lucide-react'
-import { IAuction } from 'types/_auction'
+import { Eye, Loader2, Package, Pencil, Plus } from 'lucide-react'
+import { IAuction } from 'types/auction.types'
 import { motion } from 'framer-motion'
 import { formatMoney } from 'lib/utils/currency.utils'
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getItemStatusConfig } from 'lib/utils/auction.utils'
 import Picture from 'components/_common/Picture'
+
+function AddItemLabel({ label }: { label: string }) {
+  const { pending } = useLinkStatus()
+
+  return (
+    <>
+      {pending ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <Plus size={11} aria-hidden="true" />}
+      {label}
+    </>
+  )
+}
 
 export function ItemsTab({ auction }: { auction: IAuction }) {
   const router = useRouter()
@@ -16,8 +27,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
   const fixedItems = auction.items.filter((i) => i.sellingFormat === 'FIXED')
 
   // Derived from the URL — replaces the useState
-  const itemTab: 'AUCTION' | 'FIXED' =
-    searchParams.get('type')?.toUpperCase() === 'FIXED' ? 'FIXED' : 'AUCTION'
+  const itemTab: 'AUCTION' | 'FIXED' = searchParams.get('type')?.toUpperCase() === 'FIXED' ? 'FIXED' : 'AUCTION'
 
   const selectItemTab = (tab: 'AUCTION' | 'FIXED') => {
     const params = new URLSearchParams(searchParams.toString())
@@ -30,15 +40,10 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
       {/* ── Header ── */}
       <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
         <h2 className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-          Items{' '}
-          <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">
-            {auction.items.length}
-          </span>
+          Items <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">{auction.items.length}</span>
         </h2>
         <Link
-          href={
-            auction.status === 'ENDED' ? '#' : `/admin/auctions/${auction.id}/new?type=${itemTab}`
-          }
+          href={auction.status === 'ENDED' ? '#' : `/admin/auctions/${auction.id}/new?type=${itemTab}`}
           aria-disabled={auction.status === 'ENDED'}
           onClick={auction.status === 'ENDED' ? (e) => e.preventDefault() : undefined}
           className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
@@ -47,8 +52,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
               : 'bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark'
           }`}
         >
-          <Plus size={11} aria-hidden="true" /> Add{' '}
-          {itemTab === 'AUCTION' ? 'Auction' : 'Instant Buy'} Item
+          <AddItemLabel label={`Add ${itemTab === 'AUCTION' ? 'Auction' : 'Instant Buy'} Item`} />
         </Link>
       </div>
 
@@ -89,23 +93,11 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
       {/* ── Tables ── */}
       {(['AUCTION', 'FIXED'] as const).map((tab) => (
         <div key={tab} hidden={itemTab !== tab} className="overflow-x-auto">
-          <table
-            className="w-full"
-            aria-label={`${tab === 'AUCTION' ? 'Auction' : 'Instant buy'} items`}
-          >
+          <table className="w-full" aria-label={`${tab === 'AUCTION' ? 'Auction' : 'Instant buy'} items`}>
             <thead>
               <tr className="border-b border-border-light dark:border-border-dark">
                 {(tab === 'AUCTION'
-                  ? [
-                      'Item',
-                      'Bids',
-                      'Starting',
-                      'Current Bid',
-                      'Increase',
-                      'Shipping',
-                      'Status',
-                      ''
-                    ]
+                  ? ['Item', 'Bids', 'Starting', 'Current Bid', 'Increase', 'Shipping', 'Status', '']
                   : ['Item', 'Price', 'Quantity', 'Sold', 'Shipping', 'Status', '']
                 ).map((h, i) => (
                   <th
@@ -122,9 +114,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
               {(tab === 'AUCTION' ? auctionItems : fixedItems).map((item) => {
                 const itemStatus = getItemStatusConfig(item.status)
                 const increase =
-                  item.startingPrice != null &&
-                  item.currentBid != null &&
-                  item.currentBid > item.startingPrice
+                  item.startingPrice != null && item.currentBid != null && item.currentBid > item.startingPrice
                     ? {
                         amount: item.currentBid - item.startingPrice,
                         pct: ((item.currentBid - item.startingPrice) / item.startingPrice) * 100
@@ -132,10 +122,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                     : null
 
                 return (
-                  <tr
-                    key={item.id}
-                    className="group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors"
-                  >
+                  <tr key={item.id} className="group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors">
                     {/* Item — photo + name + description */}
                     <td className="px-4 py-2.5 min-w-0">
                       <div className="flex items-center gap-2.5">
@@ -189,9 +176,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                               </p>
                             </>
                           ) : (
-                            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">
-                              —
-                            </span>
+                            <span className="text-xs font-mono text-muted-light dark:text-muted-dark">—</span>
                           )}
                         </td>
                         <td className="px-4 py-2.5 text-xs font-mono tabular-nums text-muted-light dark:text-muted-dark whitespace-nowrap">
@@ -216,9 +201,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                     )}
 
                     <td className="px-4 py-2.5 whitespace-nowrap">
-                      <span
-                        className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${itemStatus.classes}`}
-                      >
+                      <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${itemStatus.classes}`}>
                         {itemStatus.label}
                       </span>
                     </td>
@@ -234,20 +217,12 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                           <Eye size={13} aria-hidden="true" />
                         </Link>
                         <Link
-                          href={
-                            auction.status === 'ENDED'
-                              ? '#'
-                              : `/admin/auctions/${item.auctionId}/${item.id}/edit`
-                          }
+                          href={auction.status === 'ENDED' ? '#' : `/admin/auctions/${item.auctionId}/${item.id}/edit`}
                           aria-label={
-                            auction.status === 'ENDED'
-                              ? `Cannot edit ${item.name} — auction has ended`
-                              : `Edit ${item.name}`
+                            auction.status === 'ENDED' ? `Cannot edit ${item.name} — auction has ended` : `Edit ${item.name}`
                           }
                           aria-disabled={auction.status === 'ENDED'}
-                          onClick={
-                            auction.status === 'ENDED' ? (e) => e.preventDefault() : undefined
-                          }
+                          onClick={auction.status === 'ENDED' ? (e) => e.preventDefault() : undefined}
                           className={`p-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                             auction.status === 'ENDED'
                               ? 'text-muted-light/30 dark:text-muted-dark/30 cursor-not-allowed'

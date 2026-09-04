@@ -1,4 +1,3 @@
-import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.utils'
 import Pusher from 'pusher-js'
 import { useEffect, useRef, useState } from 'react'
 import {
@@ -17,6 +16,7 @@ import {
 } from 'lucide-react'
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
+import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.constants'
 
 interface EventConfig {
   icon: React.ElementType
@@ -61,8 +61,7 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: Activity,
     label: 'Recurring Donation',
     color: 'text-green-500',
-    format: (d) =>
-      `${d.email} — $${d.amount} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
+    format: (d) => `${d.email} — $${d.amount} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
   },
   'subscription-created': {
     icon: CreditCard,
@@ -201,21 +200,8 @@ export function LiveActionsFeed() {
   const FILTERS = ['all', 'orders', 'users', 'auctions', 'payments', 'system']
   const FILTER_MATCH: Record<string, string[]> = {
     orders: ['order-created', 'order-failed', 'order-shipped', 'recurring-donation'],
-    users: [
-      'user-signed-in',
-      'user-registered',
-      'user-signed-out',
-      'user-suspended',
-      'user-terminated',
-      'user-reinstated'
-    ],
-    auctions: [
-      'auction-created',
-      'auction-started',
-      'auction-ended',
-      'auction-updated',
-      'bid-placed'
-    ],
+    users: ['user-signed-in', 'user-registered', 'user-signed-out', 'user-suspended', 'user-terminated', 'user-reinstated'],
+    auctions: ['auction-created', 'auction-started', 'auction-ended', 'auction-updated', 'bid-placed'],
     payments: [
       'subscription-created',
       'subscription-updated',
@@ -254,8 +240,7 @@ export function LiveActionsFeed() {
     }
   }, [])
 
-  const filtered =
-    filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.includes(e.event))
+  const filtered = filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.includes(e.event))
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
@@ -287,9 +272,7 @@ export function LiveActionsFeed() {
             {f}
           </button>
         ))}
-        <span className="ml-auto px-3 font-mono text-[9px] text-muted-light dark:text-muted-dark">
-          {filtered.length} events
-        </span>
+        <span className="ml-auto px-3 font-mono text-[9px] text-muted-light dark:text-muted-dark">{filtered.length} events</span>
       </div>
 
       {/* Feed */}
@@ -302,11 +285,7 @@ export function LiveActionsFeed() {
       >
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2 py-12">
-            <Activity
-              size={20}
-              className="text-muted-light dark:text-muted-dark opacity-30"
-              aria-hidden="true"
-            />
+            <Activity size={20} className="text-muted-light dark:text-muted-dark opacity-30" aria-hidden="true" />
             <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
               Waiting for activity...
             </p>
@@ -340,9 +319,7 @@ export function LiveActionsFeed() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span
-                          className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}
-                        >
+                        <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>
                           {config.label}
                         </span>
                         {originChannel && (

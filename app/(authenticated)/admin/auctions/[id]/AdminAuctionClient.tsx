@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IAuction, Tab } from 'types/_auction'
+import { IAuction, Tab } from 'types/auction.types'
 import { formatDate } from 'lib/utils/date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
@@ -15,8 +15,10 @@ import { BiddersTab } from './_components/BiddersTab'
 import { WinningBiddersTab } from './_components/WinningBiddersTab'
 import { TopBar } from './_components/TopBar'
 import { Tabs } from './_components/Tabs'
+import { Role } from '@prisma/client'
+import { useSession } from 'next-auth/react'
 
-const TAB_PANELS: Record<string, React.ComponentType<{ auction: IAuction }>> = {
+const TAB_PANELS: Record<string, React.ComponentType<{ auction: IAuction; role: Role }>> = {
   Overview: OverviewTab,
   Items: ItemsTab,
   Settings: SettingsTab,
@@ -29,6 +31,8 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [copied, setCopied] = useState(false)
+  const session = useSession()
+  const role: Role = session.data?.user?.role
 
   const statusConfig = getAuctionStatusConfig(auction.status)
   const visibleTabs = TABS.filter((t) => t.statuses.includes(auction.status))
@@ -59,9 +63,7 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
       {/* ── Title band ── */}
       <div className="w-full px-4 sm:px-6 pt-6 pb-4 space-y-4">
         <div>
-          <h2 className="text-2xl sm:text-3xl font-black font-quicksand text-text-light dark:text-text-dark">
-            {auction.title}
-          </h2>
+          <h2 className="text-2xl sm:text-3xl font-black font-quicksand text-text-light dark:text-text-dark">{auction.title}</h2>
           <p className="text-xs font-mono text-muted-light dark:text-muted-dark mt-1">
             {formatDate(auction.startDate)} — {formatDate(auction.endDate)}
           </p>
@@ -117,13 +119,8 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
 
         {/* ── Panels ── */}
         <div role="tabpanel" id={`panel-${activeTab}`} aria-labelledby={`tab-${activeTab}`}>
-          <motion.div
-            key={activeTab}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.15 }}
-          >
-            {ActivePanel && <ActivePanel auction={auction} />}
+          <motion.div key={activeTab} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
+            {ActivePanel && <ActivePanel auction={auction} role={role} />}
           </motion.div>
         </div>
       </div>

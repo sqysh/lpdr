@@ -2,22 +2,27 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export async function getWelcomeWieners() {
   try {
     const welcomeWieners = await prisma.welcomeWiener.findMany({
-      orderBy: { createdAt: 'desc' }
+      where: { isLive: true, archivedAt: null },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        id: true,
+        name: true,
+        bio: true,
+        age: true,
+        images: true,
+        associatedProducts: true,
+        isPhysicalProduct: true
+      }
     })
 
-    return {
-      success: true,
-      error: null,
-      data: welcomeWieners
-    }
+    return { success: true, error: null, data: welcomeWieners }
   } catch (error) {
-    await createLog('error', 'Failed to get welcome wieners', {
-      error: error instanceof Error ? error.message : 'Unknown error'
-    })
+    await createLog('error', 'Failed to get welcome wieners', { error: getErrorMessage(error) })
 
     return {
       success: false,

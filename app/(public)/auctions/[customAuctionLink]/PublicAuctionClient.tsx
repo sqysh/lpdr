@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { IAuctionLive } from 'types/_auction-item'
+import { IAuctionLive } from 'types/auction-item.types'
 import {
   AuctionCountdown,
   AuctionEmptyState,
@@ -22,6 +22,7 @@ export default function PublicAuctionClient({ auction }: { auction: IAuctionLive
   const [slotTrigger, setSlotTrigger] = useState(0)
 
   const isAuthed = session.status === 'authenticated'
+  const isDraft = auction.status === 'DRAFT'
   const isActive = auction.status === 'ACTIVE'
   const isEnded = auction.status === 'ENDED'
 
@@ -60,6 +61,7 @@ export default function PublicAuctionClient({ auction }: { auction: IAuctionLive
           isEnded={isEnded}
           trigger={slotTrigger}
           isAuthed={isAuthed}
+          isDraft={isDraft}
         />
 
         <div className="max-w-7xl mx-auto px-4 xs:px-5 sm:px-6 py-10 sm:py-14">
@@ -72,11 +74,7 @@ export default function PublicAuctionClient({ auction }: { auction: IAuctionLive
             filter={filter}
             setSlotTrigger={setSlotTrigger}
           />
-          <AuctionSoldGrid
-            auction={auction}
-            customAuctionLink={auction.customAuctionLink}
-            sold={sold}
-          />
+          <AuctionSoldGrid auction={auction} customAuctionLink={auction.customAuctionLink} sold={sold} />
           <AuctionEmptyState auction={auction} />
           <AuctionHowItWorks isActive={isActive} />
         </div>

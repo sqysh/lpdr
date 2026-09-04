@@ -1,34 +1,46 @@
 'use server'
 
+import { randomInt } from 'crypto'
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
+import type { ActionResult } from 'types/_action.types'
+
+// No 0/O/1/I/l — they're the ones people mistype when reading a code aloud
+const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+
+const ROTATION_INTERVAL_MS = 14 * 24 * 60 * 60 * 1000
 
 function generateBypassCode(): string {
-  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*()-_=+'
-  const random = (len: number) =>
-    Array.from({ length: len }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  const random = (len: number) => Array.from({ length: len }, () => CHARS[randomInt(CHARS.length)]).join('')
 
-  return `DOXIE-${random(2).toUpperCase()}${Math.floor(Math.random() * 10)}${random(5)}`
+  return `DOXIE-${random(8)}`
 }
 
 export async function rotateBypassCodeCore() {
   const bypassCode = generateBypassCode()
-  const existing = await prisma.adoptionApplicationBypassCode.findFirst()
+  const nextRotationAt = new Date(Date.now() + ROTATION_INTERVAL_MS)
 
-  await prisma.adoptionApplicationBypassCode.upsert({
-    where: { id: existing?.id ?? '' },
-    update: { bypassCode, nextRotationAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) },
-    create: { bypassCode, nextRotationAt: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000) }
-  })
+  const existing = await prisma.adoptionApplicationBypassCode.findFirst({ select: { id: true } })
+
+  if (existing) {
+    await prisma.adoptionApplicationBypassCode.update({
+      where: { id: existing.id },
+      data: { bypassCode, nextRotationAt }
+    })
+  } else {
+    await prisma.adoptionApplicationBypassCode.create({
+      data: { bypassCode, nextRotationAt }
+    })
+  }
 
   return { bypassCode, wasFirstRun: !existing }
 }
 
-export async function rotateBypassCode() {
+export async function rotateBypassCode(): Promise<ActionResult<{ bypassCode: string; wasFirstRun: boolean }>> {
   const gate = await requireSuper()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {
     const result = await rotateBypassCodeCore()
@@ -38,12 +50,12 @@ export async function rotateBypassCode() {
       rotatedBy: gate.userId
     })
 
-    return { success: true, data: result, error: null }
+    return { success: true, data: result }
   } catch (error) {
     await createLog('error', 'Failed to manually rotate bypass code', {
       error: getErrorMessage(error),
       rotatedBy: gate.userId
     })
-    return { success: false, error: 'Failed to rotate bypass code. Please try again.', data: null }
+    return { success: false, data: null, error: 'Failed to rotate bypass code. Please try again.' }
   }
 }

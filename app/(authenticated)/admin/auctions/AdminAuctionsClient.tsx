@@ -9,10 +9,10 @@ import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import AdminEmptyState from 'app/(authenticated)/admin/_components/AdminEmptyState'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import { AUCTION_FILTERS } from 'lib/constants/auction.constants'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { AdminAuctionCard } from './_components/AdminAuctionCard'
 import { groupByYearAndQuarter } from './_lib/groupByYearAndQuarter'
-import AdminAuctionModal from './_components/AdminAuctionModal'
+import { CreateAuctionModal } from './_components/CreateAuctionModal'
 
 export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[] }) {
   const [filter, setFilter] = useState('ALL')
@@ -32,17 +32,14 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
 
   return (
     <>
-      <AdminAuctionModal isOpen={openAuctionModal} onClose={() => setOpenAuctionModal(false)} />
+      <CreateAuctionModal isOpen={openAuctionModal} onClose={() => setOpenAuctionModal(false)} />
 
       <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
         <AdminPageHeader
           title="Auctions"
           count={{ value: auctions.length, noun: 'auction' }}
           action={
-            <AdminHeaderButton
-              onClick={() => setOpenAuctionModal(true)}
-              icon={<Plus size={12} aria-hidden="true" />}
-            >
+            <AdminHeaderButton onClick={() => setOpenAuctionModal(true)} icon={<Plus size={12} aria-hidden="true" />}>
               New Auction
             </AdminHeaderButton>
           }
@@ -104,11 +101,7 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
                           {/* Full-width cards */}
                           <div className="space-y-3">
                             {auctions.map((auction) => (
-                              <AdminAuctionCard
-                                key={auction.id}
-                                auction={auction}
-                                index={cardIndex++}
-                              />
+                              <AdminAuctionCard key={auction.id} auction={auction} index={cardIndex++} />
                             ))}
                           </div>
                         </div>
@@ -118,12 +111,7 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
                 ))}
               </motion.div>
             ) : (
-              <motion.div
-                key="empty"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-              >
+              <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <AdminEmptyState
                   icon={<Gavel size={20} aria-hidden="true" />}
                   title="No auctions yet"

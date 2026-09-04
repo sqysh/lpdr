@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import prisma from 'prisma/client'
 import { AuctionItemForm } from 'app/(authenticated)/admin/auctions/[id]/[itemId]/_components/AuctionItemForm'
-import { serializeInstantBuyer } from 'lib/utils/serializers.utils'
+import { serialize } from 'lib/utils/serializers.utils'
 
 export default async function AdminAuctionEditItemPage({
   params
@@ -35,7 +35,7 @@ export default async function AdminAuctionEditItemPage({
       ...b,
       bidAmount: Number(b.bidAmount)
     })),
-    instantBuyers: serializeInstantBuyer(item.instantBuyers)
+    instantBuyers: serialize(item.instantBuyers)
   }
 
   return (

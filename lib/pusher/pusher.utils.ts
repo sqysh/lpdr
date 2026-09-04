@@ -1,7 +1,6 @@
 import { createLog } from 'lib/actions/log/createLog'
 import { pusher } from 'lib/pusher/pusher'
-
-export const SUPER_USER_CHANNEL = 'superuser'
+import { SUPER_USER_CHANNEL } from './pusher.constants'
 
 export async function pusherTrigger(channel: string, event: string, data: Record<string, unknown>) {
   // Fire both simultaneously — original channel + superuser feed

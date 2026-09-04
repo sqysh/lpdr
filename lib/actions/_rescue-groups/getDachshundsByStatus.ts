@@ -2,17 +2,17 @@ import { unstable_cache } from 'next/cache'
 import { createLog } from '../log/createLog'
 import { getPicturesAndVideos } from '../../utils/rescue-group.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import type { ActionResult } from 'types/_action.types'
 
 async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
   let lastError: unknown
 
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
-      const response = await fetch(url, {
+      return await fetch(url, {
         ...options,
         signal: AbortSignal.timeout(8000)
       })
-      return response
     } catch (error) {
       lastError = error
       if (attempt < retries) {
@@ -36,13 +36,7 @@ async function fetchDachshundsFromApi(status: string, pageLimit: number) {
       },
       body: JSON.stringify({
         data: {
-          filters: [
-            {
-              fieldName: 'statuses.name',
-              operation: 'equals',
-              criteria: status
-            }
-          ]
+          filters: [{ fieldName: 'statuses.name', operation: 'equals', criteria: status }]
         }
       })
     }
@@ -73,7 +67,7 @@ export async function getDachshundsByStatus({
   pageLimit: number
   currentPage: number
   source: string
-}) {
+}): Promise<ActionResult<Awaited<ReturnType<typeof fetchDachshundsFromApi>>>> {
   try {
     const data = await cachedFetchDachshunds(status, pageLimit)
     return { success: true, data }
@@ -86,6 +80,6 @@ export async function getDachshundsByStatus({
       error: getErrorMessage(error)
     })
 
-    return { success: false, error: 'Failed to fetch dachshunds' }
+    return { success: false, data: null, error: 'Failed to fetch dachshunds' }
   }
 }

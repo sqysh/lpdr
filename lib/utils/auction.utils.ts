@@ -1,7 +1,7 @@
 import { AuctionStatus } from '@prisma/client'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { IAuctionBid } from 'types/_auction-bid'
-import { AuctionItemStatus } from 'types/_auction-item'
+import { AuctionItemStatus } from 'types/auction-item.types'
 
 export function getItemStatusConfig(status: AuctionItemStatus) {
   switch (status) {
@@ -64,8 +64,7 @@ function calculateIncrementalTotal(bids: IAuction['bids']): number {
 export function getDisplayRevenue(auction: IAuction): number {
   if (auction.status === 'ENDED') return auction.totalAuctionRevenue
 
-  const totalFromInstantBuys =
-    auction.instantBuyers?.reduce((acc, item) => acc + (item.totalPrice ?? 0), 0) ?? 0
+  const totalFromInstantBuys = auction.instantBuyers?.reduce((acc, item) => acc + (item.totalPrice ?? 0), 0) ?? 0
 
   return calculateIncrementalTotal(auction.bids) + totalFromInstantBuys
 }

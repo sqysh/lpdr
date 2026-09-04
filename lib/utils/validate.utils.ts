@@ -1,4 +1,3 @@
-import 'server-only'
 import { ActionResult } from 'types/_action.types'
 import { z, type ZodType } from 'zod'
 

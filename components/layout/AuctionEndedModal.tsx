@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, Trophy, X, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { AuctionEndedData } from 'types/_auction'
+import { AuctionEndedData } from 'types/auction.types'
 
 type Props = {
   data: AuctionEndedData | null
@@ -88,11 +88,7 @@ export function AuctionEndedModal({ data, onClose }: Props) {
                 {/* Icon with pulse rings */}
                 <div className="relative w-16 h-16 mx-auto mb-6">
                   <div className="w-16 h-16 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center justify-center">
-                    <Trophy
-                      size={24}
-                      className="text-primary-light dark:text-primary-dark"
-                      aria-hidden="true"
-                    />
+                    <Trophy size={24} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
                   </div>
                   <motion.div
                     initial={{ scale: 0, rotate: -20 }}
@@ -112,20 +108,14 @@ export function AuctionEndedModal({ data, onClose }: Props) {
                   transition={{ delay: 0.3 }}
                   className="flex items-center justify-center gap-3 mb-4"
                 >
-                  <span
-                    className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                   <div className="flex items-center gap-2">
                     <span className="w-1.5 h-1.5 bg-red-500" aria-hidden="true" />
                     <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                       Auction Closed
                     </p>
                   </div>
-                  <span
-                    className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                 </motion.div>
 
                 <motion.h2
@@ -197,14 +187,8 @@ export function AuctionEndedModal({ data, onClose }: Props) {
                     }}
                     aria-hidden="true"
                   />
-                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
-                    View Results
-                  </span>
-                  <ChevronRight
-                    size={14}
-                    className="group-hover:translate-x-0.5 transition-transform"
-                    aria-hidden="true"
-                  />
+                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">View Results</span>
+                  <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                 </Link>
                 <button
                   onClick={onClose}

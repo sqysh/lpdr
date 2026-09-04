@@ -7,7 +7,7 @@ import { deleteAuctionItem } from 'lib/actions/admin/auction/deleteAuctionItem'
 import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
-import type { SellingFormat } from 'types/_auction-item'
+import type { SellingFormat } from 'types/auction-item.types'
 import { IAuctionItemPhoto } from 'types/_auction-item-photo'
 import { AuctionStatus } from '@prisma/client'
 import { AuctionItemDangerZone } from './AuctionItemDangerZone'
@@ -132,9 +132,8 @@ export function AuctionItemForm({
 
   const patch = (data: Partial<FormInputs>) => setInputs((prev) => ({ ...prev, ...data }))
 
-  const handleInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [success, setSuccess] = useState<FormSuccess | null>(null)
@@ -173,9 +172,7 @@ export function AuctionItemForm({
     if (pendingPhotos.length > 0) {
       try {
         photos = await Promise.all(
-          pendingPhotos.map(({ file }) =>
-            uploadFileToFirebase(file, (progress) => setUploadProgress(progress))
-          )
+          pendingPhotos.map(({ file }) => uploadFileToFirebase(file, (progress) => setUploadProgress(progress)))
         )
       } catch {
         setErrors({ form: 'Failed to upload photos. Please try again.' })
@@ -197,9 +194,7 @@ export function AuctionItemForm({
       photos
     }
 
-    const result = isUpdating
-      ? await updateAuctionItem(auctionItem!.id, payload)
-      : await createAuctionItem(payload)
+    const result = isUpdating ? await updateAuctionItem(auctionItem!.id, payload) : await createAuctionItem(payload)
 
     if (!result.success) {
       setErrors({ form: result.error ?? 'Something went wrong.' })

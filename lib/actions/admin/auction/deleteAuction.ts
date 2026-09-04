@@ -3,47 +3,38 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireSuper } from 'lib/auth/guards'
+import { getErrorMessage } from 'lib/utils/error.utils'
+import type { ActionResult } from 'types/_action.types'
 
-export const deleteAuction = async (id: string) => {
+export const deleteAuction = async (id: string): Promise<ActionResult<null>> => {
   const gate = await requireSuper()
   if (gate.ok === false) {
     await createLog('warn', 'Unauthorized deleteAuction attempt', { id })
-    return { success: false, error: gate.error, data: null }
+    return { success: false, data: null, error: gate.error }
   }
 
-  try {
-    if (!id) return { success: false, error: 'Missing id', data: null }
+  if (!id) return { success: false, data: null, error: 'Missing id' }
 
+  try {
     const auction = await prisma.auction.findUnique({
       where: { id },
       select: { status: true, title: true }
     })
 
-    if (!auction) return { success: false, error: 'Auction not found', data: null }
+    if (!auction) return { success: false, data: null, error: 'Auction not found' }
 
     if (auction.status !== 'DRAFT') {
-      return {
-        success: false,
-        error: 'Only draft auctions can be deleted.',
-        data: null
-      }
+      return { success: false, data: null, error: 'Only draft auctions can be deleted.' }
     }
 
     await prisma.auction.delete({ where: { id } })
 
-    await createLog('info', 'Auction deleted', { id, title: auction.title })
+    await createLog('info', 'Auction deleted', { id, title: auction.title, deletedBy: gate.userId })
 
     return { success: true, data: null }
   } catch (error) {
-    await createLog('error', 'Failed to delete auction', {
-      error: error instanceof Error ? error.message : 'Unknown error',
-      id
-    })
+    await createLog('error', 'Failed to delete auction', { error: getErrorMessage(error), id })
 
-    return {
-      success: false,
-      error: 'Failed to delete auction. Please try again.',
-      data: null
-    }
+    return { success: false, data: null, error: 'Failed to delete auction. Please try again.' }
   }
 }

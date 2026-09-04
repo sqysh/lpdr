@@ -1,7 +1,7 @@
 import { PaymentStatus, ShippingStatus, WinningBidPaymentStatus } from '@prisma/client'
-import { IAuctionItem } from './_auction-item'
+import { IAuctionItem } from './auction-item.types'
 import { IUser } from './_user'
-import { IAuction } from './_auction'
+import { IAuction } from './auction.types'
 
 export interface IAuctionWinningBidder {
   id: string

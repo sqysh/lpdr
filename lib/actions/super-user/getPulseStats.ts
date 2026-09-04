@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { getServiceHealth } from './getServiceHealth'
+import { ServiceHealth } from './getServiceHealth'
 
 export interface PulseStat {
   label: string
@@ -10,10 +10,10 @@ export interface PulseStat {
   detail: string
 }
 
-export async function getPulseStats(): Promise<PulseStat[]> {
+export async function getPulseStats(services: ServiceHealth[] = []) {
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000)
 
-  const [cronErrors, emailBounces, webhookFailures, services] = await Promise.all([
+  const [cronErrors, emailBounces, webhookFailures] = await Promise.all([
     // Cron errors — logs with [CRON] prefix and error level in last 24h
     prisma.log.findMany({
       where: {
@@ -42,10 +42,7 @@ export async function getPulseStats(): Promise<PulseStat[]> {
         createdAt: { gte: since24h }
       },
       select: { message: true, metadata: true }
-    }),
-
-    // Reuse getServiceHealth — already written, don't duplicate
-    getServiceHealth()
+    })
   ])
 
   // Cron signal
@@ -75,7 +72,7 @@ export async function getPulseStats(): Promise<PulseStat[]> {
   const serviceWarnings = services.filter((s) => s.status === 'warn' || s.status === 'error')
   const serviceDetail = serviceWarnings.length === 0 ? 'All services healthy' : serviceWarnings.map((s) => s.name).join(', ')
 
-  return [
+  const data: PulseStat[] = [
     {
       label: 'Cron Errors (24h)',
       value: cronErrorCount,
@@ -101,4 +98,6 @@ export async function getPulseStats(): Promise<PulseStat[]> {
       detail: serviceDetail
     }
   ]
+
+  return { success: true, error: null, data }
 }

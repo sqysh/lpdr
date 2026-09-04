@@ -5,7 +5,7 @@ import { Gavel, Calendar, Users, ChevronRight, Clock, Package as Package2 } from
 import { motion } from 'framer-motion'
 import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
 import { getProgressPct } from 'lib/utils/math.utils'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 
 export function AdminAuctionCard({ auction, index }: { auction: IAuction; index: number }) {
   const statusConfig = getAuctionStatusConfig(auction.status)
@@ -25,9 +25,7 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
         {/* Status + title */}
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 mb-1">
-            <span
-              className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${statusConfig.classes}`}
-            >
+            <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${statusConfig.classes}`}>
               {statusConfig.label}
             </span>
           </div>
@@ -60,18 +58,10 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
             }
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="text-center">
-              <p className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-none">
-                {value}
-              </p>
+              <p className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-none">{value}</p>
               <div className="flex items-center gap-1 mt-0.5">
-                <Icon
-                  size={9}
-                  className="text-muted-light dark:text-muted-dark shrink-0"
-                  aria-hidden="true"
-                />
-                <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark uppercase tracking-wider">
-                  {label}
-                </p>
+                <Icon size={9} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+                <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark uppercase tracking-wider">{label}</p>
               </div>
             </div>
           ))}
@@ -79,9 +69,7 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
 
         {/* Revenue */}
         <div className="shrink-0 text-right">
-          <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-0.5">
-            Revenue
-          </p>
+          <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-0.5">Revenue</p>
           <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark tabular-nums leading-none">
             {formatMoney(Number(auction.totalAuctionRevenue))}
           </p>
@@ -107,9 +95,7 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
         {/* ── Header: status + title ── */}
         <div className="px-5 pt-5 pb-4 border-b border-border-light dark:border-border-dark">
           <div className="flex items-center justify-between gap-3 mb-3">
-            <span
-              className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${statusConfig.classes}`}
-            >
+            <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${statusConfig.classes}`}>
               {statusConfig.label}
             </span>
             {isActive && daysLeft > 0 && (
@@ -133,9 +119,7 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
 
         {/* ── Revenue ── */}
         <div className="px-5 py-4 border-b border-border-light dark:border-border-dark">
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1">
-            Revenue
-          </p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1">Revenue</p>
           <p className="font-quicksand font-black text-2xl text-text-light dark:text-text-dark tabular-nums leading-none mb-3">
             {formatMoney(Number(auction.totalAuctionRevenue))}
           </p>
@@ -176,18 +160,10 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
             }
           ].map(({ icon: Icon, label, value }) => (
             <div key={label} className="px-6 py-3 flex items-center gap-3">
-              <p className="font-quicksand font-black text-xl text-text-light dark:text-text-dark leading-none">
-                {value}
-              </p>
+              <p className="font-quicksand font-black text-xl text-text-light dark:text-text-dark leading-none">{value}</p>
               <div className="flex items-center gap-1">
-                <Icon
-                  size={10}
-                  className="text-muted-light dark:text-muted-dark shrink-0"
-                  aria-hidden="true"
-                />
-                <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark uppercase tracking-wider">
-                  {label}
-                </p>
+                <Icon size={10} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+                <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark uppercase tracking-wider">{label}</p>
               </div>
             </div>
           ))}
@@ -213,9 +189,7 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
                   className={`h-full ${pct >= 100 ? 'bg-emerald-500' : 'bg-primary-light dark:bg-primary-dark'}`}
                 />
               </div>
-              <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
-                {pct}% of goal
-              </p>
+              <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark">{pct}% of goal</p>
             </div>
           </div>
         </div>

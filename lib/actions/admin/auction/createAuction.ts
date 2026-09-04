@@ -1,81 +1,65 @@
 'use server'
 
 import prisma from 'prisma/client'
+import { Prisma } from '@prisma/client'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { validateAuctionHour } from 'lib/utils/auction.utils'
+import { parseInput } from 'lib/utils/validate.utils'
+import { createAuctionSchema } from 'lib/schemas/auction.schema'
+import type { ActionResult } from 'types/_action.types'
+import { slugify } from 'lib/utils/slug.utils'
 
-type CreateAuctionInput = {
-  title: string
-  startDate: Date
-  endDate: Date
-  status?: 'DRAFT' | 'ACTIVE' | 'ENDED'
-  goal?: number
-  customAuctionLink?: string
-}
-
-export const createAuction = async (data: CreateAuctionInput) => {
+export const createAuction = async (input: unknown): Promise<ActionResult<{ id: string }>> => {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
-  if (!data.title?.trim()) {
-    return { success: false, error: 'Title is required', data: null }
-  }
+  const parsed = parseInput(createAuctionSchema, input)
+  if (parsed.ok === false) return parsed.result
 
-  if (!data.startDate || !data.endDate) {
-    return { success: false, error: 'Start and end date are required', data: null }
-  }
-
-  if (data.startDate >= data.endDate) {
-    return { success: false, error: 'Start date must be before end date', data: null }
-  }
-
-  const startHourError = validateAuctionHour(data.startDate.toISOString())
-  if (startHourError) return { success: false, error: `Start time: ${startHourError}`, data: null }
-
-  const endHourError = validateAuctionHour(data.endDate.toISOString())
-  if (endHourError) return { success: false, error: `End time: ${endHourError}`, data: null }
+  const { title, startDate, endDate, status, goal } = parsed.data
 
   try {
+    // Slug is generated from the title; admins can rename it in settings later
+    const base = slugify(title) || 'auction'
+
+    let customAuctionLink = base
+    let suffix = 2
+
+    while (
+      await prisma.auction.findUnique({
+        where: { customAuctionLink },
+        select: { id: true }
+      })
+    ) {
+      customAuctionLink = `${base}-${suffix}`
+      suffix += 1
+    }
+
     const auction = await prisma.auction.create({
-      data: {
-        title: data.title.trim(),
-        status: data.status ?? 'DRAFT',
-        goal: data.goal ?? 1000,
-        customAuctionLink: data.customAuctionLink?.trim(),
-        startDate: new Date(data.startDate),
-        endDate: new Date(data.endDate)
-      }
+      data: { title, status, goal, customAuctionLink, startDate, endDate }
     })
 
-    await Promise.all([
-      createLog('info', 'Auction created', {
-        auctionId: auction.id,
-        title: auction.title,
-        status: auction.status,
-        startDate: auction.startDate,
-        endDate: auction.endDate,
-        createdBy: gate.userId
-      }),
-      pusherSuperuser('auction-created', {
-        auctionId: auction.id,
-        title: auction.title,
-        status: auction.status,
-        startDate: auction.startDate,
-        endDate: auction.endDate,
-        createdBy: gate.userId
-      })
-    ])
+    const payload = {
+      auctionId: auction.id,
+      title: auction.title,
+      status: auction.status,
+      startDate: auction.startDate,
+      endDate: auction.endDate,
+      createdBy: gate.userId
+    }
+
+    await Promise.all([createLog('info', 'Auction created', payload), pusherSuperuser('auction-created', payload)])
 
     return { success: true, data: { id: auction.id } }
   } catch (error) {
-    await createLog('error', 'Failed to create auction', {
-      error: getErrorMessage(error),
-      title: data.title
-    })
+    // Two auctions created at the same instant can pick the same slug
+    if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+      return { success: false, data: null, error: 'Please try again.' }
+    }
 
-    return { success: false, error: 'Failed to create auction. Please try again.', data: null }
+    await createLog('error', 'Failed to create auction', { error: getErrorMessage(error) })
+    return { success: false, data: null, error: 'Failed to create auction. Please try again.' }
   }
 }

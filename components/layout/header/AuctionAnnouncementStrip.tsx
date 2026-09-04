@@ -17,7 +17,8 @@ type AuctionStripProps = {
 }
 
 export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps) {
-  const isActive = auction?.status === 'ACTIVE'
+  const status = auction?.status
+  const isActive = status === 'ACTIVE'
 
   if (!auction) return
 
@@ -82,11 +83,7 @@ export default function AuctionAnnouncementStrip({ auction }: AuctionStripProps)
           <div className="flex items-center gap-3 shrink-0 ml-4">
             <Link
               href={`/auctions/${auction?.customAuctionLink}`}
-              aria-label={
-                isActive
-                  ? `Bid now on ${auction?.title}`
-                  : `View upcoming auction: ${auction?.title}`
-              }
+              aria-label={isActive ? `Bid now on ${auction?.title}` : `View upcoming auction: ${auction?.title}`}
               className="group inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-white border border-white/40 hover:border-white hover:bg-white/10 px-3 py-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-transparent whitespace-nowrap"
             >
               {isActive ? 'Bid Now' : 'Learn More'}

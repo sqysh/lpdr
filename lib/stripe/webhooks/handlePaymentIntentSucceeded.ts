@@ -7,7 +7,6 @@ import { adminOrderNotificationTemplate } from 'lib/email/templates/admin-order-
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
-import { IAdoptionFee } from 'types/_adoption-fee'
 import { ProductSizeEntry } from 'types/_product'
 import { WelcomeWienerProduct } from 'types/_welcome-wiener'
 
@@ -40,9 +39,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
 
     const [products, wieners, winningBidder, instantBuyItem] = await Promise.all([
       ids.length ? prisma.product.findMany({ where: { id: { in: ids } } }) : Promise.resolve([]),
-      wienerIds.length
-        ? prisma.welcomeWiener.findMany({ where: { id: { in: wienerIds } } })
-        : Promise.resolve([]),
+      wienerIds.length ? prisma.welcomeWiener.findMany({ where: { id: { in: wienerIds } } }) : Promise.resolve([]),
       orderType === 'AUCTION_PURCHASE' && metadata?.winningBidderId
         ? prisma.auctionWinningBidder.findUnique({
             where: { id: metadata.winningBidderId },
@@ -63,9 +60,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
             const product = products.find((p) => p.id === line.i)
             return product?.isPhysicalProduct ?? false
           })
-        : (winningBidder?.auctionItems?.some((item) => item.requiresShipping) ??
-          instantBuyItem?.requiresShipping ??
-          false)
+        : (winningBidder?.auctionItems?.some((item) => item.requiresShipping) ?? instantBuyItem?.requiresShipping ?? false)
 
     const geoUser = userId
       ? await prisma.user.findUnique({
@@ -110,9 +105,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
         coverFees: metadata?.coverFees === 'true',
         feesCovered: parseFloat(metadata?.feesCovered || '0') || 0,
         isRecurring,
-        recurringFrequency: isRecurring
-          ? ((metadata?.recurringFrequency as RecurringFrequency) ?? null)
-          : null,
+        recurringFrequency: isRecurring ? ((metadata?.recurringFrequency as RecurringFrequency) ?? null) : null,
         stripeSubscriptionId: isRecurring ? (metadata?.stripeSubscriptionId ?? null) : null,
         nextBillingDate: nbd && !isNaN(+nbd) ? nbd : null,
         paymentMethodId: (paymentIntent.payment_method as string) || null,
@@ -179,9 +172,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
             const sizes = fresh.sizes as ProductSizeEntry[] | null
             const updatedSizes =
               line.s && sizes
-                ? sizes.map((s) =>
-                    s.size === line.s ? { ...s, quantity: Math.max(0, s.quantity - line.q) } : s
-                  )
+                ? sizes.map((s) => (s.size === line.s ? { ...s, quantity: Math.max(0, s.quantity - line.q) } : s))
                 : sizes
 
             await prisma.product.update({
@@ -306,8 +297,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
               auctionItemPaymentStatus: 'PAID',
               shippingStatus: 'PENDING_FULFILLMENT',
               paidOn: new Date(),
-              processingFee:
-                metadata?.coverFees === 'true' ? parseFloat(metadata.feesCovered || '0') || 0 : 0
+              processingFee: metadata?.coverFees === 'true' ? parseFloat(metadata.feesCovered || '0') || 0 : 0
             },
             include: {
               user: { select: { email: true } },
@@ -351,7 +341,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       }
     }
 
-    let adoptionFee: IAdoptionFee | undefined
+    let adoptionFee: { id: string } | undefined
     let existingAdoptionFee: { id: string } | null = null
 
     if (orderType === 'ADOPTION_FEE') {

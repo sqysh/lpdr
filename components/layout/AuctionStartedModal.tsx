@@ -4,16 +4,10 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Gavel, Zap, X, ChevronRight } from 'lucide-react'
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
 import Link from 'next/link'
-import { AuctionStartedData } from 'types/_auction'
+import { AuctionStartedData } from 'types/auction.types'
 import { CountUnit } from 'components/_primitives'
 
-export function AuctionStartedModal({
-  data,
-  onClose
-}: {
-  data: AuctionStartedData | null
-  onClose: () => void
-}) {
+export function AuctionStartedModal({ data, onClose }: { data: AuctionStartedData | null; onClose: () => void }) {
   const { days, hours, minutes, done } = useCountdown(new Date(data?.endDate))
 
   return (
@@ -109,11 +103,7 @@ export function AuctionStartedModal({
                     transition={{ duration: 0.6, delay: 0.5 }}
                     className="w-16 h-16 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center justify-center"
                   >
-                    <Gavel
-                      size={26}
-                      className="text-primary-light dark:text-primary-dark"
-                      aria-hidden="true"
-                    />
+                    <Gavel size={26} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
                   </motion.div>
                   <motion.div
                     initial={{ scale: 0, rotate: -20 }}
@@ -132,10 +122,7 @@ export function AuctionStartedModal({
                   transition={{ delay: 0.3 }}
                   className="flex items-center justify-center gap-3 mb-4"
                 >
-                  <span
-                    className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2 w-2" aria-hidden="true">
                       <span className="animate-ping absolute inline-flex h-full w-full bg-primary-light dark:bg-primary-dark opacity-75" />
@@ -145,10 +132,7 @@ export function AuctionStartedModal({
                       Now Live
                     </p>
                   </div>
-                  <span
-                    className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                 </motion.div>
 
                 <motion.h2
@@ -167,8 +151,7 @@ export function AuctionStartedModal({
                   transition={{ delay: 0.4 }}
                   className="text-xs font-mono text-muted-light dark:text-muted-dark"
                 >
-                  {data.itemCount} item{data.itemCount !== 1 ? 's' : ''} are up for bidding right
-                  now.
+                  {data.itemCount} item{data.itemCount !== 1 ? 's' : ''} are up for bidding right now.
                 </motion.p>
               </div>
 
@@ -216,14 +199,8 @@ export function AuctionStartedModal({
                     }}
                     aria-hidden="true"
                   />
-                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">
-                    Start Bidding
-                  </span>
-                  <ChevronRight
-                    size={14}
-                    className="group-hover:translate-x-0.5 transition-transform"
-                    aria-hidden="true"
-                  />
+                  <span className="text-[10px] font-mono tracking-[0.2em] uppercase font-black">Start Bidding</span>
+                  <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" aria-hidden="true" />
                 </Link>
                 <button
                   onClick={onClose}

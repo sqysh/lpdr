@@ -1,7 +1,8 @@
 'use server'
 
 import prisma from 'prisma/client'
-import Stripe from 'stripe'
+import { requireSuper } from 'lib/auth/guards'
+import { stripeClient } from 'lib/stripe/stripe-client'
 
 export type HealthStatus = 'ok' | 'warn' | 'error' | 'unknown'
 
@@ -12,8 +13,6 @@ export interface ServiceHealth {
   detail: string
   lastChecked: string
 }
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, { apiVersion: '2025-08-27.basil' })
 
 /* ── helpers ── */
 
@@ -40,7 +39,7 @@ async function checkPostgres(): Promise<ServiceHealth> {
     return {
       name: 'PostgreSQL / Prisma',
       status: 'error',
-      detail: e instanceof Error ? e.message : 'Connection failed',
+      detail: 'Connection failed',
       lastChecked: 'just now'
     }
   }
@@ -49,13 +48,13 @@ async function checkPostgres(): Promise<ServiceHealth> {
 async function checkStripe(): Promise<ServiceHealth> {
   try {
     // Pull the most recent webhook event to see when Stripe last talked to us
-    const events = await stripe.events.list({ limit: 1 })
+    const events = await stripeClient.events.list({ limit: 1 })
     const lastEvent = events.data[0]
     const ageMs = lastEvent ? Date.now() - lastEvent.created * 1000 : null
     const ageMin = ageMs ? Math.floor(ageMs / 60000) : null
 
     // Also check for recent failures in the webhook log
-    const failedEvents = await stripe.events.list({
+    const failedEvents = await stripeClient.events.list({
       limit: 10,
       type: 'payment_intent.payment_failed',
       created: { gte: Math.floor((Date.now() - 3600000) / 1000) } // last 1hr
@@ -185,7 +184,10 @@ async function checkVercel(): Promise<ServiceHealth> {
 
 /* ── main action ── */
 
-export async function getServiceHealth(): Promise<ServiceHealth[]> {
+export async function getServiceHealth() {
+  const gate = await requireSuper()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+
   // Run all checks concurrently — don't let one slow check block the rest
   const results = await Promise.all([
     checkPostgres().catch(() => ({
@@ -206,7 +208,12 @@ export async function getServiceHealth(): Promise<ServiceHealth[]> {
       detail: 'Check threw unexpectedly',
       lastChecked: 'just now'
     })),
-    checkPusher().catch(() => ({ name: 'Pusher', status: 'unknown' as HealthStatus, detail: 'Check threw unexpectedly', lastChecked: 'just now' })),
+    checkPusher().catch(() => ({
+      name: 'Pusher',
+      status: 'unknown' as HealthStatus,
+      detail: 'Check threw unexpectedly',
+      lastChecked: 'just now'
+    })),
     checkVercel().catch(() => ({
       name: 'Vercel Edge',
       status: 'unknown' as HealthStatus,
@@ -215,5 +222,5 @@ export async function getServiceHealth(): Promise<ServiceHealth[]> {
     }))
   ])
 
-  return results
+  return { success: true, error: null, data: results }
 }

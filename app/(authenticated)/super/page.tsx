@@ -7,10 +7,11 @@ import { getPulseStats } from 'lib/actions/super-user/getPulseStats'
 import { getServiceHealth } from 'lib/actions/super-user/getServiceHealth'
 
 export default async function SuperDashboardPage() {
-  const [services, cronJobs, pulseStats, adminUsers, auditLogs, managedUsers] = await Promise.all([
-    getServiceHealth(),
+  const services = await getServiceHealth()
+
+  const [cronJobs, pulseStats, adminUsers, auditLogs, managedUsers] = await Promise.all([
     getCronJobs(),
-    getPulseStats(),
+    getPulseStats(services.data ?? []),
     getAdminUsers(),
     getAuditLogs(),
     getManagedUsers()
@@ -18,12 +19,12 @@ export default async function SuperDashboardPage() {
 
   return (
     <SuperDashboardClient
-      services={services}
+      services={services.data ?? []}
       cronJobs={cronJobs}
-      pulseStats={pulseStats}
-      adminUsers={adminUsers}
-      auditLogs={auditLogs.data}
-      managedUsers={managedUsers}
+      pulseStats={pulseStats.data ?? []}
+      adminUsers={adminUsers.data ?? []}
+      auditLogs={auditLogs.data ?? []}
+      managedUsers={managedUsers.data ?? []}
     />
   )
 }

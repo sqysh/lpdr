@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Flag, Loader2, RotateCcw, Trash2, Zap } from 'lucide-react'
 import { Role } from '@prisma/client'
@@ -50,9 +50,8 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
     statusTimeout.current = setTimeout(() => setStatus(null), 6000)
   }
 
-  const handleInput = (
-    e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-  ) => setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }))
+  const handleInput = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
+    setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }))
 
   const handleSave = async () => {
     setLoading(true)
@@ -182,10 +181,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
       <div className="border border-border-light dark:border-border-dark">
         <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
           <div className="flex items-center gap-3">
-            <span
-              className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
-              aria-hidden="true"
-            />
+            <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
             <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Auction Settings
             </h2>

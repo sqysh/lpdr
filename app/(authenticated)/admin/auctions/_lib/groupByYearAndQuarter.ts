@@ -1,5 +1,5 @@
 import { YearGroup } from '../_types/auctions.types'
-import { IAuction } from 'types/_auction'
+import { IAuction } from 'types/auction.types'
 
 export function getYear(date: string | Date) {
   return new Date(date).getFullYear()

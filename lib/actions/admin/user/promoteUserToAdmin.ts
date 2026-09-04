@@ -1,5 +1,3 @@
-'use server'
-
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 

@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { serializeProduct } from 'lib/utils/serializers.utils'
+import { serialize } from 'lib/utils/serializers.utils'
 
 export const getLiveProducts = async () => {
   try {
@@ -11,7 +11,7 @@ export const getLiveProducts = async () => {
 
     return {
       success: true,
-      data: products.map(serializeProduct),
+      data: products.map(serialize),
       error: null
     }
   } catch (error) {

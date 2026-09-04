@@ -4,23 +4,33 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import type { ActionResult } from 'types/_action.types'
 
-export const deleteAuctionItem = async (id: string, auctionId: string) => {
+export const deleteAuctionItem = async (id: string, auctionId: string): Promise<ActionResult<null>> => {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {
-    const item = await prisma.auctionItem.findUnique({
-      where: { id },
+    const item = await prisma.auctionItem.findFirst({
+      where: { id, auctionId },
       select: { name: true, totalBids: true, auction: { select: { status: true } } }
     })
-    if (!item) return { success: false, error: 'Item not found', data: null }
+
+    if (!item) return { success: false, data: null, error: 'Item not found' }
 
     if (item.auction.status === 'ACTIVE') {
       return {
         success: false,
-        error: 'Items cannot be deleted while the auction is live',
-        data: null
+        data: null,
+        error: 'Items cannot be deleted while the auction is live'
+      }
+    }
+
+    if (item.totalBids > 0) {
+      return {
+        success: false,
+        data: null,
+        error: `${item.name} has ${item.totalBids} bid${item.totalBids === 1 ? '' : 's'} and cannot be deleted.`
       }
     }
 
@@ -30,17 +40,16 @@ export const deleteAuctionItem = async (id: string, auctionId: string) => {
       auctionItemId: id,
       auctionId,
       name: item.name,
-      totalBids: item.totalBids,
       deletedBy: gate.userId
     })
 
-    return { success: true, data: null, error: null }
+    return { success: true, data: null }
   } catch (error) {
     await createLog('error', 'Failed to delete auction item', {
       auctionItemId: id,
       auctionId,
       error: getErrorMessage(error)
     })
-    return { success: false, error: 'Failed to delete auction item', data: null }
+    return { success: false, data: null, error: 'Failed to delete auction item' }
   }
 }

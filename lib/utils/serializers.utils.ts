@@ -1,42 +1,19 @@
-export const serializeDecimal = (value: any) => (value != null ? Number(value) : null)
+import { Prisma } from '@prisma/client'
+import { DecimalToNumber } from 'types/auction.types'
 
-export const serializeAuction = (a: any) => ({
-  ...a,
-  goal: Number(a.goal),
-  totalAuctionRevenue: Number(a.totalAuctionRevenue)
-})
+/**
+ * Walks any Prisma result and turns every Decimal into a number so it can
+ * cross to the client. Handles nested relations and arrays; leaves Dates alone.
+ */
+export function serialize<T>(value: T): DecimalToNumber<T> {
+  if (value == null) return value as never
+  if (value instanceof Prisma.Decimal) return Number(value) as never
+  if (value instanceof Date) return value as never
+  if (Array.isArray(value)) return value.map(serialize) as never
 
-export const serializeAuctionItem = (item: any) => ({
-  ...item,
-  startingPrice: serializeDecimal(item.startingPrice),
-  buyNowPrice: serializeDecimal(item.buyNowPrice),
-  currentPrice: serializeDecimal(item.currentPrice),
-  currentBid: serializeDecimal(item.currentBid),
-  minimumBid: serializeDecimal(item.minimumBid),
-  soldPrice: serializeDecimal(item.soldPrice),
-  shippingCosts: serializeDecimal(item.shippingCosts)
-})
+  if (typeof value === 'object') {
+    return Object.fromEntries(Object.entries(value as Record<string, unknown>).map(([k, v]) => [k, serialize(v)])) as never
+  }
 
-export const serializeAuctionBid = (bid: any) => ({
-  ...bid,
-  bidAmount: Number(bid.bidAmount)
-})
-
-export const serializeWinningBidder = (b: any) => ({
-  ...b,
-  totalPrice: serializeDecimal(b.totalPrice),
-  shipping: serializeDecimal(b.shipping),
-  processingFee: serializeDecimal(b.processingFee),
-  itemSoldPrice: serializeDecimal(b.itemSoldPrice)
-})
-
-export const serializeInstantBuyer = (b: any) => ({
-  ...b,
-  totalPrice: serializeDecimal(b.totalPrice)
-})
-
-export const serializeProduct = (p: any) => ({
-  ...p,
-  price: Number(p.price),
-  shippingPrice: Number(p.shippingPrice)
-})
+  return value as never
+}

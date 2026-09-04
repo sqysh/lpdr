@@ -1,4 +1,4 @@
-import { serializeProduct } from 'lib/utils/serializers.utils'
+import { serialize } from 'lib/utils/serializers.utils'
 import prisma from 'prisma/client'
 
 export const getPublicProductById = async (id: string) => {
@@ -9,7 +9,7 @@ export const getPublicProductById = async (id: string) => {
 
     if (!product) return { success: false, error: 'Product not found.', data: null }
 
-    return { success: true, data: serializeProduct(product), error: null }
+    return { success: true, data: serialize(product), error: null }
   } catch (error) {
     return {
       success: false,

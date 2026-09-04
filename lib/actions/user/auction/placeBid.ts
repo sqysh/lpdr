@@ -33,16 +33,13 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
         })
 
         if (!auctionItem) throw new Error('Auction item not found.')
-        if (auctionItem.auction.status !== 'ACTIVE')
-          throw new Error('This auction is not currently active.')
+        if (auctionItem.auction.status !== 'ACTIVE') throw new Error('This auction is not currently active.')
 
         const auctionId = auctionItem.auctionId
         const currentMinimum = Number(auctionItem.minimumBid ?? auctionItem.startingPrice ?? 0)
 
         if (bidAmount < currentMinimum) {
-          throw new Error(
-            `Minimum bid is now $${currentMinimum.toLocaleString()}. Please increase your bid.`
-          )
+          throw new Error(`Minimum bid is now $${currentMinimum.toLocaleString()}. Please increase your bid.`)
         }
 
         previousTopBid = await tx.auctionBid.findFirst({
@@ -71,9 +68,7 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
             bidderId: bidder.id,
             bidAmount,
             email,
-            bidderName: user?.anonymousBidding
-              ? null
-              : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || null,
+            bidderName: user?.anonymousBidding ? null : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || null,
             status: 'TOP_BID'
           }
         })
@@ -165,7 +160,7 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
         yourBid: Number(previousTopBid.bidAmount),
         newBid: bidAmount,
         minimumBid: bidAmount + 1,
-        url: `${process.env.NODE_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}`
+        url: `${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}`
       })
     }
 

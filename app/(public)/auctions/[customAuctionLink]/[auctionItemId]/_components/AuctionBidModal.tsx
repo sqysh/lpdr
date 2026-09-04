@@ -6,7 +6,7 @@ import { placeBid } from 'lib/actions/user/auction/placeBid'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { useRouter } from 'next/navigation'
 import { pusherClient } from 'lib/pusher/pusher-client'
-import { IAuctionItem } from 'types/_auction-item'
+import { IAuctionItem } from 'types/auction-item.types'
 import { useSounds } from 'lib/hooks/useSounds.hook'
 import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { useConfettiStore } from 'stores/confetti.store'
@@ -24,9 +24,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
   const [error, setError] = useState<string | null>(null)
   const [mode, setMode] = useState<'default' | 'custom' | 'success'>('default')
   const [currentBid, setCurrentBid] = useState(Number(auctionItem?.currentBid ?? 0))
-  const [minimumBid, setMinimumBid] = useState(
-    Number(auctionItem?.minimumBid ?? auctionItem?.startingPrice ?? 0)
-  )
+  const [minimumBid, setMinimumBid] = useState(Number(auctionItem?.minimumBid ?? auctionItem?.startingPrice ?? 0))
   const [raceCondition, setRaceCondition] = useState<{
     newMinimumBid: number
     currentBid: number | null
@@ -169,17 +167,11 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
           <div className="absolute top-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute top-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
-        <div
-          className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10"
-          aria-hidden="true"
-        >
+        <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
           <div className="absolute bottom-0 left-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute bottom-0 left-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
-        <div
-          className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10"
-          aria-hidden="true"
-        >
+        <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
           <div className="absolute bottom-0 right-0 w-full h-px bg-cyan-600 dark:bg-violet-400" />
           <div className="absolute bottom-0 right-0 w-px h-full bg-cyan-600 dark:bg-violet-400" />
         </div>
@@ -199,10 +191,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                 {mode === 'success' ? 'Bid Placed' : 'Place a Bid'}
               </span>
             </div>
-            <h2
-              id="bid-modal-title"
-              className="  text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark"
-            >
+            <h2 id="bid-modal-title" className="  text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark">
               {itemName}
             </h2>
           </div>
@@ -226,10 +215,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                 <span className="relative inline-flex  h-2 w-2 bg-cyan-600 dark:bg-violet-400" />
               </span>
             )}
-            <p
-              id="bid-modal-desc"
-              className="  text-f10 uppercase tracking-[0.2em] text-zinc-500 dark:text-muted-dark"
-            >
+            <p id="bid-modal-desc" className="  text-f10 uppercase tracking-[0.2em] text-zinc-500 dark:text-muted-dark">
               {currentBid > 0 ? 'Live Bid' : 'Starting Bid'}
             </p>
           </div>
@@ -239,25 +225,17 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
           {currentBid > 0 && (
             <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark mt-0.5">
               Minimum next bid:{' '}
-              <span className="tabular-nums text-zinc-950 dark:text-text-dark">
-                ${minimumBid.toLocaleString()}
-              </span>
+              <span className="tabular-nums text-zinc-950 dark:text-text-dark">${minimumBid.toLocaleString()}</span>
             </p>
           )}
         </div>
 
         {/* ── Divider ── */}
-        <div
-          className="h-px mx-5 430:mx-6 mb-5 bg-zinc-200 dark:bg-border-dark"
-          aria-hidden="true"
-        />
+        <div className="h-px mx-5 430:mx-6 mb-5 bg-zinc-200 dark:bg-border-dark" aria-hidden="true" />
 
         {/* ── Mode tabs — hidden in success mode ── */}
         {mode !== 'success' && (
-          <div
-            className="flex border-b border-zinc-200 dark:border-border-dark mx-5 430:mx-6 mb-5"
-            role="tablist"
-          >
+          <div className="flex border-b border-zinc-200 dark:border-border-dark mx-5 430:mx-6 mb-5" role="tablist">
             {(['default', 'custom'] as const).map((tab) => (
               <button
                 key={tab}
@@ -291,10 +269,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                 </p>
                 <p className="font-lato text-sm text-zinc-500 dark:text-muted-dark leading-relaxed">
                   Another bid just went through. The new minimum bid is{' '}
-                  <strong className="text-zinc-950 dark:text-text-dark">
-                    ${raceCondition.newMinimumBid.toLocaleString()}
-                  </strong>
-                  .
+                  <strong className="text-zinc-950 dark:text-text-dark">${raceCondition.newMinimumBid.toLocaleString()}</strong>.
                 </p>
               </div>
               <button
@@ -317,9 +292,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                     <p className="  text-sm uppercase tracking-wide leading-none mb-0.5">
                       Bid ${raceCondition.newMinimumBid.toLocaleString()}
                     </p>
-                    <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">
-                      New minimum bid
-                    </p>
+                    <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">New minimum bid</p>
                   </div>
                 </div>
               </button>
@@ -355,21 +328,15 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                         aria-hidden="true"
                       />
                       <div className="text-left">
-                        <p className="  text-sm uppercase tracking-wide leading-none mb-0.5">
-                          Instant Bid
-                        </p>
-                        <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">
-                          +$10 above minimum
-                        </p>
+                        <p className="  text-sm uppercase tracking-wide leading-none mb-0.5">Instant Bid</p>
+                        <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">+$10 above minimum</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
                       {isQuickBidding ? (
                         <Loader2 className="w-4 h-4 animate-spin" aria-hidden="true" />
                       ) : (
-                        <span className="  text-lg tabular-nums">
-                          ${quickBidAmount.toLocaleString()}
-                        </span>
+                        <span className="  text-lg tabular-nums">${quickBidAmount.toLocaleString()}</span>
                       )}
                     </div>
                   </button>
@@ -386,9 +353,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                         <p className="  text-sm uppercase tracking-wide leading-none mb-0.5 text-zinc-950 dark:text-text-dark">
                           Custom Amount
                         </p>
-                        <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">
-                          Bid any amount above minimum
-                        </p>
+                        <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">Bid any amount above minimum</p>
                       </div>
                     </div>
                     <DollarSign className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
@@ -430,23 +395,14 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                       className="w-full pl-8 pr-4 py-4 border-l-2 border-t border-r border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-[#13131f] focus:shadow-[0_0_0_1px_rgba(8,145,178,0.3)] dark:focus:shadow-[0_0_0_1px_rgba(167,139,250,0.3)] text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40   text-lg tabular-nums outline-none transition-all"
                     />
                   </div>
-                  <p
-                    id="bid-hint"
-                    className="font-lato text-xs text-zinc-500 dark:text-muted-dark mb-5"
-                  >
-                    Minimum bid:{' '}
-                    <span className="tabular-nums">${minimumBid.toLocaleString()}</span>
+                  <p id="bid-hint" className="font-lato text-xs text-zinc-500 dark:text-muted-dark mb-5">
+                    Minimum bid: <span className="tabular-nums">${minimumBid.toLocaleString()}</span>
                   </p>
 
                   <button
                     type="button"
                     onClick={handleCustomBid}
-                    disabled={
-                      isPlacingBid ||
-                      isQuickBidding ||
-                      !customAmount ||
-                      Number(customAmount) < minimumBid
-                    }
+                    disabled={isPlacingBid || isQuickBidding || !customAmount || Number(customAmount) < minimumBid}
                     className="w-full flex items-center justify-center gap-2 px-6 py-4   text-sm uppercase tracking-widest text-white bg-cyan-600 hover:bg-cyan-500 dark:bg-violet-500 dark:hover:bg-violet-400 disabled:bg-cyan-600/30 dark:disabled:bg-violet-500/30 disabled:cursor-not-allowed transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-bg-dark"
                   >
                     {isPlacingBid ? (
@@ -475,13 +431,8 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                   {/* Confirmed amount */}
                   <div className="border-l-2 border-cyan-600 dark:border-violet-400 pl-4 mb-5">
                     <div className="flex items-center gap-2 mb-1">
-                      <CheckCircle
-                        className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0"
-                        aria-hidden="true"
-                      />
-                      <p className="  text-f10 uppercase tracking-[0.2em] text-cyan-600 dark:text-violet-400">
-                        Bid Confirmed
-                      </p>
+                      <CheckCircle className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0" aria-hidden="true" />
+                      <p className="  text-f10 uppercase tracking-[0.2em] text-cyan-600 dark:text-violet-400">Bid Confirmed</p>
                     </div>
                     <p className="  text-3xl tabular-nums tracking-tight text-zinc-950 dark:text-text-dark">
                       ${placedBidAmount?.toLocaleString()}
@@ -499,9 +450,7 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                     <p className="  text-xl tabular-nums text-zinc-950 dark:text-text-dark">
                       ${Number(minimumBid).toLocaleString()}
                     </p>
-                    <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50 mt-0.5">
-                      Updates in real time
-                    </p>
+                    <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50 mt-0.5">Updates in real time</p>
                   </div>
 
                   {/* Bid again */}
@@ -517,12 +466,8 @@ export function AuctionBidModal({ auctionItem }: { auctionItem: IAuctionItem }) 
                     <div className="flex items-center gap-3">
                       <RefreshCw className="w-4 h-4 shrink-0" aria-hidden="true" />
                       <div className="text-left">
-                        <p className="  text-sm uppercase tracking-wide leading-none mb-0.5">
-                          Bid Again
-                        </p>
-                        <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">
-                          Place a higher bid
-                        </p>
+                        <p className="  text-sm uppercase tracking-wide leading-none mb-0.5">Bid Again</p>
+                        <p className="font-lato text-xs text-cyan-600/60 dark:text-violet-400/60">Place a higher bid</p>
                       </div>
                     </div>
                   </button>
