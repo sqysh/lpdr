@@ -21,7 +21,7 @@ export default function AuctionAnnouncementStrip({ auction }: Props) {
   const status = auction?.status
   const isActive = status === 'ACTIVE'
 
-  if (!auction && !auction.isPubliclyVisible) return
+  if (!auction && !auction?.isPubliclyVisible) return
 
   return (
     <AnimatePresence>
