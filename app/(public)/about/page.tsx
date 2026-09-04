@@ -7,15 +7,7 @@ import Link from 'next/link'
 import { SectionLabel } from 'components/_primitives'
 
 // ─── Fade up animation helper ─────────────────────────────────────────────────
-function FadeUp({
-  children,
-  delay = 0,
-  className = ''
-}: {
-  children: React.ReactNode
-  delay?: number
-  className?: string
-}) {
+function FadeUp({ children, delay = 0, className = '' }: { children: React.ReactNode; delay?: number; className?: string }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-48px' })
   return (
@@ -108,9 +100,7 @@ function TeamMember({ name, role, delay }: { name: string; role: string; delay: 
       </div>
       <div className="min-w-0">
         <p className="text-sm font-quicksand font-black text-text-light dark:text-text-dark truncate">{name}</p>
-        <p className="text-[10px] font-mono tracking-[0.12em] uppercase text-muted-light dark:text-muted-dark mt-0.5">
-          {role}
-        </p>
+        <p className="text-[10px] font-mono tracking-[0.12em] uppercase text-muted-light dark:text-muted-dark mt-0.5">{role}</p>
       </div>
     </motion.div>
   )
@@ -131,16 +121,6 @@ export default function AboutPage() {
         aria-labelledby="hero-heading"
         className="relative border-b border-border-light dark:border-border-dark overflow-hidden"
       >
-        {/* Dot grid background */}
-        <div
-          className="absolute inset-0 opacity-[0.03] dark:opacity-[0.06]"
-          style={{
-            backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-            backgroundSize: '24px 24px'
-          }}
-          aria-hidden="true"
-        />
-
         {/* Accent corner */}
         <div className="absolute top-0 right-0 w-px h-full bg-border-light dark:bg-border-dark" aria-hidden="true" />
         <div className="absolute top-0 left-0 w-1 h-24 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
@@ -171,9 +151,9 @@ export default function AboutPage() {
               transition={{ duration: 0.5, delay: 0.15 }}
               className="text-base xs:text-lg font-nunito text-muted-light dark:text-muted-dark leading-relaxed max-w-2xl mb-10"
             >
-              Little Paws Dachshund Rescue is a volunteer-run, 501(c)(3) nonprofit dedicated to rescuing,
-              rehabilitating, and rehoming dachshunds and dachshund mixes in need. Since 2008, we&apos;ve placed
-              thousands of dogs into loving forever homes across the eastern United States.
+              Little Paws Dachshund Rescue is a volunteer-run, 501(c)(3) nonprofit dedicated to rescuing, rehabilitating, and
+              rehoming dachshunds and dachshund mixes in need. Since 2008, we&apos;ve placed thousands of dogs into loving forever
+              homes across the eastern United States.
             </motion.p>
 
             <motion.div
@@ -183,7 +163,7 @@ export default function AboutPage() {
               className="flex flex-wrap items-center gap-3"
             >
               <Link
-                href="/adopt"
+                href="/dachshunds"
                 className="group inline-flex items-center gap-2 px-6 py-3.5 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2"
               >
                 Meet the Dogs
@@ -230,17 +210,17 @@ export default function AboutPage() {
               </h2>
               <div className="space-y-4 font-nunito text-base text-muted-light dark:text-muted-dark leading-relaxed">
                 <p>
-                  We pull dachshunds from overcrowded shelters, owner surrenders, and neglect situations across the
-                  eastern United States. Every dog in our care receives a full veterinary evaluation, necessary medical
-                  treatment, and a loving foster home while they wait for their forever family.
+                  We pull dachshunds from overcrowded shelters, owner surrenders, and neglect situations across the eastern United
+                  States. Every dog in our care receives a full veterinary evaluation, necessary medical treatment, and a loving
+                  foster home while they wait for their forever family.
                 </p>
                 <p>
-                  Our rigorous adoption process ensures each dog is matched with a family that fits their personality,
-                  energy level, and medical needs — because the right match means a lifelong bond.
+                  Our rigorous adoption process ensures each dog is matched with a family that fits their personality, energy
+                  level, and medical needs — because the right match means a lifelong bond.
                 </p>
                 <p>
-                  As a foster-based rescue, we have no physical shelter. Every dog in our program lives in a real home,
-                  learning what it means to be loved.
+                  As a foster-based rescue, we have no physical shelter. Every dog in our program lives in a real home, learning
+                  what it means to be loved.
                 </p>
               </div>
             </FadeUp>
@@ -379,12 +359,8 @@ export default function AboutPage() {
                     </span>
                   </div>
                   <div className="px-5 xs:px-6 py-5 xs:py-6">
-                    <h3 className="font-quicksand font-black text-base text-text-light dark:text-text-dark mb-1.5">
-                      {title}
-                    </h3>
-                    <p className="text-sm font-nunito text-muted-light dark:text-muted-dark leading-relaxed">
-                      {description}
-                    </p>
+                    <h3 className="font-quicksand font-black text-base text-text-light dark:text-text-dark mb-1.5">{title}</h3>
+                    <p className="text-sm font-nunito text-muted-light dark:text-muted-dark leading-relaxed">{description}</p>
                   </div>
                 </div>
               </FadeUp>
@@ -411,9 +387,8 @@ export default function AboutPage() {
                 Our Leadership Team
               </h2>
               <p className="text-sm xs:text-base font-nunito text-muted-light dark:text-muted-dark leading-relaxed mb-8">
-                Little Paws is run entirely by passionate volunteers who give their time, expertise, and love to ensure
-                every dachshund finds their perfect home. Our board and coordinators bring decades of rescue experience
-                to this work.
+                Little Paws is run entirely by passionate volunteers who give their time, expertise, and love to ensure every
+                dachshund finds their perfect home. Our board and coordinators bring decades of rescue experience to this work.
               </p>
 
               <div className="flex items-center gap-3 p-4 border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark">
@@ -421,8 +396,7 @@ export default function AboutPage() {
                   <Star size={14} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
                 </div>
                 <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
-                  Interested in joining our volunteer team? We&apos;re always looking for fosters, transporters, and
-                  coordinators.{' '}
+                  Interested in joining our volunteer team? We&apos;re always looking for fosters, transporters, and coordinators.{' '}
                   <Link
                     href="/volunteer"
                     className="text-primary-light dark:text-primary-dark hover:underline focus:outline-none focus-visible:underline"
@@ -482,8 +456,8 @@ export default function AboutPage() {
                 Ready to make a difference?
               </h2>
               <p className="text-base font-nunito text-muted-light dark:text-muted-dark leading-relaxed mb-8">
-                Whether you&apos;re looking to adopt, foster, volunteer, or donate — there&apos;s a place for you in the
-                Little Paws family. Every contribution, big or small, saves lives.
+                Whether you&apos;re looking to adopt, foster, volunteer, or donate — there&apos;s a place for you in the Little
+                Paws family. Every contribution, big or small, saves lives.
               </p>
 
               <div className="grid grid-cols-1 xs:grid-cols-2 gap-px bg-border-light dark:bg-border-dark border border-border-light dark:border-border-dark">
@@ -509,9 +483,7 @@ export default function AboutPage() {
                       <p className="text-sm font-quicksand font-black text-text-light dark:text-text-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
                         {label}
                       </p>
-                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                        {description}
-                      </p>
+                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">{description}</p>
                     </div>
                     <ArrowRight
                       size={14}
