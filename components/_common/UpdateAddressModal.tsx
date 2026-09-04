@@ -4,7 +4,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, CheckCircle, Loader2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import { IAddress } from 'types/_address.types'
+import { IAddress } from 'types/address.types'
 
 export function UpdateAddressModal({
   open,

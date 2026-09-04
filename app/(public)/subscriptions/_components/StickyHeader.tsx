@@ -3,7 +3,7 @@ import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { motion } from 'framer-motion'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { BillingInterval } from 'types/_subscriptions.types'
+import { BillingInterval } from 'types/subscriptions.types'
 
 export function StickyHeader({
   billing,

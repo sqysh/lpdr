@@ -9,7 +9,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createSetupIntentForSubscriptionSchema } from 'lib/schemas/subscription.schema'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 
 type SetupIntentData = {
@@ -24,9 +24,7 @@ const fail = (error: string): ActionResult<SetupIntentData> => ({
   error
 })
 
-export async function createSetupIntentForSubscription(
-  input: unknown
-): Promise<ActionResult<SetupIntentData>> {
+export async function createSetupIntentForSubscription(input: unknown): Promise<ActionResult<SetupIntentData>> {
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
 

@@ -1,6 +1,6 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { IWelcomeWiener, WelcomeWienerProduct } from 'types/welcome-wiener'
 
 export const getLiveWelcomeWieners = async () => {
   try {

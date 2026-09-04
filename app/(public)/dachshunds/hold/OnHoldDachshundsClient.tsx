@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { containerVariants } from 'lib/constants/motion.constants'
 import { DogCard } from 'components/features/dachshunds/DogCard'
-import { IDachshund } from 'types/_rescue-groups.types'
+import { IDachshund } from 'types/rescue-groups.types'
 
 export default function OnHoldDachshundsClient({ data }) {
   return (

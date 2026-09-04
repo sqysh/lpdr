@@ -6,7 +6,7 @@ import { stripeClient } from 'lib/stripe/stripe-client'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export const deletePaymentMethod = async (id: string): Promise<ActionResult<null>> => {
   const gate = await requireAuth()

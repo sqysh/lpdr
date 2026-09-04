@@ -8,7 +8,7 @@ import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createAuctionSchema } from 'lib/schemas/auction.schema'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { slugify } from 'lib/utils/slug.utils'
 
 export const createAuction = async (input: unknown): Promise<ActionResult<{ id: string }>> => {

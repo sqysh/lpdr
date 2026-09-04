@@ -6,7 +6,7 @@ import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { sendOutbidEmail } from 'lib/email/sendOutbidEmail'
-import { PreviousTopBid } from 'types/_auction-bid'
+import { PreviousTopBid } from 'types/auction-bid'
 import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
 
 export async function placeBid(auctionItemId: string, bidAmount: number) {

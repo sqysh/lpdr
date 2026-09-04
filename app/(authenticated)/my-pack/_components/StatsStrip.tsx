@@ -5,7 +5,7 @@ import {
   AuctionPurchase,
   MultiItemOrder,
   Subscription
-} from 'types/_my-pack.types'
+} from 'types/my-pack.types'
 
 type Props = {
   subscriptions: Subscription[]

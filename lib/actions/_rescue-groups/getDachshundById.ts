@@ -1,9 +1,9 @@
 import { createLog } from '../log/createLog'
 import { getPicturesAndVideos } from '../../utils/rescue-group.utils'
-import { Dog } from 'types/_rescue-groups.types'
+import { Dog } from 'types/rescue-groups.types'
 import { RESCUE_GROUPS_BASE_URL } from 'lib/constants/paths.constants'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export async function getDachshundById(id: string): Promise<ActionResult<{ data: Dog }>> {
   try {

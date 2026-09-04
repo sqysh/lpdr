@@ -5,7 +5,7 @@ import { Role, UserStatus } from '@prisma/client'
 import { createLog } from '../log/createLog'
 import { requireSuper } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export async function updateUserStatus(userId: string, status: UserStatus, reason?: string): Promise<ActionResult<null>> {
   const gate = await requireSuper()

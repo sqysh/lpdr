@@ -1,7 +1,7 @@
 import Picture from 'components/_common/Picture'
 import { Package, Star } from 'lucide-react'
 import { useState } from 'react'
-import { IAuctionItemPhoto } from 'types/_auction-item-photo'
+import { IAuctionItemPhoto } from 'types/auction-item-photo'
 
 export function PhotoGallery({ photos }: { photos: IAuctionItemPhoto[] }) {
   const sorted = [...photos].sort((a, b) => a.sortOrder - b.sortOrder)

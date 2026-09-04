@@ -3,7 +3,7 @@
 import { useState, useMemo } from 'react'
 import { Search, X, CheckCircle } from 'lucide-react'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { IUser } from 'types/_user'
+import { IUser } from 'types/user'
 import { grantAdminAccess } from 'lib/actions/admin/user/grantAdminAccess'
 
 type Props = {

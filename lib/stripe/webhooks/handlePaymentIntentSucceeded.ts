@@ -7,8 +7,8 @@ import { adminOrderNotificationTemplate } from 'lib/email/templates/admin-order-
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
-import { ProductSizeEntry } from 'types/_product'
-import { WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { ProductSizeEntry } from 'types/product'
+import { WelcomeWienerProduct } from 'types/welcome-wiener'
 
 export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   const { id, amount, metadata } = paymentIntent

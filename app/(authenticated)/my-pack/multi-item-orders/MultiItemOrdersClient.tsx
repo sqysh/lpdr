@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import Link from 'next/link'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { MultiItemOrder } from 'types/_my-pack.types'
+import { MultiItemOrder } from 'types/my-pack.types'
 import { PurchaseRow } from 'app/(authenticated)/my-pack/multi-item-orders/_components/PurchaseRow'
 
 export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrder[] }) {

@@ -4,8 +4,8 @@ import prisma from 'prisma/client'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
-import type { ActionResult } from 'types/_action.types'
-import { IAdoptionFee } from 'types/_adoption-fee'
+import type { ActionResult } from 'types/action.types'
+import { IAdoptionFee } from 'types/adoption-fee'
 
 export const getAdoptionFees = async (): Promise<ActionResult<IAdoptionFee[]>> => {
   const gate = await requireAdmin()

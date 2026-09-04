@@ -6,7 +6,7 @@ import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { updateAuctionItemSchema } from 'lib/schemas/auction.schema'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export const updateAuctionItem = async (id: string, input: unknown): Promise<ActionResult<null>> => {
   const gate = await requireAdmin()

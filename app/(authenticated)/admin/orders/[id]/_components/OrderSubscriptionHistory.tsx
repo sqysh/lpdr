@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { RefreshCw, ChevronRight } from 'lucide-react'
-import { SerializedSubscriptionOrder } from 'types/_order.types'
+import { SerializedSubscriptionOrder } from 'types/order.types'
 import { STATUS_STYLES } from 'lib/constants/order.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 

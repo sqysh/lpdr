@@ -7,7 +7,7 @@ import { Check, ChevronRight, Gavel, Loader2, Tag, Zap } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useRef, useState } from 'react'
-import { IAuctionItemLive } from 'types/auction-item.types'
+import { IAuctionItemLive } from 'types/auction.types'
 import { AuctionStatus } from '@prisma/client'
 
 type Props = {

@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { Package, Heart, ChevronRight } from 'lucide-react'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 import { Label } from './OrderLabel'
 
 function money(n: number) {

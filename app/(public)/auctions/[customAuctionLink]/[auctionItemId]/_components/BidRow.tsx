@@ -4,7 +4,7 @@ import { formatDateTime } from 'lib/utils/date.utils'
 import { useInView, motion } from 'framer-motion'
 import { Trophy } from 'lucide-react'
 import { useRef } from 'react'
-import { IAuctionBid } from 'types/_auction-bid'
+import { IAuctionBid } from 'types/auction-bid'
 
 export function BidRow({ bid, rank, delay }: { bid: IAuctionBid; rank: number; delay: number }) {
   const ref = useRef(null)

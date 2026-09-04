@@ -1,5 +1,5 @@
 import { CreditCard, CheckCircle, Plus, ArrowLeft } from 'lucide-react'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 
 type Props = {
   savedCards: IPaymentMethod[]

@@ -1,11 +1,11 @@
 import prisma from 'prisma/client'
 import { serialize } from 'lib/utils/serializers.utils'
-import { auctionItemPublicArgs } from 'types/auction.types'
+import { auctionItemLiveArgs } from 'types/auction.types'
 
 export const getPublicAuctionItemById = async (id: string) => {
   const item = await prisma.auctionItem.findFirst({
     where: { id, auction: { status: { in: ['ACTIVE', 'ENDED'] } } },
-    ...auctionItemPublicArgs
+    ...auctionItemLiveArgs
   })
 
   if (!item) return { success: false, error: 'Auction item not found', data: null }

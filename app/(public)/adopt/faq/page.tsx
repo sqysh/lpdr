@@ -1,5 +1,5 @@
 import { getDachshundsByStatus } from 'lib/actions/_rescue-groups/getDachshundsByStatus'
-import { IDachshund } from 'types/_rescue-groups.types'
+import { IDachshund } from 'types/rescue-groups.types'
 import AdoptFAQClient from './AdoptFAQClient'
 
 export default async function AdoptFAQPage() {

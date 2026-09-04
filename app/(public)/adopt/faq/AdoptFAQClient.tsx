@@ -3,7 +3,7 @@
 import Picture from 'components/_common/Picture'
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { IDachshund } from 'types/_rescue-groups.types'
+import { IDachshund } from 'types/rescue-groups.types'
 
 type FAQItem = {
   q: { bold: string; light: string }

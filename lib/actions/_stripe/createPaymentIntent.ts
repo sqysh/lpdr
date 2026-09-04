@@ -4,8 +4,8 @@ import Stripe from 'stripe'
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
 import { stripeClient } from '../../stripe/stripe-client'
-import { ProductSizeEntry } from 'types/_product'
-import { WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { ProductSizeEntry } from 'types/product'
+import { WelcomeWienerProduct } from 'types/welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
@@ -14,7 +14,7 @@ import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createPaymentIntentSchema } from 'lib/schemas/payment.schema'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { OrderType } from '@prisma/client'
 import { ADOPTION_FEE_CENTS, MIN_DONATION_CENTS } from 'lib/constants/adoption-fees.constants'
 
@@ -32,25 +32,14 @@ const fail = (error: string): ActionResult<PaymentIntentData> => ({
   error
 })
 
-export async function createPaymentIntent(
-  input: unknown
-): Promise<ActionResult<PaymentIntentData>> {
+export async function createPaymentIntent(input: unknown): Promise<ActionResult<PaymentIntentData>> {
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
 
   const parsed = parseInput(createPaymentIntentSchema, input)
   if (parsed.ok === false) return parsed.result
 
-  const {
-    amount,
-    orderType,
-    saveCard,
-    coverFees,
-    savedCardId,
-    items,
-    winningBidderId,
-    auctionItemId
-  } = parsed.data
+  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId } = parsed.data
 
   const userId = gate.userId
 
@@ -88,9 +77,7 @@ export async function createPaymentIntent(
 
       const [products, wieners] = await Promise.all([
         ids.length ? prisma.product.findMany({ where: { id: { in: ids } } }) : Promise.resolve([]),
-        wienerIds.length
-          ? prisma.welcomeWiener.findMany({ where: { id: { in: wienerIds } } })
-          : Promise.resolve([])
+        wienerIds.length ? prisma.welcomeWiener.findMany({ where: { id: { in: wienerIds } } }) : Promise.resolve([])
       ])
 
       if (items.length === 1) {
@@ -113,13 +100,9 @@ export async function createPaymentIntent(
         if (product) {
           if (!product.isLive) throw new Error(`${product.name} is no longer available`)
           const sizes = product.sizes as ProductSizeEntry[] | null
-          const available = item.size
-            ? (sizes?.find((s) => s.size === item.size)?.quantity ?? 0)
-            : product.countInStock
+          const available = item.size ? (sizes?.find((s) => s.size === item.size)?.quantity ?? 0) : product.countInStock
           if (item.quantity > available) {
-            throw new Error(
-              `Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`
-            )
+            throw new Error(`Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`)
           }
           base += Number(product.price) * item.quantity + Number(product.shippingPrice)
           continue

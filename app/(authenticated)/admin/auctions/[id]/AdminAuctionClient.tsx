@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IAuction, Tab } from 'types/auction.types'
+import { IAuction, AuctionTab } from 'types/auction.types'
 import { formatDate } from 'lib/utils/date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
@@ -39,9 +39,9 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
 
   const tabSlug = (label: string) => label.toLowerCase().replace(/\s+/g, '-')
   const param = searchParams.get('tab')
-  const activeTab: Tab = visibleTabs.find((t) => tabSlug(t.label) === param)?.label ?? 'Overview'
+  const activeTab: AuctionTab = visibleTabs.find((t) => tabSlug(t.label) === param)?.label ?? 'Overview'
 
-  const selectTab = (label: Tab) => {
+  const selectTab = (label: AuctionTab) => {
     router.replace(`${pathname}?tab=${tabSlug(label)}`, { scroll: false })
   }
 

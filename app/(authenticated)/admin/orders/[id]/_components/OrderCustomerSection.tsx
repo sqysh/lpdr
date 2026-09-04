@@ -1,5 +1,5 @@
 import { User, MapPin } from 'lucide-react'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 import { Label } from './OrderLabel'
 import Link from 'next/link'
 

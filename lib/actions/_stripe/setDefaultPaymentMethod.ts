@@ -5,7 +5,7 @@ import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export const setDefaultPaymentMethod = async (id: string): Promise<ActionResult<null>> => {
   const gate = await requireAuth()

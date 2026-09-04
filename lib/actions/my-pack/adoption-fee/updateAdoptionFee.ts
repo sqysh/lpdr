@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { UpdateAdoptionFeeInputs } from 'types/_adoption-fee'
+import { UpdateAdoptionFeeInputs } from 'types/adoption-fee'
 import { cookies } from 'next/headers'
 import { createLog } from '../../log/createLog'
 import { requireAuth } from 'lib/auth/guards'

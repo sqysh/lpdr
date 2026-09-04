@@ -1,5 +1,5 @@
 import { Gavel, Heart, Package, SlidersHorizontal, User } from 'lucide-react'
-import { MyPackTab } from 'types/_my-pack.types'
+import { MyPackTab } from 'types/my-pack.types'
 
 export const TABS: { id: MyPackTab; label: string; icon: React.ElementType }[] = [
   { id: 'account', label: 'Account', icon: User },

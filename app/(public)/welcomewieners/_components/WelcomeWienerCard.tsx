@@ -1,7 +1,7 @@
 import { Plus, Check, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
-import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { IWelcomeWiener, WelcomeWienerProduct } from 'types/welcome-wiener'
 import { motion, AnimatePresence } from 'framer-motion'
 import Picture from 'components/_common/Picture'
 import { fadeUp } from 'lib/constants/motion.constants'

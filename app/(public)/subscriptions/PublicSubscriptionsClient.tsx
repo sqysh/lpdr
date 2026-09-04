@@ -3,14 +3,14 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Picture from 'components/_common/Picture'
 import { StickyHeader } from './_components/StickyHeader'
 import { SubscriptionSelector } from './_components/SubscriptionSelector'
 import { SubscriptionPaymentView } from './_components/SubscriptionPaymentView'
 import { StickyBar } from './_components/StickyBar'
-import { BillingInterval, SubscriptionTierId } from 'types/_subscriptions.types'
+import { BillingInterval, SubscriptionTierId } from 'types/subscriptions.types'
 
 type View = 'select' | 'payment'
 

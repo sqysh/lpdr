@@ -1,4 +1,4 @@
-import { TierKey } from 'types/_subscriptions.types'
+import { TierKey } from 'types/subscriptions.types'
 
 export const SUBSCRIPTION_TIERS = [
   {

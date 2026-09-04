@@ -1,10 +1,10 @@
 import type { Address, OrderItemType, OrderStatus, OrderType, PaymentStatus, ShippingStatus } from '@prisma/client'
-import { IAdoptionFee } from './_adoption-fee'
-import { IPaymentMethod } from './_payment-method.types'
-import { IUser } from './_user'
+import { IAdoptionFee } from './adoption-fee'
+import { IPaymentMethod } from './payment-method.types'
+import { IUser } from './user'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { Dispatch, SetStateAction } from 'react'
-import { BillingInterval } from './_subscriptions.types'
+import { BillingInterval } from './subscriptions.types'
 
 export interface Donation {
   id: string

@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react'
 import { DollarSign, Clock, XCircle } from 'lucide-react'
 import { formatDate } from 'lib/utils/date.utils'
-import { IAdoptionFee } from 'types/_adoption-fee'
+import { IAdoptionFee } from 'types/adoption-fee'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { FILTERS, statusStyles } from 'lib/constants/adoption-fees.constants'
 import { formatMoney } from 'lib/utils/currency.utils'

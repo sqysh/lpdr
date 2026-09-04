@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { MultiItemOrder } from 'types/_my-pack.types'
+import { MultiItemOrder } from 'types/my-pack.types'
 import { motion, AnimatePresence } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatDate } from 'lib/utils/date.utils'

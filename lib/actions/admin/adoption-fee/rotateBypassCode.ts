@@ -5,7 +5,7 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 // No 0/O/1/I/l — they're the ones people mistype when reading a code aloud
 const CHARS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'

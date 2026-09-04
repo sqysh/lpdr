@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 import Link from 'next/link'
 import { ArrowLeft, Loader2 } from 'lucide-react'
 import { getInitials } from 'lib/utils/user.utils'

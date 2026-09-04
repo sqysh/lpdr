@@ -11,8 +11,8 @@ import { SubmitButton } from 'components/_primitives/SubmitButton'
 import { Toggle } from 'components/_primitives/Toggle'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
-import type { IAuctionItemLive } from 'types/auction-item.types'
-import type { IPaymentMethod } from 'types/_payment-method.types'
+import type { IAuctionItemLive } from 'types/auction.types'
+import type { IPaymentMethod } from 'types/payment-method.types'
 import {
   InstantBuyAddressSection,
   InstantBuyBreadcrumb,

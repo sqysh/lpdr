@@ -7,7 +7,7 @@ import { formatDate } from 'lib/utils/date.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
 import AdminTable, { type Column } from 'app/(authenticated)/admin/_components/AdminTable'
-import { IDachshund } from 'types/_rescue-groups.types'
+import { IDachshund } from 'types/rescue-groups.types'
 
 type Tab = 'AVAILABLE' | 'HOLD'
 

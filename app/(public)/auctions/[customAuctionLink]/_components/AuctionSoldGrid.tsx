@@ -1,6 +1,6 @@
 import { SectionLabel } from 'components/_primitives'
 import { IAuction } from 'types/auction.types'
-import { IAuctionItemLive } from 'types/auction-item.types'
+import { IAuctionItemLive } from 'types/auction.types'
 import { AuctionItemCard } from './AuctionItemCard'
 
 export function AuctionSoldGrid({

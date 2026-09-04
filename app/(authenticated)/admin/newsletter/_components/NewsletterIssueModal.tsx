@@ -15,7 +15,7 @@ import {
 } from 'lib/constants/form.styles.constants'
 import createNewsletterIssue from 'lib/actions/admin/newsletter-issue/createNewsletterIssue'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
-import { FormState } from 'types/_newsletter-issue.types'
+import { FormState } from 'types/newsletter-issue.types'
 import { Toggle, FormError } from 'components/_primitives'
 
 const modalShell =

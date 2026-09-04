@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { AuctionEndedData, AuctionStartedData } from 'types/auction.types'
+import { AuctionEndedData, AuctionStartedData } from 'types/auction-event.types'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { AuctionStartedModal } from './AuctionStartedModal'
 import { AuctionEndedModal } from './AuctionEndedModal'

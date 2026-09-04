@@ -6,7 +6,7 @@ import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export const updateSubscriptionPaymentMethod = async ({
   subscriptionId,

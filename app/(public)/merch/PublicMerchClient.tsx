@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IProduct } from 'types/_product'
+import { IProduct } from 'types/product'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { ProductCard } from 'app/(public)/merch/_components/ProductCard'
 

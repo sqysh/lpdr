@@ -1,17 +1,11 @@
 'use client'
 
+import { Status } from 'components/_primitives/StatusMessage'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { Status } from 'components/_primitives/StatusMessage'
 
 export function useStatusMessage(duration = 6000) {
   const [status, setStatus] = useState<Status | null>(null)
   const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (timeout.current) clearTimeout(timeout.current)
-    }
-  }, [])
 
   const flash = useCallback(
     (next: Status) => {
@@ -22,7 +16,17 @@ export function useStatusMessage(duration = 6000) {
     [duration]
   )
 
-  const clear = useCallback(() => setStatus(null), [])
+  const clearStatus = useCallback(() => {
+    if (timeout.current) clearTimeout(timeout.current)
+    setStatus(null)
+  }, [])
 
-  return { status, flash, clear }
+  useEffect(
+    () => () => {
+      if (timeout.current) clearTimeout(timeout.current)
+    },
+    []
+  )
+
+  return { status, flash, clearStatus }
 }

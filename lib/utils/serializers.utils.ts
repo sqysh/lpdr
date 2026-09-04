@@ -1,5 +1,5 @@
 import { Prisma } from '@prisma/client'
-import { DecimalToNumber } from 'types/auction.types'
+import { DecimalToNumber } from 'types/prisma.types'
 
 /**
  * Walks any Prisma result and turns every Decimal into a number so it can

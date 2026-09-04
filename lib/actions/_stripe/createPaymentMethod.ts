@@ -7,7 +7,7 @@ import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 type Params = {
   stripePaymentMethodId: string

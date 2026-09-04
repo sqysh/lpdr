@@ -5,11 +5,9 @@ import { createLog } from '../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
-export async function getSetupIntentClientSecret(): Promise<
-  ActionResult<{ clientSecret: string }>
-> {
+export async function getSetupIntentClientSecret(): Promise<ActionResult<{ clientSecret: string }>> {
   const gate = await requireAuth()
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 

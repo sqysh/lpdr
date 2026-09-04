@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle } from 'lucide-react'
-import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/_order.types'
+import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/order.types'
 import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { formatMoney } from 'lib/utils/currency.utils'

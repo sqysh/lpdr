@@ -1,7 +1,8 @@
-import getAuctions from 'lib/actions/public/auction/getAuctions'
+import getPublicAuctions from 'lib/actions/public/auction/getPublicAuctions'
 import PublicAuctionsClient from './PublicAuctionsClient'
 
 export default async function PublicAuctionsPage() {
-  const result = await getAuctions({ status: ['DRAFT', 'ACTIVE', 'ENDED'] })
-  return <PublicAuctionsClient auctions={result.data} />
+  const result = await getPublicAuctions()
+
+  return <PublicAuctionsClient auctions={result.data ?? []} />
 }

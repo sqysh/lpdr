@@ -1,4 +1,4 @@
-import { Level } from 'types/_log.types'
+import { Level } from 'types/log.types'
 
 export const PAGE_SIZE = 50
 

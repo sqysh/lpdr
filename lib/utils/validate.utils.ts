@@ -1,4 +1,4 @@
-import { ActionResult } from 'types/_action.types'
+import { ActionResult } from 'types/action.types'
 import { z, type ZodType } from 'zod'
 
 export function parseInput<T>(

@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { MemberClientProps, MyPackTab } from 'types/_my-pack.types'
+import { MemberClientProps, MyPackTab } from 'types/my-pack.types'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { Header } from 'app/(authenticated)/my-pack/_components/Header'

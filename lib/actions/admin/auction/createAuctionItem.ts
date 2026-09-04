@@ -7,7 +7,7 @@ import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createAuctionItemSchema } from 'lib/schemas/auction.schema'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import type { SellingFormat } from '@prisma/client'
 
 export const createAuctionItem = async (input: unknown): Promise<ActionResult<{ sellingFormat: SellingFormat }>> => {

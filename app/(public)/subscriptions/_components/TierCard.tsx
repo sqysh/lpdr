@@ -1,6 +1,6 @@
 import { T, SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { BillingInterval } from 'types/_subscriptions.types'
+import { BillingInterval } from 'types/subscriptions.types'
 
 type Props = {
   tier: (typeof SUBSCRIPTION_TIERS)[number]

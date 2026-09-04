@@ -4,7 +4,7 @@ import prisma from 'prisma/client'
 import { Role } from '@prisma/client'
 import { createLog } from '../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { requireAdmin } from 'lib/auth/guards'
 
 type GrantedUser = {

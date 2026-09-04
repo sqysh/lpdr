@@ -6,7 +6,7 @@ import { setPrimaryAuctionItemPhoto } from 'lib/actions/admin/auction/setPrimary
 import { convertIfHeic } from 'lib/utils/image.utils'
 import { ImagePlus, Star, Trash2, X } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-import { IAuctionItemPhoto } from 'types/_auction-item-photo'
+import { IAuctionItemPhoto } from 'types/auction-item-photo'
 
 type PendingPhoto = {
   file: File

@@ -2,7 +2,7 @@ import { getUserAddress } from 'lib/actions/my-pack/getUserAddress'
 import { getUserName } from 'lib/actions/my-pack/getUserName'
 import { auth } from 'lib/auth'
 import { PublicCheckoutClient } from './PublicCheckoutClient'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
 
 export default async function PublicCheckoutPage() {

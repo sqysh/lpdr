@@ -14,6 +14,69 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.5.0',
+    date: '2026-09-03',
+    title: 'Server action guards, client bundle leaks, and upcoming auctions',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Added missing auth guards to super user and admin dashboard reads (admin users, managed users, user search, audit logs, Pusher events, service health, pulse stats, cron jobs, dashboard data), all of which were reachable without a session'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed the Pusher server credentials and Prisma client being bundled into the browser on the super dashboard and product form, caused by a shared channel constant and a log helper crossing the server boundary'
+      },
+      {
+        type: 'fix',
+        text: 'Split the public auction item page onto its own action with an explicit select; it was rendering bidder emails and names into the page for anyone to read'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed the outbid email link using a mistyped environment variable, which produced broken URLs in every outbid notification'
+      },
+      {
+        type: 'fix',
+        text: 'Filtered the public welcome wieners list to live, unarchived entries; unpublished ones were visible'
+      },
+      {
+        type: 'fix',
+        text: 'Added an ownership check to email change verification so a token can only be redeemed by the account that requested it'
+      },
+      {
+        type: 'feature',
+        text: 'Upcoming auctions now appear on the public auctions page above past auctions, with their own card treatment, detail page state, and no bidding path until the auction opens'
+      },
+      {
+        type: 'feature',
+        text: 'Added a layout guard on the super dashboard so non-super users are redirected instead of seeing an empty shell'
+      },
+      {
+        type: 'improvement',
+        text: 'Locked the end date and custom link on active auctions in both the settings form and the server action, closing a path that ended an auction without going through the end flow'
+      },
+      {
+        type: 'improvement',
+        text: 'Added rate limiting to newsletter signup and email change requests'
+      },
+      {
+        type: 'improvement',
+        text: 'Added Zod validation and a slug collision check to auction create and update'
+      },
+      {
+        type: 'chore',
+        text: 'Standardized server actions on a single result shape and replaced the per-model serializers with one generic Decimal walker, which also fixed legitimate zero values being converted to null'
+      },
+      {
+        type: 'chore',
+        text: 'Consolidated Prisma query args into the types layer and added server-only to the Prisma client, auth guards, Pusher, Resend, and Stripe modules'
+      },
+      {
+        type: 'chore',
+        text: 'Removed unused auction anomaly actions left over from the original live auction page'
+      }
+    ]
+  },
+  {
     version: '1.4.0',
     date: '2026-08-31',
     title: 'Prisma 7 upgrade, payment security, and migration fixes',

@@ -18,9 +18,9 @@ const CORE_GRADIENT = {
 export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState('')
   const [loading, setLoading] = useState(false)
-  const { status, flash, clear } = useStatusMessage()
+  const { status, flash, clearStatus } = useStatusMessage()
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
 
     if (!EMAIL_REGEX.test(email)) {
@@ -29,7 +29,7 @@ export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
     }
 
     setLoading(true)
-    clear()
+    clearStatus()
 
     const result = await createNewsletter(email)
 
@@ -54,9 +54,7 @@ export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="px-4 py-5">
-      <p className="text-f10 uppercase tracking-[0.25em] text-muted-light dark:text-muted-dark mb-1">
-        Stay Updated
-      </p>
+      <p className="text-f10 uppercase tracking-[0.25em] text-muted-light dark:text-muted-dark mb-1">Stay Updated</p>
       <p className="font-lato text-xs text-muted-light dark:text-muted-dark mb-4 leading-relaxed">
         Subscribe to our newsletter for rescues, events, and adoption opportunities!
       </p>

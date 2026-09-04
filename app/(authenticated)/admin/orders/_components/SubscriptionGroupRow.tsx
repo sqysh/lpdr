@@ -2,7 +2,7 @@
 
 import { formatMoney } from 'lib/utils/currency.utils'
 import { ChevronRight, RefreshCw } from 'lucide-react'
-import { OrderRow } from 'types/_order.types'
+import { OrderRow } from 'types/order.types'
 import { useRouter } from 'next/navigation'
 import { StatusPill } from 'components/_primitives'
 

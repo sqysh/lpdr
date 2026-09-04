@@ -2,7 +2,7 @@ import { motion } from 'framer-motion'
 import { CheckCircle, Info, Loader2 } from 'lucide-react'
 import { FormField } from 'components/_primitives'
 import { slideVariants } from 'lib/constants/motion.constants'
-import { STEPS_TYPES } from 'types/_adoption-application.types'
+import { STEPS_TYPES } from 'types/adoption-application.types'
 
 type Inputs = {
   bypassCode: string

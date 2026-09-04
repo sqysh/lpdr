@@ -2,8 +2,8 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { serialize } from 'lib/utils/serializers.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { auctionLiveArgs, type IAuctionLive } from 'types/auction-item.types'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
+import { auctionLiveArgs, IAuctionLive } from 'types/auction.types'
 
 export const getAuctionByCustomAuctionLink = async (link: string): Promise<ActionResult<IAuctionLive>> => {
   try {

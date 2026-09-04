@@ -1,7 +1,7 @@
 import { AuctionStatus } from '@prisma/client'
 import { IAuction } from 'types/auction.types'
-import { IAuctionBid } from 'types/_auction-bid'
-import { AuctionItemStatus } from 'types/auction-item.types'
+import { IAuctionBid } from 'types/auction-bid'
+import { AuctionItemStatus } from 'types/auction.types'
 
 export function getItemStatusConfig(status: AuctionItemStatus) {
   switch (status) {

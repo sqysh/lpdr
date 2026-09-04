@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, Dog, ImagePlus, LayoutDashboard, Loader2, Minus, Plus, X } from 'lucide-react'
-import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { IWelcomeWiener, WelcomeWienerProduct } from 'types/welcome-wiener'
 import {
   WELCOME_WIENER_CATALOG,
   WELCOME_WIENER_CATEGORIES,
@@ -25,14 +25,12 @@ const crumb =
 
 const crumbSep = 'text-[9px] font-mono text-border-light dark:text-muted-dark/70'
 
-const panel =
-  'border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
+const panel = 'border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
 
 const panelHead =
   'px-4 py-2.5 border-b border-border-light dark:border-border-dark text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark'
 
-const thumb =
-  'relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden'
+const thumb = 'relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden'
 
 type FormState = {
   name: string
@@ -65,22 +63,19 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
   const [loading, setLoading] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
   const [pendingPhotos, setPendingPhotos] = useState<File[]>([])
-  const { status, flash, clear } = useStatusMessage()
+  const { status, flash, clearStatus } = useStatusMessage()
 
   const patch = (data: Partial<FormState>) => setForm((prev) => ({ ...prev, ...data }))
 
-  const handleInput = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => patch({ [e.target.name]: e.target.value } as Partial<FormState>)
+  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
+    patch({ [e.target.name]: e.target.value } as Partial<FormState>)
 
   const associated = form.associatedProducts
   const isAdded = (id: string) => associated.some((p) => p.id === id)
 
   const toggleProduct = (product: WelcomeWienerProduct) => {
     patch({
-      associatedProducts: isAdded(product.id)
-        ? associated.filter((p) => p.id !== product.id)
-        : [...associated, product]
+      associatedProducts: isAdded(product.id) ? associated.filter((p) => p.id !== product.id) : [...associated, product]
     })
   }
 
@@ -92,14 +87,12 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
 
     setLoading(true)
     setErrors({})
-    clear()
+    clearStatus()
 
     let uploaded: string[] = []
     if (pendingPhotos.length > 0) {
       try {
-        uploaded = await Promise.all(
-          pendingPhotos.map((file) => uploadFileToFirebase(file, setUploadProgress))
-        )
+        uploaded = await Promise.all(pendingPhotos.map((file) => uploadFileToFirebase(file, setUploadProgress)))
       } catch {
         setErrors({ form: 'Failed to upload images. Please try again.' })
         setLoading(false)
@@ -116,9 +109,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
       associatedProducts: associated
     }
 
-    const result = isUpdating
-      ? await updateWelcomeWiener(welcomeWiener!.id, payload)
-      : await createWelcomeWiener(payload)
+    const result = isUpdating ? await updateWelcomeWiener(welcomeWiener!.id, payload) : await createWelcomeWiener(payload)
 
     if (!result.success) {
       setErrors({ form: result.error ?? 'Something went wrong.' })
@@ -149,10 +140,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
       {/* ── Topbar ── */}
       <header className="fixed top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-3">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
-          <Link
-            href="/admin/dashboard"
-            className={`hidden sm:inline-flex items-center gap-1.5 ${crumb}`}
-          >
+          <Link href="/admin/dashboard" className={`hidden sm:inline-flex items-center gap-1.5 ${crumb}`}>
             <LayoutDashboard className="w-3 h-3" aria-hidden="true" />
             Dashboard
           </Link>
@@ -179,11 +167,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
           {/* ── Title band ── */}
           <div className="flex items-center gap-3 pt-6 pb-4">
             <div className="w-8 h-8 flex items-center justify-center bg-primary-light/10 dark:bg-primary-dark/10 shrink-0">
-              <Dog
-                size={15}
-                className="text-primary-light dark:text-primary-dark"
-                aria-hidden="true"
-              />
+              <Dog size={15} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
             </div>
             <div className="min-w-0">
               <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
@@ -280,15 +264,9 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                                   className={`w-5 h-5 flex items-center justify-center border transition-colors duration-150 ${added ? 'border-primary-light dark:border-primary-dark bg-primary-light dark:bg-primary-dark' : 'border-border-light dark:border-border-dark'}`}
                                 >
                                   {added ? (
-                                    <Check
-                                      className="w-3 h-3 text-white dark:text-bg-dark"
-                                      aria-hidden="true"
-                                    />
+                                    <Check className="w-3 h-3 text-white dark:text-bg-dark" aria-hidden="true" />
                                   ) : (
-                                    <Plus
-                                      className="w-3 h-3 text-muted-light dark:text-muted-dark"
-                                      aria-hidden="true"
-                                    />
+                                    <Plus className="w-3 h-3 text-muted-light dark:text-muted-dark" aria-hidden="true" />
                                   )}
                                 </div>
                               </div>
@@ -324,17 +302,10 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                     <div className="grid grid-cols-3 gap-2 mb-2">
                       {form?.images.map((photo: string, i: number) => (
                         <div key={photo} className={thumb}>
-                          <Picture
-                            priority={true}
-                            src={photo}
-                            alt={`Image ${i + 1}`}
-                            className="w-full h-full object-cover"
-                          />
+                          <Picture priority={true} src={photo} alt={`Image ${i + 1}`} className="w-full h-full object-cover" />
                           <button
                             type="button"
-                            onClick={() =>
-                              patch({ images: form.images.filter((url: string) => url !== photo) })
-                            }
+                            onClick={() => patch({ images: form.images.filter((url: string) => url !== photo) })}
                             aria-label={`Remove image ${i + 1}`}
                             className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 focus-visible:opacity-100 transition-opacity flex items-center justify-center focus:outline-none"
                           >
@@ -363,9 +334,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                           )}
                           <button
                             type="button"
-                            onClick={() =>
-                              setPendingPhotos((prev) => prev.filter((_, idx) => idx !== i))
-                            }
+                            onClick={() => setPendingPhotos((prev) => prev.filter((_, idx) => idx !== i))}
                             className="absolute top-1 right-1 w-5 h-5 flex items-center justify-center bg-red-500 text-white opacity-0 group-hover:opacity-100 transition-opacity"
                             aria-label={`Remove ${file.name}`}
                           >
@@ -400,9 +369,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                         className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase cursor-pointer transition-colors"
                       >
                         <ImagePlus size={13} aria-hidden="true" />
-                        {pendingPhotos.length > 0
-                          ? `${pendingPhotos.length} selected — add more`
-                          : 'Select photos'}
+                        {pendingPhotos.length > 0 ? `${pendingPhotos.length} selected — add more` : 'Select photos'}
                       </label>
                       <input
                         id="photos"
@@ -426,16 +393,12 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                 <section className={panel}>
                   <div className={`${panelHead} flex items-center justify-between`}>
                     <h3>Selected</h3>
-                    <span className="tabular-nums text-primary-light dark:text-primary-dark">
-                      {associated.length}
-                    </span>
+                    <span className="tabular-nums text-primary-light dark:text-primary-dark">{associated.length}</span>
                   </div>
                   <div className="px-4 py-3 space-y-1.5">
                     {associated.map((p) => (
                       <div key={p.id} className="flex items-center justify-between">
-                        <span className="text-[11px] font-mono text-text-light dark:text-text-dark">
-                          {p.name}
-                        </span>
+                        <span className="text-[11px] font-mono text-text-light dark:text-text-dark">{p.name}</span>
                         <div className="flex items-center gap-3">
                           <span className="text-[11px] font-mono text-primary-light dark:text-primary-dark tabular-nums">
                             ${p.price}
@@ -484,10 +447,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
       <div className="fixed bottom-0 inset-x-0 z-20 w-full border-t border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 sm:px-6 py-3">
         <div className="max-w-6xl mx-auto flex items-center justify-end gap-3">
           {errors?.form && (
-            <p
-              role="alert"
-              className="mr-auto text-[10px] font-mono text-red-500 dark:text-red-400 truncate"
-            >
+            <p role="alert" className="mr-auto text-[10px] font-mono text-red-500 dark:text-red-400 truncate">
               {errors.form}
             </p>
           )}
@@ -506,8 +466,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
           >
             {loading ? (
               <>
-                <Loader2 size={13} className="animate-spin" aria-hidden="true" />{' '}
-                {isUpdating ? 'Saving...' : 'Creating...'}
+                <Loader2 size={13} className="animate-spin" aria-hidden="true" /> {isUpdating ? 'Saving...' : 'Creating...'}
               </>
             ) : (
               <>

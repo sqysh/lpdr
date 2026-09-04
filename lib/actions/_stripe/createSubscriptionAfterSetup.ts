@@ -9,7 +9,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import { createSubscriptionAfterSetupSchema } from 'lib/schemas/subscription.schema'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 
 type SubscriptionData = {

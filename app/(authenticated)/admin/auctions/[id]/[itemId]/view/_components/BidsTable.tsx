@@ -1,6 +1,6 @@
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDateTime } from 'lib/utils/date.utils'
-import { IAuctionBid } from 'types/_auction-bid'
+import { IAuctionBid } from 'types/auction-bid'
 import { motion } from 'framer-motion'
 
 export function BidsTable({ bids }: { bids: IAuctionBid[] }) {

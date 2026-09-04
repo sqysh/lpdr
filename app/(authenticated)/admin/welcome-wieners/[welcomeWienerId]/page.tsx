@@ -1,6 +1,6 @@
 import { notFound } from 'next/navigation'
 import prisma from 'prisma/client'
-import { IWelcomeWiener } from 'types/_welcome-wiener'
+import { IWelcomeWiener } from 'types/welcome-wiener'
 import { WelcomeWienerForm } from '../_components/WelcomeWienerForm'
 
 export default async function AdminWelcomeWienersEditPage({

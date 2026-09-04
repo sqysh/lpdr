@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { STATUS_STYLES } from 'lib/constants/order.constants'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 
 export function OrderTopbar({ order }: { order: SerializedOrder }) {
   return (

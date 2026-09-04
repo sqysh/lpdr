@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { ArrowLeft } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
-import type { IPaymentMethod } from 'types/_payment-method.types'
+import type { IPaymentMethod } from 'types/payment-method.types'
 import { FormError, Toggle } from 'components/_primitives'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'

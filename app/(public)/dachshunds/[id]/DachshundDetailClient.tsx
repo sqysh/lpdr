@@ -1,6 +1,6 @@
 'use client'
 
-import { Dog } from 'types/_rescue-groups.types'
+import { Dog } from 'types/rescue-groups.types'
 import { Breadcrumb } from './_components/Breadcrumb'
 import { LeftGallery } from './_components/LeftGallery'
 import { RightInfoPanel } from './_components/RightInfoPanel'

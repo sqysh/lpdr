@@ -1,6 +1,6 @@
 'use client'
 
-import { SerializedOrder, SerializedSubscriptionOrder } from 'types/_order.types'
+import { SerializedOrder, SerializedSubscriptionOrder } from 'types/order.types'
 import { OrderTopbar } from './_components/OrderTopbar'
 import { OrderFailureBanner } from './_components/OrderFailureBanner'
 import { OrderItemsSection } from './_components/OrderItemsSection'

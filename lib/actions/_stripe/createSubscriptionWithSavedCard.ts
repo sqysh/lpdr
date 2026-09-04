@@ -8,7 +8,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 import { createSubscriptionSchema } from 'lib/schemas/subscription.schema'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 
@@ -23,9 +23,7 @@ const fail = (error: string): ActionResult<SubscriptionData> => ({
   error
 })
 
-export async function createSubscriptionWithSavedCard(
-  input: unknown
-): Promise<ActionResult<SubscriptionData>> {
+export async function createSubscriptionWithSavedCard(input: unknown): Promise<ActionResult<SubscriptionData>> {
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
 

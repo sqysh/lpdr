@@ -1,5 +1,5 @@
 import { AlertCircle } from 'lucide-react'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 
 export function OrderFailureBanner({ order }: { order: SerializedOrder }) {
   if (!order.failureCode && !order.failureReason) return null

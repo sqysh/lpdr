@@ -6,9 +6,9 @@ import { useRouter } from 'next/navigation'
 import { verifyBypassCode } from 'lib/actions/my-pack/adoption-fee/verifyBypassCode'
 import { updateAdoptionFee } from 'lib/actions/my-pack/adoption-fee/updateAdoptionFee'
 import { STEPS } from 'lib/constants/adoption-application.constants'
-import { STEPS_TYPES } from 'types/_adoption-application.types'
+import { STEPS_TYPES } from 'types/adoption-application.types'
 import { Header, Progress, Step0SignIn, Step1Terms, Step2Info, Step3Payment } from './_components'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 import { useConfettiStore } from 'stores/confetti.store'
 
 type Props = {

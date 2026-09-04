@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { IWelcomeWiener, WelcomeWienerProduct } from 'types/_welcome-wiener'
+import { IWelcomeWiener, WelcomeWienerProduct } from 'types/welcome-wiener'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { FILTERS, FilterValue } from 'lib/constants/welcome-wiener.constants'
 import { WelcomeWienerCard } from 'app/(public)/welcomewieners/_components/WelcomeWienerCard'

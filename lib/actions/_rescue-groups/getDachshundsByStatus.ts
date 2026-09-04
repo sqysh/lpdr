@@ -2,7 +2,7 @@ import { unstable_cache } from 'next/cache'
 import { createLog } from '../log/createLog'
 import { getPicturesAndVideos } from '../../utils/rescue-group.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 async function fetchWithRetry(url: string, options: RequestInit, retries = 2): Promise<Response> {
   let lastError: unknown

@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateOrderShippingStatus } from 'lib/actions/admin/order/updateOrderShippingStatus'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 import { StatusMessage } from 'components/_primitives/StatusMessage'
 import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import { Label } from './OrderLabel'
@@ -20,16 +20,14 @@ export function OrderFulfillmentSection({ order }: { order: SerializedOrder }) {
   const router = useRouter()
   const [shipLoading, setShipLoading] = useState(false)
   const [shippedLocally, setShippedLocally] = useState(false)
-  const { status, flash, clear } = useStatusMessage()
+  const { status, flash, clearStatus } = useStatusMessage()
 
-  const address = [order.addressLine1, order.addressLine2, order.city, order.state]
-    .filter(Boolean)
-    .join(', ')
+  const address = [order.addressLine1, order.addressLine2, order.city, order.state].filter(Boolean).join(', ')
   const isShipped = order.shippingStatus === 'SHIPPED' || shippedLocally
 
   const handleMarkShipped = async () => {
     setShipLoading(true)
-    clear()
+    clearStatus()
 
     const result = await updateOrderShippingStatus({ id: order.id, shippingStatus: 'SHIPPED' })
 
@@ -79,12 +77,7 @@ export function OrderFulfillmentSection({ order }: { order: SerializedOrder }) {
             Shipped
           </p>
         ) : (
-          <button
-            type="button"
-            onClick={handleMarkShipped}
-            disabled={shipLoading}
-            className={shipButton}
-          >
+          <button type="button" onClick={handleMarkShipped} disabled={shipLoading} className={shipButton}>
             {shipLoading ? (
               <span className="flex items-center gap-2" aria-live="polite">
                 <motion.span

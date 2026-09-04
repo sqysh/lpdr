@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
-import { IAuctionLive } from 'types/auction-item.types'
+import { IAuctionLive } from 'types/auction.types'
 import {
   AuctionCountdown,
   AuctionEmptyState,

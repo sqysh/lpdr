@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, ChevronRight } from 'lucide-react'
 import { Fragment, useState } from 'react'
 import { IAuction } from 'types/auction.types'
-import { IAuctionItem } from 'types/auction-item.types'
+import { IAuctionItem } from 'types/auction.types'
 
 export function BiddersTab({ auction }: { auction: IAuction }) {
   const [expanded, setExpanded] = useState<string | null>(null)

@@ -3,7 +3,7 @@
 import { motion } from 'framer-motion'
 import { Package, Truck } from 'lucide-react'
 import Image from 'next/image'
-import { IAuctionWinningBidder } from 'types/_auction-winning-bidder'
+import { IAuctionWinningBidder } from 'types/auction-winning-bidder'
 import { fadeUp } from 'lib/constants/motion.constants'
 
 type Props = {

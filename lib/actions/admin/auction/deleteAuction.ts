@@ -4,7 +4,7 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireSuper } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import type { ActionResult } from 'types/_action.types'
+import type { ActionResult } from 'types/action.types'
 
 export const deleteAuction = async (id: string): Promise<ActionResult<null>> => {
   const gate = await requireSuper()

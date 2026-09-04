@@ -8,7 +8,6 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
 
 export async function startAuction(auctionId: string) {
-  // REVERT to requireSuper before going live with real Stripe keys.
   const gate = await requireSuper()
   if (gate.ok === false) return { success: false, error: gate.error }
 
@@ -26,8 +25,7 @@ export async function startAuction(auctionId: string) {
     })
 
     if (!auction) return { success: false, error: 'Auction not found' }
-    if (auction.status !== 'DRAFT')
-      return { success: false, error: 'Auction is not in DRAFT status' }
+    if (auction.status !== 'DRAFT') return { success: false, error: 'Auction is not in DRAFT status' }
 
     await prisma.auction.update({
       where: { id: auctionId },

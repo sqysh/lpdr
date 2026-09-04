@@ -1,7 +1,7 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
-import { IDachshund } from 'types/_rescue-groups.types'
+import { IDachshund } from 'types/rescue-groups.types'
 import { cardVariants } from 'lib/constants/motion.constants'
 import Picture from '../../_common/Picture'
 

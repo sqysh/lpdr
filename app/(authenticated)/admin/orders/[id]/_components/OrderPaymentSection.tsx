@@ -1,5 +1,5 @@
 import { CreditCard, AlertCircle } from 'lucide-react'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 import { DECLINE_EXPLANATIONS } from 'lib/constants/order.constants'
 import { formatDate } from 'lib/utils/date.utils'
 import { Label } from './OrderLabel'

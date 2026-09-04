@@ -1,32 +1,59 @@
 import { Prisma } from '@prisma/client'
 import { TABS } from 'lib/constants/auction.constants'
-import { IAuctionAnomaly } from './_auction-anomaly'
-import { userContactSelect } from './prisma-selects.types'
+import { bidSelect, userContactSelect, userPublicSelect } from './prisma-selects.types'
+import { DecimalToNumber } from './prisma.types'
+import { IAuctionAnomaly } from './auction-anomaly'
 
-export type DecimalToNumber<T> = T extends Prisma.Decimal
-  ? number
-  : T extends Prisma.Decimal | null
-    ? number | null
-    : T extends Date
-      ? T
-      : T extends (infer U)[]
-        ? DecimalToNumber<U>[]
-        : T extends object
-          ? { [K in keyof T]: DecimalToNumber<T[K]> }
-          : T
+export type { AuctionItemStatus, SellingFormat, AuctionStatus } from '@prisma/client'
 
-/** Shared bid field set — excludes internal email-tracking columns. */
-export const bidSelect = {
+// ─── Shared selects ───────────────────────────────────────────────────────
+
+/** Parent auction header — safe on any page. */
+const auctionHeaderSelect = {
   id: true,
-  bidAmount: true,
-  auctionId: true,
-  auctionItemId: true,
-  userId: true,
-  bidderId: true,
+  title: true,
   status: true,
-  createdAt: true,
-  updatedAt: true
-} satisfies Prisma.AuctionBidSelect
+  startDate: true,
+  endDate: true,
+  customAuctionLink: true
+} satisfies Prisma.AuctionSelect
+
+/** Photos in display order, primary first. */
+const photosOrdered = { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] } satisfies Prisma.AuctionItem$photosArgs
+
+// ─── Public: auction detail page ──────────────────────────────────────────
+
+/** Item include for public pages: own bids, instant buyers, parent auction. */
+export const auctionItemLiveInclude = {
+  photos: true,
+  bids: { select: bidSelect },
+  instantBuyers: true,
+  auction: { select: auctionHeaderSelect },
+  _count: { select: { bids: true } }
+} satisfies Prisma.AuctionItemInclude
+
+export const auctionItemLiveArgs = Prisma.validator<Prisma.AuctionItemDefaultArgs>()({
+  include: auctionItemLiveInclude
+})
+
+export type IAuctionItemLive = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemLiveArgs>>
+
+/** Public auction detail page — live items, public-safe user fields. */
+export const auctionLiveArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
+  include: {
+    items: { orderBy: { createdAt: 'asc' }, include: auctionItemLiveInclude },
+    bidders: { include: { user: { select: userPublicSelect } } },
+    bids: { orderBy: { createdAt: 'desc' }, select: bidSelect },
+    winningBidders: {
+      include: { user: { select: userPublicSelect }, auctionItems: true }
+    },
+    instantBuyers: true
+  }
+})
+
+export type IAuctionLive = DecimalToNumber<Prisma.AuctionGetPayload<typeof auctionLiveArgs>>
+
+// ─── Admin: auctions list and detail ──────────────────────────────────────
 
 /** List view — admin auctions table, overview tab. */
 export const auctionListArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
@@ -47,107 +74,17 @@ export type IAuction = DecimalToNumber<Prisma.AuctionGetPayload<typeof auctionLi
   anomalies?: IAuctionAnomaly[]
 }
 
-export type Tab = (typeof TABS)[number]['label']
-
-export interface AuctionStartedData {
-  auctionId: string
-  auctionTitle: string
-  itemCount: number
-  endDate: string
-  customAuctionLink?: string
-}
-
-export interface AuctionEndedData {
-  auctionTitle: string
-  totalRaised: number
-  itemCount: number
-  bidderCount: number
-  customAuctionLink: string
-}
-
-/** Detail view — admin auction item page. */
-export const auctionItemDetailArgs = Prisma.validator<Prisma.AuctionItemDefaultArgs>()({
-  include: {
-    photos: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
-    bids: {
-      orderBy: { createdAt: 'desc' },
-      include: {
-        user: { select: { ...userContactSelect, anonymousBidding: true } },
-        bidder: { select: { id: true } }
-      }
-    },
-    winningBidder: { include: { user: { select: userContactSelect } } },
-    instantBuyers: { include: { user: { select: userContactSelect } } },
-    auction: {
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-        customAuctionLink: true
-      }
-    }
-  }
-})
-
-export type IAuctionItemDetail = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemDetailArgs>>
-
-/** Detail view — public auction item page. No user relations. */
-export const auctionItemPublicArgs = Prisma.validator<Prisma.AuctionItemDefaultArgs>()({
-  select: {
-    id: true,
-    name: true,
-    description: true,
-    sellingFormat: true,
-    status: true,
-    startingPrice: true,
-    buyNowPrice: true,
-    currentPrice: true,
-    currentBid: true,
-    minimumBid: true,
-    soldPrice: true,
-    shippingCosts: true,
-    requiresShipping: true,
-    totalQuantity: true,
-    photos: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
-    _count: { select: { bids: true } },
-    auction: {
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        startDate: true,
-        endDate: true,
-        customAuctionLink: true,
-        items: {
-          orderBy: { createdAt: 'asc' },
-          select: {
-            id: true,
-            name: true,
-            sellingFormat: true,
-            status: true,
-            startingPrice: true,
-            buyNowPrice: true,
-            currentBid: true,
-            photos: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
-            _count: { select: { bids: true } }
-          }
-        }
-      }
-    }
-  }
-})
-
-export type IAuctionItemPublic = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemPublicArgs>>
+/** List-view item shape, derived from the auction list query. */
+export type IAuctionItem = NonNullable<IAuction['items']>[number]
 
 /** Detail view — admin auction page. */
 export const auctionDetailArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
   include: {
-    items: { orderBy: { createdAt: 'asc' }, include: { photos: true } },
-    bidders: {
-      include: { user: { select: { ...userContactSelect, anonymousBidding: true } } }
+    items: {
+      orderBy: { createdAt: 'asc' },
+      include: { photos: true, instantBuyers: true, _count: { select: { bids: true } } }
     },
+    bidders: { include: { user: { select: userContactSelect } } },
     bids: { orderBy: { createdAt: 'desc' }, select: bidSelect },
     winningBidders: {
       include: { auctionItems: true, user: { select: userContactSelect } }
@@ -157,3 +94,24 @@ export const auctionDetailArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
 })
 
 export type IAuctionDetail = DecimalToNumber<Prisma.AuctionGetPayload<typeof auctionDetailArgs>>
+
+/** Detail view — admin auction item page. Includes bidder emails. */
+export const auctionItemDetailArgs = Prisma.validator<Prisma.AuctionItemDefaultArgs>()({
+  include: {
+    photos: photosOrdered,
+    bids: {
+      orderBy: { createdAt: 'desc' },
+      include: {
+        user: { select: userContactSelect },
+        bidder: { select: { id: true } }
+      }
+    },
+    winningBidder: { include: { user: { select: userContactSelect } } },
+    instantBuyers: { include: { user: { select: userContactSelect } } },
+    auction: { select: auctionHeaderSelect }
+  }
+})
+
+export type IAuctionItemDetail = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemDetailArgs>>
+
+export type AuctionTab = (typeof TABS)[number]['label']

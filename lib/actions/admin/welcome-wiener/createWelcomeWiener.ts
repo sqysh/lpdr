@@ -4,7 +4,7 @@ import { Prisma } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
-import { WelcomeWienerInputs } from 'types/_welcome-wiener'
+import { WelcomeWienerInputs } from 'types/welcome-wiener'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireAdmin } from 'lib/auth/guards'
 

@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { WelcomeWienerInputs } from 'types/_welcome-wiener'
+import { WelcomeWienerInputs } from 'types/welcome-wiener'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'

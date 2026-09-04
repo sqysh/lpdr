@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useSession } from 'next-auth/react'
-import { IPaymentMethod } from 'types/_payment-method.types'
+import { IPaymentMethod } from 'types/payment-method.types'
 
 export function useDefaultCard(savedCards: IPaymentMethod[], setSelectedCardId: (id: string) => void) {
   const { status } = useSession()

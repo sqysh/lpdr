@@ -7,7 +7,6 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
 
 export async function revertAuctionToDraft(auctionId: string) {
-  // REVERT to requireSuper before going live with real Stripe keys.
   const gate = await requireSuper()
   if (gate.ok === false) return { success: false, error: gate.error }
 

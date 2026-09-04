@@ -373,6 +373,8 @@ model Auction {
   historicalBidderCount Int @default(0)
   historicalBidCount    Int @default(0)
 
+  isPubliclyVisible Boolean @default(false)
+
   items          AuctionItem[]
   bidders        AuctionBidder[]
   bids           AuctionBid[]

@@ -5,7 +5,7 @@ import { StatusPill } from 'components/_primitives/StatusPill'
 import { formatDate } from 'lib/utils/date.utils'
 import Picture from 'components/_common/Picture'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { AuctionParticipation, AuctionPurchase } from 'types/_my-pack.types'
+import { AuctionParticipation, AuctionPurchase } from 'types/my-pack.types'
 
 interface Props {
   auctionParticipation: AuctionParticipation[]

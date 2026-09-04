@@ -7,8 +7,10 @@ import { createLog } from '../../log/createLog'
 export default async function getDraftOrActiveAuction() {
   try {
     const auction = await prisma.auction.findFirst({
-      where: { status: { in: ['ACTIVE', 'DRAFT'] } },
-      orderBy: { createdAt: 'desc' },
+      where: {
+        OR: [{ status: 'ACTIVE' }, { status: 'DRAFT', isPubliclyVisible: true }]
+      },
+      orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       select: {
         id: true,
         title: true,

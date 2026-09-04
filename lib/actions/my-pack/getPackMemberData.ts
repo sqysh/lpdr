@@ -7,7 +7,7 @@ import {
   MultiItemOrder,
   ParticipationItem,
   Subscription
-} from 'types/_my-pack.types'
+} from 'types/my-pack.types'
 import { requireAuth } from 'lib/auth/guards'
 
 export const getPackMemberData = async () => {

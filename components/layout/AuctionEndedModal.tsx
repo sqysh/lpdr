@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, Trophy, X, ChevronRight } from 'lucide-react'
 import Link from 'next/link'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { AuctionEndedData } from 'types/auction.types'
+import { AuctionEndedData } from 'types/auction-event.types'
 
 type Props = {
   data: AuctionEndedData | null

@@ -1,5 +1,5 @@
 import { Info } from 'lucide-react'
-import { SerializedOrder } from 'types/_order.types'
+import { SerializedOrder } from 'types/order.types'
 
 export function OrderAnomalyBanner({ order }: { order: SerializedOrder }) {
   const noIdentity = !order.userId && !order.customerName && !order.customerEmail

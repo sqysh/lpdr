@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import prisma from 'prisma/client'
 import { AdminOrderDetailsClient } from './AdminOrderDetailsClient'
-import { SerializedOrder, SerializedSubscriptionOrder } from 'types/_order.types'
+import { SerializedOrder, SerializedSubscriptionOrder } from 'types/order.types'
 
 export default async function AdminOrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
