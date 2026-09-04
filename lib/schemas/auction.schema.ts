@@ -61,7 +61,7 @@ export const updateAuctionSchema = z
     title: titleField.optional(),
     startDate: z.coerce.date().optional(),
     endDate: z.coerce.date().optional(),
-    goal: z.number().positive().optional(),
+    goal: z.coerce.number().positive().optional(),
     customAuctionLink: z
       .string()
       .trim()

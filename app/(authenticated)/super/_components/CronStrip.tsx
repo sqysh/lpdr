@@ -30,7 +30,7 @@ export function CronStrip({ initialJobs }: { initialJobs: CronJob[] }) {
     try {
       await fetch(route)
       const fresh = await getCronJobs()
-      setJobs(fresh)
+      setJobs(fresh.data ?? [])
     } finally {
       setTriggering(null)
     }
@@ -42,24 +42,16 @@ export function CronStrip({ initialJobs }: { initialJobs: CronJob[] }) {
         label="Cron Jobs"
         action={
           <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark">
-            {jobs.filter((j) => j.enabled).length} active ·{' '}
-            {jobs.filter((j) => j.lastStatus === 'error').length} errored
+            {jobs.filter((j) => j.enabled).length} active · {jobs.filter((j) => j.lastStatus === 'error').length} errored
           </span>
         }
       />
       <div className="flex divide-x divide-border-light dark:divide-border-dark overflow-x-auto">
         {jobs.map((job) => (
-          <div
-            key={job.id}
-            className={`flex flex-col gap-1 px-3 py-2 shrink-0 min-w-40 ${!job.enabled ? 'opacity-50' : ''}`}
-          >
+          <div key={job.id} className={`flex flex-col gap-1 px-3 py-2 shrink-0 min-w-40 ${!job.enabled ? 'opacity-50' : ''}`}>
             <div className="flex items-center justify-between gap-2">
-              <p className="font-mono text-[9px] uppercase text-text-light dark:text-text-dark truncate">
-                {job.name}
-              </p>
-              <span
-                className={`font-mono text-[8px] uppercase font-bold ${cronStatusColor[job.lastStatus]}`}
-              >
+              <p className="font-mono text-[9px] uppercase text-text-light dark:text-text-dark truncate">{job.name}</p>
+              <span className={`font-mono text-[8px] uppercase font-bold ${cronStatusColor[job.lastStatus]}`}>
                 {job.lastStatus}
               </span>
             </div>
@@ -71,11 +63,7 @@ export function CronStrip({ initialJobs }: { initialJobs: CronJob[] }) {
               disabled={!job.enabled || triggering === job.id}
               className="inline-flex items-center gap-0.5 px-1.5 py-0.5 font-mono text-[8px] uppercase border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-primary-light dark:hover:text-primary-dark disabled:opacity-30 transition-colors focus:outline-none w-fit"
             >
-              <RotateCcw
-                size={8}
-                className={triggering === job.id ? 'animate-spin' : ''}
-                aria-hidden="true"
-              />
+              <RotateCcw size={8} className={triggering === job.id ? 'animate-spin' : ''} aria-hidden="true" />
               Run
             </button>
           </div>

@@ -20,7 +20,7 @@ export default async function SuperDashboardPage() {
   return (
     <SuperDashboardClient
       services={services.data ?? []}
-      cronJobs={cronJobs}
+      cronJobs={cronJobs.data ?? []}
       pulseStats={pulseStats.data ?? []}
       adminUsers={adminUsers.data ?? []}
       auditLogs={auditLogs.data ?? []}

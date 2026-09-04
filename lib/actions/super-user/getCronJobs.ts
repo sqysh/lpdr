@@ -1,7 +1,10 @@
 'use server'
 
+import { requireSuper } from 'lib/auth/guards'
 import { formatLastRan, formatNextRun } from 'lib/utils/time.utils'
 import prisma from 'prisma/client'
+import { createLog } from '../log/createLog'
+import { getErrorMessage } from 'lib/utils/error.utils'
 
 export type CronStatus = 'success' | 'error' | 'skipped' | 'never'
 
@@ -27,52 +30,52 @@ const CRON_DEFINITIONS: Record<string, { schedule: string; enabled: boolean }> =
   'winner-payment-reminder': { schedule: '0 12 * * *', enabled: true }
 }
 
-export async function getCronJobs(): Promise<CronJob[]> {
-  // Get the most recent log entry per cron name in one query
-  const logs = await prisma.log.findMany({
-    where: {
-      message: { startsWith: '[CRON]' }
-    },
-    orderBy: { createdAt: 'desc' },
-    // Grab enough rows to ensure we get at least one per cron
-    take: 50
-  })
+export async function getCronJobs() {
+  const gate = await requireSuper()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
-  // Dedupe to most recent per cron name
-  const latest = new Map<string, (typeof logs)[number]>()
-  for (const log of logs) {
-    const meta = log.metadata as {
-      cronName?: string
-      status?: string
-      durationMs?: number
-      detail?: string
-    } | null
-    const name = meta?.cronName
-    if (name && !latest.has(name)) {
-      latest.set(name, log)
+  try {
+    const logs = await prisma.log.findMany({
+      where: { message: { startsWith: '[CRON]' } },
+      orderBy: { createdAt: 'desc' },
+      take: 50
+    })
+
+    const latest = new Map<string, (typeof logs)[number]>()
+    for (const log of logs) {
+      const meta = log.metadata as { cronName?: string } | null
+      const name = meta?.cronName
+      if (name && !latest.has(name)) {
+        latest.set(name, log)
+      }
     }
+
+    const data: CronJob[] = Object.entries(CRON_DEFINITIONS).map(([name, def]) => {
+      const log = latest.get(name)
+      const meta = log?.metadata as {
+        status?: CronStatus
+        durationMs?: number
+        detail?: string
+      } | null
+
+      return {
+        id: `cron_${name}`,
+        name,
+        schedule: def.schedule,
+        enabled: def.enabled,
+        lastRan: formatLastRan(log ? log.createdAt : null),
+        nextRun: formatNextRun(getNextRun(def.schedule)),
+        lastStatus: meta?.status ?? 'never',
+        durationMs: meta?.durationMs ?? null,
+        detail: meta?.detail ?? null
+      }
+    })
+
+    return { success: true, error: null, data }
+  } catch (error) {
+    await createLog('error', 'Failed to fetch cron jobs', { error: getErrorMessage(error) })
+    return { success: false, error: 'Failed to fetch cron jobs', data: null }
   }
-
-  return Object.entries(CRON_DEFINITIONS).map(([name, def]) => {
-    const log = latest.get(name)
-    const meta = log?.metadata as {
-      status?: CronStatus
-      durationMs?: number
-      detail?: string
-    } | null
-
-    return {
-      id: `cron_${name}`,
-      name,
-      schedule: def.schedule,
-      enabled: def.enabled,
-      lastRan: formatLastRan(log ? log.createdAt : null),
-      nextRun: formatNextRun(getNextRun(def.schedule)),
-      lastStatus: meta?.status ?? ('never' as CronStatus),
-      durationMs: meta?.durationMs ?? null,
-      detail: meta?.detail ?? null
-    }
-  })
 }
 
 // Naive next-run calculator — good enough for display
