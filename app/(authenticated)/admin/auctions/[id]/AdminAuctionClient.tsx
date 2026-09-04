@@ -1,12 +1,12 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IAuction, AuctionTab } from 'types/auction.types'
+import { IAuctionDetail, AuctionTab } from 'types/auction.types'
 import { formatDate } from 'lib/utils/date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
 import { TABS } from 'lib/constants/auction.constants'
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { Check, Copy, ExternalLink, Eye, EyeOff } from 'lucide-react'
 import { useState } from 'react'
 import { OverviewTab } from './_components/OverviewTab'
 import { ItemsTab } from './_components/ItemsTab'
@@ -16,9 +16,11 @@ import { WinningBiddersTab } from './_components/WinningBiddersTab'
 import { TopBar } from './_components/TopBar'
 import { Tabs } from './_components/Tabs'
 import { Role } from '@prisma/client'
-import { useSession } from 'next-auth/react'
+import { useStatusMessage } from '@hooks/useStatusMessage.hook'
+import { toggleAuctionVisibility } from 'lib/actions/admin/auction/toggleAuctionVisibility'
+import { StatusMessage } from 'components/_primitives/StatusMessage'
 
-const TAB_PANELS: Record<string, React.ComponentType<{ auction: IAuction; role: Role }>> = {
+const TAB_PANELS: Record<AuctionTab, React.ComponentType<{ auction: IAuctionDetail; role: Role }>> = {
   Overview: OverviewTab,
   Items: ItemsTab,
   Settings: SettingsTab,
@@ -26,13 +28,36 @@ const TAB_PANELS: Record<string, React.ComponentType<{ auction: IAuction; role: 
   'Winning Bidders': WinningBiddersTab
 }
 
-export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
+export default function AdminAuctionClient({ auction, role }: { auction: IAuctionDetail; role: Role }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
   const [copied, setCopied] = useState(false)
-  const session = useSession()
-  const role: Role = session.data?.user?.role
+  const [isPubliclyVisible, setIsPubliclyVisible] = useState(auction.isPubliclyVisible)
+  const [visibilityLoading, setVisibilityLoading] = useState(false)
+
+  const { status, flash } = useStatusMessage()
+
+  const isDraft = auction.status === 'DRAFT'
+
+  const handleToggleVisibility = async () => {
+    const prev = isPubliclyVisible
+    setIsPubliclyVisible(!prev)
+    setVisibilityLoading(true)
+
+    const result = await toggleAuctionVisibility(auction.id)
+
+    setVisibilityLoading(false)
+
+    if (!result.success) {
+      setIsPubliclyVisible(prev)
+      flash({ tone: 'error', message: 'Failed to update visibility', description: result.error ?? 'Please try again.' })
+      return
+    }
+
+    router.refresh()
+  }
 
   const statusConfig = getAuctionStatusConfig(auction.status)
   const visibleTabs = TABS.filter((t) => t.statuses.includes(auction.status))
@@ -69,6 +94,8 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
           </p>
         </div>
 
+        <StatusMessage status={status} />
+
         {auction.customAuctionLink && (
           <div className="flex items-center gap-px border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
             <div className="flex items-center gap-2 px-3 py-2 flex-1 min-w-0">
@@ -79,6 +106,33 @@ export default function AdminAuctionClient({ auction }: { auction: IAuction }) {
                 {auction.customAuctionLink}
               </span>
             </div>
+
+            {isDraft && (
+              <button
+                type="button"
+                onClick={handleToggleVisibility}
+                disabled={visibilityLoading}
+                aria-pressed={isPubliclyVisible}
+                aria-label={isPubliclyVisible ? 'Hide from public site' : 'Show on public site'}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-2 border-l border-border-light dark:border-border-dark text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed ${
+                  isPubliclyVisible
+                    ? 'text-emerald-500 hover:bg-emerald-500/5'
+                    : 'text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:bg-primary-light/5 dark:hover:bg-primary-dark/5'
+                }`}
+              >
+                {isPubliclyVisible ? (
+                  <>
+                    <Eye size={11} aria-hidden="true" />
+                    Visible
+                  </>
+                ) : (
+                  <>
+                    <EyeOff size={11} aria-hidden="true" />
+                    Hidden
+                  </>
+                )}
+              </button>
+            )}
 
             <button
               type="button"
