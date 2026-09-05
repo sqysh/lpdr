@@ -7,7 +7,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 export async function getWelcomeWieners() {
   try {
     const welcomeWieners = await prisma.welcomeWiener.findMany({
-      where: { isLive: true, archivedAt: null },
+      where: { archivedAt: null },
       orderBy: { createdAt: 'desc' },
       select: {
         id: true,
@@ -16,7 +16,8 @@ export async function getWelcomeWieners() {
         age: true,
         images: true,
         associatedProducts: true,
-        isPhysicalProduct: true
+        isPhysicalProduct: true,
+        isLive: true
       }
     })
 
