@@ -6,7 +6,6 @@ import { Dispatch, SetStateAction } from 'react'
 import { FormField } from 'components/_primitives/FormField'
 import { PackMember } from 'types/my-pack.types'
 import { formatRole } from 'lib/utils/user.utils'
-import { EmailChangeSection } from './EmailChangeSection'
 import Picture from 'components/_common/Picture'
 
 interface HeaderProps {
@@ -33,8 +32,7 @@ export function Header({
   setEditingName
 }: HeaderProps) {
   const fullName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || 'Member'
-  const initials =
-    [user?.firstName?.[0], user?.lastName?.[0]].filter(Boolean).join('').toUpperCase() || '?'
+  const initials = [user?.firstName?.[0], user?.lastName?.[0]].filter(Boolean).join('').toUpperCase() || '?'
 
   return (
     <motion.div
@@ -52,17 +50,9 @@ export function Header({
         aria-hidden="true"
       >
         {user.image ? (
-          <Picture
-            priority={true}
-            src={user.image}
-            alt=""
-            className="w-full h-full object-cover"
-            unoptimized={false}
-          />
+          <Picture priority={true} src={user.image} alt="" className="w-full h-full object-cover" unoptimized={false} />
         ) : (
-          <span className="font-quicksand font-black text-base text-primary-light dark:text-primary-dark">
-            {initials}
-          </span>
+          <span className="font-quicksand font-black text-base text-primary-light dark:text-primary-dark">{initials}</span>
         )}
       </motion.div>
 
@@ -73,10 +63,7 @@ export function Header({
           transition={{ duration: 0.3, delay: 0.1 }}
           className="flex items-center gap-3 mb-1"
         >
-          <span
-            className="block w-5 h-px bg-primary-light dark:bg-primary-dark"
-            aria-hidden="true"
-          />
+          <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
             {formatRole(user.role)}
           </p>
@@ -168,7 +155,7 @@ export function Header({
           </motion.div>
         )}
 
-        <EmailChangeSection currentEmail={user.email} />
+        <p className="font-mono text-xs text-muted-light dark:text-muted-dark mt-1">{user.email}</p>
       </div>
     </motion.div>
   )

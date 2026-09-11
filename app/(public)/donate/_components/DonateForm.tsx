@@ -1,15 +1,12 @@
-import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
-import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
-import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { OrderType } from '@prisma/client'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
 import { formatWithCommas } from 'lib/utils/currency.utils'
-import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { IPaymentMethod } from 'types/payment-method.types'
 import { PresetAmounts } from './PresetAmounts'
 import { DonateSaveCardToggle } from './DonateSaveCardToggle'
@@ -20,154 +17,89 @@ import { CardElementField } from 'components/features/payment/CardElementField'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
 import { useSearchParams } from 'next/navigation'
 import { DONATION_PRESETS } from 'lib/constants/donation.constants'
+import { DonateFormInput, DonateFormValues, donateSchema } from 'lib/schemas/donate.schema'
+import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
 
-export interface PaymentInputs {
-  // amount
-  selectedAmount: number | null
+type AmountState = {
   useCustom: boolean
   customAmount: string
-  // fees
-  coverFees: boolean
-  // card
-  cardComplete: boolean
-  selectedCardId: string | null
-  useNewCard: boolean
-  saveCard: boolean
-  // identity
-  firstName: string
-  lastName: string
-  email: string
-  // ui
-  loading: boolean
-  error: string | null
+  selectedAmount: number | null
 }
 
 type Props = {
   savedCards: IPaymentMethod[]
-  userName: { firstName?: string; lastName?: string }
+  userName: { firstName?: string; lastName?: string } | null
   isAuthed: boolean
-  email: string
+  email: string | null
 }
 
 export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
-  const stripe = useStripe()
-  const elements = useElements()
-  const { setupPusherListenerOneTime } = usePaymentProcessor()
-
   const searchParams = useSearchParams()
-  const donationAmountFromUrl = searchParams.get('donationAmount')
-  const parsed = Number(donationAmountFromUrl)
-  const seededAmount = Number.isFinite(parsed) && parsed > 0 ? parsed : 25
-  const seeded = Number.isFinite(parsed) && parsed > 0 ? parsed : null
+  const seededParam = Number(searchParams.get('donationAmount'))
+  const seeded = Number.isFinite(seededParam) && seededParam > 0 ? seededParam : null
   const seededIsPreset = seeded !== null && DONATION_PRESETS.includes(seeded)
 
-  const [inputs, setInputs] = useState<PaymentInputs>({
-    selectedAmount: seededAmount,
+  const [amount, setAmount] = useState<AmountState>({
     useCustom: seeded !== null && !seededIsPreset,
     customAmount: seeded !== null && !seededIsPreset ? String(seeded) : '',
-    coverFees: false,
-    cardComplete: false,
-    selectedCardId: savedCards[0]?.stripePaymentId ?? null,
-    useNewCard: savedCards.length === 0,
-    saveCard: false,
-    firstName: userName?.firstName ?? '',
-    lastName: userName?.lastName ?? '',
-    email: email ?? '',
-    loading: false,
-    error: null
+    selectedAmount: seeded !== null && seededIsPreset ? seeded : 25
   })
 
-  const patch = (data: Partial<PaymentInputs>) => setInputs((prev) => ({ ...prev, ...data }))
+  const patchAmount = (data: Partial<AmountState>) => setAmount((prev) => ({ ...prev, ...data }))
 
   const [amountBlurred, setAmountBlurred] = useState(false)
 
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<DonateFormInput, unknown, DonateFormValues>({
+    resolver: zodResolver(donateSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      firstName: userName?.firstName ?? '',
+      lastName: userName?.lastName ?? ''
+    }
+  })
+
+  const values = useWatch({ control })
+
+  const { payment, patch, usingSavedCard, pay } = useStripeCheckout({
+    savedCards,
+    isAuthed,
+    billingName: `${values.firstName} ${values.lastName}`,
+    billingEmail: email ?? ''
+  })
+
   // ── Derived values ────────────────────────────────────────────────────────
-  const donationAmount = inputs.useCustom ? parseFloat(inputs.customAmount) || 0 : (inputs.selectedAmount ?? 0)
+  const donationAmount = amount.useCustom ? parseFloat(amount.customAmount) || 0 : (amount.selectedAmount ?? 0)
   const processingFee = calculateStripeFees(donationAmount)
-  const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && isAuthed
-  const finalAmount = inputs.coverFees ? donationAmount + processingFee : donationAmount
-  const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
+  const finalAmount = payment.coverFees ? donationAmount + processingFee : donationAmount
+  const enteringNewCard = !isAuthed || savedCards.length === 0 || payment.useNewCard
 
   const isValid =
     donationAmount >= 5 &&
-    !!inputs?.firstName?.trim() &&
-    !!inputs?.lastName?.trim() &&
-    EMAIL_REGEX.test(inputs?.email) &&
-    (inputs?.selectedCardId && !inputs?.useNewCard ? true : inputs?.cardComplete)
+    !!values.firstName?.trim() &&
+    !!values.lastName?.trim() &&
+    (usingSavedCard ? true : payment.cardComplete)
 
-  // ── Default card seeding ──────────────────────────────────────────────────
-  const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
-  useDefaultCard(savedCards, setDefaultCard)
+  const handlePresetSelect = (value: number) => patchAmount({ selectedAmount: value, useCustom: false, customAmount: '' })
 
-  // ── Handlers ──────────────────────────────────────────────────────────────
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
-
-  const handlePresetSelect = (amount: number) => patch({ selectedAmount: amount, useCustom: false, customAmount: '' })
-
-  // ── Handlde Submit ─────────────────────────────────────────────────────────────────
-  async function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault()
-    if (!stripe || !elements || !isValid) return
-
-    patch({ loading: true, error: null })
-
-    try {
-      const name = `${inputs?.firstName?.trim()} ${inputs?.lastName?.trim()}`
-      const trimmedEmail = inputs.email.trim()
-
-      const basePayload = {
-        amount: Math.round(donationAmount * 100),
-        coverFees: inputs?.coverFees,
-        orderType: 'ONE_TIME_DONATION' as OrderType
-      }
-
-      if (usingSavedCard) {
-        const result = await createPaymentIntent({
-          ...basePayload,
-          savedCardId: inputs?.selectedCardId
-        })
-
-        if (!result.success) throw new Error(result.error)
-
-        setupPusherListenerOneTime()
-      } else {
-        // ── New card — confirmed client-side ──
-        const cardElement = elements.getElement(CardElement)
-        if (!cardElement) throw new Error('Card element not found')
-
-        const intentResult = await createPaymentIntent({
-          ...basePayload,
-          saveCard: inputs.saveCard
-        })
-
-        if (!intentResult.success) throw new Error(intentResult.error)
-
-        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
-          payment_method: {
-            card: cardElement,
-            billing_details: { name, email: trimmedEmail }
-          }
-        })
-
-        if (result.error) {
-          patch({ loading: false, error: result.error.message ?? 'Payment failed' })
-        } else if (result.paymentIntent?.status === 'succeeded') {
-          setupPusherListenerOneTime()
-        }
-      }
-    } catch (err) {
-      patch({
-        loading: false,
-        error: err instanceof Error ? err.message : 'Something went wrong. Please try again.'
-      })
-    }
-  }
+  const onSubmit = () =>
+    pay({
+      amount: Math.round(donationAmount * 100),
+      coverFees: payment.coverFees,
+      orderType: 'ONE_TIME_DONATION' as OrderType
+    })
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="One-time donation form" className="w-full space-y-5">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="One-time donation form" className="w-full space-y-5">
       {/* Preset amounts */}
-      <PresetAmounts inputs={inputs} onSelect={handlePresetSelect} />
+      <PresetAmounts
+        inputs={{ useCustom: amount.useCustom, selectedAmount: amount.selectedAmount }}
+        onSelect={handlePresetSelect}
+      />
 
       {/* ── Custom amount ── */}
       <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0.5} className="mb-6">
@@ -181,7 +113,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
         <div className="relative">
           <span
             className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-quicksand font-black text-sm pointer-events-none transition-colors duration-200 ${
-              inputs?.useCustom ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'
+              amount?.useCustom ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'
             }`}
             aria-hidden="true"
           >
@@ -192,14 +124,14 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
             type="text"
             inputMode="numeric"
             placeholder="Enter amount"
-            value={inputs?.customAmount ? formatWithCommas(inputs.customAmount) : ''}
+            value={amount?.customAmount ? formatWithCommas(amount.customAmount) : ''}
             onChange={(e) => {
               const raw = e.target.value.replace(/[^0-9]/g, '')
-              patch({ customAmount: raw, useCustom: true, selectedAmount: null })
+              patchAmount({ customAmount: raw, useCustom: true, selectedAmount: null })
             }}
             onFocus={() => {
               setAmountBlurred(false)
-              patch({ useCustom: true, selectedAmount: null })
+              patchAmount({ useCustom: true, selectedAmount: null })
             }}
             onBlur={() => setAmountBlurred(true)}
             aria-describedby="custom-amount-hint"
@@ -207,11 +139,11 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
               w-full pl-8 pr-4 py-3 text-sm font-quicksand font-bold border-2 bg-surface-light dark:bg-surface-dark
               text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50
               transition-colors duration-200 focus:outline-none
-              ${inputs?.useCustom ? 'border-primary-light dark:border-primary-dark' : 'border-border-light dark:border-border-dark'}
+              ${amount?.useCustom ? 'border-primary-light dark:border-primary-dark' : 'border-border-light dark:border-border-dark'}
               focus-visible:border-primary-light dark:focus-visible:border-primary-dark
             `}
           />
-          {inputs?.useCustom && amountBlurred && inputs?.customAmount && parseFloat(inputs?.customAmount) < 5 && (
+          {amount?.useCustom && amountBlurred && amount?.customAmount && parseFloat(amount?.customAmount) < 5 && (
             <p
               id="custom-amount-hint"
               role="alert"
@@ -245,7 +177,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
 
       {!isAuthed && <StepSignIn redirectTo={`/donate?donationAmount=${donationAmount}`} />}
 
-      <SignedInRow />
+      {isAuthed && <SignedInRow />}
 
       {isAuthed && (
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={1.25} className="space-y-5">
@@ -254,21 +186,19 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
             <FormField
               id="donate-firstName"
               label="First Name"
-              name="firstName"
-              value={inputs?.firstName ?? ''}
-              onChange={handleInput}
+              {...register('firstName')}
               placeholder="Jane"
               autoComplete="given-name"
+              error={errors.firstName?.message}
               required
             />
             <FormField
               id="donate-lastName"
               label="Last Name"
-              name="lastName"
-              value={inputs?.lastName ?? ''}
-              onChange={handleInput}
-              placeholder="Doe"
+              {...register('lastName')}
+              placeholder="Smith"
               autoComplete="family-name"
+              error={errors.lastName?.message}
               required
             />
           </div>
@@ -278,22 +208,20 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
             label="Email Address"
             name="email"
             type="email"
-            value={inputs?.email ?? ''}
-            onChange={handleInput}
-            placeholder="jane@example.com"
+            value={email}
+            onChange={() => {}}
             autoComplete="email"
-            required
-            disabled={isAuthed}
-            readOnly={isAuthed}
-            hint={isAuthed ? 'Using your signed-in account email.' : undefined}
+            disabled
+            readOnly
+            hint="Using your signed-in account email."
           />
 
           {/* Saved cards */}
           {isAuthed && (
             <SavedCardSelector
               savedCards={savedCards}
-              selectedCardId={inputs.selectedCardId}
-              useNewCard={inputs.useNewCard}
+              selectedCardId={payment.selectedCardId}
+              useNewCard={payment.useNewCard}
               onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
               onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
               onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
@@ -307,26 +235,26 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
 
           {/* ── Cover fees ── */}
           <CoverFeesToggle
-            checked={inputs.coverFees}
-            onChange={() => patch({ coverFees: !inputs.coverFees })}
+            checked={payment.coverFees}
+            onChange={() => patch({ coverFees: !payment.coverFees })}
             processingFee={processingFee}
           />
 
           {/* Save card — donate-specific wrapper */}
           <DonateSaveCardToggle
-            checked={inputs.saveCard}
-            onToggle={() => patch({ saveCard: !inputs.saveCard })}
+            checked={payment.saveCard}
+            onToggle={() => patch({ saveCard: !payment.saveCard })}
             usingNewCard={enteringNewCard}
           />
 
           {/* Error */}
-          <FormError error={inputs.error} />
+          <FormError error={payment.error} />
 
           {/* Submit */}
           <SubmitButton
-            loading={inputs.loading}
+            loading={payment.loading}
             isValid={isValid}
-            label={`Pay $${(inputs.coverFees ? finalAmount : donationAmount).toFixed(2)}`}
+            label={`Pay $${(payment.coverFees ? finalAmount : donationAmount).toFixed(2)}`}
           />
         </motion.div>
       )}

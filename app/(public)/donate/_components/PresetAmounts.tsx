@@ -1,22 +1,15 @@
 import { fadeUp } from 'lib/constants/motion.constants'
 import { AnimatePresence, motion } from 'framer-motion'
-import { PaymentInputs } from './DonateForm'
 import { DONATION_PRESETS } from 'lib/constants/donation.constants'
 
 interface PresetAmountsProps {
-  inputs: PaymentInputs
+  inputs: { useCustom: boolean; selectedAmount: number }
   onSelect: (amount: number) => void
 }
 
 export function PresetAmounts({ inputs, onSelect }: PresetAmountsProps) {
   return (
-    <motion.fieldset
-      variants={fadeUp}
-      initial="hidden"
-      animate="show"
-      custom={0.25}
-      className="mb-5 border-0 p-0 min-w-0"
-    >
+    <motion.fieldset variants={fadeUp} initial="hidden" animate="show" custom={0.25} className="mb-5 border-0 p-0 min-w-0">
       <legend className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-3">
         Select Amount
       </legend>

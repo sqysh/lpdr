@@ -50,7 +50,7 @@ export function SubscriptionPaymentView({ setView, selectedTier, billing, savedP
           <div className="max-w-md w-full mx-auto lg:mx-0">
             <StepIndicator current={currentStep} total={3} labels={paymentStepLabels} isDark />
 
-            <SignedInRow isDark />
+            <SignedInRow />
 
             {currentStep === 2 && (
               <StepSignIn redirectTo={`/subscriptions?tier=${selectedTier.id}&billing=${billing}&view=payment`} />
