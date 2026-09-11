@@ -2,6 +2,8 @@ import type { EmailConfig } from 'next-auth/providers/email'
 import { resend } from '../email/resend'
 import { createLog } from '../actions/log/createLog'
 import { magicLinkTemplate } from '../email/templates/magic-link.template'
+import { getRequestDetails } from 'lib/utils/log.server.utils'
+import { checkSignInRateLimit } from 'lib/utils/checkSignInRateLimit.utils'
 
 /**
  * Mail security scanners issue a GET to every link in an incoming message to
@@ -24,6 +26,21 @@ export const magicLinkProvider: EmailConfig = {
   maxAge: 15 * 60, // 15 mins
   from: process.env.RESEND_FROM_EMAIL!,
   sendVerificationRequest: async ({ identifier: email, url, provider }) => {
+    const details = await getRequestDetails()
+    const limit = await checkSignInRateLimit({ email, ip: details.ip })
+
+    if (limit.allowed === false) {
+      await createLog('warn', 'Sign-in request rate limited', {
+        location: ['magic-link.provider.ts'],
+        email,
+        ip: details.ip,
+        reason: limit.reason
+      })
+
+      // Returning quietly rather than throwing, so the sender is told nothing
+      return
+    }
+
     try {
       const result = await resend.emails.send({
         from: `Little Paws Dachshund Rescue <${provider.from!}>`,
