@@ -1,25 +1,43 @@
+'use client'
+
 import { AnimatePresence, motion } from 'framer-motion'
 import { AlertCircle, ArrowRight, Mail } from 'lucide-react'
-import { signIn } from 'next-auth/react'
 import { useState } from 'react'
+import { Turnstile } from 'components/_common/Turnstile'
+import { requestMagicLink } from 'lib/actions/auth/requestMagicLink'
 
-export function MagicLink({ email, setEmail, setSent, redirectTo }) {
+type Props = {
+  email: string
+  setEmail: (email: string) => void
+  setSent: (sent: boolean) => void
+  redirectTo?: string
+}
+
+export function MagicLink({ email, setEmail, setSent, redirectTo }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [token, setToken] = useState<string | null>(null)
+  const [resetSignal, setResetSignal] = useState(0)
+
+  const canSubmit = Boolean(email && token) && !loading
 
   async function handleMagicLink() {
-    if (!email || loading) return
+    if (!canSubmit) return
+
     setLoading(true)
     setError(null)
-    try {
-      const res = await signIn('email', { email, redirect: false, redirectTo })
-      if (res?.error) throw new Error(res.error)
-      setSent(true)
-    } catch {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setLoading(false)
+
+    const result = await requestMagicLink({ email, token: token ?? undefined, redirectTo })
+
+    setLoading(false)
+
+    if (!result.success) {
+      setError(result.error ?? 'Something went wrong. Please try again.')
+      setResetSignal((n) => n + 1)
+      return
     }
+
+    setSent(true)
   }
 
   return (
@@ -55,6 +73,14 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }) {
         </div>
       </div>
 
+      <Turnstile action="magic-link" onToken={setToken} resetSignal={resetSignal} />
+
+      {!token && !loading && (
+        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark" aria-live="polite">
+          Waiting for verification to finish
+        </p>
+      )}
+
       {/* Error */}
       <AnimatePresence>
         {error && (
@@ -75,11 +101,11 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }) {
 
       <motion.button
         onClick={handleMagicLink}
-        disabled={!email || loading}
-        whileHover={email && !loading ? { y: -1 } : {}}
-        whileTap={email && !loading ? { scale: 0.98 } : {}}
+        disabled={!canSubmit}
+        whileHover={canSubmit ? { y: -1 } : {}}
+        whileTap={canSubmit ? { scale: 0.98 } : {}}
         className={`w-full py-3 text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2 flex items-center justify-center gap-2 ${
-          email && !loading
+          canSubmit
             ? 'bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white cursor-pointer'
             : 'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark cursor-not-allowed'
         }`}

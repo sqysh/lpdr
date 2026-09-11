@@ -14,6 +14,33 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.6.0',
+    date: '2026-09-11',
+    title: 'Bot protection on sign-in and draft auction visibility',
+    changes: [
+      {
+        type: 'feature',
+        text: 'Added Cloudflare Turnstile to the magic link sign-in form. Sign-in now goes through a server action that verifies the token before sending anything, so posting directly to the auth endpoint no longer works'
+      },
+      {
+        type: 'feature',
+        text: 'Draft auctions are hidden from the public site until an admin turns them on, so items can be added and priced before anyone sees them'
+      },
+      {
+        type: 'improvement',
+        text: 'Turnstile verification checks the hostname and the form the token was minted for, not just that it passed, so a token from another site or another form cannot be reused'
+      },
+      {
+        type: 'fix',
+        text: 'Added the Cloudflare challenge domains to the content security policy'
+      },
+      {
+        type: 'fix',
+        text: 'Blocked crafted sign-in redirects that could have sent people to an outside site after logging in'
+      }
+    ]
+  },
+  {
     version: '1.5.0',
     date: '2026-09-03',
     title: 'Server action guards, client bundle leaks, and upcoming auctions',
