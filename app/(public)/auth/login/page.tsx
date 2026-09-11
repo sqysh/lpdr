@@ -45,17 +45,11 @@ export default function LoginPage() {
               className="inline-flex items-center gap-2 mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               aria-label="Little Paws Dachshund Rescue — Home"
             >
-              <span
-                className="block w-5.5 h-px bg-primary-light dark:bg-primary-dark"
-                aria-hidden="true"
-              />
+              <span className="block w-5.5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
               <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-primary-light dark:text-primary-dark">
                 Little Paws
               </span>
-              <span
-                className="block w-5.5 h-px bg-primary-light dark:bg-primary-dark"
-                aria-hidden="true"
-              />
+              <span className="block w-5.5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
             </Link>
 
             <h1 className="font-quicksand font-black text-[30px] text-text-light dark:text-text-dark leading-none mb-1.5 tracking-tight">
@@ -73,10 +67,7 @@ export default function LoginPage() {
             transition={{ duration: 0.45, delay: 0.1 }}
             className="border border-border-light dark:border-border-dark bg-bg-light dark:bg-surface-dark relative overflow-hidden"
           >
-            <div
-              className="absolute top-0 left-0 w-full h-0.5 bg-primary-light dark:bg-primary-dark"
-              aria-hidden="true"
-            />
+            <div className="absolute top-0 left-0 w-full h-0.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
 
             <AnimatePresence mode="wait">
               {sent ? (
@@ -111,12 +102,8 @@ export default function LoginPage() {
                   </motion.div>
 
                   <div>
-                    <p className="font-quicksand font-black text-xl text-text-light dark:text-text-dark mb-1">
-                      Check your email
-                    </p>
-                    <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">
-                      Magic link sent to
-                    </p>
+                    <p className="font-quicksand font-black text-xl text-text-light dark:text-text-dark mb-1">Check your email</p>
+                    <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">Magic link sent to</p>
                     <p className="text-[12px] font-mono text-primary-light dark:text-primary-dark font-bold mt-0.5 truncate px-2">
                       {email}
                     </p>
@@ -124,8 +111,7 @@ export default function LoginPage() {
 
                   <div className="w-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark px-4 py-3">
                     <p className="text-[11px] font-nunito text-text-light dark:text-text-dark leading-relaxed">
-                      Click the link in your email to sign in. It expires in{' '}
-                      <strong>24 hours</strong>.
+                      Click the link in your email to sign in. It expires in <strong>24 hours</strong>.
                     </p>
                   </div>
 
@@ -154,8 +140,8 @@ export default function LoginPage() {
                 >
                   {/* OAuth group */}
                   <div className="flex flex-col gap-2">
-                    <GoogleButton redirectTo="/auth/login" />
-                    <FacebookButton redirectTo="/auth/login" />
+                    <GoogleButton redirectTo="/my-pack" />
+                    <FacebookButton redirectTo="/my-pack" />
                   </div>
 
                   {/* Divider */}
@@ -168,12 +154,7 @@ export default function LoginPage() {
                   </div>
 
                   {/* Email */}
-                  <MagicLink
-                    email={email}
-                    redirectTo="/auth/login"
-                    setEmail={setEmail}
-                    setSent={setSent}
-                  />
+                  <MagicLink email={email} redirectTo="/my-pack" setEmail={setEmail} setSent={setSent} />
 
                   {/* Footer note */}
                   <div className="-mx-6 mt-1 border-t border-border-light dark:border-border-dark px-6 py-3">

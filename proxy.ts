@@ -7,8 +7,7 @@ const SESSION_COOKIES = ['authjs.session-token', '__Secure-authjs.session-token'
 
 const PROTECTED_PREFIXES = ['/my-pack', '/admin', '/super']
 
-const hasSessionCookie = (req: NextRequest) =>
-  SESSION_COOKIES.some((name) => !!req.cookies.get(name)?.value)
+const hasSessionCookie = (req: NextRequest) => SESSION_COOKIES.some((name) => !!req.cookies.get(name)?.value)
 
 const isProtectedPath = (pathname: string) =>
   PROTECTED_PREFIXES.some((base) => pathname === base || pathname.startsWith(`${base}/`))
@@ -19,10 +18,7 @@ export function proxy(request: NextRequest) {
 
   // Bounce logged-in users away from the login page
   if (pathname === '/auth/login' && isLoggedIn) {
-    const redirect = request.cookies.get('lpdr_redirect')?.value
-    const response = NextResponse.redirect(new URL(redirect || '/my-pack', request.url))
-    response.cookies.delete('lpdr_redirect')
-    return response
+    return NextResponse.redirect(new URL('/my-pack', request.url))
   }
 
   // Fast path only. No session cookie means definitely logged out, so skip the

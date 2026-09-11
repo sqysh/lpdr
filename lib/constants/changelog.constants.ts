@@ -37,6 +37,10 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: 'Blocked crafted sign-in redirects that could have sent people to an outside site after logging in'
+      },
+      {
+        type: 'fix',
+        text: 'Sign in links no longer break for people on work email. Corporate mail filters open every link in a message to check it is safe, which was using up the link before the recipient clicked it. The email now points at a confirmation page, so only pressing the button signs you in'
       }
     ]
   },
