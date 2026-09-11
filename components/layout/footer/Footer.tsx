@@ -1,37 +1,50 @@
 import Link from 'next/link'
 import createNewsletter from 'lib/actions/public/newsletter/createNewsletter'
-import { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { NAV_LINKS, SOCIAL_LINKS } from 'lib/constants/footer.constants'
 import Picture from 'components/_common/Picture'
+import { useStatusMessage } from '@hooks/useStatusMessage.hook'
 
 export default function Footer() {
   const [email, setEmail] = useState('')
-  const [error, setError] = useState(null)
-  const [success, setSuccess] = useState(false)
+  const [website, setWebsite] = useState('')
   const [loading, setLoading] = useState(false)
+  const renderedAt = useRef(0)
+
+  const { status, flash } = useStatusMessage()
+
+  useEffect(() => {
+    renderedAt.current = Date.now()
+  }, [])
 
   const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
+
     if (!email.trim()) {
-      setError('Please enter your email')
+      flash({ tone: 'error', message: 'Please enter your email' })
       return
     }
 
     setLoading(true)
-    setError(null)
 
-    const result = await createNewsletter(email.trim())
+    const result = await createNewsletter({
+      email: email.trim(),
+      website,
+      renderedAt: renderedAt.current
+    })
 
     setLoading(false)
 
     if (!result.success) {
-      setError('Something went wrong. Please try again.')
+      flash({
+        tone: 'error',
+        message: result.error ?? 'Something went wrong. Please try again.'
+      })
       return
     }
 
     setEmail('')
-    setSuccess(true)
-    setTimeout(() => setSuccess(false), 3000)
+    flash({ tone: 'success', message: 'You are subscribed' })
   }
 
   return (
@@ -62,10 +75,7 @@ export default function Footer() {
 
             <address className="not-italic mt-6 space-y-1.5">
               <div className="flex items-center gap-3">
-                <span
-                  className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                  aria-hidden="true"
-                />
+                <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                 <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                   Contact
                 </p>
@@ -101,10 +111,7 @@ export default function Footer() {
           {/* Col 3 — Nav ── */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <span
-                className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                aria-hidden="true"
-              />
+              <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                 Quick Links
               </h2>
@@ -132,10 +139,7 @@ export default function Footer() {
           {/* Col 4 — Newsletter ── */}
           <div>
             <div className="flex items-center gap-3 mb-5">
-              <span
-                className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                aria-hidden="true"
-              />
+              <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                 Newsletter
               </h2>
@@ -143,7 +147,17 @@ export default function Footer() {
             <p className="text-[11px] font-mono text-on-dark leading-relaxed mb-4">
               Stay up to date with rescues, events, and ways to help.
             </p>
-            <form onSubmit={handleSubmit} aria-label="Newsletter signup" className="space-y-2.5">
+            <form onSubmit={handleSubmit} aria-label="Newsletter signup" className="relative space-y-2.5">
+              <input
+                type="text"
+                name="website"
+                value={website}
+                onChange={(e) => setWebsite(e.target.value)}
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                className="absolute w-px h-px overflow-hidden -left-96"
+              />
               <div>
                 <label htmlFor="footer-email" className="sr-only">
                   Your email address
@@ -152,13 +166,11 @@ export default function Footer() {
                   name="email"
                   id="footer-email"
                   type="email"
-                  value={email ?? ''}
+                  value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="Your email"
                   autoComplete="email"
-                  aria-describedby={
-                    error ? 'newsletter-error' : success ? 'newsletter-success' : undefined
-                  }
+                  aria-describedby={status ? 'newsletter-status' : undefined}
                   className="w-full bg-white/5 border border-white/10 px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-on-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark transition-colors"
                 />
               </div>
@@ -171,22 +183,15 @@ export default function Footer() {
                 {loading ? 'Subscribing...' : 'Subscribe'}
               </button>
 
-              {error && (
+              {status && (
                 <p
-                  id="newsletter-error"
-                  role="alert"
-                  className="text-[10px] font-mono tracking-widest text-red-400"
+                  id="newsletter-status"
+                  role={status.tone === 'error' ? 'alert' : 'status'}
+                  className={`text-[10px] font-mono tracking-widest ${
+                    status.tone === 'error' ? 'text-red-400' : 'text-primary-light dark:text-primary-dark'
+                  }`}
                 >
-                  {error}
-                </p>
-              )}
-              {success && (
-                <p
-                  id="newsletter-success"
-                  role="status"
-                  className="text-[10px] font-mono tracking-widest text-primary-light dark:text-primary-dark"
-                >
-                  You&apos;re subscribed — thank you!
+                  {status.message}
                 </p>
               )}
             </form>

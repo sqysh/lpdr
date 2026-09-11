@@ -1,82 +1,63 @@
 'use client'
 
-import { X, Loader2, Send } from 'lucide-react'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { motion, AnimatePresence } from 'framer-motion'
-import { useState } from 'react'
+import { X, Loader2, Send } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import sendContactEmail from 'lib/email/sendContactEmail'
-import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { FormField } from 'components/_primitives'
+import { FormField } from 'components/_primitives/FormField'
+import { FormError } from 'components/_primitives/FormError'
 import { useModalsStore } from 'stores/modals.store'
-
-interface FormInputs {
-  name: string
-  email: string
-  subject: string
-  message: string
-}
-
-interface FormErrors {
-  name?: string
-  email?: string
-  subject?: string
-  message?: string
-  form?: string
-}
-
-const EMPTY: FormInputs = { name: '', email: '', subject: '', message: '' }
-
-function validate(inputs: FormInputs): FormErrors {
-  const errs: FormErrors = {}
-  if (!inputs.name.trim()) errs.name = 'Name is required'
-  if (!EMAIL_REGEX.test(inputs.email.trim())) errs.email = 'Email is required'
-  if (!inputs.subject.trim()) errs.subject = 'Subject is required'
-  if (!inputs.message.trim()) errs.message = 'Message is required'
-  return errs
-}
+import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
+import { contactSchema, ContactFormValues, EMPTY_CONTACT, ContactFormInput } from 'lib/schemas/contact.schema'
 
 export default function PublicContactModal() {
   const closeContact = useModalsStore((s) => s.closeContact)
   const contactOpen = useModalsStore((s) => s.contactOpen)
 
-  const [inputs, setInputs] = useState<FormInputs>(EMPTY)
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [loading, setLoading] = useState(false)
   const [success, setSuccess] = useState(false)
 
-  const patch = (data: Partial<FormInputs>) => setInputs((prev) => ({ ...prev, ...data }))
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    setError,
+    formState: { errors, isSubmitting }
+  } = useForm<ContactFormInput, unknown, ContactFormValues>({
+    resolver: zodResolver(contactSchema),
+    defaultValues: EMPTY_CONTACT
+  })
 
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) =>
-    patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
+  useEscapeKey(contactOpen, closeContact)
+
+  // Stamped when the modal opens rather than on mount, since the page may have
+  // been sitting open for a while before anyone clicked Contact
+  useEffect(() => {
+    if (contactOpen) setValue('renderedAt', Date.now())
+  }, [contactOpen, setValue])
 
   const handleClose = () => {
     closeContact()
-    setInputs(EMPTY)
-    setErrors({})
+    reset(EMPTY_CONTACT)
     setSuccess(false)
   }
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault()
-
-    const errs = validate(inputs)
-    if (Object.keys(errs).length) {
-      setErrors(errs)
-      return
-    }
-
-    setLoading(true)
-    setErrors({})
-
-    const result = await sendContactEmail(inputs)
-
-    setLoading(false)
+  const onSubmit = async (values: ContactFormValues) => {
+    const result = await sendContactEmail(values)
 
     if (!result.success) {
-      setErrors({ form: 'Something went wrong. Please try again.' })
+      if (result.fieldErrors) {
+        for (const [field, messages] of Object.entries(result.fieldErrors)) {
+          setError(field as keyof ContactFormInput, { message: messages[0] })
+        }
+      }
+      setError('root', { message: result.error ?? 'Something went wrong. Please try again.' })
       return
     }
 
-    setInputs(EMPTY)
+    reset(EMPTY_CONTACT)
     setSuccess(true)
   }
 
@@ -109,10 +90,7 @@ export default function PublicContactModal() {
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-4 border-b border-border-light dark:border-border-dark">
               <div className="flex items-center gap-3">
-                <span
-                  className="block w-5 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                  aria-hidden="true"
-                />
+                <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                 <h2
                   id="contact-modal-title"
                   className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
@@ -121,6 +99,7 @@ export default function PublicContactModal() {
                 </h2>
               </div>
               <button
+                type="button"
                 onClick={handleClose}
                 aria-label="Close contact modal"
                 className="text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -139,6 +118,7 @@ export default function PublicContactModal() {
                   Thanks for reaching out. We&apos;ll get back to you as soon as we can.
                 </p>
                 <button
+                  type="button"
                   onClick={handleClose}
                   className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 >
@@ -146,30 +126,38 @@ export default function PublicContactModal() {
                 </button>
               </div>
             ) : (
-              <form onSubmit={handleSubmit} noValidate>
-                <div className="px-5 py-6 space-y-4">
+              <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <div className="relative px-5 py-6 space-y-4">
+                  {/* Hidden from people, filled in by bots */}
+                  <input
+                    type="text"
+                    {...register('website')}
+                    tabIndex={-1}
+                    autoComplete="off"
+                    aria-hidden="true"
+                    className="absolute w-px h-px overflow-hidden -left-96"
+                  />
+
+                  <FormError error={errors.root?.message ?? null} />
+
                   <div className="grid grid-cols-1 xs:grid-cols-2 gap-4">
                     <FormField
                       id="contact-name"
                       label="Name"
-                      name="name"
-                      value={inputs.name}
-                      onChange={handleInput}
+                      {...register('name')}
                       placeholder="Jane Smith"
                       autoComplete="name"
-                      error={errors.name}
+                      error={errors.name?.message}
                       required
                     />
                     <FormField
                       id="contact-email"
                       label="Email"
-                      name="email"
                       type="email"
-                      value={inputs.email}
-                      onChange={handleInput}
+                      {...register('email')}
                       placeholder="jane@example.com"
                       autoComplete="email"
-                      error={errors.email}
+                      error={errors.email?.message}
                       required
                     />
                   </div>
@@ -177,35 +165,22 @@ export default function PublicContactModal() {
                   <FormField
                     id="contact-subject"
                     label="Subject"
-                    name="subject"
-                    value={inputs.subject}
-                    onChange={handleInput}
+                    {...register('subject')}
                     placeholder="How can we help?"
-                    error={errors.subject}
+                    error={errors.subject?.message}
                     required
                   />
 
                   <FormField
                     id="contact-message"
                     label="Message"
-                    name="message"
                     type="textarea"
-                    value={inputs.message}
-                    onChange={handleInput}
-                    placeholder="Tell us what's on your mind..."
                     rows={5}
-                    error={errors.message}
+                    {...register('message')}
+                    placeholder="Tell us what's on your mind..."
+                    error={errors.message?.message}
                     required
                   />
-
-                  {errors.form && (
-                    <p
-                      role="alert"
-                      className="text-[10px] font-mono tracking-widest text-red-500 dark:text-red-400"
-                    >
-                      {errors.form}
-                    </p>
-                  )}
                 </div>
 
                 {/* Footer */}
@@ -213,18 +188,20 @@ export default function PublicContactModal() {
                   <button
                     type="button"
                     onClick={handleClose}
-                    className="px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark hover:text-text-light dark:hover:text-text-dark hover:border-text-light dark:hover:border-text-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    disabled={isSubmitting}
+                    className="px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark hover:text-text-light dark:hover:text-text-dark hover:border-text-light dark:hover:border-text-dark transition-colors duration-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={loading}
+                    disabled={isSubmitting}
+                    aria-busy={isSubmitting}
                     className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light dark:bg-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading && <Loader2 size={11} className="animate-spin" aria-hidden="true" />}
-                    {loading ? 'Sending...' : 'Send Message'}
-                    {!loading && <Send size={11} aria-hidden="true" />}
+                    {isSubmitting && <Loader2 size={11} className="animate-spin" aria-hidden="true" />}
+                    {isSubmitting ? 'Sending...' : 'Send Message'}
+                    {!isSubmitting && <Send size={11} aria-hidden="true" />}
                   </button>
                 </div>
               </form>

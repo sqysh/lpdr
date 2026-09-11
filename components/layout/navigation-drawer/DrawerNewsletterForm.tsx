@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
@@ -17,10 +17,16 @@ const CORE_GRADIENT = {
 
 export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
   const [email, setEmail] = useState('')
+  const [website, setWebsite] = useState('')
   const [loading, setLoading] = useState(false)
   const { status, flash, clearStatus } = useStatusMessage()
+  const renderedAt = useRef(0)
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  useEffect(() => {
+    renderedAt.current = Date.now()
+  }, [])
+
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
 
     if (!EMAIL_REGEX.test(email)) {
@@ -31,23 +37,25 @@ export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
     setLoading(true)
     clearStatus()
 
-    const result = await createNewsletter(email)
+    const result = await createNewsletter({
+      email: email.trim(),
+      website,
+      renderedAt: renderedAt.current
+    })
 
     setLoading(false)
 
     if (!result.success) {
       flash({
         tone: 'error',
-        message: 'Could not subscribe',
-        description: result.error ?? 'Something went wrong. Please try again.'
+        message: result.error ?? 'Something went wrong. Please try again.'
       })
       return
     }
 
     flash({
       tone: 'success',
-      message: 'Subscribed',
-      description: `You'll get rescue updates, events, and adoption news at ${email}.`
+      message: `Subscribed! You'll get rescue updates, events, and adoption news at ${email}.`
     })
     setEmail('')
   }
@@ -60,6 +68,16 @@ export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
       </p>
 
       <form onSubmit={handleSubmit} className="space-y-2">
+        <input
+          type="text"
+          name="website"
+          value={website}
+          onChange={(e) => setWebsite(e.target.value)}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+          className="absolute w-px h-px overflow-hidden -left-96"
+        />
         <input
           name="email"
           type="email"

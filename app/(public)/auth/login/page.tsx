@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
 import { MagicLink } from 'components/features/auth/MagicLink'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
+import { ArrowLeft } from 'lucide-react'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -31,7 +32,7 @@ export default function LoginPage() {
         <div className="absolute bottom-0 right-0 w-0.75 h-24 bg-primary-light dark:bg-primary-dark" />
       </div>
 
-      <div className="relative z-10 w-full max-w-90 xs:mx-auto flex flex-col justify-between min-h-[calc(100dvh-5rem)] xs:min-h-0">
+      <div className="relative z-10 w-full max-w-87 xs:mx-auto flex flex-col justify-between min-h-[calc(100dvh-5rem)] xs:min-h-0">
         <div>
           {/* ── Logo ── */}
           <motion.div
@@ -174,21 +175,31 @@ export default function LoginPage() {
           </motion.div>
         </div>
 
-        {/* ── Privacy ── */}
-        <motion.p
+        {/* ── Footer ── */}
+        <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.4 }}
-          className="text-center text-[10px] font-mono text-muted-light dark:text-muted-dark mt-4 leading-relaxed"
+          className="mt-4 flex flex-col items-center gap-3"
         >
-          By signing in you agree to our{' '}
           <Link
-            href="/privacy-policy"
-            className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            href="/"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
-            Privacy Policy
+            <ArrowLeft size={12} aria-hidden="true" />
+            Back to site
           </Link>
-        </motion.p>
+
+          <p className="text-center text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
+            By signing in you agree to our{' '}
+            <Link
+              href="/privacy-policy"
+              className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            >
+              Privacy Policy
+            </Link>
+          </p>
+        </motion.div>
       </div>
     </main>
   )
