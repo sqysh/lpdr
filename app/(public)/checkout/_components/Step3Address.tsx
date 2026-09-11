@@ -5,21 +5,15 @@ import { ArrowLeft, ArrowRight, Check, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { FormField } from 'components/_primitives/FormField'
-
-interface IAddress {
-  addressLine1: string | null
-  addressLine2?: string | null
-  city: string | null
-  state: string | null
-  zipPostalCode: string | null
-}
+import { Control, FieldErrors, UseFormRegister, useWatch } from 'react-hook-form'
+import { CheckoutFormInput } from 'lib/schemas/checkout.schema'
+import { FormError } from 'components/_primitives'
+import { IAddress } from 'types/address.types'
 
 interface Props {
-  inputs: any
-  errors: Record<string, string>
-  handleInput: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => void
+  register: UseFormRegister<CheckoutFormInput>
+  control: Control<CheckoutFormInput>
+  errors: FieldErrors<CheckoutFormInput>
   onNext: () => void
   onBack: () => void
   userAddress: IAddress | null
@@ -30,9 +24,9 @@ interface Props {
 }
 
 export function Step3Address({
-  inputs,
+  register,
+  control,
   errors,
-  handleInput,
   onNext,
   onBack,
   userAddress,
@@ -41,35 +35,50 @@ export function Step3Address({
   onUseDifferentAddress,
   onUseSavedAddress
 }: Props) {
+  const firstName = useWatch({ control, name: 'firstName' })
+  const lastName = useWatch({ control, name: 'lastName' })
+  const addressLine1 = useWatch({ control, name: 'addressLine1' })
+  const addressLine2 = useWatch({ control, name: 'addressLine2' })
+  const city = useWatch({ control, name: 'city' })
+  const state = useWatch({ control, name: 'state' })
+  const zipPostalCode = useWatch({ control, name: 'zipPostalCode' })
+
+  const [saveError, setSaveError] = useState<string | null>(null)
   const [showReplaceModal, setShowReplaceModal] = useState(false)
   const router = useRouter()
+
+  const saveAddress = () =>
+    updateAddress({
+      name: `${firstName?.trim()} ${lastName?.trim()}`,
+      addressLine1: addressLine1?.trim(),
+      addressLine2: addressLine2?.trim() || null,
+      city: city?.trim(),
+      state,
+      zipPostalCode: zipPostalCode?.trim(),
+      country: 'US'
+    })
 
   const handleContinue = async () => {
     if (!useSaved && userAddress) {
       setShowReplaceModal(true)
-    } else {
-      if (!userAddress) {
-        await updateAddress({
-          name: `${inputs?.firstName?.trim()} ${inputs?.lastName?.trim()}`,
-          addressLine1: inputs?.addressLine1?.trim(),
-          addressLine2: inputs?.addressLine2?.trim() || null,
-          city: inputs?.city?.trim(),
-          state: inputs?.state,
-          zipPostalCode: inputs?.zipPostalCode?.trim(),
-          country: 'US'
-        })
-        router.refresh()
-      }
-      onNext()
+      return
     }
+
+    if (!userAddress) {
+      const result = await saveAddress()
+
+      if (!result.success) {
+        setSaveError(result.error ?? 'Could not save your address. Please try again.')
+        return
+      }
+
+      router.refresh()
+    }
+
+    onNext()
   }
 
-  const isValid = useSaved
-    ? !!userAddress
-    : !!inputs?.addressLine1?.trim() &&
-      !!inputs?.city?.trim() &&
-      !!inputs?.state &&
-      !!inputs?.zipPostalCode?.trim()
+  const isValid = useSaved ? !!userAddress : !!addressLine1?.trim() && !!city?.trim() && !!state && !!zipPostalCode?.trim()
 
   return (
     <>
@@ -82,7 +91,10 @@ export function Step3Address({
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="fixed inset-0 bg-black/40 z-50"
-              onClick={() => setShowReplaceModal(false)}
+              onClick={() => {
+                setShowReplaceModal(false)
+                setSaveError(null)
+              }}
               aria-hidden="true"
             />
             <motion.div
@@ -98,18 +110,12 @@ export function Step3Address({
             >
               <div className="px-6 py-5 border-b border-border-light dark:border-border-dark">
                 <div className="flex items-center gap-3 mb-1">
-                  <span
-                    className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                     Shipping Address
                   </p>
                 </div>
-                <h3
-                  id="replace-address-title"
-                  className="font-quicksand font-bold text-lg text-text-light dark:text-text-dark"
-                >
+                <h3 id="replace-address-title" className="font-quicksand font-bold text-lg text-text-light dark:text-text-dark">
                   Update saved address?
                 </h3>
               </div>
@@ -118,19 +124,22 @@ export function Step3Address({
                 <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed mb-6">
                   Would you like to save this as your new address, or just use it for this order?
                 </p>
+                {saveError && (
+                  <p role="alert" className="text-[11px] font-mono text-red-500 dark:text-red-400 mb-4">
+                    {saveError}
+                  </p>
+                )}
                 <div className="space-y-2">
                   <button
                     type="button"
                     onClick={async () => {
-                      await updateAddress({
-                        name: `${inputs?.firstName?.trim()} ${inputs?.lastName?.trim()}`,
-                        addressLine1: inputs?.addressLine1?.trim(),
-                        addressLine2: inputs?.addressLine2?.trim() || null,
-                        city: inputs?.city?.trim(),
-                        state: inputs?.state,
-                        zipPostalCode: inputs?.zipPostalCode?.trim(),
-                        country: 'US'
-                      })
+                      const result = await saveAddress()
+
+                      if (!result.success) {
+                        setSaveError(result.error ?? 'Could not save your address. Please try again.')
+                        return
+                      }
+
                       router.refresh()
                       setShowReplaceModal(false)
                       onNext()
@@ -166,8 +175,7 @@ export function Step3Address({
       >
         <div>
           <h2 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-1">
-            Shipping{' '}
-            <span className="font-light text-muted-light dark:text-muted-dark">address</span>
+            Shipping <span className="font-light text-muted-light dark:text-muted-dark">address</span>
           </h2>
           <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
             One or more items in your cart ship physically.
@@ -193,10 +201,7 @@ export function Step3Address({
                   {userAddress.city}, {userAddress.state} {userAddress.zipPostalCode}
                 </p>
               </div>
-              <Check
-                className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5"
-                aria-hidden="true"
-              />
+              <Check className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
             </button>
 
             <button
@@ -230,36 +235,30 @@ export function Step3Address({
             <FormField
               id="checkout-addressLine1"
               label="Street Address"
-              name="addressLine1"
-              value={inputs?.addressLine1 ?? ''}
-              onChange={handleInput}
+              {...register('addressLine1')}
               placeholder="123 Main Street"
               autoComplete="street-address"
-              error={errors?.addressLine1}
+              error={errors?.addressLine1?.message}
               required
             />
 
             <FormField
               id="checkout-addressLine2"
               label="Unit / Apartment No."
-              name="addressLine2"
-              value={inputs?.addressLine2 ?? ''}
-              onChange={handleInput}
+              {...register('addressLine2')}
               placeholder="Unit 1"
               autoComplete="street-address"
-              error={errors?.addressLine2}
+              error={errors?.addressLine2?.message}
             />
 
             <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
               <FormField
                 id="checkout-city"
                 label="City"
-                name="city"
-                value={inputs?.city ?? ''}
-                onChange={handleInput}
+                {...register('city')}
                 placeholder="Boston"
                 autoComplete="address-level2"
-                error={errors?.city}
+                error={errors?.city?.message}
                 required
               />
 
@@ -267,11 +266,9 @@ export function Step3Address({
               <FormField
                 id="checkout-state"
                 label="State"
-                name="state"
                 type="select"
-                value={inputs?.state ?? ''}
-                onChange={handleInput}
-                error={errors?.state}
+                {...register('state')}
+                error={errors?.state?.message}
                 required
               >
                 <option value="" disabled>
@@ -288,17 +285,17 @@ export function Step3Address({
             <FormField
               id="checkout-zip"
               label="ZIP / Postal Code"
-              name="zipPostalCode"
-              value={inputs?.zipPostalCode ?? ''}
-              onChange={handleInput}
+              {...register('zipPostalCode')}
               placeholder="02101"
               autoComplete="postal-code"
-              error={errors?.zipPostalCode}
+              error={errors?.zipPostalCode?.message}
               required
               className="max-w-45"
             />
           </div>
         )}
+
+        <FormError error={saveError} />
 
         <div className="flex gap-3">
           <button

@@ -82,9 +82,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   const [amountBlurred, setAmountBlurred] = useState(false)
 
   // ── Derived values ────────────────────────────────────────────────────────
-  const donationAmount = inputs.useCustom
-    ? parseFloat(inputs.customAmount) || 0
-    : (inputs.selectedAmount ?? 0)
+  const donationAmount = inputs.useCustom ? parseFloat(inputs.customAmount) || 0 : (inputs.selectedAmount ?? 0)
   const processingFee = calculateStripeFees(donationAmount)
   const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && isAuthed
   const finalAmount = inputs.coverFees ? donationAmount + processingFee : donationAmount
@@ -105,8 +103,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
     patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
 
-  const handlePresetSelect = (amount: number) =>
-    patch({ selectedAmount: amount, useCustom: false, customAmount: '' })
+  const handlePresetSelect = (amount: number) => patch({ selectedAmount: amount, useCustom: false, customAmount: '' })
 
   // ── Handlde Submit ─────────────────────────────────────────────────────────────────
   async function handleSubmit(e: { preventDefault: () => void }) {
@@ -179,16 +176,12 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
           className="block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2"
         >
           Custom Amount
-          <span className="ml-1 text-muted-light/60 dark:text-muted-dark/60 normal-case tracking-normal font-sans">
-            (min $5)
-          </span>
+          <span className="ml-1 text-muted-light/60 dark:text-muted-dark/60 normal-case tracking-normal font-sans">(min $5)</span>
         </label>
         <div className="relative">
           <span
             className={`absolute left-3.5 top-1/2 -translate-y-1/2 font-quicksand font-black text-sm pointer-events-none transition-colors duration-200 ${
-              inputs?.useCustom
-                ? 'text-primary-light dark:text-primary-dark'
-                : 'text-muted-light dark:text-muted-dark'
+              inputs?.useCustom ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'
             }`}
             aria-hidden="true"
           >
@@ -218,18 +211,15 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
               focus-visible:border-primary-light dark:focus-visible:border-primary-dark
             `}
           />
-          {inputs?.useCustom &&
-            amountBlurred &&
-            inputs?.customAmount &&
-            parseFloat(inputs?.customAmount) < 5 && (
-              <p
-                id="custom-amount-hint"
-                role="alert"
-                className="absolute text-[11px] text-red-500 dark:text-red-400 mt-1.5 font-mono"
-              >
-                Minimum donation is $5
-              </p>
-            )}
+          {inputs?.useCustom && amountBlurred && inputs?.customAmount && parseFloat(inputs?.customAmount) < 5 && (
+            <p
+              id="custom-amount-hint"
+              role="alert"
+              className="absolute text-[11px] text-red-500 dark:text-red-400 mt-1.5 font-mono"
+            >
+              Minimum donation is $5
+            </p>
+          )}
         </div>
       </motion.div>
 
@@ -249,9 +239,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
           <span className="font-quicksand font-black text-2xl text-primary-light dark:text-primary-dark">
             ${formatWithCommas(donationAmount)}
           </span>
-          <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark ml-auto">
-            one-time
-          </span>
+          <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark ml-auto">one-time</span>
         </motion.div>
       )}
 
@@ -308,17 +296,13 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
               useNewCard={inputs.useNewCard}
               onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
               onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-              onUseSavedCard={() =>
-                patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
-              }
+              onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
             />
           )}
 
           {/* ── Card element ── */}
           {enteringNewCard && (
-            <CardElementField
-              onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })}
-            />
+            <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })} />
           )}
 
           {/* ── Cover fees ── */}

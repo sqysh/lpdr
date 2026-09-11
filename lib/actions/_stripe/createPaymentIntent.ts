@@ -121,34 +121,59 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
       baseCents = Math.round(base * 100)
     } else if (orderType === 'AUCTION_PURCHASE') {
-      if (!winningBidderId) throw new Error('Missing auction winner reference')
-
-      const winner = await prisma.auctionWinningBidder.findUnique({
-        where: { id: winningBidderId },
-        select: {
-          userId: true,
-          shipping: true,
-          winningBidPaymentStatus: true,
-          auctionItems: { select: { soldPrice: true } }
-        }
-      })
-
-      if (!winner || winner.userId !== userId) {
-        await createLog('warn', 'Auction payment attempted for another user', {
-          userId,
-          winningBidderId
+      if (auctionItemId) {
+        // Instant buy — a fixed-price item, priced from the database
+        const item = await prisma.auctionItem.findFirst({
+          where: { id: auctionItemId, auction: { status: 'ACTIVE' } },
+          select: {
+            name: true,
+            status: true,
+            sellingFormat: true,
+            buyNowPrice: true,
+            shippingCosts: true,
+            requiresShipping: true
+          }
         })
-        throw new Error('This auction win is not associated with your account')
+
+        if (!item) throw new Error('This item is no longer available')
+        if (item.sellingFormat !== 'FIXED') throw new Error('This item is not available for instant buy')
+        if (item.status === 'SOLD') throw new Error('This item has already been sold')
+        if (item.buyNowPrice == null) throw new Error('This item has no price set')
+
+        const shipping = item.requiresShipping ? Number(item.shippingCosts ?? 0) : 0
+
+        baseCents = Math.round((Number(item.buyNowPrice) + shipping) * 100)
+        purchaseDescription = `${item.name} instant buy from ${displayName}`
+      } else if (winningBidderId) {
+        const winner = await prisma.auctionWinningBidder.findUnique({
+          where: { id: winningBidderId },
+          select: {
+            userId: true,
+            shipping: true,
+            winningBidPaymentStatus: true,
+            auctionItems: { select: { soldPrice: true } }
+          }
+        })
+
+        if (!winner || winner.userId !== userId) {
+          await createLog('warn', 'Auction payment attempted for another user', {
+            userId,
+            winningBidderId
+          })
+          throw new Error('This auction win is not associated with your account')
+        }
+
+        if (winner.winningBidPaymentStatus === 'PAID') {
+          throw new Error('This auction item has already been paid for')
+        }
+
+        const itemsTotal = winner.auctionItems.reduce((sum, i) => sum + Number(i.soldPrice ?? 0), 0)
+        if (itemsTotal <= 0) throw new Error('This auction win has no items to pay for')
+
+        baseCents = Math.round((itemsTotal + Number(winner.shipping ?? 0)) * 100)
+      } else {
+        throw new Error('Missing auction reference')
       }
-
-      if (winner.winningBidPaymentStatus === 'PAID') {
-        throw new Error('This auction item has already been paid for')
-      }
-
-      const itemsTotal = winner.auctionItems.reduce((sum, i) => sum + Number(i.soldPrice ?? 0), 0)
-      if (itemsTotal <= 0) throw new Error('This auction win has no items to pay for')
-
-      baseCents = Math.round((itemsTotal + Number(winner.shipping ?? 0)) * 100)
     } else if (orderType === 'ADOPTION_FEE') {
       baseCents = ADOPTION_FEE_CENTS
     } else {
@@ -173,7 +198,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       ONE_TIME_DONATION: `One-time donation from ${displayName}`,
       RECURRING_DONATION: `Recurring donation from ${displayName}`,
       ADOPTION_FEE: `Adoption fee from ${displayName}`,
-      AUCTION_PURCHASE: `Auction payment from ${displayName}`,
+      AUCTION_PURCHASE: auctionItemId ? purchaseDescription : `Auction payment from ${displayName}`,
       PURCHASE: purchaseDescription,
       ECARD: `Ecard purchase from ${displayName}`
     }

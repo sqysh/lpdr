@@ -3,12 +3,11 @@
 import { updateSubscriptionPaymentMethod } from 'lib/actions/_stripe/updateSubscriptionPaymentMethod'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useThemeStore } from 'stores/theme.store'
-import { useState } from 'react'
+import { SyntheticEvent, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FormError } from 'components/_primitives'
 
-const fieldLabel =
-  'block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2'
+const fieldLabel = 'block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2'
 
 const buttonBase =
   'py-3 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
@@ -30,7 +29,7 @@ export function UpdateCardForm({
   const [error, setError] = useState<string | null>(null)
   const [cardComplete, setCardComplete] = useState(false)
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
+  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!stripe || !elements) return
 

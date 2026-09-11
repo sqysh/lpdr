@@ -107,10 +107,16 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
         })
 
         if (result.error) {
-          patch({ error: result.error.message || 'Payment failed' })
-        } else if (result.paymentIntent?.status === 'succeeded') {
-          setupPusherListenerOneTime()
+          patch({ loading: false, error: result.error.message || 'Payment failed' })
+          return
         }
+
+        if (result.paymentIntent?.status !== 'succeeded') {
+          patch({ loading: false, error: 'Payment did not complete. Please try again.' })
+          return
+        }
+
+        setupPusherListenerOneTime()
       }
     } catch (err) {
       patch({
@@ -130,9 +136,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
           useNewCard={payment.useNewCard}
           onSelectCard={(id) => patch({ selectedCardId: id })}
           onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-          onUseSavedCard={() =>
-            patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
-          }
+          onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
         />
       )}
 
@@ -142,11 +146,7 @@ export function Step3PaymentForm({ savedCards, isAuthed, firstName, lastName, em
       )}
 
       {/* ── Cover fees ── */}
-      <CoverFeesToggle
-        checked={payment.coverFees}
-        onChange={(v) => patch({ coverFees: v })}
-        processingFee={processingFee}
-      />
+      <CoverFeesToggle checked={payment.coverFees} onChange={(v) => patch({ coverFees: v })} processingFee={processingFee} />
 
       {/* ── Save card ── */}
       <AdoptionSaveCardToggle

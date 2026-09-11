@@ -14,6 +14,33 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.7.0',
+    date: '2026-09-11',
+    title: 'Checkout form rewrite and instant buy pricing fix',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Fixed instant buy taking its price from the browser instead of the database. The amount is now looked up server-side from the item, along with checks that the auction is running, the item is a fixed-price listing, and it has not already sold'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed the pay button spinning forever when a card payment came back without either a success or an error, which left people unable to try again'
+      },
+      {
+        type: 'improvement',
+        text: 'Rebuilt checkout, contact and newsletter forms on react-hook-form with shared validation rules, so field errors are consistent and the same rules apply in the browser and on the server'
+      },
+      {
+        type: 'improvement',
+        text: 'Address saving is now validated properly, including the state field which was never checked'
+      },
+      {
+        type: 'chore',
+        text: 'Extracted the checkout step flow, cart totals and Stripe payment handling into shared hooks, cutting the checkout page roughly in half and giving the three payment forms one implementation instead of three'
+      }
+    ]
+  },
+  {
     version: '1.6.0',
     date: '2026-09-11',
     title: 'Bot protection on sign-in and draft auction visibility',

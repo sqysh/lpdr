@@ -1,9 +1,21 @@
 import { ArrowRight } from 'lucide-react'
 import { motion } from 'framer-motion'
+import { Control, useWatch, type FieldErrors, type UseFormRegister } from 'react-hook-form'
 import { FormField } from 'components/_primitives/FormField'
+import type { CheckoutFormInput } from 'lib/schemas/checkout.schema'
 
-export function Step2Name({ inputs, errors, handleInput, onNext, isAuthed }: any) {
-  const isValid = !!inputs?.firstName?.trim() && !!inputs?.lastName?.trim()
+type Props = {
+  register: UseFormRegister<CheckoutFormInput>
+  errors: FieldErrors<CheckoutFormInput>
+  control: Control<CheckoutFormInput>
+  onNext: () => void
+}
+
+export function Step2Name({ register, errors, control, onNext }: Props) {
+  const firstName = useWatch({ control, name: 'firstName' })
+  const lastName = useWatch({ control, name: 'lastName' })
+
+  const isValid = !!firstName?.trim() && !!lastName?.trim()
 
   return (
     <motion.div
@@ -18,50 +30,29 @@ export function Step2Name({ inputs, errors, handleInput, onNext, isAuthed }: any
         <h2 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-1">
           Your <span className="font-light text-muted-light dark:text-muted-dark">name</span>
         </h2>
-        <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
-          Who should we thank for this donation?
-        </p>
+        <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">Who should we thank for this donation?</p>
       </div>
 
       <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
         <FormField
           id="checkout-firstName"
           label="First Name"
-          name="firstName"
-          value={inputs?.firstName ?? ''}
-          onChange={handleInput}
+          {...register('firstName')}
           placeholder="Jane"
           autoComplete="given-name"
-          error={errors?.firstName}
+          error={errors.firstName?.message}
           required
         />
         <FormField
           id="checkout-lastName"
           label="Last Name"
-          name="lastName"
-          value={inputs?.lastName ?? ''}
-          onChange={handleInput}
+          {...register('lastName')}
           placeholder="Smith"
           autoComplete="family-name"
-          error={errors?.lastName}
+          error={errors.lastName?.message}
           required
         />
       </div>
-
-      {!isAuthed && (
-        <FormField
-          id="checkout-email"
-          label="Email Address"
-          name="email"
-          type="email"
-          value={inputs?.email ?? ''}
-          onChange={handleInput}
-          placeholder="jane@example.com"
-          autoComplete="email"
-          error={errors?.email}
-          required
-        />
-      )}
 
       <button
         type="button"

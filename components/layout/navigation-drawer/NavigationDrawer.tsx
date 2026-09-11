@@ -9,7 +9,7 @@ import { DrawerHeader } from './DrawerHeader'
 import { DrawerAuctionBanner } from './DrawerAuctionBanner'
 import { DrawerAuthSection } from './DrawerAuthSection'
 import { DrawerCartLink } from './DrawerCartLink'
-import { DrawerNewsletterForm } from './DrawerNewsletterForm'
+import { NavigationDrawerNewsletterForm } from './NavigationDrawerNewsletterForm'
 import { DrawerNavSection } from './DrawerNavSection'
 import { useNavigationStore } from 'stores/navigation.store'
 import { useCartStore } from 'stores/cart.store'
@@ -61,23 +61,15 @@ export default function NavigationDrawer({ auction, hasActiveFee }) {
 
               <div className="mx-4 border-t border-border-light/50 dark:border-border-dark" />
 
-              <DrawerCartLink
-                totalItems={totalItems}
-                active={isLinkActive('/cart')}
-                onClose={onClose}
-              />
+              <DrawerCartLink totalItems={totalItems} active={isLinkActive('/cart')} onClose={onClose} />
 
               <div className="mx-4 border-t border-border-light/50 dark:border-border-dark" />
 
-              <DrawerNewsletterForm onClose={onClose} />
+              <NavigationDrawerNewsletterForm onClose={onClose} />
 
               <div className="mx-4 border-t border-border-light dark:border-border-dark" />
 
-              <DrawerNavSection
-                links={mainNavigationLinks(hasActiveFee)}
-                isLinkActive={isLinkActive}
-                onClose={onClose}
-              />
+              <DrawerNavSection links={mainNavigationLinks(hasActiveFee)} isLinkActive={isLinkActive} onClose={onClose} />
             </div>
           </motion.div>
         </>

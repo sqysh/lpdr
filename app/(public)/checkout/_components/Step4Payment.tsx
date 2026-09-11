@@ -8,37 +8,13 @@ import { FormError, Toggle } from 'components/_primitives'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { CardElementField } from 'components/features/payment/CardElementField'
-
-interface CheckoutFormInputs {
-  // identity
-  firstName?: string
-  lastName?: string
-  email?: string
-
-  // shipping
-  useSavedAddress?: boolean
-  addressLine1?: string
-  addressLine2?: string
-  city?: string
-  state?: string
-  zipPostalCode?: string
-
-  // payment
-  selectedCardId?: string | null
-  useNewCard?: boolean
-  saveCard?: boolean
-  coverFees?: boolean
-  cardComplete?: boolean
-
-  // submission lifecycle
-  loading?: boolean
-  error?: string | null
-  processingStatus?: string
-}
+import { PaymentState } from '../_types/checkout.types'
 
 interface Props {
-  inputs: CheckoutFormInputs
-  patch: (data: Partial<CheckoutFormInputs>) => void
+  payment: PaymentState
+  patch: (data: Partial<PaymentState>) => void
+  firstName: string
+  lastName: string
   onBack: () => void
   onSubmit: (e: { preventDefault: () => void }) => void | Promise<void>
   savedCards: IPaymentMethod[]
@@ -49,8 +25,10 @@ interface Props {
 }
 
 export function Step4Payment({
-  inputs,
+  payment,
   patch,
+  firstName,
+  lastName,
   onBack,
   onSubmit,
   savedCards,
@@ -59,8 +37,8 @@ export function Step4Payment({
   isValid,
   isAuthed
 }: Props) {
-  const loading = !!inputs.loading
-  const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
+  const loading = payment.loading
+  const enteringNewCard = !isAuthed || savedCards.length === 0 || payment.useNewCard
   const isSubmitReady = isValid && !loading
 
   return (
@@ -80,7 +58,7 @@ export function Step4Payment({
         <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
           Donating as{' '}
           <span className="text-text-light dark:text-text-dark">
-            {inputs.firstName} {inputs.lastName}
+            {firstName} {lastName}
           </span>
         </p>
       </div>
@@ -90,13 +68,11 @@ export function Step4Payment({
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3.5} className="mb-6">
           <SavedCardSelector
             savedCards={savedCards}
-            selectedCardId={inputs.selectedCardId}
-            useNewCard={inputs.useNewCard}
+            selectedCardId={payment.selectedCardId}
+            useNewCard={payment.useNewCard}
             onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
             onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-            onUseSavedCard={() =>
-              patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })
-            }
+            onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
           />
         </motion.div>
       )}
@@ -104,17 +80,15 @@ export function Step4Payment({
       {/* Card element */}
       {enteringNewCard && (
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4} className="mb-6">
-          <CardElementField
-            onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })}
-          />
+          <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })} />
         </motion.div>
       )}
 
       {/* Options */}
       <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4.5} className="mb-6 space-y-2">
         <CoverFeesToggle
-          checked={inputs.coverFees}
-          onChange={() => patch({ coverFees: !inputs.coverFees })}
+          checked={payment.coverFees}
+          onChange={() => patch({ coverFees: !payment.coverFees })}
           processingFee={processingFee}
         />
 
@@ -123,14 +97,14 @@ export function Step4Payment({
             id="checkout-save-card"
             label="Save card for future donations"
             description="One-click checkout next time"
-            checked={inputs.saveCard}
-            onToggle={() => patch({ saveCard: !inputs.saveCard })}
+            checked={payment.saveCard}
+            onToggle={() => patch({ saveCard: !payment.saveCard })}
           />
         )}
       </motion.div>
 
       {/* Error */}
-      <FormError error={inputs.error} />
+      <FormError error={payment.error} />
 
       {/* Actions */}
       <div className="flex gap-3">

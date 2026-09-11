@@ -1,13 +1,15 @@
 'use client'
 
-import { SyntheticEvent, useEffect, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { motion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import createNewsletter from 'lib/actions/public/newsletter/createNewsletter'
-import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 import { StatusMessage } from 'components/_primitives/StatusMessage'
 import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
+import { useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { EMPTY_NEWSLETTER, NewsletterFormInput, NewsletterFormValues, newsletterSchema } from 'lib/schemas/newsletter.schema'
 
 const CORE_GRADIENT = {
   background: 'linear-gradient(90deg, #0e7490, #0891b2, #06b6d4, #0891b2, #0e7490)',
@@ -15,49 +17,39 @@ const CORE_GRADIENT = {
   animation: 'stripScroll 4s linear infinite'
 }
 
-export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
-  const [email, setEmail] = useState('')
-  const [website, setWebsite] = useState('')
-  const [loading, setLoading] = useState(false)
+export function NavigationDrawerNewsletterForm({ onClose }: { onClose: () => void }) {
   const { status, flash, clearStatus } = useStatusMessage()
-  const renderedAt = useRef(0)
+
+  const {
+    register,
+    handleSubmit,
+    reset,
+    setValue,
+    formState: { errors, isSubmitting }
+  } = useForm<NewsletterFormInput, unknown, NewsletterFormValues>({
+    resolver: zodResolver(newsletterSchema),
+    defaultValues: EMPTY_NEWSLETTER
+  })
 
   useEffect(() => {
-    renderedAt.current = Date.now()
-  }, [])
+    setValue('renderedAt', Date.now())
+  }, [setValue])
 
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (!EMAIL_REGEX.test(email)) {
-      flash({ tone: 'error', message: 'Please enter a valid email address.' })
-      return
-    }
-
-    setLoading(true)
+  const onSubmit = async (values: NewsletterFormValues) => {
     clearStatus()
 
-    const result = await createNewsletter({
-      email: email.trim(),
-      website,
-      renderedAt: renderedAt.current
-    })
-
-    setLoading(false)
+    const result = await createNewsletter(values)
 
     if (!result.success) {
-      flash({
-        tone: 'error',
-        message: result.error ?? 'Something went wrong. Please try again.'
-      })
+      flash({ tone: 'error', message: result.error ?? 'Something went wrong. Please try again.' })
       return
     }
 
     flash({
       tone: 'success',
-      message: `Subscribed! You'll get rescue updates, events, and adoption news at ${email}.`
+      message: `Subscribed! You'll get rescue updates, events, and adoption news at ${values.email}.`
     })
-    setEmail('')
+    reset(EMPTY_NEWSLETTER)
   }
 
   return (
@@ -67,33 +59,42 @@ export function DrawerNewsletterForm({ onClose }: { onClose: () => void }) {
         Subscribe to our newsletter for rescues, events, and adoption opportunities!
       </p>
 
-      <form onSubmit={handleSubmit} className="space-y-2">
+      <form onSubmit={handleSubmit(onSubmit)} noValidate className="relative space-y-2">
         <input
           type="text"
-          name="website"
-          value={website}
-          onChange={(e) => setWebsite(e.target.value)}
+          {...register('website')}
           tabIndex={-1}
           autoComplete="off"
           aria-hidden="true"
           className="absolute w-px h-px overflow-hidden -left-96"
         />
-        <input
-          name="email"
-          type="email"
-          autoComplete="email"
-          placeholder="your@email.com"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          className="w-full px-3.5 py-2.5 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark font-lato text-sm focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors"
-        />
+        <div>
+          <label htmlFor="drawer-newsletter-email" className="sr-only">
+            Your email address
+          </label>
+          <input
+            id="drawer-newsletter-email"
+            type="email"
+            autoComplete="email"
+            placeholder="your@email.com"
+            aria-invalid={!!errors.email}
+            {...register('email')}
+            aria-describedby={status ? 'newsletter-status' : undefined}
+            className="w-full px-3.5 py-2.5 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark font-lato text-sm focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors"
+          />
+          {errors.email && (
+            <p role="alert" className="text-[10px] font-mono text-red-500 dark:text-red-400 mt-1">
+              {errors.email.message}
+            </p>
+          )}
+        </div>
         <button
           type="submit"
-          disabled={loading}
+          disabled={isSubmitting}
           className="w-full py-2.5 px-4 disabled:opacity-50 disabled:cursor-not-allowed text-white text-f10 uppercase tracking-[0.25em] transition-opacity focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
           style={CORE_GRADIENT}
         >
-          {loading ? (
+          {isSubmitting ? (
             <span className="flex items-center justify-center gap-2">
               <motion.div
                 animate={{ rotate: 360 }}

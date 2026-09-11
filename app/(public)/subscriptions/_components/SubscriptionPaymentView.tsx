@@ -10,13 +10,7 @@ import { SubscriptionPaymentForm } from './SubscriptionsPaymentForm'
 
 const paymentStepLabels = ['Choose Plan', 'Sign-In', 'Payment']
 
-export function SubscriptionPaymentView({
-  setView,
-  selectedTier,
-  billing,
-  savedPaymentMethods,
-  userName
-}) {
+export function SubscriptionPaymentView({ setView, selectedTier, billing, savedPaymentMethods, userName }) {
   const session = useSession()
   const isAuthed = session.status === 'authenticated'
   const currentStep = isAuthed ? 3 : 2
@@ -34,9 +28,7 @@ export function SubscriptionPaymentView({
       <div className="border-b border-border-dark px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="block w-5 h-px bg-primary-dark" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">
-            Little Paws Dachshund Rescue
-          </p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">Little Paws Dachshund Rescue</p>
         </div>
         <button
           type="button"
@@ -61,10 +53,7 @@ export function SubscriptionPaymentView({
             <SignedInRow isDark />
 
             {currentStep === 2 && (
-              <StepSignIn
-                redirectTo={`/subscriptions?tier=${selectedTier.id}&billing=${billing}&view=payment`}
-                isDark
-              />
+              <StepSignIn redirectTo={`/subscriptions?tier=${selectedTier.id}&billing=${billing}&view=payment`} />
             )}
 
             {currentStep === 3 && (

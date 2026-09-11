@@ -1,52 +1,9 @@
 import Link from 'next/link'
-import createNewsletter from 'lib/actions/public/newsletter/createNewsletter'
-import { SyntheticEvent, useEffect, useRef, useState } from 'react'
 import { NAV_LINKS, SOCIAL_LINKS } from 'lib/constants/footer.constants'
 import Picture from 'components/_common/Picture'
-import { useStatusMessage } from '@hooks/useStatusMessage.hook'
+import { FooterNewsletterForm } from './FooterNewsletterForm'
 
 export default function Footer() {
-  const [email, setEmail] = useState('')
-  const [website, setWebsite] = useState('')
-  const [loading, setLoading] = useState(false)
-  const renderedAt = useRef(0)
-
-  const { status, flash } = useStatusMessage()
-
-  useEffect(() => {
-    renderedAt.current = Date.now()
-  }, [])
-
-  const handleSubmit = async (e: SyntheticEvent<HTMLFormElement>) => {
-    e.preventDefault()
-
-    if (!email.trim()) {
-      flash({ tone: 'error', message: 'Please enter your email' })
-      return
-    }
-
-    setLoading(true)
-
-    const result = await createNewsletter({
-      email: email.trim(),
-      website,
-      renderedAt: renderedAt.current
-    })
-
-    setLoading(false)
-
-    if (!result.success) {
-      flash({
-        tone: 'error',
-        message: result.error ?? 'Something went wrong. Please try again.'
-      })
-      return
-    }
-
-    setEmail('')
-    flash({ tone: 'success', message: 'You are subscribed' })
-  }
-
   return (
     <footer
       className="bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark"
@@ -147,54 +104,7 @@ export default function Footer() {
             <p className="text-[11px] font-mono text-on-dark leading-relaxed mb-4">
               Stay up to date with rescues, events, and ways to help.
             </p>
-            <form onSubmit={handleSubmit} aria-label="Newsletter signup" className="relative space-y-2.5">
-              <input
-                type="text"
-                name="website"
-                value={website}
-                onChange={(e) => setWebsite(e.target.value)}
-                tabIndex={-1}
-                autoComplete="off"
-                aria-hidden="true"
-                className="absolute w-px h-px overflow-hidden -left-96"
-              />
-              <div>
-                <label htmlFor="footer-email" className="sr-only">
-                  Your email address
-                </label>
-                <input
-                  name="email"
-                  id="footer-email"
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="Your email"
-                  autoComplete="email"
-                  aria-describedby={status ? 'newsletter-status' : undefined}
-                  className="w-full bg-white/5 border border-white/10 px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-on-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark transition-colors"
-                />
-              </div>
-              <button
-                type="submit"
-                disabled={loading}
-                aria-disabled={loading}
-                className="w-full py-2.5 px-4 text-[10px] font-mono tracking-[0.2em] uppercase border border-primary-light dark:border-primary-dark text-white hover:bg-primary-light/10 dark:hover:bg-primary-dark/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {loading ? 'Subscribing...' : 'Subscribe'}
-              </button>
-
-              {status && (
-                <p
-                  id="newsletter-status"
-                  role={status.tone === 'error' ? 'alert' : 'status'}
-                  className={`text-[10px] font-mono tracking-widest ${
-                    status.tone === 'error' ? 'text-red-400' : 'text-primary-light dark:text-primary-dark'
-                  }`}
-                >
-                  {status.message}
-                </p>
-              )}
-            </form>
+            <FooterNewsletterForm />
           </div>
         </div>
 

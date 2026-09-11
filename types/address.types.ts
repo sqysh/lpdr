@@ -1,25 +1,15 @@
-export interface IAddress {
-  updatedAt: Date
-  id: string
-  name: string
-  addressLine1: string
-  addressLine2: string | null
-  city: string
-  state: string
-  zipPostalCode: string
-  country: string
-}
+import { Prisma } from '@prisma/client'
 
-export interface AddressSectionProps {
-  address: IAddress | null
-}
-
-export interface UpdateAddressInput {
-  name?: string
-  addressLine1: string
-  addressLine2: string | null
-  city: string
-  state: string
-  zipPostalCode: string
-  country: string
-}
+export type IAddress = Prisma.AddressGetPayload<{
+  select: {
+    id: true
+    updatedAt: true
+    name: true
+    addressLine1: true
+    addressLine2: true
+    city: true
+    state: true
+    zipPostalCode: true
+    country: true
+  }
+}>

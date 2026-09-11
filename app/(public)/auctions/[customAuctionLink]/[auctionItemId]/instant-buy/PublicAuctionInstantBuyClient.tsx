@@ -114,7 +114,6 @@ export default function PublicAuctionInstantBuyClient({
   const processingFee = calculateStripeFees(baseAmount)
   const feesCovered = inputs.coverFees ? processingFee : 0
   const finalAmount = baseAmount + shipping + feesCovered
-  const finalAmountInCents = Math.round(finalAmount * 100)
 
   // ── Payment derived ───────────────────────────────────────────────────────
   const usingSavedCard = isAuthed && !!inputs.selectedCardId && !inputs.useNewCard
@@ -210,12 +209,8 @@ export default function PublicAuctionInstantBuyClient({
       const name = `${inputs.firstName.trim()} ${inputs.lastName.trim()}`
 
       const basePayload = {
-        amount: finalAmountInCents,
-        name,
-        email: userEmail,
         orderType: 'AUCTION_PURCHASE' as const,
         coverFees: inputs.coverFees,
-        feesCovered,
         auctionItemId: auctionItem?.id
       }
 
