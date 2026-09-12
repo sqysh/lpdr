@@ -2,7 +2,7 @@ import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.share
 import Pusher from 'pusher-js'
 
 type OrderCreatedEvent = {
-  type: string
+  type?: string
   orderId?: string
 }
 
@@ -10,14 +10,18 @@ type OrderFailedEvent = {
   error?: string
 }
 
-// The webhook has to create the order, send mail and update related records, so
-// this waits longer than feels necessary. A timeout here means the payment very
-// likely succeeded and we lost the notification, not that anything failed.
+// The webhook has to create records and send mail, so this waits longer than
+// feels necessary. A timeout means the payment very likely succeeded and we
+// lost the notification, not that anything failed.
 const TIMEOUT_MS = 30_000
 
-export function setupPusherListenerOneTime(channelId: string, router: AppRouterInstance): Promise<void> {
+const TIMEOUT_MESSAGE =
+  'This is taking longer than expected. Your payment may have gone through, so please check your email before trying again.'
+
+/** Waits for the webhook to confirm, then navigates. Resolves once, cleans up on every path. */
+export function waitForOrder(channelKey: string, router: AppRouterInstance): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (!channelId) {
+    if (!channelKey) {
       reject(new Error('Missing payment channel'))
       return
     }
@@ -30,7 +34,7 @@ export function setupPusherListenerOneTime(channelId: string, router: AppRouterI
       return
     }
 
-    const channelName = `payment-${channelId}`
+    const channelName = `payment-${channelKey}`
     const pusher = new Pusher(key, { cluster })
     const channel = pusher.subscribe(channelName)
 
@@ -58,15 +62,10 @@ export function setupPusherListenerOneTime(channelId: string, router: AppRouterI
       reject(new Error(message))
     }
 
-    const timeout = setTimeout(
-      () =>
-        fail(
-          'This is taking longer than expected. Your payment may have gone through, so please check your email before trying again.'
-        ),
-      TIMEOUT_MS
-    )
+    const timeout = setTimeout(() => fail(TIMEOUT_MESSAGE), TIMEOUT_MS)
 
     channel.bind('order-created', (data: OrderCreatedEvent) => {
+      // The adoption fee has no order to show, so it goes straight to the form
       if (data.type === 'ADOPTION_FEE') {
         succeed('/adopt/application?ref=orders')
         return

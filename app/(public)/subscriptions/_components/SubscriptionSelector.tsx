@@ -5,12 +5,7 @@ import { MobileTierCard } from './MobileTierCard'
 import { TierKey } from 'types/subscriptions.types'
 import { SubscriptionSelectorProps } from 'types/my-pack.types'
 
-export function SubscriptionSelector({
-  setBilling,
-  billing,
-  selected,
-  setSelected
-}: SubscriptionSelectorProps) {
+export function SubscriptionSelector({ setBilling, billing, selected, setSelected }: SubscriptionSelectorProps) {
   return (
     <motion.div
       key="select"
@@ -62,10 +57,7 @@ export function SubscriptionSelector({
         {/* ── Tier column labels ── */}
         <div className="hidden md:grid grid-cols-4 gap-2 mb-2" aria-hidden="true">
           {(['bronze', 'silver', 'gold', 'elite'] as TierKey[]).map((k) => (
-            <p
-              key={k}
-              className={`text-center text-[9px] font-mono tracking-widest uppercase ${T[k].labelClass}`}
-            >
+            <p key={k} className={`text-center text-[9px] font-mono tracking-widest uppercase ${T[k].labelClass}`}>
               {T[k].label}
             </p>
           ))}
@@ -119,6 +111,17 @@ export function SubscriptionSelector({
             </span>
           ))}
         </div>
+        <p className="mt-6 text-center text-[10px] font-mono text-muted-dark/70">
+          Designed &amp; built by{' '}
+          <a
+            href="https://sqysh.com?utm_source=littlepawsdr&utm_medium=referral&utm_campaign=subscriptions"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-muted-dark hover:text-primary-dark transition-colors underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark"
+          >
+            Sqysh
+          </a>
+        </p>
       </div>
     </motion.div>
   )

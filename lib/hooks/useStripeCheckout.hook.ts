@@ -6,7 +6,7 @@ import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import type { IPaymentMethod } from 'types/payment-method.types'
 import { useRouter } from 'next/navigation'
-import { setupPusherListenerOneTime } from 'lib/pusher/setupPusherListenerOneTime'
+import { waitForOrder } from 'lib/pusher/waitForOrder'
 
 export type PaymentState = {
   cardComplete: boolean
@@ -63,9 +63,9 @@ export function useStripeCheckout({
         const result = await createPaymentIntent({ ...basePayload, savedCardId: payment.selectedCardId })
         if (!result.success) throw new Error(result.error)
 
-        // Loading stays on until Pusher confirms and navigates, so the button
-        // cannot be pressed twice on a charge that already went through
-        await setupPusherListenerOneTime(userId, router)
+        // Loading stays on until the webhook confirms and we navigate, so the
+        // button cannot be pressed twice on a charge that already went through
+        await waitForOrder(userId, router)
         return
       }
 
@@ -89,9 +89,7 @@ export function useStripeCheckout({
         return
       }
 
-      // Loading stays on until Pusher confirms, so the button cannot be pressed
-      // twice on a charge that already went through
-      await setupPusherListenerOneTime(userId, router)
+      await waitForOrder(userId, router)
     } catch (err) {
       patch({ loading: false, error: err instanceof Error ? err.message : 'Something went wrong. Please try again.' })
     }

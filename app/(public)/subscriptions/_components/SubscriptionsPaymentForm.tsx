@@ -13,15 +13,15 @@ import { IPaymentMethod } from 'types/payment-method.types'
 import { ordinal } from 'lib/utils/date.utils'
 import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { CardElementField } from 'components/features/payment/CardElementField'
-import { useThemeStore } from 'stores/theme.store'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
-import { setupPusherListenerRecurring } from 'lib/pusher/setupPusherListenerRecurring'
 import { useRouter } from 'next/navigation'
+import { useForm, useWatch } from 'react-hook-form'
+import { SubscriptionFormInput, subscriptionFormSchema, SubscriptionFormValues } from 'lib/schemas/subscription.schema'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { StripeSecurityNote } from './StripeSecurityNote'
+import { waitForOrder } from 'lib/pusher/waitForOrder'
 
 type PaymentInputs = {
-  firstName: string
-  lastName: string
-  email: string
   selectedCardId: string | null
   useNewCard: boolean
   cardComplete: boolean
@@ -38,7 +38,6 @@ type Props = {
   firstName: string
   lastName: string
   email: string
-  isDark?: boolean
 }
 
 export function SubscriptionPaymentForm({
@@ -48,28 +47,29 @@ export function SubscriptionPaymentForm({
   isAuthed,
   firstName: initialFirstName,
   lastName: initialLastName,
-  email: initialEmail,
-  isDark
+  email
 }: Props) {
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
-  const storeDark = useThemeStore((s) => s.isDark)
-  const dark = isDark ?? storeDark
 
-  const c = {
-    box: dark ? 'border-border-dark bg-surface-dark' : 'border-border-light bg-surface-light',
-    notice: dark ? 'border-primary-dark bg-surface-dark' : 'border-primary-light bg-surface-light',
-    muted: dark ? 'text-muted-dark' : 'text-muted-light',
-    text: dark ? 'text-text-dark' : 'text-text-light',
-    primary: dark ? 'text-primary-dark' : 'text-primary-light'
-  }
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors }
+  } = useForm<SubscriptionFormInput, unknown, SubscriptionFormValues>({
+    resolver: zodResolver(subscriptionFormSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      firstName: initialFirstName ?? '',
+      lastName: initialLastName ?? ''
+    }
+  })
 
-  // ── Local state, seeded from props ──
+  const values = useWatch({ control })
+
   const [inputs, setInputs] = useState<PaymentInputs>({
-    firstName: initialFirstName ?? '',
-    lastName: initialLastName ?? '',
-    email: initialEmail ?? '',
     selectedCardId: null,
     useNewCard: false,
     cardComplete: false,
@@ -79,9 +79,7 @@ export function SubscriptionPaymentForm({
   })
 
   const patch = (data: Partial<PaymentInputs>) => setInputs((prev) => ({ ...prev, ...data }))
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
-    patch({ [e.target.name]: e.target.value } as Partial<PaymentInputs>)
-  }
+
   // ── Derived ──
   const baseAmount = tier.price[billing]
   const processingFee = calculateStripeFees(baseAmount)
@@ -89,24 +87,17 @@ export function SubscriptionPaymentForm({
   const usingSavedCard = !!inputs.selectedCardId && !inputs.useNewCard && isAuthed
   const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
 
-  const isValid =
-    !!inputs.firstName.trim() &&
-    !!inputs.lastName.trim() &&
-    !!inputs.email.trim() &&
-    (usingSavedCard ? true : inputs.cardComplete)
-
+  const isValid = !!values.firstName?.trim() && !!values.lastName?.trim() && (usingSavedCard ? true : inputs.cardComplete)
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
   useDefaultCard(savedCards, isAuthed, setDefaultCard)
 
-  const handleSubmit = async (e: { preventDefault: () => void }) => {
-    e.preventDefault()
+  const onSubmit = async (data: SubscriptionFormValues) => {
     if (!stripe || !elements || !isValid) return
 
     patch({ loading: true, error: null })
 
     try {
-      const name = `${inputs.firstName.trim()} ${inputs.lastName.trim()}`
-      const email = inputs.email.trim()
+      const name = `${data.firstName.trim()} ${data.lastName.trim()}`
 
       const basePayload = {
         tierId: tier.id,
@@ -114,42 +105,40 @@ export function SubscriptionPaymentForm({
         coverFees: inputs.coverFees
       }
 
-      if (inputs.selectedCardId && !inputs.useNewCard) {
+      if (usingSavedCard) {
         const result = await createSubscriptionWithSavedCard({
           ...basePayload,
           savedCardId: inputs.selectedCardId
         })
+
         if (!result.success) throw new Error(result.error ?? 'Failed to create subscription')
-        setupPusherListenerRecurring({ subscriptionId: result.data.subscriptionId }, router)
-      } else {
-        const setupResult = await createSetupIntentForSubscription(basePayload)
-        if (!setupResult.success) throw new Error(setupResult.error ?? 'Failed to create setup intent')
 
-        const cardElement = elements.getElement(CardElement)
-        if (!cardElement) throw new Error('Card element not found')
-
-        const { error: stripeError } = await stripe.confirmCardSetup(setupResult.data.clientSecret, {
-          payment_method: { card: cardElement, billing_details: { email, name } }
-        })
-
-        if (stripeError) {
-          patch({ error: stripeError.message ?? 'Card confirmation failed', loading: false })
-          return
-        }
-
-        const subscriptionResult = await createSubscriptionAfterSetup({
-          ...basePayload,
-          setupIntentId: setupResult.data.setupIntentId
-        })
-        if (!subscriptionResult.success) throw new Error(subscriptionResult.error ?? 'Failed to create subscription')
-
-        setupPusherListenerRecurring(
-          {
-            subscriptionId: subscriptionResult.data.subscriptionId
-          },
-          router
-        )
+        await waitForOrder(result.data.subscriptionId, router)
+        return
       }
+
+      const setupResult = await createSetupIntentForSubscription(basePayload)
+      if (!setupResult.success) throw new Error(setupResult.error ?? 'Failed to create setup intent')
+
+      const cardElement = elements.getElement(CardElement)
+      if (!cardElement) throw new Error('Card element not found')
+
+      const { error: stripeError } = await stripe.confirmCardSetup(setupResult.data.clientSecret, {
+        payment_method: { card: cardElement, billing_details: { email, name } }
+      })
+
+      if (stripeError) {
+        patch({ loading: false, error: stripeError.message ?? 'Card confirmation failed' })
+        return
+      }
+
+      const subscriptionResult = await createSubscriptionAfterSetup({
+        setupIntentId: setupResult.data.setupIntentId
+      })
+
+      if (!subscriptionResult.success) throw new Error(subscriptionResult.error ?? 'Failed to create subscription')
+
+      await waitForOrder(subscriptionResult.data.subscriptionId, router)
     } catch (err) {
       patch({
         loading: false,
@@ -159,24 +148,24 @@ export function SubscriptionPaymentForm({
   }
 
   return (
-    <form onSubmit={handleSubmit} noValidate aria-label="Subscription payment form" className="dark space-y-5 max-w-lg">
+    <form onSubmit={handleSubmit(onSubmit)} noValidate aria-label="Subscription payment form" className="space-y-5 max-w-lg">
       {/* ── Plan summary ── */}
-      <div className={`flex items-center justify-between px-4 py-3 border ${c.box}`}>
+      <div className="flex items-center justify-between px-4 py-3 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
         <div>
-          <p className={`text-[10px] font-mono tracking-[0.2em] uppercase mb-0.5 ${c.muted}`}>{billing} plan</p>
-          <p className={`font-quicksand font-black text-sm ${c.text}`}>{tier.name}</p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase mb-0.5 text-muted-light dark:text-muted-dark">{billing} plan</p>
+          <p className="font-quicksand font-black text-sm text-text-light dark:text-text-dark">{tier.name}</p>
         </div>
         <div className="text-right">
-          <p className={`font-quicksand font-black text-xl tabular-nums ${c.primary}`}>${baseAmount}</p>
-          <p className={`text-[10px] font-mono ${c.muted}`}>/{billing === 'MONTHLY' ? 'mo' : 'yr'}</p>
+          <p className="font-quicksand font-black text-xl tabular-nums text-primary-light dark:text-primary-dark">${baseAmount}</p>
+          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">/{billing === 'MONTHLY' ? 'mo' : 'yr'}</p>
         </div>
       </div>
 
       {/* ── Billing notice ── */}
-      <div className={`px-4 py-3 border-l-2 ${c.notice}`}>
-        <p className={`text-[11px] font-mono leading-relaxed ${c.muted}`}>
+      <div className="px-4 py-3 border-l-2 border-primary-light dark:border-primary-dark bg-surface-light dark:bg-surface-dark">
+        <p className="text-[11px] font-mono leading-relaxed text-muted-light dark:text-muted-dark">
           Your card will be charged{' '}
-          <span className={c.text}>
+          <span className="text-text-light dark:text-text-dark">
             {billing === 'MONTHLY'
               ? `on the ${ordinal(new Date().getDate())} of each month`
               : `every year on ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric' })}`}
@@ -188,52 +177,47 @@ export function SubscriptionPaymentForm({
       {/* ── Name ── */}
       <div className="grid grid-cols-1 min-[420px]:grid-cols-2 gap-3">
         <FormField
-          id="checkout-firstName"
+          id="subscription-firstName"
           label="First Name"
-          name="firstName"
-          value={inputs?.firstName ?? ''}
-          onChange={handleInput}
+          {...register('firstName')}
           placeholder="Jane"
           autoComplete="given-name"
+          error={errors.firstName?.message}
           required
         />
         <FormField
-          id="checkout-lastName"
+          id="subscription-lastName"
           label="Last Name"
-          name="lastName"
-          value={inputs?.lastName ?? ''}
-          onChange={handleInput}
+          {...register('lastName')}
           placeholder="Doe"
           autoComplete="family-name"
+          error={errors.lastName?.message}
           required
         />
       </div>
 
       {/* Saved cards */}
-      {isAuthed && (
+      {isAuthed && savedCards.length > 0 && (
         <SavedCardSelector
           savedCards={savedCards}
           selectedCardId={inputs.selectedCardId}
           useNewCard={inputs.useNewCard}
-          onSelectCard={(id) => patch({ selectedCardId: id })}
+          onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
           onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
           onUseSavedCard={() => patch({ useNewCard: false, selectedCardId: savedCards[0]?.stripePaymentId ?? null })}
         />
       )}
 
       {/* Card element */}
-      {enteringNewCard && (
-        <CardElementField isDark={dark} onChange={({ complete, error }) => patch({ cardComplete: complete, error })} />
-      )}
+      {enteringNewCard && <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error })} />}
 
       {/* Cover fees */}
       <CoverFeesToggle checked={inputs.coverFees} onChange={(v) => patch({ coverFees: v })} processingFee={processingFee} />
 
       {/* ── Card storage note (replaces SaveCardToggle — saving is required for subscriptions) ── */}
       {enteringNewCard && (
-        <p className={`text-[10px] font-mono leading-relaxed ${c.muted}`}>
-          Your card will be securely saved with Stripe to process your recurring {billing === 'MONTHLY' ? 'monthly' : 'yearly'}{' '}
-          payments.
+        <p className="text-[10px] font-mono leading-relaxed text-muted-light dark:text-muted-dark">
+          Your card will be securely saved with Stripe to process your recurring {billing === 'MONTHLY' ? 'monthly' : 'yearly'} payments.
         </p>
       )}
 
@@ -248,21 +232,7 @@ export function SubscriptionPaymentForm({
       />
 
       {/* ── Security note ── */}
-      <p className={`flex items-center justify-center gap-2 text-[10px] font-mono ${c.muted}`}>
-        <svg
-          viewBox="0 0 24 24"
-          className="w-3 h-3 shrink-0"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth={2}
-          strokeLinecap="square"
-          aria-hidden="true"
-        >
-          <rect x="3" y="11" width="18" height="11" />
-          <path d="M7 11V7a5 5 0 0110 0v4" />
-        </svg>
-        Secured by Stripe. We never store your card details.
-      </p>
+      <StripeSecurityNote />
     </form>
   )
 }

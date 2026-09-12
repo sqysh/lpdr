@@ -28,9 +28,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
 
     // ── Resolve items + hasPhysical BEFORE creating the order ──
     const compact =
-      orderType === 'PURCHASE' && metadata?.items
-        ? (JSON.parse(metadata.items) as Array<{ i: string; q: number; s: string | null }>)
-        : []
+      orderType === 'PURCHASE' && metadata?.items ? (JSON.parse(metadata.items) as Array<{ i: string; q: number; s: string | null }>) : []
 
     const FEED_A_FOSTER_IDS = Object.keys(FEED_A_FOSTER_ITEMS)
     const wienerLines = compact.filter((c) => !FEED_A_FOSTER_IDS.includes(c.i) && c.i.includes('-'))
@@ -171,9 +169,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
           if (fresh) {
             const sizes = fresh.sizes as ProductSizeEntry[] | null
             const updatedSizes =
-              line.s && sizes
-                ? sizes.map((s) => (s.size === line.s ? { ...s, quantity: Math.max(0, s.quantity - line.q) } : s))
-                : sizes
+              line.s && sizes ? sizes.map((s) => (s.size === line.s ? { ...s, quantity: Math.max(0, s.quantity - line.q) } : s)) : sizes
 
             await prisma.product.update({
               where: { id: product.id },
@@ -309,9 +305,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
           const auction = winningBidderRecord.auction
           const userEmail = winningBidderRecord.user?.email
           const updatedEmails =
-            userEmail && !auction.supporterEmails.includes(userEmail)
-              ? [...auction.supporterEmails, userEmail]
-              : auction.supporterEmails
+            userEmail && !auction.supporterEmails.includes(userEmail) ? [...auction.supporterEmails, userEmail] : auction.supporterEmails
 
           await tx.auction.update({
             where: { id: auction.id },
@@ -341,23 +335,15 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       }
     }
 
-    let adoptionFee: { id: string } | undefined
-    let existingAdoptionFee: { id: string } | null = null
-
     if (orderType === 'ADOPTION_FEE') {
-      const userId = metadata.userId
-
-      existingAdoptionFee = await prisma.adoptionFee.findFirst({
-        where: {
-          userId,
-          status: 'ACTIVE',
-          expiresAt: { gt: new Date() }
-        },
+      const existingFee = await prisma.adoptionFee.findFirst({
+        where: { userId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
         select: { id: true }
       })
 
-      if (!existingAdoptionFee) {
-        adoptionFee = await prisma.adoptionFee.create({
+      // Paying while access is already active should not stack another week
+      if (!existingFee) {
+        await prisma.adoptionFee.create({
           data: {
             userId,
             orderId: order.id,
@@ -377,25 +363,39 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       include: { items: true }
     })
 
-    await sendConfirmationEmail(orderWithItems)
+    // Not awaited: a slow mail provider should not hold the webhook open long
+    // enough for Stripe to time out and retry
+    void sendConfirmationEmail(orderWithItems).catch((error) =>
+      createLog('error', 'Failed to send order confirmation', {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    )
 
     if (hasPhysical && orderWithItems.addressLine1) {
-      await resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
-        to: 'lpdr@littlepawsdr.org',
-        subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
-        html: adminOrderNotificationTemplate({
-          orderId: orderWithItems.id,
-          customerName: orderWithItems.customerName,
-          customerEmail: orderWithItems.customerEmail,
-          items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
-          addressLine1: orderWithItems.addressLine1,
-          addressLine2: orderWithItems.addressLine2,
-          city: orderWithItems.city,
-          state: orderWithItems.state,
-          zipPostalCode: orderWithItems.zipPostalCode
+      void resend.emails
+        .send({
+          from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
+          to: 'lpdr@littlepawsdr.org',
+          subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
+          html: adminOrderNotificationTemplate({
+            orderId: orderWithItems.id,
+            customerName: orderWithItems.customerName,
+            customerEmail: orderWithItems.customerEmail,
+            items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
+            addressLine1: orderWithItems.addressLine1,
+            addressLine2: orderWithItems.addressLine2,
+            city: orderWithItems.city,
+            state: orderWithItems.state,
+            zipPostalCode: orderWithItems.zipPostalCode
+          })
         })
-      })
+        .catch((error) =>
+          createLog('error', 'Failed to send admin shipping notification', {
+            orderId: order.id,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          })
+        )
     }
 
     const channelId = userId
@@ -405,8 +405,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       amount: order.totalAmount,
       status: order.status,
       type: order.type,
-      createdAt: order.createdAt,
-      adoptionFeeId: adoptionFee?.id ?? existingAdoptionFee?.id ?? null
+      createdAt: order.createdAt
     })
 
     await pusherSuperuser('order-created', {
@@ -432,5 +431,9 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       amount: amount / 100,
       paymentIntentId: id
     })
+
+    // Rethrow so the route returns a non-200 and Stripe retries. The
+    // existingOrder check above makes the retry safe.
+    throw error
   }
 }

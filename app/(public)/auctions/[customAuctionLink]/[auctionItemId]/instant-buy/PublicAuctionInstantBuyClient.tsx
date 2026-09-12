@@ -23,7 +23,7 @@ import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
-import { setupPusherListenerOneTime } from 'lib/pusher/setupPusherListenerOneTime'
+import { waitForOrder } from 'lib/pusher/waitForOrder'
 
 interface FormInputs {
   // identity
@@ -126,8 +126,7 @@ export default function PublicAuctionInstantBuyClient({
   const addressRequired = !!auctionItem?.requiresShipping
   const addressReady = !addressRequired || hasAddress
 
-  const isValid =
-    hasName && addressReady && !inputs.loading && !!stripe && !!elements && (usingSavedCard ? true : inputs.cardComplete)
+  const isValid = hasName && addressReady && !inputs.loading && !!stripe && !!elements && (usingSavedCard ? true : inputs.cardComplete)
 
   // ── Cover photo ───────────────────────────────────────────────────────────
   const coverPhoto = auctionItem?.photos?.sort((a, b) => a.sortOrder - b.sortOrder)[0]?.url
@@ -222,7 +221,7 @@ export default function PublicAuctionInstantBuyClient({
         })
         if (!result.success) throw new Error(result.error)
 
-        setupPusherListenerOneTime(userId, router)
+        await waitForOrder(userId, router)
       } else {
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) throw new Error('Card element not found')
@@ -243,7 +242,7 @@ export default function PublicAuctionInstantBuyClient({
         if (result.error) {
           patch({ loading: false, error: result.error.message ?? 'Payment failed' })
         } else if (result.paymentIntent?.status === 'succeeded') {
-          setupPusherListenerOneTime(userId, router)
+          await waitForOrder(userId, router)
         }
       }
     } catch (err) {
@@ -270,9 +269,7 @@ export default function PublicAuctionInstantBuyClient({
             <div className="w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
             <span className="  text-f10 uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">Instant Buy</span>
           </div>
-          <h1 className="  text-2xl sm:text-3xl uppercase tracking-widest text-text-light dark:text-text-dark">
-            Complete Purchase
-          </h1>
+          <h1 className="  text-2xl sm:text-3xl uppercase tracking-widest text-text-light dark:text-text-dark">Complete Purchase</h1>
         </div>
 
         <div className="space-y-6">

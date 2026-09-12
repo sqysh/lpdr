@@ -66,7 +66,6 @@ export function SubscriptionPaymentView({ setView, selectedTier, billing, savedP
                   firstName={userName.firstName}
                   lastName={userName.lastName}
                   email={session.data.user.email}
-                  isDark
                 />
               </div>
             )}
