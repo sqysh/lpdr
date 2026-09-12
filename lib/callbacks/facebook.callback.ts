@@ -15,14 +15,14 @@ interface FacebookProfile extends Profile {
   }
 }
 
-export async function handleFacebookCallback(
-  user: User,
-  account: Account,
-  profile: FacebookProfile
-): Promise<boolean> {
+export async function handleFacebookCallback(user: User, account: Account, profile: FacebookProfile): Promise<boolean | string> {
   if (!user.email) {
-    await createLog('warn', 'Facebook sign-in missing email', { profile })
-    return false
+    await createLog('warn', 'Facebook sign-in missing email', {
+      location: ['facebook.callback.ts'],
+      facebookId: profile?.id
+    })
+
+    return '/auth/login?error=facebook-no-email'
   }
 
   try {

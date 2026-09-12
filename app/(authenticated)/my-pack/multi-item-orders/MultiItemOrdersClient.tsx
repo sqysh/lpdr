@@ -8,18 +8,12 @@ import { PurchaseRow } from 'app/(authenticated)/my-pack/multi-item-orders/_comp
 
 export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrder[] }) {
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-              aria-hidden="true"
-            />
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
             <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
               Multi Item Orders
             </p>
@@ -29,7 +23,7 @@ export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrd
               My <span className="font-light text-muted-light dark:text-muted-dark">Purchases</span>
             </h1>
             <Link
-              href=" /my-pack"
+              href="/my-pack"
               className="shrink-0 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mt-2"
             >
               ← My Pack
@@ -51,9 +45,7 @@ export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrd
             role="status"
             aria-live="polite"
           >
-            <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
-              You haven&apos;t made any orders yet.
-            </p>
+            <p className="text-sm font-mono text-muted-light dark:text-muted-dark">You haven&apos;t made any orders yet.</p>
             <Link
               href="/merch"
               className="inline-block mt-4 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:underline"

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useSyncExternalStore } from 'react'
 
 function calcTime(endDate: Date) {
   const diff = new Date(endDate).getTime() - Date.now()
@@ -12,15 +12,23 @@ function calcTime(endDate: Date) {
   }
 }
 
-const zero = { days: 0, hours: 0, minutes: 0, seconds: 0, done: false }
+const subscribeToSecond = (onChange: () => void) => {
+  const id = setInterval(onChange, 1000)
+  return () => clearInterval(id)
+}
 
+/**
+ * `ready` is false during SSR and the first client render, since the server
+ * cannot compute a countdown and rendering zeros would flash a wrong value.
+ */
 export function useCountdown(endDate: Date) {
-  const [time, setTime] = useState(zero)
+  const now = useSyncExternalStore(
+    subscribeToSecond,
+    () => Math.floor(Date.now() / 1000),
+    () => null
+  )
 
-  useEffect(() => {
-    const id = setInterval(() => setTime(calcTime(endDate)), 1000)
-    return () => clearInterval(id)
-  }, [endDate])
+  if (now === null) return { days: 0, hours: 0, minutes: 0, seconds: 0, done: false, ready: false }
 
-  return time
+  return { ...calcTime(endDate), ready: true }
 }

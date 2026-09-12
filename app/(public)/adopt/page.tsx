@@ -31,6 +31,7 @@ export default async function PreApplicationFlowPage() {
       userName={userNameResult.data ?? null}
       email={session?.user?.email}
       isAuthed={isAuthed}
+      userId={session?.user?.id ?? null}
     />
   )
 }

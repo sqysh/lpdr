@@ -2,7 +2,6 @@
 
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShieldCheck } from 'lucide-react'
-import { useSession } from 'next-auth/react'
 import { IPaymentMethod } from 'types/payment-method.types'
 import { IAuctionWinningBidder } from 'types/auction-winning-bidder'
 import { fadeUp } from 'lib/constants/motion.constants'
@@ -11,63 +10,26 @@ import { AuctionWinnerAddressSection } from './AuctionWinnerAddressSection'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { CardElementField } from 'components/features/payment/CardElementField'
-
-export type PaymentState = {
-  selectedCardId: string | null
-  useNewCard: boolean
-  loading: boolean
-  error: string | null
-  saveCard: boolean
-  coverFees: boolean
-  processingFee: number
-  finalAmount: number
-  isValid: boolean
-}
-
-export type PaymentHandlers = {
-  onSelectCard: (id: string) => void
-  onUseNewCard: () => void
-  onUseSavedCard: () => void
-  onCardChange: (state: { complete: boolean; error: string | null }) => void
-  onSaveCardToggle: () => void
-  onCoverFeesChange: (value: boolean) => void
-  onSubmit: (e: { preventDefault: () => void }) => void
-}
+import { PaymentHandlers, PaymentState } from '../_types/auction-winner.types'
 
 type Props = {
   winningBidder: IAuctionWinningBidder
   savedCards: IPaymentMethod[]
+  isAuthed: boolean
   state: PaymentState
   handlers: PaymentHandlers
 }
 
-export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }: Props) {
-  const session = useSession()
-  const {
-    selectedCardId,
-    useNewCard,
-    loading,
-    error,
-    saveCard,
-    coverFees,
-    processingFee,
-    finalAmount,
-    isValid
-  } = state
-  const {
-    onSelectCard,
-    onUseNewCard,
-    onUseSavedCard,
-    onCardChange,
-    onSaveCardToggle,
-    onCoverFeesChange,
-    onSubmit
-  } = handlers
+export function AuctionWinnerPaymentForm({ winningBidder, savedCards, isAuthed, state, handlers }: Props) {
+  const { selectedCardId, useNewCard, loading, error, saveCard, coverFees, processingFee, finalAmount, isValid } = state
+  const { onSelectCard, onUseNewCard, onUseSavedCard, onCardChange, onSaveCardToggle, onCoverFeesChange, onSubmit } = handlers
+
+  const enteringNewCard = !isAuthed || savedCards.length === 0 || useNewCard
 
   return (
     <div className="space-y-5">
       {/* ── Saved cards ── */}
-      {session?.data?.user && savedCards.length > 0 && (
+      {isAuthed && savedCards.length > 0 && (
         <SavedCardSelector
           savedCards={savedCards}
           selectedCardId={selectedCardId}
@@ -79,7 +41,7 @@ export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }
       )}
 
       {/* ── Card element ── */}
-      {(!session?.data?.user || savedCards.length === 0 || useNewCard) && (
+      {enteringNewCard && (
         <AnimatePresence>
           <motion.div
             key="card-form"
@@ -92,19 +54,12 @@ export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }
           >
             <div className="flex items-center gap-2 mb-3">
               <div className="w-3 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
-              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
-                Card Details
-              </span>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Card Details</span>
             </div>
             <CardElementField onChange={onCardChange} />
             <div className="flex items-center gap-2 mt-2">
-              <ShieldCheck
-                className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0"
-                aria-hidden="true"
-              />
-              <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
-                Secured and encrypted by Stripe
-              </p>
+              <ShieldCheck className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
+              <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Secured and encrypted by Stripe</p>
             </div>
           </motion.div>
         </AnimatePresence>
@@ -117,17 +72,11 @@ export function WinnerPaymentForm({ winningBidder, savedCards, state, handlers }
       <motion.div variants={fadeUp} initial="hidden" animate="show" custom={4}>
         <div className="flex items-center gap-2 mb-3">
           <div className="w-3 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
-          <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
-            Options
-          </span>
+          <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Options</span>
         </div>
         <div className="border border-zinc-200 dark:border-border-dark divide-y divide-zinc-200 dark:divide-border-dark">
-          <CoverFeesToggle
-            checked={coverFees}
-            onChange={onCoverFeesChange}
-            processingFee={processingFee}
-          />
-          {session?.data?.user && (!selectedCardId || useNewCard) && (
+          <CoverFeesToggle checked={coverFees} onChange={onCoverFeesChange} processingFee={processingFee} />
+          {isAuthed && enteringNewCard && (
             <Toggle
               id="save-card"
               label="Save card"

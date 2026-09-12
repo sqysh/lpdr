@@ -2,16 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import {
-  CheckCircle,
-  ArrowRight,
-  Receipt,
-  Package,
-  Heart,
-  ChevronLeft,
-  User,
-  Utensils
-} from 'lucide-react'
+import { CheckCircle, ArrowRight, Receipt, Package, Heart, ChevronLeft, User, Utensils } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from 'components/_common/Picture'
 import { useSession } from 'next-auth/react'
@@ -23,6 +14,11 @@ import { ITEM_ICONS } from 'lib/constants/feed-a-foster.constants'
 import { useCartStore } from 'stores/cart.store'
 import { useConfettiStore } from 'stores/confetti.store'
 import { OrderItem } from '@prisma/client'
+import { LinkBody } from 'components/_common/LinkBody'
+import { LinkSpinner } from 'components/_common/LinkSpinner'
+
+const headerLink =
+  'flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
 
 export default function OrderConfirmationClient({ order }) {
   const clearCart = useCartStore((s) => s.clearCart)
@@ -33,7 +29,9 @@ export default function OrderConfirmationClient({ order }) {
   const searchParams = useSearchParams()
   const isNewOrder = searchParams.get('ref') === 'new'
   const isAdminView = searchParams.get('ref') === 'admin'
-  const myPackTab = !isNewOrder && !isAdminView ? searchParams.get('ref') : ''
+  const params = useSearchParams()
+  const myPackTab = params.get('ref')
+  const myPackHref = myPackTab ? `/my-pack?ref=${myPackTab}` : '/my-pack'
 
   useEffect(() => {
     clearCart()
@@ -43,6 +41,12 @@ export default function OrderConfirmationClient({ order }) {
   }, [clearCart, isNewOrder, showConfetti])
 
   const typeCode = order?.type === 'RECURRING_DONATION' ? 'RD' : 'DN'
+
+  const headerNav = isAdminView
+    ? { href: `/admin/orders/${order.id}`, icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Back to Order' }
+    : session?.data?.user
+      ? { href: '/my-pack', icon: <User className="w-3 h-3" aria-hidden="true" />, label: 'My Pack' }
+      : { href: '/', icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Home' }
 
   return (
     <div className="min-h-dvh bg-white dark:bg-bg-dark">
@@ -54,38 +58,16 @@ export default function OrderConfirmationClient({ order }) {
         custom={0}
         className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-border-dark bg-white/90 dark:bg-bg-dark/90 backdrop-blur-sm"
       >
-        <div className="px-4 430:px-6 py-4 flex items-center justify-between">
+        <div className="max-w-2xl mx-auto px-4 430:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-4 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
             <span className="text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400">
               Little Paws Dachshund Rescue
             </span>
           </div>
-          {isAdminView ? (
-            <Link
-              href={`/admin/orders/${order.id}`}
-              className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
-            >
-              <ChevronLeft className="w-3 h-3" aria-hidden="true" />
-              Back to Order
-            </Link>
-          ) : session?.data?.user ? (
-            <Link
-              href="/my-pack"
-              className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
-            >
-              <User className="w-3 h-3" aria-hidden="true" />
-              My Pack
-            </Link>
-          ) : (
-            <Link
-              href="/"
-              className="flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
-            >
-              <ChevronLeft className="w-3 h-3" aria-hidden="true" />
-              Home
-            </Link>
-          )}
+          <Link href={headerNav.href} className={headerLink}>
+            <LinkBody icon={headerNav.icon} label={headerNav.label} />
+          </Link>
         </div>
       </motion.header>
 
@@ -100,10 +82,7 @@ export default function OrderConfirmationClient({ order }) {
               className="relative shrink-0"
             >
               <div className="w-10 h-10 flex items-center justify-center bg-cyan-600/10 dark:bg-violet-400/10">
-                <CheckCircle
-                  className="w-5 h-5 text-cyan-600 dark:text-violet-400"
-                  aria-hidden="true"
-                />
+                <CheckCircle className="w-5 h-5 text-cyan-600 dark:text-violet-400" aria-hidden="true" />
               </div>
               <motion.div
                 animate={{
@@ -121,15 +100,11 @@ export default function OrderConfirmationClient({ order }) {
               />
             </motion.div>
             <div>
-              <p className="  text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400 mb-1">
-                {config.label}
-              </p>
+              <p className="  text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400 mb-1">{config.label}</p>
               <h1 className="  text-3xl 430:text-4xl uppercase leading-none text-zinc-950 dark:text-text-dark mb-2">
                 Thank you, {order?.customerName}!
               </h1>
-              <p className="font-lato text-sm text-zinc-500 dark:text-muted-dark leading-relaxed max-w-lg">
-                {config.message}
-              </p>
+              <p className="font-lato text-sm text-zinc-500 dark:text-muted-dark leading-relaxed max-w-lg">{config.message}</p>
             </div>
           </div>
         </motion.div>
@@ -145,13 +120,8 @@ export default function OrderConfirmationClient({ order }) {
           {/* Receipt header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-white/2">
             <div className="flex items-center gap-2">
-              <Receipt
-                className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50"
-                aria-hidden="true"
-              />
-              <span className="  text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
-                Receipt
-              </span>
+              <Receipt className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50" aria-hidden="true" />
+              <span className="  text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Receipt</span>
             </div>
             <span className="  text-[10px] uppercase tracking-[0.15em] text-zinc-400 dark:text-muted-dark/50 font-mono">
               #{order?.id.slice(-8).toUpperCase()}
@@ -175,17 +145,11 @@ export default function OrderConfirmationClient({ order }) {
                         />
                       ) : Icon ? (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Icon
-                            className="w-4 h-4 text-zinc-400 dark:text-muted-dark/30"
-                            aria-hidden="true"
-                          />
+                          <Icon className="w-4 h-4 text-zinc-400 dark:text-muted-dark/30" aria-hidden="true" />
                         </div>
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
-                          <Package
-                            className="w-4 h-4 text-zinc-400 dark:text-muted-dark/30"
-                            aria-hidden="true"
-                          />
+                          <Package className="w-4 h-4 text-zinc-400 dark:text-muted-dark/30" aria-hidden="true" />
                         </div>
                       )}
                     </div>
@@ -194,9 +158,7 @@ export default function OrderConfirmationClient({ order }) {
                         {item.itemName ?? 'Item'}
                       </p>
                       {item.quantity && item.quantity > 1 && (
-                        <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50 mt-0.5">
-                          Qty: {item.quantity}
-                        </p>
+                        <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50 mt-0.5">Qty: {item.quantity}</p>
                       )}
                       {item.shippingPrice != null && Number(item.shippingPrice) > 0 && (
                         <p className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50 mt-0.5">
@@ -225,14 +187,10 @@ export default function OrderConfirmationClient({ order }) {
               </div>
               <div className="flex flex-col">
                 <p className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
-                  {order?.type === 'RECURRING_DONATION'
-                    ? 'Recurring Donation'
-                    : 'One-Time Donation'}
+                  {order?.type === 'RECURRING_DONATION' ? 'Recurring Donation' : 'One-Time Donation'}
                 </p>
                 {order?.tierName && (
-                  <p className="  text-xs uppercase tracking-wide text-zinc-400 dark:text-muted-dark/50">
-                    {order.tierName}
-                  </p>
+                  <p className="  text-xs uppercase tracking-wide text-zinc-400 dark:text-muted-dark/50">{order.tierName}</p>
                 )}
               </div>
             </div>
@@ -243,17 +201,11 @@ export default function OrderConfirmationClient({ order }) {
             {order?.coverFees && Number(order?.feesCovered) > 0 && (
               <>
                 <div className="flex justify-between items-center">
-                  <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
-                    Subtotal
-                  </span>
-                  <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
-                    {formatMoney(subtotal)}
-                  </span>
+                  <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Subtotal</span>
+                  <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">{formatMoney(subtotal)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
-                    Processing fees covered
-                  </span>
+                  <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Processing fees covered</span>
                   <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
                     +${Number(order?.feesCovered).toFixed(2)}
                   </span>
@@ -262,9 +214,7 @@ export default function OrderConfirmationClient({ order }) {
             )}
             {order?.isRecurring && order?.recurringFrequency && (
               <div className="flex justify-between items-center">
-                <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
-                  Frequency
-                </span>
+                <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Frequency</span>
                 <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark capitalize">
                   {order?.recurringFrequency.toLowerCase()}
                 </span>
@@ -272,15 +222,12 @@ export default function OrderConfirmationClient({ order }) {
             )}
             <div
               className={`flex justify-between items-center ${
-                (order?.coverFees && Number(order?.feesCovered) > 0) ||
-                (order?.isRecurring && order?.recurringFrequency)
+                (order?.coverFees && Number(order?.feesCovered) > 0) || (order?.isRecurring && order?.recurringFrequency)
                   ? 'pt-2.5 border-t border-zinc-200 dark:border-border-dark'
                   : ''
               }`}
             >
-              <span className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
-                Total
-              </span>
+              <span className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">Total</span>
               <span className="  text-2xl tabular-nums text-cyan-600 dark:text-violet-400">
                 {formatMoney(order?.totalAmount)}
               </span>
@@ -290,18 +237,14 @@ export default function OrderConfirmationClient({ order }) {
           {/* Meta */}
           <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-white/2 space-y-2">
             <div className="flex justify-between items-center">
-              <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
-                Email
-              </span>
+              <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Email</span>
               <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark truncate max-w-50">
                 {order?.customerEmail}
               </span>
             </div>
             {order?.paidAt && (
               <div className="flex justify-between items-center">
-                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
-                  Date
-                </span>
+                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Date</span>
                 <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">
                   {new Date(order?.paidAt).toLocaleDateString('en-US', {
                     month: 'long',
@@ -313,9 +256,7 @@ export default function OrderConfirmationClient({ order }) {
             )}
             {order?.isRecurring && order?.nextBillingDate && (
               <div className="flex justify-between items-center">
-                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">
-                  Next billing
-                </span>
+                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Next billing</span>
                 <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">
                   {new Date(order?.nextBillingDate).toLocaleDateString('en-US', {
                     month: 'long',
@@ -337,10 +278,7 @@ export default function OrderConfirmationClient({ order }) {
           className="flex items-start gap-3 px-4 py-3 mb-6 border-l-2 border-cyan-600 dark:border-violet-400 bg-cyan-600/5 dark:bg-violet-400/5"
           role="note"
         >
-          <Heart
-            className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0 mt-0.5"
-            aria-hidden="true"
-          />
+          <Heart className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark leading-relaxed">
             A confirmation email has been sent to &nbsp;{' '}
             <strong className="text-zinc-950 dark:text-text-dark">{order?.customerEmail}</strong>
@@ -348,13 +286,7 @@ export default function OrderConfirmationClient({ order }) {
         </motion.div>
 
         {/* ── Actions ── */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={3}
-          className="flex flex-col 430:flex-row gap-3"
-        >
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="flex flex-col 430:flex-row gap-3">
           {isAdminView ? (
             <Link
               href={`/admin/orders/${order.id}`}
@@ -373,14 +305,15 @@ export default function OrderConfirmationClient({ order }) {
                   className="absolute inset-0 -translate-x-full bg-linear-to-r from-transparent via-white/15 to-transparent group-hover:animate-[shimmer_1.4s_ease_infinite] pointer-events-none"
                   aria-hidden="true"
                 />
-                <span>Donate Again</span>
+                <LinkBody icon={null} label="Donate Again" spinnerClass="w-4 h-4" />
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>
+
               <Link
-                href={`/my-pack${myPackTab}`}
-                className="flex-1 flex items-center justify-center px-6 py-3.5 text-sm uppercase tracking-widest border border-zinc-200 dark:border-border-dark hover:border-cyan-600/30 dark:hover:border-violet-400/30 hover:bg-zinc-50 dark:hover:bg-white/5 text-zinc-500 dark:text-muted-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
+                href={myPackHref}
+                className="flex-1 flex items-center justify-center gap-2 px-6 py-3.5 text-sm uppercase tracking-widest border border-zinc-200 dark:border-border-dark hover:border-cyan-600/30 dark:hover:border-violet-400/30 hover:bg-zinc-50 dark:hover:bg-white/5 text-zinc-500 dark:text-muted-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
               >
-                My Pack
+                <LinkSpinner label="My Pack" spinnerClass="w-4 h-4" />
               </Link>
             </>
           )}

@@ -3,9 +3,10 @@
 import { useCallback, useState } from 'react'
 import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
-import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import type { IPaymentMethod } from 'types/payment-method.types'
+import { useRouter } from 'next/navigation'
+import { setupPusherListenerOneTime } from 'lib/pusher/setupPusherListenerOneTime'
 
 export type PaymentState = {
   cardComplete: boolean
@@ -20,17 +21,19 @@ export type PaymentState = {
 export function useStripeCheckout({
   savedCards,
   isAuthed,
+  userId,
   billingName,
   billingEmail
 }: {
   savedCards: IPaymentMethod[]
   isAuthed: boolean
+  userId: string
   billingName: string
   billingEmail: string
 }) {
   const stripe = useStripe()
   const elements = useElements()
-  const { setupPusherListenerOneTime } = usePaymentProcessor()
+  const router = useRouter()
 
   const [payment, setPayment] = useState<PaymentState>({
     cardComplete: false,
@@ -45,7 +48,7 @@ export function useStripeCheckout({
   const patch = (data: Partial<PaymentState>) => setPayment((prev) => ({ ...prev, ...data }))
 
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
-  useDefaultCard(savedCards, setDefaultCard)
+  useDefaultCard(savedCards, isAuthed, setDefaultCard)
 
   const usingSavedCard = !!payment.selectedCardId && !payment.useNewCard && isAuthed
 
@@ -60,7 +63,9 @@ export function useStripeCheckout({
         const result = await createPaymentIntent({ ...basePayload, savedCardId: payment.selectedCardId })
         if (!result.success) throw new Error(result.error)
 
-        setupPusherListenerOneTime()
+        // Loading stays on until Pusher confirms and navigates, so the button
+        // cannot be pressed twice on a charge that already went through
+        await setupPusherListenerOneTime(userId, router)
         return
       }
 
@@ -86,7 +91,7 @@ export function useStripeCheckout({
 
       // Loading stays on until Pusher confirms, so the button cannot be pressed
       // twice on a charge that already went through
-      setupPusherListenerOneTime()
+      await setupPusherListenerOneTime(userId, router)
     } catch (err) {
       patch({ loading: false, error: err instanceof Error ? err.message : 'Something went wrong. Please try again.' })
     }

@@ -1,4 +1,4 @@
-export { AuctionReceipt } from './AuctionReceipt'
+export { AuctionWinnerReceipt } from './AuctionWinnerReceipt'
 export { AuctionWinnerAddressSection } from './AuctionWinnerAddressSection'
 export { WinnerOrderSummary } from './WinnerOrderSummary'
-export { WinnerPaymentForm } from './WinnerPaymentForm'
+export { AuctionWinnerPaymentForm } from './AuctionWinnerPaymentForm'

@@ -2,22 +2,19 @@
 
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ShoppingBag } from 'lucide-react'
+import { ArrowLeft, ShoppingBag } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { CartItemRow } from 'app/(public)/cart/_components/CartItemRow'
-import { useRouter } from 'next/navigation'
 import { CartItem, useCartStore } from 'stores/cart.store'
+import { LinkSpinner } from 'components/_common/LinkSpinner'
+import { LinkBody } from 'components/_common/LinkBody'
 
 export default function CartClient() {
   const items = useCartStore((s) => s.items)
   const clearCart = useCartStore((s) => s.clearCart)
-  const router = useRouter()
 
-  const subtotal = items.reduce(
-    (s: number, i: { price: number; quantity: number }) => s + i.price * i.quantity,
-    0
-  )
+  const subtotal = items.reduce((s: number, i: { price: number; quantity: number }) => s + i.price * i.quantity, 0)
   const shipping = items
     .filter((i: { isPhysicalProduct: boolean }) => i.isPhysicalProduct)
     .reduce((sum: number, i) => sum + (i.shippingPrice ?? 0), 0)
@@ -28,45 +25,24 @@ export default function CartClient() {
   const isFeedAFosterMonth = new Date().getMonth() === 6 // 0-indexed: 6 = July
 
   return (
-    <main
-      id="main-content"
-      className="min-h-200 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-200 bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0}
-          className="mb-10 sm:mb-12"
-        >
-          <button
-            onClick={() => router.back()}
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
+          <Link
+            href="/merch"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
-            <svg
-              viewBox="0 0 24 24"
-              className="w-3.5 h-3.5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              strokeLinecap="square"
-              aria-hidden="true"
-            >
-              <path d="M19 12H5M5 12l7-7M5 12l7 7" />
-            </svg>
-            Continue Shopping
-          </button>
+            <LinkBody
+              icon={<ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />}
+              label="Continue Shopping"
+              spinnerClass="w-3.5 h-3.5"
+            />
+          </Link>
 
           <div className="flex items-center gap-3 mb-2">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark"
-              aria-hidden="true"
-            />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Your Cart
-            </p>
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">Your Cart</p>
           </div>
           <h1 className="font-quicksand font-black text-3xl sm:text-4xl text-text-light dark:text-text-dark leading-tight">
             {isEmpty ? (
@@ -93,16 +69,10 @@ export default function CartClient() {
               aria-live="polite"
             >
               <div className="w-14 h-14 border border-border-light dark:border-border-dark flex items-center justify-center">
-                <ShoppingBag
-                  size={22}
-                  className="text-muted-light dark:text-muted-dark"
-                  aria-hidden="true"
-                />
+                <ShoppingBag size={22} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
               </div>
               <div>
-                <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark mb-1">
-                  Nothing here yet
-                </p>
+                <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark mb-1">Nothing here yet</p>
                 <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
                   Add some items from the store to get started.
                 </p>
@@ -113,20 +83,20 @@ export default function CartClient() {
                   href="/merch"
                   className="px-6 py-3 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 >
-                  Browse Merch
+                  <LinkSpinner label="Browse Merch" />
                 </Link>
                 <Link
                   href="/welcomewieners"
                   className="px-6 py-3 border border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-text-light dark:text-text-dark text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 >
-                  Welcome Wieners
+                  <LinkSpinner label=" Welcome Wieners" />
                 </Link>
                 {isFeedAFosterMonth && (
                   <Link
                     href="/feed"
                     className="px-6 py-3 border border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-text-light dark:text-text-dark text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
-                    Feed a Foster
+                    <LinkSpinner label="Feed a Foster" />
                   </Link>
                 )}
               </div>
@@ -176,10 +146,7 @@ export default function CartClient() {
                 {/* Summary header */}
                 <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
                   <div className="flex items-center gap-3">
-                    <span
-                      className="block w-4 h-px bg-primary-light dark:bg-primary-dark"
-                      aria-hidden="true"
-                    />
+                    <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                     <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                       Order Summary
                     </p>
@@ -192,30 +159,20 @@ export default function CartClient() {
                     <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
                       Subtotal ({itemCount} {itemCount === 1 ? 'item' : 'items'})
                     </p>
-                    <p className="text-xs font-mono text-text-light dark:text-text-dark">
-                      {formatMoney(subtotal)}
-                    </p>
+                    <p className="text-xs font-mono text-text-light dark:text-text-dark">{formatMoney(subtotal)}</p>
                   </div>
 
                   {shipping > 0 && (
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
-                        Shipping
-                      </p>
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark">
-                        {formatMoney(shipping)}
-                      </p>
+                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Shipping</p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark">{formatMoney(shipping)}</p>
                     </div>
                   )}
 
                   {shipping === 0 && (
                     <div className="flex items-center justify-between">
-                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
-                        Shipping
-                      </p>
-                      <p className="text-[10px] font-mono text-green-600 dark:text-green-400">
-                        Free
-                      </p>
+                      <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Shipping</p>
+                      <p className="text-[10px] font-mono text-green-600 dark:text-green-400">Free</p>
                     </div>
                   )}
 
@@ -224,9 +181,7 @@ export default function CartClient() {
 
                   {/* Total */}
                   <div className="flex items-center justify-between">
-                    <p className="text-xs font-mono font-black text-text-light dark:text-text-dark">
-                      Total
-                    </p>
+                    <p className="text-xs font-mono font-black text-text-light dark:text-text-dark">Total</p>
                     <p className="font-quicksand font-black text-xl text-primary-light dark:text-primary-dark">
                       {formatMoney(total)}
                     </p>
@@ -237,10 +192,10 @@ export default function CartClient() {
                 <div className="px-5 pb-5 flex flex-col gap-2">
                   <Link
                     href="/checkout"
-                    className="w-full text-center py-3.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    className="w-full flex items-center justify-center py-3.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     aria-label={`Proceed to checkout — total ${formatMoney(total)}`}
                   >
-                    Checkout
+                    <LinkSpinner label="Checkout" />
                   </Link>
                   <p className="text-[9px] font-mono text-center text-muted-light dark:text-muted-dark mt-1">
                     Proceeds support dachshund rescue

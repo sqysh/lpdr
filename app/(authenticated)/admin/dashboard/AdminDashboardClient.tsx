@@ -11,6 +11,7 @@ import { TopSupporters } from './_components/TopSupporters'
 import { PendingShipments } from './_components/PendingShipments'
 import { RevenueOverlay } from './_components/RevenueOverlay'
 import { RegionCount } from './_types/map.types'
+import { Loader2 } from 'lucide-react'
 
 type Point = {
   id: string
@@ -50,15 +51,9 @@ type Props = {
   }
 }
 
-export function AdminDashboardClient({
-  points,
-  regionCounts,
-  shipments,
-  supporters,
-  totalRevenue,
-  orderMetrics
-}: Props) {
+export function AdminDashboardClient({ points, regionCounts, shipments, supporters, totalRevenue, orderMetrics }: Props) {
   const isDark = useThemeStore((s) => s.isDark)
+  const isResolved = useThemeStore((s) => s.isResolved)
   const mapRef = useRef<google.maps.Map | null>(null)
   const [zoom, setZoom] = useState(US_ZOOM)
 
@@ -67,6 +62,8 @@ export function AdminDashboardClient({
   })
 
   const clusters = useMemo(() => clusterByGrid(points, zoom), [points, zoom])
+
+  const [tilesReady, setTilesReady] = useState(false)
 
   const onLoad = useCallback((map: google.maps.Map) => {
     mapRef.current = map
@@ -112,12 +109,13 @@ export function AdminDashboardClient({
 
   return (
     <div className="relative h-[calc(100dvh-48px)] lg:h-dvh w-full">
-      {isLoaded && (
+      {isLoaded && isResolved && (
         <GoogleMap
           mapContainerClassName="absolute inset-0"
           center={US_CENTER}
           zoom={US_ZOOM}
           onLoad={onLoad}
+          onTilesLoaded={() => setTilesReady(true)}
           onZoomChanged={onZoomChanged}
           options={{
             disableDefaultUI: true,
@@ -142,22 +140,25 @@ export function AdminDashboardClient({
         </GoogleMap>
       )}
 
+      {!tilesReady && (
+        <div
+          className="absolute inset-0 z-10 flex items-center justify-center bg-surface-light dark:bg-surface-dark"
+          role="status"
+          aria-live="polite"
+        >
+          <Loader2 className="w-5 h-5 text-primary-light dark:text-primary-dark animate-spin" aria-hidden="true" />
+          <span className="sr-only">Loading map</span>
+        </div>
+      )}
+
       {/* Stats overlay */}
-      <MapStatsPanel
-        total={points.length}
-        regionCounts={regionCounts}
-        onRegionClick={focusRegion}
-      />
+      <MapStatsPanel total={points.length} regionCounts={regionCounts} onRegionClick={focusRegion} />
 
       <TopSupporters supporters={supporters} />
 
       <PendingShipments shipments={shipments} />
 
-      <RevenueOverlay
-        liveRevenue={totalRevenue}
-        monthlyChange={orderMetrics.monthlyChange}
-        sources={sources}
-      />
+      <RevenueOverlay liveRevenue={totalRevenue} monthlyChange={orderMetrics.monthlyChange} sources={sources} />
     </div>
   )
 }

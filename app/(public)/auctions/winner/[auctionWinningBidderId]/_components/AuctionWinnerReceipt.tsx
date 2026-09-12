@@ -3,28 +3,11 @@
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { ChevronLeft, Heart, Package } from 'lucide-react'
+import { IAuctionWinningBidder } from 'types/auction-winning-bidder'
+import { formatDate } from 'lib/utils/date.utils'
+import { formatMoney } from 'lib/utils/currency.utils'
 
-type AuctionItem = {
-  id: string
-  name: string
-  soldPrice: number
-}
-
-type WinningBidder = {
-  paidOn?: Date | string | null
-  auction?: { title: string }
-  auctionItems?: AuctionItem[]
-  shipping?: number | null
-  processingFee?: number | null
-  totalPrice?: number | null
-  user: { firstName: string } | null
-}
-
-type WinnerReceiptProps = {
-  winningBidder: WinningBidder
-}
-
-export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
+export function AuctionWinnerReceipt({ winningBidder }: { winningBidder: IAuctionWinningBidder }) {
   const itemsTotal = winningBidder.auctionItems.reduce((sum, item) => sum + item.soldPrice, 0)
 
   return (
@@ -39,20 +22,12 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
         <div className="text-center mb-8">
           <div className="flex items-center justify-center gap-3 mb-4">
             <div className="w-4 h-px bg-cyan-600 dark:bg-violet-400" />
-            <span className="  text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400">
-              Receipt
-            </span>
+            <span className="text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400">Receipt</span>
             <div className="w-4 h-px bg-cyan-600 dark:bg-violet-400" />
           </div>
-          <h1 className="  text-2xl uppercase text-zinc-950 dark:text-text-dark mb-1">Payment Confirmed</h1>
+          <h1 className="text-2xl uppercase text-zinc-950 dark:text-text-dark mb-1">Payment Confirmed</h1>
           <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark">
-            {winningBidder.paidOn
-              ? new Date(winningBidder.paidOn).toLocaleDateString('en-US', {
-                  month: 'long',
-                  day: 'numeric',
-                  year: 'numeric'
-                })
-              : '—'}
+            {winningBidder.paidOn ? formatDate(winningBidder.paidOn, true) : '—'}
           </p>
         </div>
 
@@ -60,7 +35,7 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
         <div className="border border-zinc-200 dark:border-border-dark">
           {/* Auction */}
           <div className="px-5 py-3 border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-white/2">
-            <p className="  text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
+            <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">
               {winningBidder.auction.title}
             </p>
           </div>
@@ -73,8 +48,8 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
                   <Package className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
                   <p className="font-lato text-sm text-zinc-950 dark:text-text-dark truncate">{item.name}</p>
                 </div>
-                <span className="  text-sm tabular-nums text-zinc-950 dark:text-text-dark shrink-0">
-                  ${item.soldPrice.toLocaleString()}
+                <span className="text-sm tabular-nums text-zinc-950 dark:text-text-dark shrink-0">
+                  {formatMoney(item.soldPrice)}
                 </span>
               </div>
             ))}
@@ -84,30 +59,28 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
           <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark space-y-2">
             <div className="flex justify-between items-center">
               <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Items</span>
-              <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
-                ${itemsTotal.toLocaleString()}
-              </span>
+              <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">{formatMoney(itemsTotal)}</span>
             </div>
             {(winningBidder.shipping ?? 0) > 0 && (
               <div className="flex justify-between items-center">
                 <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Shipping</span>
-                <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
-                  ${Number(winningBidder.shipping).toLocaleString()}
+                <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">
+                  {formatMoney(Number(winningBidder.shipping))}
                 </span>
               </div>
             )}
             {(winningBidder.processingFee ?? 0) > 0 && (
               <div className="flex justify-between items-center">
                 <span className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Processing fee</span>
-                <span className="  text-xs tabular-nums text-zinc-950 dark:text-text-dark">
-                  ${Number(winningBidder.processingFee).toLocaleString()}
+                <span className="text-xs tabular-nums text-zinc-950 dark:text-text-dark">
+                  {formatMoney(Number(winningBidder.processingFee))}
                 </span>
               </div>
             )}
             <div className="pt-2 border-t border-zinc-200 dark:border-border-dark flex justify-between items-center">
-              <span className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">Total Paid</span>
-              <span className="  text-xl tabular-nums text-cyan-600 dark:text-violet-400">
-                ${Number(winningBidder.totalPrice ?? 0).toLocaleString()}
+              <span className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">Total Paid</span>
+              <span className="text-xl tabular-nums text-cyan-600 dark:text-violet-400">
+                {formatMoney(Number(winningBidder.totalPrice ?? 0))}
               </span>
             </div>
           </div>
@@ -116,8 +89,8 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
           <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-white/2 flex items-start gap-3">
             <Heart className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0 mt-0.5" aria-hidden="true" />
             <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark leading-relaxed">
-              Thank you for supporting Little Paws Dachshund Rescue, {winningBidder.user?.firstName}. Your generosity
-              helps the dogs in our care find their forever homes.
+              Thank you for supporting Little Paws Dachshund Rescue, {winningBidder.user?.firstName}. Your generosity helps the
+              dogs in our care find their forever homes.
             </p>
           </div>
         </div>
@@ -125,8 +98,8 @@ export function AuctionReceipt({ winningBidder }: WinnerReceiptProps) {
         {/* Back to account */}
         <div className="mt-6 text-center">
           <Link
-            href=" /my-pack"
-            className="inline-flex items-center gap-1.5   text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors"
+            href="/my-pack?tab=orders"
+            className="inline-flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors"
           >
             <ChevronLeft className="w-3 h-3" aria-hidden="true" />
             Back to My Account

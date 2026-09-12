@@ -31,9 +31,10 @@ type Props = {
   userName: { firstName?: string; lastName?: string } | null
   isAuthed: boolean
   email: string | null
+  userId: string | null
 }
 
-export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
+export function DonateForm({ savedCards, userName, isAuthed, email, userId }: Props) {
   const searchParams = useSearchParams()
   const seededParam = Number(searchParams.get('donationAmount'))
   const seeded = Number.isFinite(seededParam) && seededParam > 0 ? seededParam : null
@@ -68,6 +69,7 @@ export function DonateForm({ savedCards, userName, isAuthed, email }: Props) {
   const { payment, patch, usingSavedCard, pay } = useStripeCheckout({
     savedCards,
     isAuthed,
+    userId,
     billingName: `${values.firstName} ${values.lastName}`,
     billingEmail: email ?? ''
   })

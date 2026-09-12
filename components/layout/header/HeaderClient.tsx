@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LogIn, Menu, ShoppingBasket, User } from 'lucide-react'
+import { LogIn, Menu, User } from 'lucide-react'
 import GoogleTranslate from './GoogleTranslate'
 import { NavDropdown } from './NavDropdown'
 import { mainNavigationLinks } from 'lib/constants/navigation.constants'
@@ -12,6 +12,9 @@ import { useNavigationStore } from 'stores/navigation.store'
 import { useCartStore } from 'stores/cart.store'
 import { useModalsStore } from 'stores/modals.store'
 import { AuctionStatus } from '@prisma/client'
+import { LinkBody } from 'components/_common/LinkBody'
+import { LinkSpinner } from 'components/_common/LinkSpinner'
+import { CartLinkContent } from './CartLinkContent'
 
 type HeaderClientProps = {
   auction: {
@@ -37,9 +40,6 @@ const infoText = 'text-on-dark text-[10px] font-mono tracking-[0.15em] uppercase
 const burger = `text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors ${focusRing} rounded p-1`
 
 const cartLink = `relative inline-flex items-center ${focusRing} rounded p-1`
-
-const cartBadge =
-  'absolute -top-1 -right-1 w-4 h-4 flex items-center justify-center bg-primary-light dark:bg-primary-dark text-white text-[9px] font-mono font-bold'
 
 const donateButton =
   'inline-flex items-center justify-center bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white font-mono uppercase transition-colors duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
@@ -99,15 +99,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
               <ul className="flex items-center space-x-6 list-none">
                 <li>
                   <Link href="/cart" aria-label={cartLabel} className={cartLink}>
-                    <ShoppingBasket
-                      className="w-4 h-4 text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors"
-                      aria-hidden="true"
-                    />
-                    {totalItems > 0 && (
-                      <span className={cartBadge} aria-hidden="true">
-                        {totalItems > 9 ? '9+' : totalItems}
-                      </span>
-                    )}
+                    <CartLinkContent totalItems={totalItems} />
                   </Link>
                 </li>
                 <li>
@@ -116,17 +108,16 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
                     aria-label={isAuthed ? 'Go to My Pack' : 'Sign in to your account'}
                     className={`inline-flex items-center gap-1.5 ${topBarLink} tracking-[0.2em] whitespace-nowrap ${focusRing} rounded`}
                   >
-                    {isAuthed ? (
-                      <>
-                        <User className="w-3 h-3" aria-hidden="true" />
-                        My Pack
-                      </>
-                    ) : (
-                      <>
-                        <LogIn className="w-3 h-3" aria-hidden="true" />
-                        Sign In
-                      </>
-                    )}
+                    <LinkBody
+                      icon={
+                        isAuthed ? (
+                          <User className="w-3 h-3" aria-hidden="true" />
+                        ) : (
+                          <LogIn className="w-3 h-3" aria-hidden="true" />
+                        )
+                      }
+                      label={isAuthed ? 'My Pack' : 'Sign In'}
+                    />
                   </Link>
                 </li>
               </ul>
@@ -163,15 +154,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
 
             <div className="flex justify-end items-center gap-3">
               <Link href="/cart" aria-label={cartLabel} className={cartLink}>
-                <ShoppingBasket
-                  className="w-5 h-5 text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors"
-                  aria-hidden="true"
-                />
-                {totalItems > 0 && (
-                  <span className={cartBadge} aria-hidden="true">
-                    {totalItems > 9 ? '9+' : totalItems}
-                  </span>
-                )}
+                <CartLinkContent totalItems={totalItems} />
               </Link>
 
               <Link
@@ -228,9 +211,9 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
               <Link
                 href="/donate"
                 aria-label="Donate to Little Paws Dachshund Rescue today"
-                className={`${donateButton} gap-2 px-6 py-3 text-[10px] tracking-[0.2em] focus-visible:ring-offset-2 focus-visible:ring-offset-primary-light dark:focus-visible:ring-offset-primary-dark`}
+                className={`${donateButton} gap-2 px-6 py-3 text-[10px] tracking-[0.2em] focus-visible:ring-offset-2 focus-visible:ring-offset-primary-light dark:focus-visible:ring-offset-primary-dark w-25`}
               >
-                Donate
+                <LinkSpinner label="Donate" />
               </Link>
             </div>
           </div>

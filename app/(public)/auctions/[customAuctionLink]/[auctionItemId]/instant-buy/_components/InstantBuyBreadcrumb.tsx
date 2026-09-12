@@ -20,7 +20,7 @@ export function InstantBuyBreadcrumb({ auctionLink, auctionItemId, auctionTitle 
         Back to Auction Item
       </Link>
       <Link
-        href=" /my-pack"
+        href="/my-pack"
         className="inline-flex items-center gap-2 text-f10 uppercase tracking-[0.25em] text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors"
       >
         My Pack

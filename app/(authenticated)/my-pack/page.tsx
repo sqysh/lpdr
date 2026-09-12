@@ -1,14 +1,11 @@
 import { getPackMemberData } from 'lib/actions/my-pack/getPackMemberData'
 import MyPackClient from './MyPackClient'
 import { Suspense } from 'react'
-import { MyPackSkeleton } from 'app/(authenticated)/my-pack/_components/MyPackSkeleton'
 import { checkOwnMigrationStatus } from 'lib/actions/user/checkOwnMigrationStatus'
-
-export const dynamic = 'force-dynamic'
 
 export default function MyPackPage() {
   return (
-    <Suspense fallback={<MyPackSkeleton />}>
+    <Suspense fallback={null}>
       <MyPackContent />
     </Suspense>
   )

@@ -2,7 +2,6 @@
 
 import { useCallback, useState } from 'react'
 import { useStripe, useElements, CardElement } from '@stripe/react-stripe-js'
-import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
@@ -16,6 +15,8 @@ import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { CardElementField } from 'components/features/payment/CardElementField'
 import { useThemeStore } from 'stores/theme.store'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
+import { setupPusherListenerRecurring } from 'lib/pusher/setupPusherListenerRecurring'
+import { useRouter } from 'next/navigation'
 
 type PaymentInputs = {
   firstName: string
@@ -50,11 +51,11 @@ export function SubscriptionPaymentForm({
   email: initialEmail,
   isDark
 }: Props) {
+  const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
   const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
-  const { setupPusherListenerRecurring } = usePaymentProcessor()
 
   const c = {
     box: dark ? 'border-border-dark bg-surface-dark' : 'border-border-light bg-surface-light',
@@ -95,7 +96,7 @@ export function SubscriptionPaymentForm({
     (usingSavedCard ? true : inputs.cardComplete)
 
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
-  useDefaultCard(savedCards, setDefaultCard)
+  useDefaultCard(savedCards, isAuthed, setDefaultCard)
 
   const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault()
@@ -119,7 +120,7 @@ export function SubscriptionPaymentForm({
           savedCardId: inputs.selectedCardId
         })
         if (!result.success) throw new Error(result.error ?? 'Failed to create subscription')
-        setupPusherListenerRecurring({ subscriptionId: result.data.subscriptionId })
+        setupPusherListenerRecurring({ subscriptionId: result.data.subscriptionId }, router)
       } else {
         const setupResult = await createSetupIntentForSubscription(basePayload)
         if (!setupResult.success) throw new Error(setupResult.error ?? 'Failed to create setup intent')
@@ -142,9 +143,12 @@ export function SubscriptionPaymentForm({
         })
         if (!subscriptionResult.success) throw new Error(subscriptionResult.error ?? 'Failed to create subscription')
 
-        setupPusherListenerRecurring({
-          subscriptionId: subscriptionResult.data.subscriptionId
-        })
+        setupPusherListenerRecurring(
+          {
+            subscriptionId: subscriptionResult.data.subscriptionId
+          },
+          router
+        )
       }
     } catch (err) {
       patch({

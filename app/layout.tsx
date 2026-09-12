@@ -11,7 +11,7 @@ export { viewport } from './viewport'
 
 const fontVariables = [quicksand, workSans, bebas, nunito].map((f) => f.variable).join(' ')
 
-const themeScript = `if(matchMedia('(prefers-color-scheme: dark)').matches)document.documentElement.classList.add('dark')`
+const themeScript = `(function(){try{if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark')}}catch(e){}})()`
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,11 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={fontVariables}>
         <SessionProvider refetchOnWindowFocus={false}>
-          <RootLayoutWrapper
-            header={<Header />}
-            navDrawer={<SiteNavigationDrawer />}
-            auctionRealtime={<AuctionRealtime />}
-          >
+          <RootLayoutWrapper header={<Header />} navDrawer={<SiteNavigationDrawer />} auctionRealtime={<AuctionRealtime />}>
             {children}
           </RootLayoutWrapper>
         </SessionProvider>

@@ -2,7 +2,7 @@ import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 import { PreApp4PaymentForm } from './PreApp4PaymentForm'
 
-export function PreApp4Payment({ savedCards, setStep, email, firstName, lastName, isAuthed }) {
+export function PreApp4Payment({ savedCards, setStep, email, firstName, lastName, isAuthed, userId }) {
   return (
     <motion.section
       key="payment"
@@ -25,7 +25,14 @@ export function PreApp4Payment({ savedCards, setStep, email, firstName, lastName
         <span className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark">$15.00</span>
       </div>
 
-      <PreApp4PaymentForm savedCards={savedCards} email={email} firstName={firstName} isAuthed={isAuthed} lastName={lastName} />
+      <PreApp4PaymentForm
+        savedCards={savedCards}
+        email={email}
+        firstName={firstName}
+        isAuthed={isAuthed}
+        lastName={lastName}
+        userId={userId}
+      />
 
       <button
         onClick={() => setStep('info')}

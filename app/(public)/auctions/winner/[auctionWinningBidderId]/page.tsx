@@ -4,13 +4,10 @@ import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMetho
 import { auth } from 'lib/auth'
 import { redirect } from 'next/navigation'
 
-export default async function AuctionWinnerPaymentPage({
-  params
-}: {
-  params: Promise<{ auctionWinningBidderId: string }>
-}) {
+export default async function AuctionWinnerPaymentPage({ params }: { params: Promise<{ auctionWinningBidderId: string }> }) {
   const { auctionWinningBidderId } = await params
   const session = await auth()
+  const isAuthed = !!session?.user?.id
 
   if (!session?.user?.id) {
     redirect(`/auth/login?callbackUrl=/auctions/winner/${auctionWinningBidderId}`)
@@ -25,6 +22,9 @@ export default async function AuctionWinnerPaymentPage({
     <AuctionWinnerPaymentClient
       winningBidder={result?.data}
       savedCards={paymentMethodsResult.data}
+      isAuthed={isAuthed}
+      userEmail={session?.user?.email ?? null}
+      userId={session?.user?.id ?? null}
     />
   )
 }

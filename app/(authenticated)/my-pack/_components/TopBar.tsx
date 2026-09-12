@@ -2,8 +2,72 @@
 
 import { useState } from 'react'
 import { signOut, useSession } from 'next-auth/react'
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { Loader2 } from 'lucide-react'
+
+const linkClass =
+  'inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2'
+
+const mutedLink = `${linkClass} text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`
+
+const accentLink = `${linkClass} text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`
+
+/** Swaps the icon for a spinner while the route is loading. */
+function LinkBody({ icon, label }: { icon: React.ReactNode; label: string }) {
+  const { pending } = useLinkStatus()
+
+  return (
+    <>
+      {pending ? <Loader2 className="w-3 h-3 animate-spin" aria-hidden="true" /> : icon}
+      {label}
+    </>
+  )
+}
+
+const HomeIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-3 h-3"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="square"
+    aria-hidden="true"
+  >
+    <path d="M19 12H5M5 12l7-7M5 12l7 7" />
+  </svg>
+)
+
+const StarIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-3 h-3"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="square"
+    aria-hidden="true"
+  >
+    <path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z" />
+  </svg>
+)
+
+const GridIcon = (
+  <svg
+    viewBox="0 0 24 24"
+    className="w-3 h-3"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth={2}
+    strokeLinecap="square"
+    aria-hidden="true"
+  >
+    <rect x="3" y="3" width="7" height="7" />
+    <rect x="14" y="3" width="7" height="7" />
+    <rect x="3" y="14" width="7" height="7" />
+    <rect x="14" y="14" width="7" height="7" />
+  </svg>
+)
 
 export function TopBar() {
   const session = useSession()
@@ -20,65 +84,20 @@ export function TopBar() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
       <div className="max-w-5xl mx-auto px-4 h-10 flex items-center justify-between">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-        >
-          <svg
-            viewBox="0 0 24 24"
-            className="w-3 h-3"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            strokeLinecap="square"
-            aria-hidden="true"
-          >
-            <path d="M19 12H5M5 12l7-7M5 12l7 7" />
-          </svg>
-          Home
+        <Link href="/" className={mutedLink}>
+          <LinkBody icon={HomeIcon} label="Home" />
         </Link>
 
         <div className="flex items-center gap-4">
           {isSuperUser && (
-            <Link
-              href="/super"
-              className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="square"
-                aria-hidden="true"
-              >
-                <path d="M12 2l3 6 6 1-4.5 4.5L18 20l-6-3-6 3 1.5-6.5L3 9l6-1z" />
-              </svg>
-              Super
+            <Link href="/super" className={accentLink}>
+              <LinkBody icon={StarIcon} label="Super" />
             </Link>
           )}
 
           {isAdmin && (
-            <Link
-              href="/admin/dashboard"
-              className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-            >
-              <svg
-                viewBox="0 0 24 24"
-                className="w-3 h-3"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth={2}
-                strokeLinecap="square"
-                aria-hidden="true"
-              >
-                <rect x="3" y="3" width="7" height="7" />
-                <rect x="14" y="3" width="7" height="7" />
-                <rect x="3" y="14" width="7" height="7" />
-                <rect x="14" y="14" width="7" height="7" />
-              </svg>
-              Dashboard
+            <Link href="/admin/dashboard" className={accentLink}>
+              <LinkBody icon={GridIcon} label="Dashboard" />
             </Link>
           )}
 

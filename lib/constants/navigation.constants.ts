@@ -129,7 +129,7 @@ export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
       icon: Heart,
       links: [
         {
-          linkKey: hasActiveFee ? '/adopt/application?ref=?tab=orders' : '/adopt',
+          linkKey: hasActiveFee ? '/adopt/application?ref=orders' : '/adopt',
           linkText: 'Application'
         },
         {

@@ -4,12 +4,11 @@ import { motion } from 'framer-motion'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { IPaymentMethod } from 'types/payment-method.types'
 import Link from 'next/link'
-import { ArrowLeft, Loader2 } from 'lucide-react'
+import { ArrowLeft } from 'lucide-react'
 import { getInitials } from 'lib/utils/user.utils'
 import { DonateForm } from './_components'
-import Picture from 'components/_common/Picture'
-import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { LinkBody } from 'components/_common/LinkBody'
+import { MyPackAvatar } from '../../../components/_common/MyPackAvatar'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -17,74 +16,32 @@ type Props = {
   isAuthed: boolean
   email?: string | null
   userImage?: string | null
+  userId?: string | null
 }
 
-export default function PublicDonateClient({
-  savedCards,
-  userName,
-  isAuthed,
-  email,
-  userImage
-}: Props) {
-  const router = useRouter()
-  const [navigatingToMyPack, setNavigatingToMyPack] = useState(false)
-
-  const handleMyPackClick = () => {
-    setNavigatingToMyPack(true)
-    router.push('/my-pack')
-  }
-
+export default function PublicDonateClient({ savedCards, userName, isAuthed, email, userImage, userId }: Props) {
   return (
     <>
       {/* ── Thin sticky header ── */}
       <header className="sticky top-0 z-50 bg-topbar-light/95 dark:bg-topbar-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark">
         <div className="max-w-5xl mx-auto w-full px-4 1150:px-0 h-12 flex items-center justify-between">
-          {/* Back to home */}
           <Link
             href="/"
             aria-label="Back to Little Paws Dachshund Rescue home"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark rounded"
           >
-            <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
-            Home
+            <LinkBody icon={<ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />} label="Home" spinnerClass="w-3.5 h-3.5" />
           </Link>
 
           {/* Signed-in indicator — links to My Pack */}
           {email && (
-            <button
-              type="button"
-              onClick={handleMyPackClick}
-              disabled={navigatingToMyPack}
+            <Link
+              href="/my-pack"
               aria-label="Go to My Pack"
-              className="flex items-center gap-2 min-w-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark rounded disabled:opacity-70"
+              className="flex items-center gap-2 min-w-0 group focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark rounded"
             >
-              <div
-                aria-hidden="true"
-                className="shrink-0 w-7 h-7 bg-primary-light/10 dark:bg-primary-dark/10 border border-primary-light/30 dark:border-primary-dark/30 group-hover:border-primary-light dark:group-hover:border-primary-dark flex items-center justify-center overflow-hidden transition-colors"
-              >
-                {navigatingToMyPack ? (
-                  <Loader2
-                    className="w-3.5 h-3.5 text-primary-light dark:text-primary-dark animate-spin"
-                    aria-hidden="true"
-                  />
-                ) : userImage ? (
-                  <Picture
-                    priority={true}
-                    src={userImage}
-                    alt=""
-                    className="w-full h-full object-cover"
-                    unoptimized={false}
-                  />
-                ) : (
-                  <span className="text-[9px] font-mono font-bold text-primary-light dark:text-primary-dark uppercase">
-                    {getInitials(userName?.firstName, userName?.lastName)}
-                  </span>
-                )}
-              </div>
-              <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-on-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
-                {navigatingToMyPack ? 'Loading...' : 'My Pack'}
-              </span>
-            </button>
+              <MyPackAvatar userImage={userImage} initials={getInitials(userName?.firstName, userName?.lastName)} />
+            </Link>
           )}
         </div>
       </header>
@@ -92,25 +49,15 @@ export default function PublicDonateClient({
       <main className="min-h-dvh px-4 1150:px-0 pt-12 sm:pt-16 pb-24 sm:pb-32 bg-bg-light dark:bg-bg-dark flex flex-col gap-y-20 sm:gap-y-28">
         <div className="max-w-5xl mx-auto w-full">
           {/* ── Page header ── */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0}
-            className="mb-12"
-          >
+          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12">
             <div className="flex items-center gap-3 mb-4">
-              <span
-                className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
-                aria-hidden="true"
-              />
+              <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
               <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                 One-Time Donation
               </p>
             </div>
             <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight mb-5">
-              Make a{' '}
-              <span className="font-light text-muted-light dark:text-muted-dark">Difference</span>
+              Make a <span className="font-light text-muted-light dark:text-muted-dark">Difference</span>
             </h1>
             <p className="text-base sm:text-lg text-muted-light dark:text-on-dark leading-relaxed max-w-2xl">
               Every dollar goes directly to rescue, vetting, and care for our dachshunds.
@@ -131,18 +78,14 @@ export default function PublicDonateClient({
               {/* Mission */}
               <div>
                 <div className="flex items-center gap-3 mb-4">
-                  <span
-                    className="block w-5 h-px bg-primary-light dark:bg-primary-dark"
-                    aria-hidden="true"
-                  />
+                  <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                   <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
                     Our Mission
                   </p>
                 </div>
                 <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
-                  Little Paws Dachshund Rescue is a volunteer-run nonprofit dedicated to saving
-                  dachshunds and dachshund mixes from shelters, surrenders, and neglect — giving
-                  every long dog a second chance at a loving forever home.
+                  Little Paws Dachshund Rescue is a volunteer-run nonprofit dedicated to saving dachshunds and dachshund mixes
+                  from shelters, surrenders, and neglect — giving every long dog a second chance at a loving forever home.
                 </p>
               </div>
 
@@ -164,9 +107,7 @@ export default function PublicDonateClient({
                       <dt className="font-quicksand font-black text-2xl text-primary-light dark:text-primary-dark tabular-nums shrink-0">
                         {stat}
                       </dt>
-                      <dd className="text-[11px] font-mono text-muted-light dark:text-muted-dark leading-snug">
-                        {label}
-                      </dd>
+                      <dd className="text-[11px] font-mono text-muted-light dark:text-muted-dark leading-snug">{label}</dd>
                     </div>
                   ))}
                 </dl>
@@ -190,9 +131,7 @@ export default function PublicDonateClient({
                       <span className="font-quicksand font-black text-sm text-primary-light dark:text-primary-dark shrink-0 mt-px">
                         {amount}
                       </span>
-                      <span className="text-[11px] font-mono text-muted-light dark:text-muted-dark leading-snug">
-                        {desc}
-                      </span>
+                      <span className="text-[11px] font-mono text-muted-light dark:text-muted-dark leading-snug">{desc}</span>
                     </li>
                   ))}
                 </ul>
@@ -200,10 +139,7 @@ export default function PublicDonateClient({
               {/* ── Logged-in indicator ── */}
               {email && userName?.firstName && (
                 <motion.div variants={fadeUp} initial="hidden" animate="show" custom={1}>
-                  <div
-                    className="h-px bg-border-light dark:bg-border-dark mb-8"
-                    aria-hidden="true"
-                  />
+                  <div className="h-px bg-border-light dark:bg-border-dark mb-8" aria-hidden="true" />
                   <div className="flex items-center gap-3">
                     {/* Avatar initials circle */}
                     <div
@@ -224,27 +160,17 @@ export default function PublicDonateClient({
                       <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
                         Signed in as
                       </p>
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">
-                        {email}
-                      </p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">{email}</p>
                     </div>
                     {/* Active dot */}
-                    <div
-                      aria-hidden="true"
-                      className="shrink-0 ml-auto w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark"
-                    />
+                    <div aria-hidden="true" className="shrink-0 ml-auto w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark" />
                   </div>
                 </motion.div>
               )}
             </motion.aside>
 
             {/* ── RIGHT PANEL — the form ── */}
-            <DonateForm
-              savedCards={savedCards}
-              userName={userName}
-              isAuthed={isAuthed}
-              email={email}
-            />
+            <DonateForm savedCards={savedCards} userName={userName} isAuthed={isAuthed} email={email} userId={userId} />
           </div>
           {/* end two-column grid */}
         </div>

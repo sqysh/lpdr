@@ -10,7 +10,6 @@ import { FormError } from 'components/_primitives/FormError'
 import { SubmitButton } from 'components/_primitives/SubmitButton'
 import { Toggle } from 'components/_primitives/Toggle'
 import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
-import { usePaymentProcessor } from 'lib/hooks/usePaymentProcessor.hook'
 import type { IAuctionItemLive } from 'types/auction.types'
 import type { IPaymentMethod } from 'types/payment-method.types'
 import {
@@ -24,6 +23,7 @@ import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
+import { setupPusherListenerOneTime } from 'lib/pusher/setupPusherListenerOneTime'
 
 interface FormInputs {
   // identity
@@ -61,6 +61,7 @@ interface Props {
     state: string | null
     zipPostalCode: string | null
   } | null
+  userId?: string | null
 }
 
 export default function PublicAuctionInstantBuyClient({
@@ -69,12 +70,12 @@ export default function PublicAuctionInstantBuyClient({
   isAuthed,
   userEmail,
   userName,
-  userAddress
+  userAddress,
+  userId
 }: Props) {
   const router = useRouter()
   const stripe = useStripe()
   const elements = useElements()
-  const { setupPusherListenerOneTime } = usePaymentProcessor()
 
   // ── Local form state ──────────────────────────────────────────────────────
   const [inputs, setInputs] = useState<FormInputs>({
@@ -133,7 +134,7 @@ export default function PublicAuctionInstantBuyClient({
 
   // ── Default card ──────────────────────────────────────────────────────────
   const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
-  useDefaultCard(savedCards, setDefaultCard)
+  useDefaultCard(savedCards, isAuthed, setDefaultCard)
 
   // ── Name handlers ─────────────────────────────────────────────────────────
   async function handleSaveName() {
@@ -221,7 +222,7 @@ export default function PublicAuctionInstantBuyClient({
         })
         if (!result.success) throw new Error(result.error)
 
-        setupPusherListenerOneTime()
+        setupPusherListenerOneTime(userId, router)
       } else {
         const cardElement = elements.getElement(CardElement)
         if (!cardElement) throw new Error('Card element not found')
@@ -242,7 +243,7 @@ export default function PublicAuctionInstantBuyClient({
         if (result.error) {
           patch({ loading: false, error: result.error.message ?? 'Payment failed' })
         } else if (result.paymentIntent?.status === 'succeeded') {
-          setupPusherListenerOneTime()
+          setupPusherListenerOneTime(userId, router)
         }
       }
     } catch (err) {

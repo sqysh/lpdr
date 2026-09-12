@@ -28,6 +28,7 @@ export default async function PublicDonatePage() {
         isAuthed={isAuthed}
         email={user?.email ?? null}
         userImage={user?.image}
+        userId={user?.id ?? null}
       />
     </Suspense>
   )

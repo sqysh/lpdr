@@ -1,66 +1,91 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
 import Pusher from 'pusher-js'
-import { setAdoptionFeeCookie } from '../actions/_infra/setAdoptionFeeCookie'
 
 type OrderCreatedEvent = {
   type: string
   orderId?: string
-  adoptionFeeId?: string
 }
 
 type OrderFailedEvent = {
   error?: string
 }
 
-export async function setupPusherListenerOneTime(
-  channelId: string,
-  router: AppRouterInstance
-): Promise<void> {
-  let processingStatus = 'processing'
-  let hasProcessed = false
+// The webhook has to create the order, send mail and update related records, so
+// this waits longer than feels necessary. A timeout here means the payment very
+// likely succeeded and we lost the notification, not that anything failed.
+const TIMEOUT_MS = 30_000
 
+export function setupPusherListenerOneTime(channelId: string, router: AppRouterInstance): Promise<void> {
   return new Promise((resolve, reject) => {
-    if (!channelId) return
+    if (!channelId) {
+      reject(new Error('Missing payment channel'))
+      return
+    }
 
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER
-    })
-    const channel = pusher.subscribe(`payment-${channelId}`)
+    const key = process.env.NEXT_PUBLIC_PUSHER_KEY
+    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER
 
-    const timeout = setTimeout(() => {
-      if (processingStatus === 'processing') {
-        processingStatus = 'failed'
-        reject(new Error('Order processing timeout. Please check your email for confirmation.'))
-      }
-    }, 10000)
+    if (!key || !cluster) {
+      reject(new Error('Payment updates are unavailable. Please check your email for confirmation.'))
+      return
+    }
+
+    const channelName = `payment-${channelId}`
+    const pusher = new Pusher(key, { cluster })
+    const channel = pusher.subscribe(channelName)
+
+    let settled = false
+
+    const cleanup = () => {
+      clearTimeout(timeout)
+      channel.unbind_all()
+      pusher.unsubscribe(channelName)
+      pusher.disconnect()
+    }
+
+    const succeed = (path: string) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      router.push(path)
+      resolve()
+    }
+
+    const fail = (message: string) => {
+      if (settled) return
+      settled = true
+      cleanup()
+      reject(new Error(message))
+    }
+
+    const timeout = setTimeout(
+      () =>
+        fail(
+          'This is taking longer than expected. Your payment may have gone through, so please check your email before trying again.'
+        ),
+      TIMEOUT_MS
+    )
 
     channel.bind('order-created', (data: OrderCreatedEvent) => {
-      if (hasProcessed) return
-      hasProcessed = true
-      clearTimeout(timeout)
-      processingStatus = 'success'
-
-      const finish = async () => {
-        if (data.type === 'ADOPTION_FEE') {
-          if (data.adoptionFeeId) await setAdoptionFeeCookie(data.adoptionFeeId)
-          router.push('/adopt/application?ref=?tab=orders')
-        } else {
-          router.push(`/order-confirmation/${data.orderId}?ref=new`)
-        }
-        channel.unbind_all()
-        pusher.unsubscribe(`payment-${channelId}`)
-        resolve()
+      if (data.type === 'ADOPTION_FEE') {
+        succeed('/adopt/application?ref=orders')
+        return
       }
 
-      finish().catch(reject)
+      if (!data.orderId) {
+        fail('Your payment went through but we could not open your confirmation. Please check your email.')
+        return
+      }
+
+      succeed(`/order-confirmation/${data.orderId}?ref=new`)
     })
 
     channel.bind('order-failed', (data: OrderFailedEvent) => {
-      clearTimeout(timeout)
-      processingStatus = 'failed'
-      channel.unbind_all()
-      pusher.unsubscribe(`payment-${channelId}`)
-      reject(new Error(data.error || 'Order processing failed'))
+      fail(data.error || 'Order processing failed')
+    })
+
+    channel.bind('pusher:subscription_error', () => {
+      fail('Could not connect for payment updates. Please check your email for confirmation.')
     })
   })
 }

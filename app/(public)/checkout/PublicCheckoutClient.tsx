@@ -26,9 +26,10 @@ type Props = {
   // from server page — no useSession() flash
   isAuthed: boolean
   email: string | null
+  userId: string | null
 }
 
-export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuthed, email }: Props) {
+export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuthed, email, userId }: Props) {
   const items = useCartStore((s) => s.items)
 
   const {
@@ -59,6 +60,7 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
   const { payment, patch, usingSavedCard, pay } = useStripeCheckout({
     savedCards,
     isAuthed,
+    userId,
     billingName: `${values.firstName} ${values.lastName}`,
     billingEmail: email ?? ''
   })

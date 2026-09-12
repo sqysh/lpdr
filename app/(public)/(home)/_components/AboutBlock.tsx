@@ -4,13 +4,11 @@ import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { container, imageReveal, item } from 'lib/constants/motion.constants'
 import Picture from 'components/_common/Picture'
+import { LinkSpinner } from 'components/_common/LinkSpinner'
 
 export const AboutBlock = () => {
   return (
-    <section
-      aria-labelledby="about-heading"
-      className="relative w-full overflow-x-hidden bg-bg-light dark:bg-bg-dark"
-    >
+    <section aria-labelledby="about-heading" className="relative w-full overflow-x-hidden bg-bg-light dark:bg-bg-dark">
       {/* Texture background */}
       <div
         className="absolute inset-0 bg-repeat dark:opacity-20 pointer-events-none"
@@ -73,12 +71,12 @@ export const AboutBlock = () => {
             {/* Body copy */}
             <motion.div variants={item} className="space-y-3 sm:space-y-4">
               <p className="font-nunito text-sm sm:text-base text-text-light dark:text-text-dark font-semibold leading-relaxed">
-                We are a volunteer-based nonprofit dedicated to rescuing, rehabilitating, and
-                rehoming dachshunds and dachshund mixes across the United States.
+                We are a volunteer-based nonprofit dedicated to rescuing, rehabilitating, and rehoming dachshunds and dachshund
+                mixes across the United States.
               </p>
               <p className="font-nunito text-sm sm:text-base text-muted-light dark:text-muted-dark leading-relaxed">
-                Every dog in our care receives veterinary attention, foster love, and the chance at
-                a forever home. We believe every dachshund deserves a safe, loving family.
+                Every dog in our care receives veterinary attention, foster love, and the chance at a forever home. We believe
+                every dachshund deserves a safe, loving family.
               </p>
             </motion.div>
 
@@ -108,9 +106,9 @@ export const AboutBlock = () => {
               <Link
                 href="/about"
                 aria-label="Learn more about Little Paws Dachshund Rescue"
-                className="inline-flex items-center justify-center w-full xs:w-auto px-8 sm:px-11 py-3 sm:py-3.5 border-2 border-primary-light dark:border-primary-dark text-text-light dark:text-text-dark text-sm font-semibold font-nunito tracking-wide hover:bg-primary-light dark:hover:bg-primary-dark hover:text-white dark:hover:text-bg-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2"
+                className="inline-flex items-center justify-center w-full min-w-30 xs:w-auto px-8 sm:px-11 py-3 sm:py-3.5 border-2 border-primary-light dark:border-primary-dark text-text-light dark:text-text-dark text-sm font-semibold font-nunito tracking-wide hover:bg-primary-light dark:hover:bg-primary-dark hover:text-white dark:hover:text-bg-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2"
               >
-                More about us
+                <LinkSpinner label="More about us" />
               </Link>
             </motion.div>
           </motion.div>

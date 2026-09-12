@@ -17,10 +17,7 @@ export function Subscriptions({ subscriptions }) {
           {subscriptions.map((sub) => {
             const isCancelled = sub.status === 'CANCELLED'
             return (
-              <li
-                key={sub.id}
-                className={`bg-bg-light dark:bg-bg-dark p-5 ${isCancelled ? 'opacity-60' : ''}`}
-              >
+              <li key={sub.id} className={`bg-bg-light dark:bg-bg-dark p-5 ${isCancelled ? 'opacity-60' : ''}`}>
                 <div className="flex items-start justify-between gap-3 mb-3">
                   <div className="min-w-0">
                     <p className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-snug truncate">
@@ -58,7 +55,7 @@ export function Subscriptions({ subscriptions }) {
 
                 <div className="mt-3 pt-3 border-t border-border-light dark:border-border-dark">
                   <Link
-                    href={`/my-pack/subscription/${sub.id}?ref=?tab=giving`}
+                    href={`/my-pack/subscription/${sub.id}?ref=giving`}
                     aria-label={`View details for ${sub.tierName} subscription`}
                     title={`View details for ${sub.tierName} subscription`}
                     className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"

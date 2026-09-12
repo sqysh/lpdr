@@ -13,7 +13,9 @@
     "migrate:cleanup": "node scripts/migrate/cleanup.js",
     "migrate:all": "npm run migrate:cleanup && npm run migrate:seed && npm run dev",
     "reset:users": "node scripts/migrate/wipeAllUsers.js",
-    "reset:logs": "node scripts/migrate/wipeLogs.js"
+    "reset:logs": "node scripts/migrate/wipeLogs.js",
+    "typecheck": "tsc --noEmit",
+    "check": "npm run typecheck && npm run build"
   },
   "dependencies": {
     "@auth/core": "^0.41.1",

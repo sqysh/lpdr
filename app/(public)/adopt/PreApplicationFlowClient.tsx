@@ -18,9 +18,10 @@ type Props = {
   userName: { firstName: string; lastName: string } | null
   isAuthed: boolean
   email: string | null
+  userId: string | null
 }
 
-export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email }: Props) => {
+export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email, userId }: Props) => {
   const showConfetti = useConfettiStore((s) => s.show)
   const router = useRouter()
 
@@ -133,6 +134,7 @@ export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email
               firstName={values.firstName ?? ''}
               lastName={values.lastName ?? ''}
               isAuthed={isAuthed}
+              userId={userId ?? ''}
             />
           )}
         </AnimatePresence>

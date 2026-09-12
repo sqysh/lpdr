@@ -70,9 +70,7 @@ export function MultiItemOrders({ multiItemOrders }) {
                       </span>
                     )}
                     {order.customerName && (
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark mt-0.5">
-                        {order.customerName}
-                      </p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark mt-0.5">{order.customerName}</p>
                     )}
                   </div>
                 </div>
@@ -98,36 +96,25 @@ export function MultiItemOrders({ multiItemOrders }) {
                         aria-hidden="true"
                       >
                         {item.image ? (
-                          <Picture
-                            priority={false}
-                            src={item.image}
-                            alt={item.name}
-                            className="w-full h-full object-cover"
-                          />
+                          <Picture priority={false} src={item.image} alt={item.name} className="w-full h-full object-cover" />
                         ) : Icon ? (
                           <div className="w-full h-full flex items-center justify-center">
                             <Icon className="w-4 h-4 text-muted-light dark:text-muted-dark" />
                           </div>
                         ) : (
                           <div className="w-full h-full flex items-center justify-center">
-                            <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
-                              ?
-                            </span>
+                            <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">?</span>
                           </div>
                         )}
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">
-                          {item.name}
-                        </p>
+                        <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
                         <div className="flex items-center gap-2 mt-0.5">
                           <span className="text-[9px] font-mono tracking-[0.15em] uppercase px-1.5 py-0.5 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark shrink-0">
                             {ITEM_TYPE_LABELS[item.itemType] ?? item.itemType.replaceAll('_', ' ')}
                           </span>
                           {item.quantity > 1 && (
-                            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                              ×{item.quantity}
-                            </p>
+                            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">×{item.quantity}</p>
                           )}
                         </div>
                       </div>
@@ -147,11 +134,9 @@ export function MultiItemOrders({ multiItemOrders }) {
                   </p>
                   <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
                     {order.shippingAddress.addressLine1}
-                    {order.shippingAddress.addressLine2 &&
-                      `, ${order.shippingAddress.addressLine2}`}
+                    {order.shippingAddress.addressLine2 && `, ${order.shippingAddress.addressLine2}`}
                     {', '}
-                    {order.shippingAddress.city}, {order.shippingAddress.state}{' '}
-                    {order.shippingAddress.zipPostalCode}
+                    {order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.zipPostalCode}
                   </p>
                 </div>
               )}
@@ -159,7 +144,7 @@ export function MultiItemOrders({ multiItemOrders }) {
               {/* View confirmation */}
               <div className="mt-3 pt-3 border-t border-border-light dark:border-border-dark">
                 <Link
-                  href={`/order-confirmation/${order.id}?ref=?tab=orders`}
+                  href={`/order-confirmation/${order.id}?ref=orders`}
                   aria-label={`View order confirmation for ${formatDate(order.createdAt)}`}
                   className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
                 >

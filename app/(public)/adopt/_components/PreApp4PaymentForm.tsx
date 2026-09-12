@@ -15,12 +15,14 @@ type Props = {
   firstName: string
   lastName: string
   email: string | null
+  userId: string | null
 }
 
-export function PreApp4PaymentForm({ savedCards, isAuthed, firstName, lastName, email }: Props) {
+export function PreApp4PaymentForm({ savedCards, isAuthed, firstName, lastName, email, userId }: Props) {
   const { payment, patch, usingSavedCard, pay } = useStripeCheckout({
     savedCards,
     isAuthed,
+    userId,
     billingName: `${firstName.trim()} ${lastName.trim()}`,
     billingEmail: email ?? ''
   })

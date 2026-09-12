@@ -34,6 +34,7 @@ export default async function PublicAuctionInstantBuyPage({ params }: { params: 
       userEmail={session?.user?.email ?? null}
       userName={userNameResult.data}
       userAddress={userAddressResult.data}
+      userId={session?.user?.id ?? null}
     />
   )
 }

@@ -1,3 +1,4 @@
+import { LinkSpinner } from 'components/_common/LinkSpinner'
 import Link from 'next/link'
 
 export function SlideContent({
@@ -38,9 +39,9 @@ export function SlideContent({
         <div className="flex flex-wrap gap-3">
           <Link
             href={slide.primaryCta.href}
-            className="inline-flex items-center justify-center px-5 sm:px-6 py-3 bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2 focus-visible:ring-offset-bg-light dark:focus-visible:ring-offset-bg-dark active:scale-95"
+            className="inline-flex w-auto min-w-25 items-center justify-center px-5 sm:px-6 py-3 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark focus-visible:ring-offset-2 focus-visible:ring-offset-bg-light dark:focus-visible:ring-offset-bg-dark active:scale-95"
           >
-            {slide.primaryCta.label}
+            <LinkSpinner label={slide.primaryCta.label} />
           </Link>
         </div>
       </div>

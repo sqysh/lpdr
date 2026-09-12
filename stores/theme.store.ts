@@ -5,12 +5,15 @@ import { create } from 'zustand'
 
 type ThemeState = {
   isDark: boolean
+  /** False until the OS preference has been read, since the server cannot know it */
+  isResolved: boolean
   setIsDark: (v: boolean) => void
 }
 
 export const useThemeStore = create<ThemeState>((set) => ({
   isDark: false,
-  setIsDark: (isDark) => set({ isDark })
+  isResolved: false,
+  setIsDark: (isDark) => set({ isDark, isResolved: true })
 }))
 
 export function useSyncTheme() {
