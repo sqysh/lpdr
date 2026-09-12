@@ -14,6 +14,41 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.8.0',
+    date: '2026-09-11',
+    title: 'Adoption application access and bypass codes',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Access to the adoption application was granted by a browser setting that anyone could change by hand. It now checks the paid fee record and its expiry date'
+      },
+      {
+        type: 'fix',
+        text: 'Bypass codes could be used more than once to keep extending access without paying. A code now grants a single week and does nothing while access is already active'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed the bypass code rotation running three times a month instead of every two weeks'
+      },
+      {
+        type: 'improvement',
+        text: 'Rebuilt the pre-application flow with shared validation, and combined the two-step code check into one so entering a valid code takes you straight to the application'
+      },
+      {
+        type: 'improvement',
+        text: 'Dropped the state field from the pre-application form; it was already recorded automatically and nothing used what people typed'
+      },
+      {
+        type: 'fix',
+        text: 'Fixed the pre-application page flashing on screen for a moment before redirecting people who already have access'
+      },
+      {
+        type: 'improvement',
+        text: 'Dropdown fields now match the rest of the form styling'
+      }
+    ]
+  },
+  {
     version: '1.7.0',
     date: '2026-09-11',
     title: 'Checkout form rewrite and instant buy pricing fix',

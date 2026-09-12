@@ -18,11 +18,22 @@ function generateBypassCode(): string {
   return `DOXIE-${random(8)}`
 }
 
-export async function rotateBypassCodeCore() {
+/**
+ * Cron cannot express a true 14-day interval, so it runs daily and this decides
+ * whether the code is actually due. `force` is for a manual rotation, which
+ * should happen regardless and resets the clock from now.
+ */
+export async function rotateBypassCodeCore({ force = false }: { force?: boolean } = {}) {
+  const existing = await prisma.adoptionApplicationBypassCode.findFirst({
+    select: { id: true, nextRotationAt: true }
+  })
+
+  if (!force && existing?.nextRotationAt && existing.nextRotationAt > new Date()) {
+    return { rotated: false as const, nextRotationAt: existing.nextRotationAt }
+  }
+
   const bypassCode = generateBypassCode()
   const nextRotationAt = new Date(Date.now() + ROTATION_INTERVAL_MS)
-
-  const existing = await prisma.adoptionApplicationBypassCode.findFirst({ select: { id: true } })
 
   if (existing) {
     await prisma.adoptionApplicationBypassCode.update({
@@ -35,27 +46,34 @@ export async function rotateBypassCodeCore() {
     })
   }
 
-  return { bypassCode, wasFirstRun: !existing }
+  return { rotated: true as const, bypassCode, nextRotationAt, wasFirstRun: !existing }
 }
 
-export async function rotateBypassCode(): Promise<ActionResult<{ bypassCode: string; wasFirstRun: boolean }>> {
+export async function rotateBypassCode(): Promise<ActionResult<{ bypassCode: string; nextRotationAt: Date }>> {
   const gate = await requireSuper()
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {
-    const result = await rotateBypassCodeCore()
+    const result = await rotateBypassCodeCore({ force: true })
+
+    if (!result.rotated) {
+      return { success: false, data: null, error: 'Failed to rotate bypass code. Please try again.' }
+    }
 
     await createLog('info', 'Bypass code rotated manually', {
+      location: ['rotateBypassCode.ts'],
       wasFirstRun: result.wasFirstRun,
       rotatedBy: gate.userId
     })
 
-    return { success: true, data: result }
+    return { success: true, data: { bypassCode: result.bypassCode, nextRotationAt: result.nextRotationAt } }
   } catch (error) {
     await createLog('error', 'Failed to manually rotate bypass code', {
+      location: ['rotateBypassCode.ts'],
       error: getErrorMessage(error),
       rotatedBy: gate.userId
     })
+
     return { success: false, data: null, error: 'Failed to rotate bypass code. Please try again.' }
   }
 }

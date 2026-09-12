@@ -7,6 +7,8 @@ export default async function AdminLayoutPage({ children }: { children: ReactNod
   const { email, role } = await requireAdminPage()
   const bypassCode = await getBypassCodeStatus()
 
+  console.log(bypassCode)
+
   return (
     <AdminLayoutClient
       email={email}

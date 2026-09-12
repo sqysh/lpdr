@@ -52,6 +52,10 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
     ? className
     : `w-full px-3.5 py-3 text-sm font-mono border-2 border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark ${readOnly || disabled ? 'cursor-not-allowed opacity-70' : ''}`
 
+  // The native select draws its own background, so appearance-none is needed
+  // for the field colours to apply. That removes the arrow, drawn back below.
+  const selectClass = `${fieldClass} appearance-none pr-10 cursor-pointer`
+
   const labelClass = `block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2`
   const errorClass = `text-[11px] text-red-500 dark:text-red-400 font-mono mt-1.5`
 
@@ -89,9 +93,22 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
           className={`${fieldClass} resize-none`}
         />
       ) : type === 'select' ? (
-        <select {...shared} ref={ref as React.Ref<HTMLSelectElement>} disabled={disabled} className={fieldClass}>
-          {children}
-        </select>
+        <div className="relative">
+          <select {...shared} ref={ref as React.Ref<HTMLSelectElement>} disabled={disabled} className={selectClass}>
+            {children}
+          </select>
+          <svg
+            viewBox="0 0 24 24"
+            className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-light dark:text-muted-dark"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={2}
+            strokeLinecap="square"
+            aria-hidden="true"
+          >
+            <path d="M6 9l6 6 6-6" />
+          </svg>
+        </div>
       ) : (
         <input
           {...shared}

@@ -38,7 +38,7 @@ export const TERMS_AND_CONDITIONS = [
   }
 ]
 
-export const STEPS = ['sign-in', 'terms', 'info', 'payment'] as const
+export const STEPS = ['sign-in', 'terms', 'details', 'payment'] as const
 
 export const STEP_LABELS: Record<string, string> = {
   'sign-in': 'Sign In',

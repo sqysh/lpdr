@@ -5,6 +5,7 @@ import { AlertCircle, ArrowRight, Mail } from 'lucide-react'
 import { useState } from 'react'
 import { Turnstile } from 'components/_common/Turnstile'
 import { requestMagicLink } from 'lib/actions/auth/requestMagicLink'
+import { EMAIL_REGEX } from 'lib/constants/regex.constants'
 
 type Props = {
   email: string
@@ -19,7 +20,7 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }: Props) {
   const [token, setToken] = useState<string | null>(null)
   const [resetSignal, setResetSignal] = useState(0)
 
-  const canSubmit = Boolean(email && token) && !loading
+  const canSubmit = EMAIL_REGEX.test(email.trim()) && !!token && !loading
 
   async function handleMagicLink() {
     if (!canSubmit) return

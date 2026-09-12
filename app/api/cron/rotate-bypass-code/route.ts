@@ -12,8 +12,21 @@ export async function GET(request: Request) {
   }
 
   const start = Date.now()
+
   try {
     const result = await rotateBypassCodeCore()
+
+    // Runs daily, but only rotates when the 14 days are up
+    if (!result.rotated) {
+      await createLog('info', '[CRON] rotate-bypass-code', {
+        cronName: 'rotate-bypass-code',
+        status: 'skipped',
+        durationMs: Date.now() - start,
+        detail: `Not due until ${result.nextRotationAt.toISOString()}`
+      })
+
+      return NextResponse.json({ success: true, skipped: true })
+    }
 
     await createLog('info', '[CRON] rotate-bypass-code', {
       cronName: 'rotate-bypass-code',
@@ -30,6 +43,7 @@ export async function GET(request: Request) {
       durationMs: Date.now() - start,
       detail: getErrorMessage(error)
     })
+
     return NextResponse.json({ success: false, error: getErrorMessage(error) }, { status: 500 })
   }
 }

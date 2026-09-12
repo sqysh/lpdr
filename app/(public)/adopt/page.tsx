@@ -1,11 +1,9 @@
 import { PreApplicationFlowClient } from 'app/(public)/adopt/PreApplicationFlowClient'
 import { getSavedPaymentMethods } from 'lib/actions/_stripe/getSavedPaymentMethods'
-import { hasActiveAdoptionFee } from 'lib/actions/my-pack/adoption-fee/hasActiveAdoptionFee'
+import { hasActiveAdoptionFee } from 'lib/actions/adoption-fee/hasActiveAdoptionFee'
 import { getUserName } from 'lib/actions/my-pack/getUserName'
 import { auth } from 'lib/auth'
 import { redirect } from 'next/navigation'
-
-export const dynamic = 'force-dynamic'
 
 export default async function PreApplicationFlowPage() {
   const session = await auth()
@@ -14,7 +12,7 @@ export default async function PreApplicationFlowPage() {
   // Signed-in users with an active fee skip straight to the application.
   if (isAuthed) {
     const { isActive } = await hasActiveAdoptionFee()
-    if (isActive) redirect('/adopt/application?ref=?tab=orders')
+    if (isActive) redirect('/adopt/application?ref=orders')
   }
 
   const [paymentMethodsResult, userNameResult] = isAuthed

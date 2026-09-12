@@ -1,129 +1,102 @@
 'use client'
 
 import { useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { verifyBypassCode } from 'lib/actions/my-pack/adoption-fee/verifyBypassCode'
-import { updateAdoptionFee } from 'lib/actions/my-pack/adoption-fee/updateAdoptionFee'
 import { STEPS } from 'lib/constants/adoption-application.constants'
 import { STEPS_TYPES } from 'types/adoption-application.types'
-import { Header, Progress, Step0SignIn, Step1Terms, Step2Info, Step3Payment } from './_components'
+import { Header, Progress, PreApp1SignIn, PreApp2Terms, PreApp3Details, PreApp4Payment } from './_components'
 import { IPaymentMethod } from 'types/payment-method.types'
 import { useConfettiStore } from 'stores/confetti.store'
+import { redeemBypassCodeSchema, RedeemBypassCodeInput, RedeemBypassCodeValues } from 'lib/schemas/adoption-fee.schema'
+import { redeemBypassCode } from 'lib/actions/adoption-fee/redeemBypassCode'
 
 type Props = {
   savedCards: IPaymentMethod[]
-  userName?: { firstName: string; lastName: string } | any
+  userName: { firstName: string; lastName: string } | null
   isAuthed: boolean
-  email?: string
+  email: string | null
 }
 
-export const PreApplicationFlowClient = ({
-  savedCards,
-  userName,
-  isAuthed,
-  email
-}: Props & { isAuthed: boolean; email: string | null }) => {
+export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email }: Props) => {
   const showConfetti = useConfettiStore((s) => s.show)
   const router = useRouter()
 
   const [step, setStep] = useState<STEPS_TYPES>(isAuthed ? 'terms' : 'sign-in')
   const [agreedToTerms, setAgreedToTerms] = useState(false)
-  const [bypassPayment, setBypassPayment] = useState(false)
-  const [adoptionFeeId, setAdoptionFeeId] = useState('')
 
   // Magic link state
   const [magicEmail, setMagicEmail] = useState('')
   const [magicLinkSent, setMagicLinkSent] = useState(false)
-  const [inputs, setInputs] = useState({
-    firstName: userName?.firstName ?? '',
-    lastName: userName?.lastName ?? '',
-    email: email ?? '',
-    state: '',
-    bypassCode: ''
+
+  const [redeeming, setRedeeming] = useState(false)
+  const [bypassError, setBypassError] = useState('')
+
+  const {
+    register,
+    control,
+    trigger,
+    getValues,
+    formState: { errors }
+  } = useForm<RedeemBypassCodeInput, unknown, RedeemBypassCodeValues>({
+    resolver: zodResolver(redeemBypassCodeSchema),
+    mode: 'onBlur',
+    defaultValues: {
+      firstName: userName?.firstName ?? '',
+      lastName: userName?.lastName ?? '',
+      bypassCode: ''
+    }
   })
 
-  const [verifyingCode, setVerifyingCode] = useState(false)
-  const [bypassError, setBypassError] = useState('')
-  const [isProceeding, setIsProceeding] = useState(false)
+  const values = useWatch({ control })
 
   const handleContinueToInfo = () => {
     if (!agreedToTerms) return
-    setStep('info')
+    setStep('details')
   }
 
-  const handleVerifyBypassCode = async () => {
-    const code = inputs.bypassCode.trim()
-    if (!code) return
+  /** Details are required either way, so validate them before both paths. */
+  const detailsValid = () => trigger(['firstName', 'lastName'])
 
-    setVerifyingCode(true)
+  const handleRedeemCode = async () => {
+    if (!(await detailsValid())) return
+    if (!(await trigger('bypassCode'))) return
+
+    setRedeeming(true)
     setBypassError('')
 
-    try {
-      const result = await verifyBypassCode(code)
-      if (result.isValid) {
-        setBypassPayment(true)
-        setAdoptionFeeId(result.data.adoptionFeeId)
-        showConfetti()
-      } else {
-        setBypassPayment(false)
-        setBypassError(result.error ?? 'Invalid bypass code')
-      }
-    } catch {
-      setBypassPayment(false)
-      setBypassError('Error verifying code. Please try again.')
-    } finally {
-      setVerifyingCode(false)
-    }
-  }
+    const result = await redeemBypassCode(getValues())
 
-  const handleProceed = async () => {
-    if (!(bypassPayment && adoptionFeeId)) {
-      setStep('payment')
+    setRedeeming(false)
+
+    if (!result.success) {
+      setBypassError(result.error ?? 'That code is not valid.')
       return
     }
 
-    setIsProceeding(true)
-    setBypassError('')
-    try {
-      const result = await updateAdoptionFee({
-        adoptionFeeId,
-        firstName: inputs.firstName,
-        lastName: inputs.lastName,
-        email: inputs.email,
-        state: inputs.state
-      })
-      if (!result.success) {
-        setBypassError(result.error ?? 'Something went wrong. Please try again.')
-        return
-      }
-      router.push('/adopt/application?ref=?tab=orders')
-    } catch {
-      setBypassError('Something went wrong. Please try again.')
-    } finally {
-      setIsProceeding(false)
-    }
+    showConfetti()
+    router.push('/adopt/application')
+  }
+
+  const handleContinueToPayment = async () => {
+    if (!(await detailsValid())) return
+    setStep('payment')
   }
 
   const currentIndex = STEPS.indexOf(step)
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
-        {/* ── Header ── */}
         <Header />
 
-        {/* ── Progress ── */}
         <Progress currentIndex={currentIndex} step={step} />
 
-        {/* ── Step content ── */}
         <AnimatePresence mode="wait">
-          {/* Step 0: Sign in */}
           {step === 'sign-in' && (
-            <Step0SignIn
+            <PreApp1SignIn
               magicEmail={magicEmail}
               magicLinkSent={magicLinkSent}
               setMagicEmail={setMagicEmail}
@@ -131,40 +104,34 @@ export const PreApplicationFlowClient = ({
             />
           )}
 
-          {/* Step 1: Terms */}
           {step === 'terms' && (
-            <Step1Terms
+            <PreApp2Terms
               agreedToTerms={agreedToTerms}
               handleContinueToInfo={handleContinueToInfo}
               setAgreedToTerms={setAgreedToTerms}
             />
           )}
 
-          {/* Step 2: Info */}
-          {step === 'info' && (
-            <Step2Info
+          {step === 'details' && (
+            <PreApp3Details
+              register={register}
+              errors={errors}
+              email={email}
               bypassError={bypassError}
-              bypassPayment={bypassPayment}
-              handleProceed={handleProceed}
-              handleVerifyBypassCode={handleVerifyBypassCode}
-              inputs={inputs}
-              isProceeding={isProceeding}
-              setBypassError={setBypassError}
-              setBypassPayment={setBypassPayment}
-              setInputs={setInputs}
+              redeeming={redeeming}
+              onRedeemCode={handleRedeemCode}
+              onContinueToPayment={handleContinueToPayment}
               setStep={setStep}
-              verifyingCode={verifyingCode}
             />
           )}
 
-          {/* Step 3: Payment */}
           {step === 'payment' && (
-            <Step3Payment
+            <PreApp4Payment
               savedCards={savedCards}
               setStep={setStep}
               email={email}
-              firstName={inputs.firstName}
-              lastName={inputs.lastName}
+              firstName={values.firstName ?? ''}
+              lastName={values.lastName ?? ''}
               isAuthed={isAuthed}
             />
           )}

@@ -15,36 +15,23 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
   const [modalOpen, setModalOpen] = useState(true)
   const params = useSearchParams()
   const myPackTab = params.get('ref')
+  const myPackHref = myPackTab ? `/my-pack?tab=${myPackTab}` : '/my-pack'
 
   return (
     <>
       <AdoptionFeeWelcomeModal isOpen={modalOpen} onClose={() => setModalOpen(false)} />
 
-      <main
-        id="main-content"
-        className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-      >
+      <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16">
           {/* ── Header ── */}
-          <motion.div
-            variants={fadeUp}
-            initial="hidden"
-            animate="show"
-            custom={0}
-            className="mb-12 sm:mb-16"
-          >
+          <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12 sm:mb-16">
             <div className="flex items-center justify-between gap-3 mb-4">
               <div className="flex items-center gap-3">
-                <span
-                  className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
-                  aria-hidden="true"
-                />
-                <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                  Adoption
-                </p>
+                <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+                <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">Adoption</p>
               </div>
               <Link
-                href={`/my-pack${myPackTab}`}
+                href={myPackHref}
                 className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 <ChevronLeft className="w-3 h-3" aria-hidden="true" />
@@ -61,10 +48,9 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
               </p>
             </div>
             <p className="text-base text-muted-light dark:text-muted-dark leading-relaxed">
-              Thank you for taking the next step toward adopting a Little Paws dachshund. Please
-              complete the application below. Our team will review your submission and be in touch
-              within 3–5 business days. If you need to step away, you can pick this back up any time
-              from{' '}
+              Thank you for taking the next step toward adopting a Little Paws dachshund. Please complete the application below.
+              Our team will review your submission and be in touch within 3–5 business days. If you need to step away, you can
+              pick this back up any time from{' '}
               <Link
                 href="/my-pack"
                 className="text-primary-light dark:text-primary-dark hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -79,18 +65,9 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
           {expiresAt && <ApplicationExpiryTimer expiresAt={expiresAt} />}
 
           {/* ── Application iframe ── */}
-          <motion.section
-            variants={fadeUp}
-            initial="hidden"
-            whileInView="show"
-            custom={2}
-            aria-labelledby="application-heading"
-          >
+          <motion.section variants={fadeUp} initial="hidden" whileInView="show" custom={2} aria-labelledby="application-heading">
             <div className="flex items-center gap-3 mb-3">
-              <span
-                className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                aria-hidden="true"
-              />
+              <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2
                 id="application-heading"
                 className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"

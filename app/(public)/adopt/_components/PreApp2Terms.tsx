@@ -3,7 +3,7 @@ import { TERMS_AND_CONDITIONS } from 'lib/constants/adoption-application.constan
 import { slideVariants } from 'lib/constants/motion.constants'
 import { motion } from 'framer-motion'
 
-export function Step1Terms({ agreedToTerms, handleContinueToInfo, setAgreedToTerms }) {
+export function PreApp2Terms({ agreedToTerms, handleContinueToInfo, setAgreedToTerms }) {
   return (
     <motion.section
       key="terms"
@@ -14,10 +14,7 @@ export function Step1Terms({ agreedToTerms, handleContinueToInfo, setAgreedToTer
       aria-labelledby="step-terms-heading"
       className="bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark p-6 sm:p-8"
     >
-      <h2
-        id="step-terms-heading"
-        className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-6"
-      >
+      <h2 id="step-terms-heading" className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-6">
         Terms &amp; Conditions
       </h2>
 
@@ -34,14 +31,8 @@ export function Step1Terms({ agreedToTerms, handleContinueToInfo, setAgreedToTer
             </h3>
             <ul className="space-y-2" role="list">
               {section.content.map((item, i) => (
-                <li
-                  key={i}
-                  className="flex items-start gap-2.5 text-sm text-muted-light dark:text-on-dark"
-                >
-                  <span
-                    className="w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark shrink-0 mt-1.5"
-                    aria-hidden="true"
-                  />
+                <li key={i} className="flex items-start gap-2.5 text-sm text-muted-light dark:text-on-dark">
+                  <span className="w-1.5 h-1.5  bg-primary-light dark:bg-primary-dark shrink-0 mt-1.5" aria-hidden="true" />
                   {item}
                 </li>
               ))}

@@ -35,12 +35,7 @@ export default function LoginPage() {
       <div className="relative z-10 w-full max-w-87 xs:mx-auto flex flex-col justify-between min-h-[calc(100dvh-5rem)] xs:min-h-0">
         <div>
           {/* ── Logo ── */}
-          <motion.div
-            initial={{ opacity: 0, y: -16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45 }}
-            className="mb-7"
-          >
+          <div className="mb-7">
             <Link
               href="/"
               className="inline-flex items-center gap-2 mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -59,20 +54,15 @@ export default function LoginPage() {
             <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark tracking-[0.2em] uppercase">
               Sign in to your account to continue
             </p>
-          </motion.div>
+          </div>
 
           {/* ── Card ── */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.1 }}
-            className="border border-border-light dark:border-border-dark bg-bg-light dark:bg-surface-dark relative overflow-hidden"
-          >
+          <div className="border border-border-light dark:border-border-dark bg-bg-light dark:bg-surface-dark relative overflow-hidden">
             <div className="absolute top-0 left-0 w-full h-0.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
 
+            {/* Animated because it is a real state change, not an entrance */}
             <AnimatePresence mode="wait">
               {sent ? (
-                /* ── Success ── */
                 <motion.div
                   key="sent"
                   initial={{ opacity: 0, y: 8 }}
@@ -112,11 +102,12 @@ export default function LoginPage() {
 
                   <div className="w-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark px-4 py-3">
                     <p className="text-[11px] font-nunito text-text-light dark:text-text-dark leading-relaxed">
-                      Click the link in your email to sign in. It expires in <strong>24 hours</strong>.
+                      Click the link in your email to sign in. It expires in <strong>15 minutes</strong>.
                     </p>
                   </div>
 
                   <button
+                    type="button"
                     onClick={() => {
                       setSent(false)
                       setEmail('')
@@ -131,7 +122,6 @@ export default function LoginPage() {
                   </p>
                 </motion.div>
               ) : (
-                /* ── Form ── */
                 <motion.div
                   key="form"
                   initial={{ opacity: 0 }}
@@ -172,16 +162,11 @@ export default function LoginPage() {
                 </motion.div>
               )}
             </AnimatePresence>
-          </motion.div>
+          </div>
         </div>
 
         {/* ── Footer ── */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mt-4 flex flex-col items-center gap-3"
-        >
+        <div className="mt-4 flex flex-col items-center gap-3">
           <Link
             href="/"
             className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -194,12 +179,12 @@ export default function LoginPage() {
             By signing in you agree to our{' '}
             <Link
               href="/privacy-policy"
-              className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light"
             >
               Privacy Policy
             </Link>
           </p>
-        </motion.div>
+        </div>
       </div>
     </main>
   )

@@ -1,28 +1,10 @@
 {
   "crons": [
-    {
-      "path": "/api/cron/expire-adoption-fees",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/start-auction",
-      "schedule": "0 10-23,0-2 * * *"
-    },
-    {
-      "path": "/api/cron/end-auction",
-      "schedule": "0 10-23,0-2 * * *"
-    },
-    {
-      "path": "/api/cron/winner-payment-reminders",
-      "schedule": "0 0 * * *"
-    },
-    {
-      "path": "/api/cron/rotate-bypass-code",
-      "schedule": "0 0 */14 * *"
-    },
-    {
-      "path": "/api/cron/cleanup-payment-attempts",
-      "schedule": "0 0 * * *"
-    }
+    { "path": "/api/cron/expire-adoption-fees", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/start-auction", "schedule": "0 10-23,0-2 * * *" },
+    { "path": "/api/cron/end-auction", "schedule": "0 10-23,0-2 * * *" },
+    { "path": "/api/cron/winner-payment-reminders", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/rotate-bypass-code", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/cleanup-payment-attempts", "schedule": "0 0 * * *" }
   ]
 }
