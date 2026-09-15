@@ -1,14 +1,16 @@
 import { getAuctionById } from 'lib/actions/admin/auction/getAuctionById'
-import { requireAdminPage } from 'lib/auth/guards'
 import { notFound } from 'next/navigation'
 import AdminAuctionClient from './AdminAuctionClient'
+import { getAuctionSignups } from 'lib/actions/admin/auction/getAuctionSignups'
+import { auth } from 'lib/auth'
 
 export default async function AdminAuctionPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const gate = await requireAdminPage()
-  const result = await getAuctionById(id)
+  const [auction, signups, session] = await Promise.all([getAuctionById(id), getAuctionSignups(id), auth()])
 
-  if (!result.success || !result.data) notFound()
+  if (!auction.success || !auction.data) notFound()
 
-  return <AdminAuctionClient auction={result.data} role={gate.role} />
+  const role = session?.user?.role
+
+  return <AdminAuctionClient auction={auction.data} role={role} signups={signups} />
 }

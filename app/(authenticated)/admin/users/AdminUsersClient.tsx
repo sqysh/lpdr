@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
 import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Minus, Search } from 'lucide-react'
 import { formatDate } from 'lib/utils/date.utils'
-import { IUser, RoleFilter } from 'types/user'
+import { RoleFilter } from 'types/user'
 import { formatRole } from 'lib/utils/user.utils'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
@@ -14,9 +14,20 @@ import { PAGE_SIZE, ROLE_FILTER_LABELS, ROLE_FILTERS } from 'lib/constants/user.
 import { GrantAdminAccessModal } from 'app/(authenticated)/admin/users/_components/GrantAdminAccessModal'
 import { PendingAdminInvitesList } from 'app/(authenticated)/admin/users/_components/PendingListInvites'
 import { GrantAdminAccessTrigger } from 'app/(authenticated)/admin/users/_components/GrantAdminAccessTrigger'
-import { PendingAdminInvite } from '@prisma/client'
+import { PendingAdminInvite, Role } from '@prisma/client'
 
-const columns: Column<IUser>[] = [
+type User = {
+  id: string
+  role: Role
+  firstName: string
+  lastName: string
+  email: string
+  migrationStatus: string
+  paymentMethodCount: number
+  createdAt: string
+}
+
+const columns: Column<User>[] = [
   {
     header: 'Name',
     cell: (user) => {
@@ -27,27 +38,25 @@ const columns: Column<IUser>[] = [
               {user.firstName} {user.lastName}
             </p>
             {user.migrationStatus === 'pending' && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-[8px] font-mono tracking-[0.15em] uppercase shrink-0">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-[8px] font-mono tracking-tag uppercase shrink-0">
                 <AlertCircle className="w-2.5 h-2.5" aria-hidden="true" />
                 Migration pending
               </span>
             )}
             {user.migrationStatus === 'migrated' && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[8px] font-mono tracking-[0.15em] uppercase shrink-0">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[8px] font-mono tracking-tag uppercase shrink-0">
                 <CheckCircle className="w-2.5 h-2.5" aria-hidden="true" />
                 Migrated
               </span>
             )}
             {user.migrationStatus === 'not-needed' && (
-              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark bg-bg-light dark:bg-bg-dark text-[8px] font-mono tracking-[0.15em] uppercase shrink-0">
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark bg-bg-light dark:bg-bg-dark text-[8px] font-mono tracking-tag uppercase shrink-0">
                 <Minus className="w-2.5 h-2.5" aria-hidden="true" />
                 No prior history
               </span>
             )}
           </div>
-          <p className="text-xs font-mono text-muted-light dark:text-muted-dark mt-0.5">
-            {user.email}
-          </p>
+          <p className="text-xs font-mono text-muted-light dark:text-muted-dark mt-0.5">{user.email}</p>
         </>
       )
     }
@@ -104,13 +113,7 @@ const columns: Column<IUser>[] = [
   }
 ]
 
-export default function AdminUsersClient({
-  users,
-  pendingInvites
-}: {
-  users: IUser[]
-  pendingInvites: PendingAdminInvite[]
-}) {
+export default function AdminUsersClient({ users, pendingInvites }: { users: User[]; pendingInvites: PendingAdminInvite[] }) {
   const router = useRouter()
   const [roleFilter, setRoleFilter] = useState<RoleFilter>('ALL')
   const [search, setSearch] = useState('')
@@ -121,8 +124,7 @@ export default function AdminUsersClient({
     const q = search.toLowerCase().trim()
     return users.filter((u) => {
       const matchesRole = roleFilter === 'ALL' || u.role === roleFilter
-      const matchesSearch =
-        !q || [u.firstName, u.lastName, u.email].some((v) => v?.toLowerCase().includes(q))
+      const matchesSearch = !q || [u.firstName, u.lastName, u.email].some((v) => v?.toLowerCase().includes(q))
       return matchesRole && matchesSearch
     })
   }, [users, roleFilter, search])
@@ -152,12 +154,7 @@ export default function AdminUsersClient({
 
   return (
     <>
-      <GrantAdminAccessModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        users={users}
-        onGranted={() => router.refresh()}
-      />
+      <GrantAdminAccessModal open={modalOpen} onClose={() => setModalOpen(false)} users={users} onGranted={() => router.refresh()} />
 
       <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
         <AdminPageHeader
@@ -214,13 +211,7 @@ export default function AdminUsersClient({
 
           {/* Pagination */}
           {filtered.length > PAGE_SIZE && (
-            <Pagination
-              page={safePage}
-              totalPages={totalPages}
-              onPage={setPage}
-              totalItems={filtered.length}
-              pageSize={PAGE_SIZE}
-            />
+            <Pagination page={safePage} totalPages={totalPages} onPage={setPage} totalItems={filtered.length} pageSize={PAGE_SIZE} />
           )}
         </div>
       </main>

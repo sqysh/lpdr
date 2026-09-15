@@ -13,9 +13,7 @@ export default async function PublicAuctionInstantBuyPage({ params }: { params: 
 
   const [itemResult, cardsResult, userNameResult, userAddressResult] = await Promise.all([
     getPublicAuctionItemById(auctionItemId).catch(() => ({ data: null })),
-    isAuthed
-      ? getSavedPaymentMethods().catch(() => ({ success: false, data: [] }))
-      : Promise.resolve({ success: true, data: [] }),
+    isAuthed ? getSavedPaymentMethods().catch(() => ({ success: false, data: [] })) : Promise.resolve({ success: true, data: [] }),
     isAuthed ? getUserName().catch(() => ({ success: false, data: null })) : Promise.resolve({ success: true, data: null }),
     isAuthed ? getUserAddress().catch(() => ({ success: false, data: null })) : Promise.resolve({ success: true, data: null })
   ])
@@ -30,7 +28,6 @@ export default async function PublicAuctionInstantBuyPage({ params }: { params: 
     <PublicAuctionInstantBuyClient
       auctionItem={auctionItem}
       savedCards={cardsResult.success ? (cardsResult.data ?? []) : []}
-      isAuthed={isAuthed}
       userEmail={session?.user?.email ?? null}
       userName={userNameResult.data}
       userAddress={userAddressResult.data}

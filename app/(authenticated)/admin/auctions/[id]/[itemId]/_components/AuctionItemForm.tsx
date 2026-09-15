@@ -1,12 +1,14 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
 import { updateAuctionItem } from 'lib/actions/admin/auction/updateAuctionItem'
 import { deleteAuctionItem } from 'lib/actions/admin/auction/deleteAuctionItem'
 import { createAuctionItem } from 'lib/actions/admin/auction/createAuctionItem'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
-import { formatMoney } from 'lib/utils/currency.utils'
+import { createAuctionItemFormSchema, toAuctionItemPayload, type CreateAuctionItemFormValues } from 'lib/schemas/auction.schema'
 import type { SellingFormat } from 'types/auction.types'
 import { IAuctionItemPhoto } from 'types/auction-item-photo'
 import { AuctionStatus } from '@prisma/client'
@@ -15,87 +17,10 @@ import { AuctionItemFormHeader } from './AuctionItemFormHeader'
 import { AuctionItemFormTitleBand } from './AuctionItemFormTitleBand'
 import { AuctionItemFields } from './AuctionItemFields'
 import { AuctionItemPhotoPanel } from './AuctionItemPhotoPanel'
+import { useStatusMessage } from '@hooks/useStatusMessage.hook'
+import { buildSummary } from '../_lib/buildSummary'
 
-interface FormInputs {
-  name: string
-  description: string
-  sellingFormat: SellingFormat
-  startingPrice: string
-  buyNowPrice: string
-  totalQuantity: string
-  requiresShipping: boolean
-  shippingCosts: string
-  photos: IAuctionItemPhoto[]
-}
-
-export interface FormErrors {
-  name?: string
-  startingPrice?: string
-  buyNowPrice?: string
-  form?: string
-}
-
-export interface FormSuccess {
-  message: string
-  description?: string
-}
-
-interface PendingPhoto {
-  file: File
-  previewUrl: string
-}
-
-function validate(inputs: FormInputs, type: SellingFormat): FormErrors {
-  const errs: FormErrors = {}
-  if (!inputs.name.trim()) errs.name = 'Name is required'
-  if (type === 'AUCTION' && !inputs.startingPrice) errs.startingPrice = 'Starting price is required'
-  if (type === 'FIXED' && !inputs.buyNowPrice) errs.buyNowPrice = 'Buy now price is required'
-  return errs
-}
-
-function buildSummary(
-  payload: {
-    sellingFormat: SellingFormat
-    startingPrice: number | null
-    buyNowPrice: number | null
-    requiresShipping: boolean
-    shippingCosts: number | null
-  },
-  photoCount: number
-) {
-  const price =
-    payload.sellingFormat === 'AUCTION'
-      ? payload.startingPrice != null
-        ? `starting at ${formatMoney(payload.startingPrice)}`
-        : null
-      : payload.buyNowPrice != null
-        ? `${formatMoney(payload.buyNowPrice)} each`
-        : null
-
-  const shipping = payload.requiresShipping
-    ? payload.shippingCosts != null
-      ? `+${formatMoney(payload.shippingCosts)} shipping`
-      : 'shipping TBD'
-    : 'no shipping'
-
-  return (
-    [
-      payload.sellingFormat === 'AUCTION' ? 'Auction item' : 'Instant buy',
-      price,
-      shipping,
-      photoCount > 0 ? `${photoCount} photo${photoCount === 1 ? '' : 's'} added` : null
-    ]
-      .filter(Boolean)
-      .join(' · ') || undefined
-  )
-}
-
-export function AuctionItemForm({
-  auctionItem,
-  auctionId,
-  type,
-  auctionStatus
-}: {
+type Props = {
   auctionItem: {
     id: string
     name: string
@@ -111,14 +36,22 @@ export function AuctionItemForm({
   auctionId: string
   type: SellingFormat
   auctionStatus: AuctionStatus
-}) {
+}
+
+interface PendingPhoto {
+  file: File
+  previewUrl: string
+}
+
+export function AuctionItemForm({ auctionItem, auctionId, type, auctionStatus }: Props) {
   const router = useRouter()
+  const { status, flash, clearStatus } = useStatusMessage()
 
   const isUpdating = !!auctionItem
   const isActive = auctionStatus === 'ACTIVE'
   const showBuyNow = type === 'FIXED'
 
-  const [inputs, setInputs] = useState<FormInputs>(() => ({
+  const DEFAULT_VALUES = {
     name: auctionItem?.name ?? '',
     description: auctionItem?.description ?? '',
     sellingFormat: auctionItem?.sellingFormat ?? type,
@@ -126,91 +59,60 @@ export function AuctionItemForm({
     buyNowPrice: auctionItem?.buyNowPrice?.toString() ?? '',
     totalQuantity: auctionItem?.totalQuantity?.toString() ?? '1',
     requiresShipping: auctionItem?.requiresShipping ?? true,
-    shippingCosts: auctionItem?.shippingCosts?.toString() ?? '',
-    photos: auctionItem?.photos ?? []
-  }))
-
-  const patch = (data: Partial<FormInputs>) => setInputs((prev) => ({ ...prev, ...data }))
-
-  const handleInput = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) =>
-    patch({ [e.target.name]: e.target.value } as Partial<FormInputs>)
-
-  const [errors, setErrors] = useState<FormErrors>({})
-  const [success, setSuccess] = useState<FormSuccess | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [confirmDel, setConfirmDel] = useState(false)
-  const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([])
-  const [uploadProgress, setUploadProgress] = useState<number>(0)
-
-  const successTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-  useEffect(() => {
-    return () => {
-      if (successTimeout.current) clearTimeout(successTimeout.current)
-    }
-  }, [])
-
-  const flashSuccess = (next: FormSuccess) => {
-    if (successTimeout.current) clearTimeout(successTimeout.current)
-    setSuccess(next)
-    successTimeout.current = setTimeout(() => setSuccess(null), 6000)
+    shippingCosts: auctionItem?.shippingCosts?.toString() ?? ''
   }
 
-  const handleSave = async () => {
-    const errs = validate(inputs, type)
-    if (Object.keys(errs).length) {
-      setErrors(errs)
-      return
-    }
+  const {
+    control,
+    handleSubmit,
+    reset,
+    formState: { isSubmitting }
+  } = useForm<CreateAuctionItemFormValues>({
+    resolver: zodResolver(createAuctionItemFormSchema),
+    reValidateMode: 'onChange',
+    defaultValues: DEFAULT_VALUES
+  })
 
-    setLoading(true)
-    setErrors({})
-    setSuccess(null)
+  // The title band echoes the name as it is typed, so it subscribes to that one field.
+  const itemName = useWatch({ control, name: 'name' })
 
-    let photos: string[] = []
+  // Photos stay outside the form: they are files mid-upload until save, not values to validate.
+  const [photos, setPhotos] = useState<IAuctionItemPhoto[]>(auctionItem?.photos ?? [])
+  const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([])
+  const [uploadProgress, setUploadProgress] = useState(0)
+
+  const [deleting, setDeleting] = useState(false)
+  const [confirmDel, setConfirmDel] = useState(false)
+
+  const onSubmit = async (values: CreateAuctionItemFormValues) => {
+    clearStatus()
+
+    let uploaded: string[] = []
     if (pendingPhotos.length > 0) {
       try {
-        photos = await Promise.all(
-          pendingPhotos.map(({ file }) => uploadFileToFirebase(file, (progress) => setUploadProgress(progress)))
-        )
+        uploaded = await Promise.all(pendingPhotos.map(({ file }) => uploadFileToFirebase(file, setUploadProgress)))
       } catch {
-        setErrors({ form: 'Failed to upload photos. Please try again.' })
-        setLoading(false)
+        setUploadProgress(0)
+        flash({ tone: 'error', message: 'The photos did not upload, so nothing was saved. Try again.' })
         return
       }
     }
 
-    const payload = {
-      auctionId,
-      name: inputs.name.trim(),
-      description: inputs.description.trim() || null,
-      sellingFormat: inputs.sellingFormat,
-      startingPrice: inputs.startingPrice ? Number(inputs.startingPrice) : null,
-      buyNowPrice: inputs.buyNowPrice ? Number(inputs.buyNowPrice) : null,
-      totalQuantity: inputs.totalQuantity ? Number(inputs.totalQuantity) : 1,
-      requiresShipping: inputs.requiresShipping,
-      shippingCosts: inputs.shippingCosts ? Number(inputs.shippingCosts) : null,
-      photos
-    }
-
+    const payload = toAuctionItemPayload(values, { auctionId, photos: uploaded })
     const result = isUpdating ? await updateAuctionItem(auctionItem!.id, payload) : await createAuctionItem(payload)
 
     if (!result.success) {
-      setErrors({ form: result.error ?? 'Something went wrong.' })
-      setLoading(false)
+      flash({ tone: 'error', message: result.error ?? 'Something went wrong.' })
       return
     }
 
     if (isUpdating) {
-      flashSuccess({
-        message: `${payload.name} updated`,
-        description: buildSummary(payload, photos.length)
-      })
-      router.refresh()
-      setLoading(false)
+      flash({ tone: 'success', message: `${payload.name} updated`, description: buildSummary(payload, uploaded.length) })
+      // reset with the saved values so the form is no longer dirty and the refresh can't clobber typing.
+      reset(values)
       setUploadProgress(0)
       setPendingPhotos([])
+      router.refresh()
       return
     }
 
@@ -227,7 +129,7 @@ export function AuctionItemForm({
     const result = await deleteAuctionItem(auctionItem!.id, auctionId)
 
     if (!result.success) {
-      setErrors({ form: result.error ?? 'Failed to delete item.' })
+      flash({ tone: 'error', message: result.error ?? 'Failed to delete item.' })
       setDeleting(false)
       setConfirmDel(false)
       return
@@ -247,41 +149,36 @@ export function AuctionItemForm({
 
       <div className="w-full px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
-          <AuctionItemFormTitleBand
-            auctionId={auctionId}
-            auctionItemId={auctionItem?.id}
-            isUpdating={isUpdating}
-            itemName={inputs.name}
-          />
+          <AuctionItemFormTitleBand auctionId={auctionId} auctionItemId={auctionItem?.id} isUpdating={isUpdating} itemName={itemName} />
 
           {/* Body */}
-          <div className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-6 xl:gap-8 items-start pb-6">
-            {/* Left — fields */}
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            noValidate
+            className="grid grid-cols-1 xl:grid-cols-[minmax(0,1fr)_380px] gap-6 xl:gap-8 items-start pb-6"
+          >
+            {/* Left: fields */}
             <AuctionItemFields
               auctionId={auctionId}
+              control={control}
+              status={status}
               isActive={isActive}
               isUpdating={isUpdating}
-              loading={loading}
+              isSubmitting={isSubmitting}
               uploadProgress={uploadProgress}
               type={type}
               showBuyNow={showBuyNow}
-              inputs={inputs}
-              errors={errors}
-              success={success}
-              handleInput={handleInput}
-              patch={patch}
-              onSave={handleSave}
             />
 
-            {/* Right — photos & danger zone */}
-            <div className="space-y-5 min-w-0">
+            {/* Right: photos and danger zone */}
+            <div className="flex flex-col gap-5 min-w-0">
               <AuctionItemPhotoPanel
                 auctionId={auctionId}
                 auctionItemId={auctionItem?.id}
                 isUpdating={isUpdating}
-                photos={inputs.photos}
+                photos={photos}
                 pendingPhotos={pendingPhotos}
-                onPatchPhotos={(photos) => patch({ photos })}
+                onPatchPhotos={setPhotos}
                 onSetPendingPhotos={setPendingPhotos}
               />
 
@@ -294,7 +191,7 @@ export function AuctionItemForm({
                 />
               )}
             </div>
-          </div>
+          </form>
         </div>
       </div>
     </main>

@@ -9,6 +9,12 @@ import { sendOutbidEmail } from 'lib/email/sendOutbidEmail'
 import { PreviousTopBid } from 'types/auction-bid'
 import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
 
+/** Thrown deliberately, so the message is safe to show the bidder. Anything else is not. */
+class BidError extends Error {}
+
+const fullName = (user: { firstName: string | null; lastName: string | null } | null) =>
+  `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim()
+
 export async function placeBid(auctionItemId: string, bidAmount: number) {
   const gate = await requireAuth()
   if (gate.ok === false) return { success: false, error: 'You must be logged in to place a bid.' }
@@ -32,14 +38,15 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           include: { auction: true }
         })
 
-        if (!auctionItem) throw new Error('Auction item not found.')
-        if (auctionItem.auction.status !== 'ACTIVE') throw new Error('This auction is not currently active.')
+        if (!auctionItem) throw new BidError('Auction item not found.')
+        if (auctionItem.auction.status !== 'ACTIVE') throw new BidError('This auction is not currently active.')
+        if (auctionItem.status === 'SOLD') throw new BidError('This item has already been sold.')
 
         const auctionId = auctionItem.auctionId
         const currentMinimum = Number(auctionItem.minimumBid ?? auctionItem.startingPrice ?? 0)
 
         if (bidAmount < currentMinimum) {
-          throw new Error(`Minimum bid is now $${currentMinimum.toLocaleString()}. Please increase your bid.`)
+          throw new BidError(`Minimum bid is now $${currentMinimum.toLocaleString()}. Please increase your bid.`)
         }
 
         previousTopBid = await tx.auctionBid.findFirst({
@@ -58,7 +65,13 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           data: { status: 'OUTBID' }
         })
 
-        const user = await tx.user.findUnique({ where: { id: userId } })
+        const user = await tx.user.findUnique({
+          where: { id: userId },
+          select: { firstName: true, lastName: true, anonymousBidding: true }
+        })
+
+        const name = fullName(user)
+        const isAnonymous = !!user?.anonymousBidding
 
         const bid = await tx.auctionBid.create({
           data: {
@@ -68,7 +81,7 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
             bidderId: bidder.id,
             bidAmount,
             email,
-            bidderName: user?.anonymousBidding ? null : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || null,
+            bidderName: isAnonymous ? null : name || null,
             status: 'TOP_BID'
           }
         })
@@ -79,9 +92,10 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
             currentBid: bidAmount,
             minimumBid: bidAmount + 1,
             totalBids: { increment: 1 },
-            topBidder: user?.anonymousBidding
-              ? 'Anonymous'
-              : `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || 'Anonymous'
+            // Display form, not the raw name. This column is a scalar on AuctionItem, so it goes
+            // to the browser with every public item query; storing "Gregory Row" here would put
+            // full names on the auction page no matter what the bid select leaves out.
+            topBidder: isAnonymous || !name ? 'Anonymous' : `${user!.firstName} ${user!.lastName?.[0] ?? ''}.`.trim()
           }
         })
 
@@ -100,7 +114,7 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           totalBids: true,
           topBidder: true,
           name: true,
-          auction: true
+          auction: { select: { customAuctionLink: true } }
         }
       }),
       prisma.user.findUnique({
@@ -110,18 +124,26 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
       stampUserGeoFromRequest(userId)
     ])
 
-    const bidderName = sessionUser?.firstName
-      ? `${sessionUser.firstName}${sessionUser.lastName ? ` ${sessionUser.lastName}` : ''}`
-      : (sessionUser?.email ?? 'Unknown')
+    // The bid is committed either way, so a missing item here only means the follow-up work is
+    // skipped. It is not a reason to tell the bidder their bid failed.
+    if (!updatedItem) {
+      await createLog('warn', 'Auction item disappeared after a bid was committed', { auctionItemId, userId })
+      return { success: true }
+    }
+
+    const bidderName = fullName(sessionUser) || (sessionUser?.email ?? 'Unknown')
 
     try {
       await Promise.all([
+        // Public channel. Only the figures the item page renders, nothing carrying an identity.
         pusherTrigger(`auction-item-${auctionItemId}`, 'bid-placed', {
-          bid: { ...result, bidAmount: Number(result.bidAmount) },
+          bid: { id: result.id, bidAmount: Number(result.bidAmount), createdAt: result.createdAt },
           auctionItem: {
-            ...updatedItem,
-            currentBid: Number(updatedItem?.currentBid),
-            minimumBid: Number(updatedItem?.minimumBid)
+            id: updatedItem.id,
+            currentBid: Number(updatedItem.currentBid),
+            minimumBid: Number(updatedItem.minimumBid),
+            totalBids: updatedItem.totalBids,
+            topBidder: updatedItem.topBidder
           }
         }),
         createLog('info', 'Bid placed', {
@@ -139,9 +161,9 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           bidAmount: Number(result.bidAmount),
           bidderName,
           email: sessionUser?.email ?? null,
-          itemName: updatedItem?.name ?? null,
-          currentBid: Number(updatedItem?.currentBid),
-          topBidder: updatedItem?.topBidder ?? null
+          itemName: updatedItem.name,
+          currentBid: Number(updatedItem.currentBid),
+          topBidder: updatedItem.topBidder
         })
       ])
     } catch (error) {
@@ -153,15 +175,20 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
     }
 
     if (previousTopBid && previousTopBid.userId !== userId) {
-      await sendOutbidEmail({
-        email: previousTopBid.user.email,
-        firstName: previousTopBid.user.firstName ?? 'Friend',
-        itemName: updatedItem.name,
-        yourBid: Number(previousTopBid.bidAmount),
-        newBid: bidAmount,
-        minimumBid: bidAmount + 1,
-        url: `${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}`
-      })
+      try {
+        await sendOutbidEmail({
+          email: previousTopBid.user.email,
+          firstName: previousTopBid.user.firstName ?? 'Friend',
+          itemName: updatedItem.name,
+          yourBid: Number(previousTopBid.bidAmount),
+          newBid: bidAmount,
+          minimumBid: bidAmount + 1,
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}`
+        })
+      } catch (error) {
+        // A failed email must not surface as a failed bid: the bid is already committed.
+        await createLog('warn', 'Outbid email failed', { auctionItemId, error: getErrorMessage(error) })
+      }
     }
 
     return { success: true }
@@ -188,6 +215,10 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
       }
     }
 
-    return { success: false, error: error?.message ?? 'Something went wrong. Please try again.' }
+    // Only messages we wrote reach the bidder. A Prisma or Stripe message would leak internals.
+    return {
+      success: false,
+      error: error instanceof BidError ? error.message : 'Something went wrong. Please try again.'
+    }
   }
 }

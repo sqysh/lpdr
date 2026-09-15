@@ -5,7 +5,7 @@ import { motion } from 'framer-motion'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { updateOrderShippingStatus } from 'lib/actions/admin/order/updateOrderShippingStatus'
-import { SerializedOrder } from 'types/order.types'
+import { IOrder } from 'types/order.types'
 import { StatusMessage } from 'components/_primitives/StatusMessage'
 import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import { Label } from './OrderLabel'
@@ -16,7 +16,7 @@ const shipButton =
 const shippedPill =
   'inline-flex items-center gap-2 px-3 py-2 border border-emerald-500/40 bg-emerald-500/5 text-[10px] font-mono tracking-[0.2em] uppercase text-emerald-600 dark:text-emerald-400'
 
-export function OrderFulfillmentSection({ order }: { order: SerializedOrder }) {
+export function OrderFulfillmentSection({ order }: { order: IOrder }) {
   const router = useRouter()
   const [shipLoading, setShipLoading] = useState(false)
   const [shippedLocally, setShippedLocally] = useState(false)

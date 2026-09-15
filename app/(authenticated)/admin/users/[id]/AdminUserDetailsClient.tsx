@@ -34,28 +34,13 @@ type UserDetail = NonNullable<Awaited<ReturnType<typeof getUserById>>['data']>
 
 const ASSIGNABLE_ROLES: Role[] = ['ADMIN', 'PACK_MEMBER']
 
-function Field({
-  icon: Icon,
-  label,
-  children
-}: {
-  icon: React.ElementType
-  label: string
-  children: React.ReactNode
-}) {
+function Field({ icon: Icon, label, children }: { icon: React.ElementType; label: string; children: React.ReactNode }) {
   return (
     <div className="flex items-start gap-3 py-3 border-b border-border-light dark:border-border-dark last:border-b-0">
-      <Icon
-        className="w-4 h-4 text-muted-light dark:text-muted-dark shrink-0 mt-0.5"
-        aria-hidden="true"
-      />
+      <Icon className="w-4 h-4 text-muted-light dark:text-muted-dark shrink-0 mt-0.5" aria-hidden="true" />
       <div className="min-w-0 flex-1">
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-0.5">
-          {label}
-        </p>
-        <div className="text-sm text-text-light dark:text-text-dark wrap-break-word">
-          {children}
-        </div>
+        <p className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-0.5">{label}</p>
+        <div className="text-sm text-text-light dark:text-text-dark wrap-break-word">{children}</div>
       </div>
     </div>
   )
@@ -107,12 +92,12 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
         breadcrumbs={[{ label: 'Users', href: '/admin/users' }]}
         action={
           migrationStatus?.hasPendingMigration ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-[9px] font-mono tracking-[0.15em] uppercase">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5 text-[9px] font-mono tracking-tag uppercase">
               <AlertCircle className="w-3 h-3" aria-hidden="true" />
               Migration pending ({migrationStatus.pendingCount})
             </span>
           ) : user.hasMigrated ? (
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[9px] font-mono tracking-[0.15em] uppercase">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[9px] font-mono tracking-tag uppercase">
               <CheckCircle className="w-3 h-3" aria-hidden="true" />
               Migrated
             </span>
@@ -129,13 +114,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
               <div className="flex items-center gap-4 mb-3">
                 <div className="w-14 h-14 shrink-0 flex items-center justify-center bg-primary-light/10 dark:bg-primary-dark/10 border border-primary-light/30 dark:border-primary-dark/30 overflow-hidden">
                   {user.image ? (
-                    <Picture
-                      priority={true}
-                      src={user.image}
-                      alt=""
-                      className="w-full h-full object-cover"
-                      unoptimized={false}
-                    />
+                    <Picture priority={true} src={user.image} alt="" className="w-full h-full object-cover" unoptimized={false} />
                   ) : (
                     <span className="font-quicksand font-black text-lg text-primary-light dark:text-primary-dark">
                       {(user.firstName?.[0] ?? user.email[0]).toUpperCase()}
@@ -143,24 +122,16 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                   )}
                 </div>
                 <div className="min-w-0">
-                  <h2 className="text-xl font-bold text-text-light dark:text-text-dark truncate">
-                    {fullName}
-                  </h2>
-                  <p className="text-sm text-muted-light dark:text-muted-dark truncate">
-                    {user.email}
-                  </p>
+                  <h2 className="text-xl font-bold text-text-light dark:text-text-dark truncate">{fullName}</h2>
+                  <p className="text-sm text-muted-light dark:text-muted-dark truncate">{user.email}</p>
                 </div>
               </div>
 
               {user.hasMigrated && !hasMigratedOrders && (
                 <div className="flex items-start gap-2.5 px-3.5 py-3 mt-3 border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/5 dark:bg-primary-dark/5 mb-6">
-                  <Info
-                    className="w-3.5 h-3.5 text-primary-light dark:text-primary-dark shrink-0 mt-0.5"
-                    aria-hidden="true"
-                  />
+                  <Info className="w-3.5 h-3.5 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
                   <p className="text-[11px] font-mono text-text-light dark:text-text-dark leading-relaxed">
-                    Migration ran successfully. This user had no orders, donations, or other history
-                    on the previous site.
+                    Migration ran successfully. This user had no orders, donations, or other history on the previous site.
                   </p>
                 </div>
               )}
@@ -182,28 +153,20 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                 </Field>
                 <Field icon={user.emailVerified ? CheckCircle : XCircle} label="Email verified">
                   {user.emailVerified ? (
-                    <span className="text-emerald-600 dark:text-emerald-400">
-                      Verified {formatDate(user.emailVerified)}
-                    </span>
+                    <span className="text-emerald-600 dark:text-emerald-400">Verified {formatDate(user.emailVerified)}</span>
                   ) : (
                     <span className="text-muted-light dark:text-muted-dark">Not verified</span>
                   )}
                 </Field>
                 <Field icon={Clock} label="Last login">
-                  {user.lastLoginAt ? (
-                    formatDate(user.lastLoginAt)
-                  ) : (
-                    <span className="text-muted-light dark:text-muted-dark">Never</span>
-                  )}
+                  {user.lastLoginAt ? formatDate(user.lastLoginAt) : <span className="text-muted-light dark:text-muted-dark">Never</span>}
                 </Field>
                 <Field icon={Calendar} label="Joined">
                   {formatDate(user.createdAt)}
                 </Field>
                 {(user.lastGeoCity || user.lastGeoRegion || user.lastGeoCountry) && (
                   <Field icon={MapPin} label="Last location">
-                    {[user.lastGeoCity, user.lastGeoRegion, user.lastGeoCountry]
-                      .filter(Boolean)
-                      .join(', ')}
+                    {[user.lastGeoCity, user.lastGeoRegion, user.lastGeoCountry].filter(Boolean).join(', ')}
                   </Field>
                 )}
               </div>
@@ -212,10 +175,8 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
             {/* Payment methods */}
             <section className="border border-border-light dark:border-border-dark divide-y divide-border-light dark:divide-border-dark">
               <div className="px-4 py-3 flex items-center justify-between">
-                <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                  Payment methods
-                </p>
-                <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
+                <p className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark">Payment methods</p>
+                <span className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark">
                   {user.paymentMethods.length} saved
                 </span>
               </div>
@@ -228,10 +189,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                 user.paymentMethods.map((pm) => (
                   <div key={pm.id} className="px-4 py-3 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-2.5 min-w-0">
-                      <CreditCard
-                        className="w-3.5 h-3.5 shrink-0 text-muted-light dark:text-muted-dark"
-                        aria-hidden="true"
-                      />
+                      <CreditCard className="w-3.5 h-3.5 shrink-0 text-muted-light dark:text-muted-dark" aria-hidden="true" />
                       <div className="min-w-0">
                         <p className="font-mono text-[11px] text-text-light dark:text-text-dark capitalize">
                           {pm.cardBrand} ···· {pm.cardLast4}
@@ -252,8 +210,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
             </section>
 
             {/* Tabbed: Role + Merge */}
-            {((user.role !== 'SUPER_USER' && loggedInUser.id !== user.id) ||
-              loggedInUser.role === 'SUPER_USER') && (
+            {((user.role !== 'SUPER_USER' && loggedInUser.id !== user.id) || loggedInUser.role === 'SUPER_USER') && (
               <section className="border border-border-light dark:border-border-dark">
                 {/* Tab headers */}
                 <div className="flex border-b border-border-light dark:border-border-dark">
@@ -262,7 +219,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                       key={t}
                       type="button"
                       onClick={() => setTab(t)}
-                      className={`px-4 py-2.5 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+                      className={`px-4 py-2.5 font-mono text-[9px] tracking-tag uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                         tab === t
                           ? 'text-text-light dark:text-text-dark border-b-2 border-primary-light dark:border-primary-dark -mb-px'
                           : 'text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -280,7 +237,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                       Admins can manage the site. Supporters are regular members.
                     </p>
 
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-5 border border-primary-light/40 dark:border-primary-dark/40 text-primary-light dark:text-primary-dark text-[9px] font-mono tracking-[0.15em] uppercase">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 mb-5 border border-primary-light/40 dark:border-primary-dark/40 text-primary-light dark:text-primary-dark text-[9px] font-mono tracking-tag uppercase">
                       Currently {formatRole(user.role)}
                     </div>
 
@@ -302,10 +259,8 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                           >
                             <div className="flex items-center justify-between">
                               <p
-                                className={`text-[11px] font-mono tracking-[0.15em] uppercase font-bold ${
-                                  selected
-                                    ? 'text-primary-light dark:text-primary-dark'
-                                    : 'text-text-light dark:text-text-dark'
+                                className={`text-[11px] font-mono tracking-tag uppercase font-bold ${
+                                  selected ? 'text-primary-light dark:text-primary-dark' : 'text-text-light dark:text-text-dark'
                                 }`}
                               >
                                 {formatRole(r)}
@@ -328,7 +283,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                       type="button"
                       onClick={handleSave}
                       disabled={!dirty || saving}
-                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark transition-colors hover:bg-secondary-light dark:hover:bg-secondary-dark disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-5 py-2.5 text-[10px] font-mono tracking-tag uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark transition-colors hover:bg-secondary-light dark:hover:bg-secondary-dark disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       {saved ? (
                         <>
@@ -342,10 +297,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                     </button>
 
                     {error && (
-                      <p
-                        role="alert"
-                        className="mt-3 font-mono text-[11px] text-red-600 dark:text-red-400"
-                      >
+                      <p role="alert" className="mt-3 font-mono text-[11px] text-red-600 dark:text-red-400">
                         {error}
                       </p>
                     )}
@@ -367,33 +319,21 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
             {/* Total spent stat */}
             <div className="grid grid-cols-2 gap-3">
               <div className="border border-border-light dark:border-border-dark p-4">
-                <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1">
-                  Total spent
-                </p>
-                <p className="font-quicksand text-2xl font-black text-text-light dark:text-text-dark">
-                  ${totalSpent.toFixed(2)}
-                </p>
+                <p className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark mb-1">Total spent</p>
+                <p className="font-quicksand text-2xl font-black text-text-light dark:text-text-dark">${totalSpent.toFixed(2)}</p>
               </div>
               <div className="border border-border-light dark:border-border-dark p-4">
-                <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1">
-                  Orders
-                </p>
-                <p className="font-quicksand text-2xl font-black text-text-light dark:text-text-dark">
-                  {user.orders.length}
-                </p>
+                <p className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark mb-1">Orders</p>
+                <p className="font-quicksand text-2xl font-black text-text-light dark:text-text-dark">{user.orders.length}</p>
               </div>
             </div>
 
             {/* Orders list */}
             <section>
-              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-3">
-                Order history
-              </p>
+              <p className="font-mono text-[10px] tracking-tag uppercase text-muted-light dark:text-muted-dark mb-3">Order history</p>
 
               {user.orders.length === 0 ? (
-                <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-                  No orders yet
-                </p>
+                <p className="font-mono text-[10px] tracking-tag uppercase text-muted-light dark:text-muted-dark">No orders yet</p>
               ) : (
                 <div className="border border-border-light dark:border-border-dark divide-y divide-border-light dark:divide-border-dark">
                   {user.orders.map((order) => (
@@ -403,15 +343,10 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                       className="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <Package
-                          className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0"
-                          aria-hidden="true"
-                        />
+                        <Package className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
                         <div className="min-w-0">
                           <div className="flex items-center gap-2 flex-wrap">
-                            <p className="font-mono text-xs text-text-light dark:text-text-dark">
-                              #{order.id.slice(-8)}
-                            </p>
+                            <p className="font-mono text-xs text-text-light dark:text-text-dark">#{order.id.slice(-8)}</p>
                             <StatusPill status={order.status} />
                           </div>
                           <p className="font-mono text-[10px] text-muted-light dark:text-muted-dark mt-0.5">

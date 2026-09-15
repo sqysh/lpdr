@@ -15,7 +15,7 @@ export function Tabs({ visibleTabs, activeTab, selectTab }) {
           aria-selected={activeTab === tab.label}
           aria-controls={`panel-${tab.label}`}
           onClick={() => selectTab(tab.label)}
-          className={`relative px-4 py-2 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+          className={`relative px-4 py-2 text-[9px] font-mono tracking-eyebrow uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
             activeTab === tab.label
               ? 'text-text-light dark:text-text-dark bg-bg-light dark:bg-bg-dark'
               : 'text-muted-light dark:text-muted-dark bg-surface-light dark:bg-surface-dark hover:text-text-light dark:hover:text-text-dark'

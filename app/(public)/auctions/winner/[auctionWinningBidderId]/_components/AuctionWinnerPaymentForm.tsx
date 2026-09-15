@@ -3,7 +3,6 @@
 import { AnimatePresence, motion } from 'framer-motion'
 import { ShieldCheck } from 'lucide-react'
 import { IPaymentMethod } from 'types/payment-method.types'
-import { IAuctionWinningBidder } from 'types/auction-winning-bidder'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { FormError, SubmitButton, Toggle } from 'components/_primitives'
 import { AuctionWinnerAddressSection } from './AuctionWinnerAddressSection'
@@ -11,6 +10,7 @@ import { SavedCardSelector } from 'components/features/payment/SavedCardSelector
 import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
 import { CardElementField } from 'components/features/payment/CardElementField'
 import { PaymentHandlers, PaymentState } from '../_types/auction-winner.types'
+import { IAuctionWinningBidder } from 'types/auction.types'
 
 type Props = {
   winningBidder: IAuctionWinningBidder
@@ -92,13 +92,7 @@ export function AuctionWinnerPaymentForm({ winningBidder, savedCards, isAuthed, 
       <FormError error={error} />
 
       {/* ── Submit ── */}
-      <SubmitButton
-        loading={loading}
-        isValid={isValid}
-        label="Complete Payment"
-        price={`$${finalAmount.toFixed(2)}`}
-        onClick={onSubmit}
-      />
+      <SubmitButton loading={loading} isValid={isValid} label="Complete Payment" price={`$${finalAmount.toFixed(2)}`} onClick={onSubmit} />
     </div>
   )
 }

@@ -1,27 +1,46 @@
 import { ChangeEvent } from 'react'
-import { Loader2 } from 'lucide-react'
+import { Loader2, Lock } from 'lucide-react'
 import { toDatetimeLocal } from 'lib/utils/date.utils'
-import { IAuction } from 'types/auction.types'
+import { IAuctionDetail } from 'types/auction.types'
 
 const inputStyles = `w-full px-3.5 py-3 text-xs font-mono border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors scheme-light dark:scheme-dark`
 
-const labelStyles = `text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark`
+const lockedInputStyles = `${inputStyles} opacity-50 cursor-not-allowed`
 
-export function AuctionSettingsForm({
-  inputs,
-  isActive,
-  loading,
-  onInput,
-  onSave
-}: {
-  inputs: IAuction
+const labelStyles = `flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark`
+
+function LockedBadge() {
+  return (
+    <span className="inline-flex items-center gap-1 text-muted-light/70 dark:text-muted-dark/70">
+      <Lock size={9} aria-hidden="true" />
+      Locked
+    </span>
+  )
+}
+
+type Props = {
+  inputs: IAuctionDetail
   isActive: boolean
   loading: boolean
   onInput: (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => void
   onSave: () => void
-}) {
+}
+
+export function AuctionSettingsForm({ inputs, isActive, loading, onInput, onSave }: Props) {
+  const fieldClass = isActive ? lockedInputStyles : inputStyles
+
   return (
     <>
+      {isActive && (
+        <div className="flex items-start gap-2 px-3.5 py-3 border-l-2 border-amber-500 bg-amber-500/5">
+          <Lock size={11} className="text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" aria-hidden="true" />
+          <p className="text-[11px] font-mono text-amber-600 dark:text-amber-400 leading-relaxed">
+            The dates and auction link are locked while bidding is open, so live links keep working and the auction ends when bidders
+            expect.
+          </p>
+        </div>
+      )}
+
       <div className="flex flex-col gap-1.5">
         <label htmlFor="title" className={labelStyles}>
           Title
@@ -33,6 +52,7 @@ export function AuctionSettingsForm({
         <div className="flex flex-col gap-1.5">
           <label htmlFor="startDate" className={labelStyles}>
             Start Date
+            {isActive && <LockedBadge />}
           </label>
           <input
             disabled={isActive}
@@ -41,17 +61,14 @@ export function AuctionSettingsForm({
             type="datetime-local"
             onChange={onInput}
             value={toDatetimeLocal(inputs?.startDate) || ''}
-            className={inputStyles}
+            className={fieldClass}
           />
-          {isActive && (
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-              Start date cannot be changed once the auction is live
-            </p>
-          )}
         </div>
+
         <div className="flex flex-col gap-1.5">
           <label htmlFor="endDate" className={labelStyles}>
             End Date
+            {isActive && <LockedBadge />}
           </label>
           <input
             disabled={isActive}
@@ -60,13 +77,8 @@ export function AuctionSettingsForm({
             type="datetime-local"
             onChange={onInput}
             value={toDatetimeLocal(inputs?.endDate) || ''}
-            className={`${inputStyles} disabled:opacity-50 disabled:cursor-not-allowed`}
+            className={fieldClass}
           />
-          {isActive && (
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-              End date cannot be changed once the auction is live
-            </p>
-          )}
         </div>
       </div>
 
@@ -74,20 +86,13 @@ export function AuctionSettingsForm({
         <label htmlFor="goal" className={labelStyles}>
           Goal ($)
         </label>
-        <input
-          name="goal"
-          id="goal"
-          type="number"
-          onChange={onInput}
-          value={inputs?.goal || ''}
-          min={0}
-          className={inputStyles}
-        />
+        <input name="goal" id="goal" type="number" onChange={onInput} value={inputs?.goal || ''} min={0} className={inputStyles} />
       </div>
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="customAuctionLink" className={labelStyles}>
           Custom Link
+          {isActive && <LockedBadge />}
         </label>
         <input
           disabled={isActive}
@@ -97,20 +102,15 @@ export function AuctionSettingsForm({
           onChange={onInput}
           value={inputs?.customAuctionLink ?? ''}
           placeholder="e.g. spring-2026"
-          className={`${inputStyles} placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 disabled:opacity-50 disabled:cursor-not-allowed`}
+          className={`${fieldClass} placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50`}
         />
-        {isActive && (
-          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-            The link cannot be changed once the auction is live
-          </p>
-        )}
       </div>
 
       <div className="pt-2">
         <button
           onClick={onSave}
           disabled={loading}
-          className="px-5 py-2.5 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          className="px-5 py-2.5 bg-primary-light dark:bg-primary-dark text-white text-[10px] font-mono tracking-eyebrow uppercase hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
         >
           {loading ? (
             <>

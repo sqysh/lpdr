@@ -15,7 +15,8 @@ const auctionHeaderSelect = {
   status: true,
   startDate: true,
   endDate: true,
-  customAuctionLink: true
+  customAuctionLink: true,
+  isPubliclyVisible: true
 } satisfies Prisma.AuctionSelect
 
 /** Photos in display order, primary first. */
@@ -26,9 +27,27 @@ const photosOrdered = { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] }
 /** Item include for public pages: own bids, instant buyers, parent auction. */
 export const auctionItemLiveInclude = {
   photos: true,
-  bids: { select: bidSelect },
+  bids: { orderBy: { createdAt: 'desc' }, select: bidSelect },
   instantBuyers: true,
-  auction: { select: auctionHeaderSelect },
+  auction: {
+    select: {
+      ...auctionHeaderSelect,
+      items: {
+        orderBy: { createdAt: 'asc' },
+        select: {
+          id: true,
+          name: true,
+          sellingFormat: true,
+          status: true,
+          startingPrice: true,
+          buyNowPrice: true,
+          currentBid: true,
+          photos: photosOrdered,
+          _count: { select: { bids: true } }
+        }
+      }
+    }
+  },
   _count: { select: { bids: true } }
 } satisfies Prisma.AuctionItemInclude
 
@@ -37,6 +56,19 @@ export const auctionItemLiveArgs = Prisma.validator<Prisma.AuctionItemDefaultArg
 })
 
 export type IAuctionItemLive = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemLiveArgs>>
+
+export type PublicBid = Omit<IAuctionItemLive['bids'][number], 'user'> & { displayName: string }
+
+export type PublicAuctionItem = Omit<IAuctionItemLive, 'bids'> & { bids: PublicBid[] }
+
+/** An item as it appears inside the public auction, same bid treatment. */
+export type PublicAuctionListItem = Omit<IAuctionLive['items'][number], 'bids'> & { bids: PublicBid[] }
+
+/** The auction and its items as the grid page receives them. */
+export type PublicAuction = Omit<IAuctionLive, 'items' | 'bids'> & {
+  items: PublicAuctionListItem[]
+  bids: PublicBid[]
+}
 
 /** Public auction detail page — live items, public-safe user fields. */
 export const auctionLiveArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
@@ -115,3 +147,18 @@ export const auctionItemDetailArgs = Prisma.validator<Prisma.AuctionItemDefaultA
 export type IAuctionItemDetail = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemDetailArgs>>
 
 export type AuctionTab = (typeof TABS)[number]['label']
+
+// ─── Winner payment page ──────────────────────────────────────────────────
+
+/** What the winner payment page loads: the row, its items with photos, and who to bill. */
+export const auctionWinningBidderArgs = Prisma.validator<Prisma.AuctionWinningBidderDefaultArgs>()({
+  include: {
+    auction: { select: { id: true, title: true, customAuctionLink: true } },
+    user: { select: { id: true, firstName: true, lastName: true, email: true, address: true } },
+    auctionItems: {
+      include: { photos: photosOrdered }
+    }
+  }
+})
+
+export type IAuctionWinningBidder = DecimalToNumber<Prisma.AuctionWinningBidderGetPayload<typeof auctionWinningBidderArgs>>

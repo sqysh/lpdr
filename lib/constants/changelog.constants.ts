@@ -14,6 +14,65 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9.0',
+    date: '2026-09-15',
+    title: 'Auction bidding, winner payments and the end-of-auction run',
+    changes: [
+      {
+        type: 'feature',
+        text: 'Bidding now happens on the item page itself instead of in a pop-up. The current bid, the minimum and your own standing all stay on screen and update as other people bid'
+      },
+      {
+        type: 'feature',
+        text: 'The page tells you whether you are the top bidder or have been outbid, on both the item page and the grid, so you no longer have to work it out from the numbers'
+      },
+      {
+        type: 'feature',
+        text: 'Instant Bid now asks you to tap twice, and shows that a bid is binding and that all sales are final before it is placed'
+      },
+      {
+        type: 'feature',
+        text: 'Items can be added to an auction after it has started. Existing items lock their price, quantity and shipping once bidding is open, while the name, description and photos stay editable'
+      },
+      {
+        type: 'fix',
+        text: 'A winner who pressed pay twice could be charged twice. Each winner now has one payment that is reused rather than a new one created on every attempt'
+      },
+      {
+        type: 'fix',
+        text: 'A payment that went through but lost its confirmation would leave the page spinning with no explanation. It now says the payment may have gone through and to check your email before trying again'
+      },
+      {
+        type: 'fix',
+        text: 'Signing in from an emailed payment link sent people to My Pack instead of back to the payment page'
+      },
+      {
+        type: 'fix',
+        text: 'Opening a winner payment link while signed in as someone else showed a broken page. It now says which account the link belongs to and offers to switch'
+      },
+      {
+        type: 'improvement',
+        text: 'Winner emails now show items and shipping as separate lines, and reminders read as reminders rather than repeating the original congratulations'
+      },
+      {
+        type: 'improvement',
+        text: 'Bidder names are now worked out before the page is sent, so full names are no longer included in the auction page for anyone to find. New accounts also show a first name and initial by default instead of bidding anonymously'
+      },
+      {
+        type: 'improvement',
+        text: 'The Bidders tab lists every bid a person placed in order, with the item and whether that bid is still leading, instead of grouping them by item'
+      },
+      {
+        type: 'improvement',
+        text: 'The auction overview now shows how many new supporters signed up during the auction and how many of them went on to bid'
+      },
+      {
+        type: 'chore',
+        text: 'Auction money is now handled as exact decimals from the bid through to the receipt, so totals cannot drift by fractions of a cent'
+      }
+    ]
+  },
+  {
     version: '1.8.0',
     date: '2026-09-11',
     title: 'Adoption application access and bypass codes',

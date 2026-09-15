@@ -1,11 +1,12 @@
 import { Eye, Loader2, Package, Pencil, Plus } from 'lucide-react'
-import { IAuction } from 'types/auction.types'
+import { IAuctionDetail } from 'types/auction.types'
 import { motion } from 'framer-motion'
 import { formatMoney } from 'lib/utils/currency.utils'
 import Link, { useLinkStatus } from 'next/link'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getItemStatusConfig } from 'lib/utils/auction.utils'
 import Picture from 'components/_common/Picture'
+import { LinkBody } from 'components/_common/LinkBody'
 
 function AddItemLabel({ label }: { label: string }) {
   const { pending } = useLinkStatus()
@@ -18,10 +19,51 @@ function AddItemLabel({ label }: { label: string }) {
   )
 }
 
-export function ItemsTab({ auction }: { auction: IAuction }) {
+/**
+ * Both item types get their own button. Hanging the create type off whichever tab happened to be
+ * selected meant the same button did two different things with no way to tell which.
+ */
+function AddItemButton({
+  auctionId,
+  type,
+  label,
+  disabled,
+  variant
+}: {
+  auctionId: string
+  type: 'AUCTION' | 'FIXED'
+  label: string
+  disabled: boolean
+  variant: 'primary' | 'ghost'
+}) {
+  const base =
+    'flex items-center gap-1.5 px-3 py-1.5 text-f9 font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+
+  const tone = disabled
+    ? 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark cursor-not-allowed opacity-50'
+    : variant === 'primary'
+      ? 'bg-primary-light dark:bg-primary-dark text-white hover:bg-secondary-light dark:hover:bg-secondary-dark'
+      : 'border border-primary-light/40 dark:border-primary-dark/40 text-primary-light dark:text-primary-dark hover:bg-primary-light/5 dark:hover:bg-primary-dark/5'
+
+  return (
+    <Link
+      href={disabled ? '#' : `/admin/auctions/${auctionId}/new?type=${type}`}
+      aria-disabled={disabled}
+      title={disabled ? 'This auction has ended, so items can no longer be added' : undefined}
+      onClick={disabled ? (e) => e.preventDefault() : undefined}
+      className={`${base} ${tone}`}
+    >
+      <AddItemLabel label={label} />
+    </Link>
+  )
+}
+
+export function ItemsTab({ auction }: { auction: IAuctionDetail }) {
   const router = useRouter()
   const pathname = usePathname()
   const searchParams = useSearchParams()
+
+  const isEnded = auction.status === 'ENDED'
 
   const auctionItems = auction.items.filter((i) => i.sellingFormat === 'AUCTION')
   const fixedItems = auction.items.filter((i) => i.sellingFormat === 'FIXED')
@@ -38,33 +80,26 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
   return (
     <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
       {/* ── Header ── */}
-      <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark flex items-center justify-between">
-        <h2 className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+      <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-f9 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
           Items <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">{auction.items.length}</span>
         </h2>
-        <Link
-          href={auction.status === 'ENDED' ? '#' : `/admin/auctions/${auction.id}/new?type=${itemTab}`}
-          aria-disabled={auction.status === 'ENDED'}
-          onClick={auction.status === 'ENDED' ? (e) => e.preventDefault() : undefined}
-          className={`flex items-center gap-1.5 px-3 py-1.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
-            auction.status === 'ENDED'
-              ? 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark cursor-not-allowed opacity-50'
-              : 'bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark'
-          }`}
-        >
-          <AddItemLabel label={`Add ${itemTab === 'AUCTION' ? 'Auction' : 'Instant Buy'} Item`} />
-        </Link>
+        <div className="flex items-center gap-2">
+          <AddItemButton auctionId={auction.id} type="AUCTION" label="Add auction item" disabled={isEnded} variant="primary" />
+          <AddItemButton auctionId={auction.id} type="FIXED" label="Add instant buy item" disabled={isEnded} variant="ghost" />
+        </div>
       </div>
 
-      <div className="flex items-center justify-between border-b border-border-light dark:border-border-dark px-4">
-        <div role="tablist" aria-label="Item type" className="flex items-center">
+      {/* Tabs filter the table now. They no longer decide what the add buttons create. */}
+      <div className="flex items-center border-b border-border-light dark:border-border-dark px-4">
+        <div role="tablist" aria-label="Filter items by type" className="flex items-center">
           {(['AUCTION', 'FIXED'] as const).map((tab) => (
             <button
               key={tab}
               role="tab"
               aria-selected={itemTab === tab}
               onClick={() => selectItemTab(tab)}
-              className={`relative px-3.5 py-2.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+              className={`relative px-3.5 py-2.5 text-f9 font-mono tracking-eyebrow uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                 itemTab === tab
                   ? 'text-primary-light dark:text-primary-dark'
                   : 'text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -85,9 +120,6 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
             </button>
           ))}
         </div>
-        <p className="hidden sm:block text-[9px] font-mono text-muted-light dark:text-muted-dark">
-          The selected tab sets the type of item you create
-        </p>
       </div>
 
       {/* ── Tables ── */}
@@ -103,7 +135,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                   <th
                     key={i}
                     scope="col"
-                    className="px-4 py-2.5 text-left text-[9px] font-mono tracking-[0.2em] uppercase font-normal text-muted-light dark:text-muted-dark whitespace-nowrap"
+                    className="px-4 py-2.5 text-left text-f9 font-mono tracking-eyebrow uppercase font-normal text-muted-light dark:text-muted-dark whitespace-nowrap"
                   >
                     {h}
                   </th>
@@ -142,13 +174,9 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                           </div>
                         )}
                         <div className="min-w-0">
-                          <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate max-w-50">
-                            {item.name}
-                          </p>
+                          <p className="text-xs font-semibold text-text-light dark:text-text-dark truncate max-w-50">{item.name}</p>
                           {item.description && (
-                            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate max-w-50">
-                              {item.description}
-                            </p>
+                            <p className="text-f10 font-mono text-muted-light dark:text-muted-dark truncate max-w-50">{item.description}</p>
                           )}
                         </div>
                       </div>
@@ -171,7 +199,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                               <p className="text-xs font-mono tabular-nums text-emerald-600 dark:text-emerald-400">
                                 +{formatMoney(increase.amount)}
                               </p>
-                              <p className="text-[10px] font-mono tabular-nums text-emerald-600/70 dark:text-emerald-400/70">
+                              <p className="text-f10 font-mono tabular-nums text-emerald-600/70 dark:text-emerald-400/70">
                                 ({increase.pct.toFixed(1)}%)
                               </p>
                             </>
@@ -201,7 +229,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                     )}
 
                     <td className="px-4 py-2.5 whitespace-nowrap">
-                      <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 ${itemStatus.classes}`}>
+                      <span className={`text-f9 font-black tracking-widest uppercase px-2 py-0.5 ${itemStatus.classes}`}>
                         {itemStatus.label}
                       </span>
                     </td>
@@ -214,22 +242,20 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                           aria-label={`View ${item.name} and its bids`}
                           className="p-1.5 text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                         >
-                          <Eye size={13} aria-hidden="true" />
+                          <LinkBody icon={<Eye size={13} aria-hidden="true" />} label={null} />
                         </Link>
                         <Link
-                          href={auction.status === 'ENDED' ? '#' : `/admin/auctions/${item.auctionId}/${item.id}/edit`}
-                          aria-label={
-                            auction.status === 'ENDED' ? `Cannot edit ${item.name} — auction has ended` : `Edit ${item.name}`
-                          }
-                          aria-disabled={auction.status === 'ENDED'}
-                          onClick={auction.status === 'ENDED' ? (e) => e.preventDefault() : undefined}
+                          href={isEnded ? '#' : `/admin/auctions/${item.auctionId}/${item.id}/edit`}
+                          aria-label={isEnded ? `Cannot edit ${item.name}, the auction has ended` : `Edit ${item.name}`}
+                          aria-disabled={isEnded}
+                          onClick={isEnded ? (e) => e.preventDefault() : undefined}
                           className={`p-1.5 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
-                            auction.status === 'ENDED'
+                            isEnded
                               ? 'text-muted-light/30 dark:text-muted-dark/30 cursor-not-allowed'
                               : 'text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark'
                           }`}
                         >
-                          <Pencil size={13} aria-hidden="true" />
+                          <LinkBody icon={<Pencil size={13} aria-hidden="true" />} label={null} />
                         </Link>
                       </div>
                     </td>
@@ -240,7 +266,7 @@ export function ItemsTab({ auction }: { auction: IAuction }) {
                 <tr>
                   <td
                     colSpan={tab === 'AUCTION' ? 8 : 7}
-                    className="px-4 py-12 text-center text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
+                    className="px-4 py-12 text-center text-f10 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
                   >
                     No {tab === 'AUCTION' ? 'auction' : 'instant buy'} items yet
                   </td>

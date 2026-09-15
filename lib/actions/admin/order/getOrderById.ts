@@ -4,6 +4,7 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { serialize } from 'lib/utils/serializers.utils'
 
 export const getOrderById = async (id: string) => {
   const gate = await requireAuth()
@@ -17,6 +18,8 @@ export const getOrderById = async (id: string) => {
         type: true,
         status: true,
         totalAmount: true,
+        subtotal: true,
+        shipping: true,
         feesCovered: true,
         coverFees: true,
         isRecurring: true,
@@ -70,18 +73,7 @@ export const getOrderById = async (id: string) => {
     return {
       success: true,
       error: null,
-      data: {
-        ...order,
-        totalAmount: Number(order.totalAmount),
-        feesCovered: Number(order.feesCovered),
-        items: order.items.map((item) => ({
-          ...item,
-          price: Number(item.price),
-          subtotal: item.subtotal ? Number(item.subtotal) : null,
-          totalPrice: item.totalPrice ? Number(item.totalPrice) : null,
-          shippingPrice: item.shippingPrice ? Number(item.shippingPrice) : null
-        }))
-      }
+      data: serialize(order)
     }
   } catch (error) {
     await createLog('error', 'Failed to fetch order', {

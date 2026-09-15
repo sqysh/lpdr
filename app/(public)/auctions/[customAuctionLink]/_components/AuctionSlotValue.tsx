@@ -50,7 +50,7 @@ function SlotChar({ targetChar, spinning, delay }: { targetChar: string; spinnin
   )
 }
 
-export function SlotValue({ value, trigger }: { value: string; trigger: number }) {
+export function AuctionSlotValue({ value, trigger }: { value: string; trigger: number }) {
   const [displayValue, setDisplayValue] = useState(value)
   const [spinning, setSpinning] = useState(false)
   const prevTrigger = useRef(trigger)

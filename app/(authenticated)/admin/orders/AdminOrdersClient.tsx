@@ -1,8 +1,8 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle } from 'lucide-react'
-import { DisplayRow, FlatRow, GroupRow, OrderRow } from 'types/order.types'
+import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle, Percent } from 'lucide-react'
+import { DisplayRow, FlatRow, GroupRow, IOrderRow } from 'types/order.types'
 import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import { formatMoney } from 'lib/utils/currency.utils'
@@ -14,12 +14,11 @@ import { useRouter } from 'next/navigation'
 import { SubscriptionGroupRow } from './_components/SubscriptionGroupRow'
 import { formatDate } from 'lib/utils/date.utils'
 
-export function rowClass(o: OrderRow) {
+export function rowClass(o: IOrderRow) {
   if (!o.userId && !o.customerName && !o.customerEmail)
     return 'group border-l-2 border-l-red-500 bg-red-500/10 hover:bg-red-500/15 transition-colors'
 
-  if (o.status === 'FAILED')
-    return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
+  if (o.status === 'FAILED') return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
   if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
     return 'group border-l-2 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/8 transition-colors'
   return 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
@@ -27,21 +26,28 @@ export function rowClass(o: OrderRow) {
 
 const COL_COUNT = 9
 
-const isAnonymous = (o: OrderRow) => !o.userId && !o.customerName && !o.customerEmail
+const isAnonymous = (o: IOrderRow) => !o.userId && !o.customerName && !o.customerEmail
 
-export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
+export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
   const router = useRouter()
   const [filter, setFilter] = useState<Filter>('ALL')
 
   // Stat-card values
   const stats = useMemo(() => {
     const confirmed = orders.filter((o) => o.status === 'CONFIRMED')
+
+    const gross = confirmed.reduce((sum, o) => sum + Number(o.totalAmount), 0)
+    const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered) : 0), 0)
+    const feesAbsorbed = confirmed.reduce((sum, o) => sum + (o.coverFees ? 0 : Number(o.feesCovered)), 0)
+
     return {
-      revenue: confirmed.reduce((s, o) => s + o.totalAmount, 0),
+      // What customers paid, what the rescue keeps, and the gap between them
+      gross,
+      net: gross - feesCovered - feesAbsorbed,
+      feesCovered,
+      feesAbsorbed,
       confirmedCount: confirmed.length,
-      needsShipping: orders.filter(
-        (o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT'
-      ).length,
+      needsShipping: orders.filter((o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT').length,
       failed: orders.filter((o) => o.status === 'FAILED').length
     }
   }, [orders])
@@ -69,8 +75,8 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
     const filtered = filter === 'ALL' ? orders : orders.filter((o) => o.type === filter)
 
     // Group recurring by subscriptionId
-    const groups = new Map<string, OrderRow[]>()
-    const flat: OrderRow[] = []
+    const groups = new Map<string, IOrderRow[]>()
+    const flat: IOrderRow[] = []
 
     for (const o of filtered) {
       if (o.stripeSubscriptionId) {
@@ -93,13 +99,9 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
     // Sort all display rows by latest order date
     return [...groupRows, ...flatRows].sort((a, b) => {
       const aDate =
-        a.kind === 'group'
-          ? Math.max(...a.orders.map((o) => new Date(o.createdAt).getTime()))
-          : new Date(a.order.createdAt).getTime()
+        a.kind === 'group' ? Math.max(...a.orders.map((o) => new Date(o.createdAt).getTime())) : new Date(a.order.createdAt).getTime()
       const bDate =
-        b.kind === 'group'
-          ? Math.max(...b.orders.map((o) => new Date(o.createdAt).getTime()))
-          : new Date(b.order.createdAt).getTime()
+        b.kind === 'group' ? Math.max(...b.orders.map((o) => new Date(o.createdAt).getTime())) : new Date(b.order.createdAt).getTime()
       return bDate - aDate
     })
   }, [orders, filter])
@@ -109,9 +111,11 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
       <AdminPageHeader title="Orders" count={{ value: orders.length, noun: 'order' }} />
 
       <div className="w-full px-4 sm:px-6 py-6 space-y-6">
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          <Stat icon={DollarSign} label="Revenue" value={formatMoney(stats.revenue)} accent />
-          <Stat icon={Package} label="Confirmed Orders" value={String(stats.confirmedCount)} />
+        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
+          <Stat icon={DollarSign} label="Gross" value={formatMoney(stats.gross)} />
+          <Stat icon={DollarSign} label="Net to Rescue" value={formatMoney(stats.net)} accent />
+          <Stat icon={Percent} label="Fees Covered" value={formatMoney(stats.feesCovered)} />
+          <Stat icon={Package} label="Confirmed" value={String(stats.confirmedCount)} />
           <Stat icon={Truck} label="Needs Shipping" value={String(stats.needsShipping)} />
           <Stat icon={XCircle} label="Failed" value={String(stats.failed)} />
         </div>
@@ -130,17 +134,7 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
             <caption className="sr-only">All orders, newest first</caption>
             <thead>
               <tr className="border-b border-border-light dark:border-border-dark">
-                {[
-                  'Order',
-                  'Date',
-                  'Customer',
-                  'Type',
-                  'Items',
-                  'Total',
-                  'Status',
-                  'Shipping',
-                  ''
-                ].map((h, i) => (
+                {['Order', 'Date', 'Customer', 'Type', 'Items', 'Total', 'Status', 'Shipping', ''].map((h, i) => (
                   <th
                     key={i}
                     scope="col"
@@ -198,11 +192,10 @@ export function AdminOrdersClient({ orders }: { orders: OrderRow[] }) {
                       )}
                     </td>
                     <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
-                      {FILTER_LABELS[row.order.type as Filter] ??
-                        row.order.type.replaceAll('_', ' ')}
+                      {FILTER_LABELS[row.order.type as Filter] ?? row.order.type.replaceAll('_', ' ')}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono tabular-nums text-text-light dark:text-text-dark">
-                      {row.order.itemCount || '—'}
+                      {row.order.items.reduce((sum, i) => sum + (i.quantity ?? 1), 0) || '—'}
                     </td>
                     <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
                       {formatMoney(row.order.totalAmount)}

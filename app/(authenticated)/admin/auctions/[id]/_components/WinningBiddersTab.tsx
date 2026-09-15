@@ -5,12 +5,13 @@ import { useAuctionUiStore } from 'stores/auction-ui.store'
 
 export function WinningBiddersTab({ auction }: { auction: IAuction }) {
   const openWinningBidderDrawer = useAuctionUiStore((s) => s.openWinningBidderDrawer)
+
   return (
     <div className="border border-border-light dark:border-border-dark">
       <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
         <div className="flex items-center gap-3">
           <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-          <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+          <h2 className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
             Winning Bidders <span className="ml-1">{auction.winningBidders.length}</span>
           </h2>
         </div>
@@ -23,7 +24,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuction }) {
                 <th
                   key={h}
                   scope="col"
-                  className="px-5 py-3 text-left text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark"
+                  className="px-5 py-3 text-left text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark"
                 >
                   {h}
                 </th>
@@ -33,8 +34,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuction }) {
           <motion.tbody key="winningBidders" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.15 }}>
             {auction.winningBidders.length > 0 ? (
               auction.winningBidders.map((bidder) => {
-                const name =
-                  [bidder.user?.firstName, bidder.user?.lastName].filter(Boolean).join(' ') || bidder.user?.email || 'Guest'
+                const name = [bidder.user?.firstName, bidder.user?.lastName].filter(Boolean).join(' ') || bidder.user?.email || 'Guest'
                 return (
                   <tr
                     onClick={() => openWinningBidderDrawer(bidder)}
@@ -103,9 +103,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuction }) {
                     </td>
                     {/* Emails sent */}
                     <td className="px-5 py-3.5">
-                      <p className="text-xs font-mono tabular-nums text-text-light dark:text-text-dark">
-                        {bidder.emailNotificationCount}
-                      </p>
+                      <p className="text-xs font-mono tabular-nums text-text-light dark:text-text-dark">{bidder.emailNotificationCount}</p>
                     </td>
                   </tr>
                 )

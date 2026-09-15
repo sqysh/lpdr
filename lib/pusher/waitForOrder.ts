@@ -1,5 +1,5 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import Pusher from 'pusher-js'
+import { pusherClient } from 'lib/pusher/pusher-client'
 
 type OrderCreatedEvent = {
   type?: string
@@ -26,25 +26,18 @@ export function waitForOrder(channelKey: string, router: AppRouterInstance): Pro
       return
     }
 
-    const key = process.env.NEXT_PUBLIC_PUSHER_KEY
-    const cluster = process.env.NEXT_PUBLIC_PUSHER_CLUSTER
-
-    if (!key || !cluster) {
-      reject(new Error('Payment updates are unavailable. Please check your email for confirmation.'))
-      return
-    }
-
     const channelName = `payment-${channelKey}`
-    const pusher = new Pusher(key, { cluster })
-    const channel = pusher.subscribe(channelName)
+    const channel = pusherClient.subscribe(channelName)
 
     let settled = false
 
+    // Unsubscribe only. The connection is shared with the bid panel and anything else listening,
+    // so disconnecting here tore down sockets this function does not own, and writing an
+    // unsubscribe frame to an already closing socket is what logged the CLOSING/CLOSED warning.
     const cleanup = () => {
       clearTimeout(timeout)
       channel.unbind_all()
-      pusher.unsubscribe(channelName)
-      pusher.disconnect()
+      pusherClient.unsubscribe(channelName)
     }
 
     const succeed = (path: string) => {

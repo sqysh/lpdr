@@ -1,7 +1,7 @@
 import { Package } from 'lucide-react'
-import { IAuction } from 'types/auction.types'
+import { PublicAuction } from 'types/auction.types'
 
-export function AuctionEmptyState({ auction }: { auction: IAuction }) {
+export function AuctionEmptyState({ auction }: { auction: PublicAuction }) {
   if (auction.items.length > 0) return
 
   return (

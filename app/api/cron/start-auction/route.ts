@@ -1,23 +1,15 @@
 import { createLog } from 'lib/actions/log/createLog'
-import { pusherTrigger } from 'lib/pusher/pusher.utils'
-import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
+import { activateAuctions, AUCTION_START_SELECT } from 'lib/auction/activateAuctions'
 
-async function startAuction() {
+async function startDueAuctions() {
   const start = Date.now()
+
   try {
     const auctions = await prisma.auction.findMany({
-      where: {
-        status: 'DRAFT',
-        startDate: { lte: new Date() }
-      },
-      select: {
-        id: true,
-        title: true,
-        endDate: true,
-        _count: { select: { items: true } }
-      }
+      where: { status: 'DRAFT', startDate: { lte: new Date() } },
+      select: AUCTION_START_SELECT
     })
 
     if (auctions.length === 0) {
@@ -30,31 +22,30 @@ async function startAuction() {
       return NextResponse.json({ success: true, activated: 0 })
     }
 
-    await prisma.auction.updateMany({
-      where: { id: { in: auctions.map((a) => a.id) } },
-      data: { status: 'ACTIVE' }
-    })
-
-    revalidateTag('auction', 'max')
-
-    for (const auction of auctions) {
-      await pusherTrigger(`auction-${auction.id}`, 'auction-started', {
-        auctionId: auction.id,
-        auctionTitle: auction.title,
-        itemCount: auction._count.items,
-        endDate: auction.endDate.toISOString(),
-        timestamp: new Date().toISOString()
+    // One auction runs at a time. More than one due means a stale draft or a mistyped start
+    // date, and picking either would publish something nobody meant to publish.
+    if (auctions.length > 1) {
+      await createLog('error', '[CRON] start-auction', {
+        cronName: 'start-auction',
+        status: 'error',
+        durationMs: Date.now() - start,
+        detail: `${auctions.length} auctions are past their start date, so none were started: ${auctions
+          .map((a) => `${a.title} (${a.id})`)
+          .join(', ')}`
       })
+      return NextResponse.json({ error: 'More than one auction is due to start', auctions: auctions.map((a) => a.id) }, { status: 409 })
     }
+
+    const activated = await activateAuctions(auctions)
 
     await createLog('info', '[CRON] start-auction', {
       cronName: 'start-auction',
       status: 'success',
       durationMs: Date.now() - start,
-      detail: `${auctions.length} auction(s) started — ${auctions.map((a) => a.title).join(', ')}`
+      detail: `${activated} auction(s) started: ${auctions.map((a) => a.title).join(', ')}`
     })
 
-    return NextResponse.json({ success: true, activated: auctions.length })
+    return NextResponse.json({ success: true, activated })
   } catch (error) {
     await createLog('error', '[CRON] start-auction', {
       cronName: 'start-auction',
@@ -71,5 +62,5 @@ export async function GET(request: Request) {
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
-  return startAuction()
+  return startDueAuctions()
 }

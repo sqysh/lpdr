@@ -1,14 +1,24 @@
 import Link from 'next/link'
 import { RefreshCw, ChevronRight } from 'lucide-react'
-import { SerializedSubscriptionOrder } from 'types/order.types'
 import { STATUS_STYLES } from 'lib/constants/order.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
+import { OrderStatus } from '@prisma/client'
 
 export function OrderSubscriptionHistory({
   orders,
   currentOrderId
 }: {
-  orders: SerializedSubscriptionOrder[]
+  orders: {
+    id: string
+    status: OrderStatus
+    createdAt: Date
+    totalAmount: number
+    paymentIntentId: string
+    failureReason: string
+    failureCode: string
+    nextBillingDate: Date
+    isFirstPayment: boolean
+  }[]
   currentOrderId: string
 }) {
   const lifetimeValue = orders.reduce((s, o) => s + o.totalAmount, 0)
@@ -24,16 +34,11 @@ export function OrderSubscriptionHistory({
           id="subscription-heading"
           className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark"
         >
-          <RefreshCw
-            className="w-4 h-4 text-primary-light dark:text-primary-dark"
-            aria-hidden="true"
-          />
+          <RefreshCw className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
           Subscription History
         </h2>
         <div className="text-right">
-          <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
-            {formatMoney(lifetimeValue)}
-          </p>
+          <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">{formatMoney(lifetimeValue)}</p>
           <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70">
             {renewalCount} renewal{renewalCount !== 1 ? 's' : ''}
           </p>
@@ -47,9 +52,7 @@ export function OrderSubscriptionHistory({
             <li
               key={o.id}
               className={`flex items-center gap-3 px-4 py-3 ${
-                isCurrent
-                  ? 'bg-primary-light/5 dark:bg-primary-dark/5'
-                  : 'hover:bg-primary-light/3 dark:hover:bg-primary-dark/3'
+                isCurrent ? 'bg-primary-light/5 dark:bg-primary-dark/5' : 'hover:bg-primary-light/3 dark:hover:bg-primary-dark/3'
               }`}
             >
               {/* Index */}
@@ -69,25 +72,23 @@ export function OrderSubscriptionHistory({
                     })}
                   </p>
                   {i === 0 && (
-                    <span className="text-[8px] font-mono tracking-[0.15em] uppercase px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-primary-light dark:text-primary-dark">
+                    <span className="text-[8px] font-mono tracking-tag uppercase px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-primary-light dark:text-primary-dark">
                       Latest
                     </span>
                   )}
                   {o.isFirstPayment && (
-                    <span className="text-[8px] font-mono tracking-[0.15em] uppercase px-1.5 py-0.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark">
+                    <span className="text-[8px] font-mono tracking-tag uppercase px-1.5 py-0.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark">
                       First
                     </span>
                   )}
                   {isCurrent && (
-                    <span className="text-[8px] font-mono tracking-[0.15em] uppercase px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark">
+                    <span className="text-[8px] font-mono tracking-tag uppercase px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/10 dark:bg-primary-dark/10 text-primary-light dark:text-primary-dark">
                       Viewing
                     </span>
                   )}
                 </div>
                 {o.paymentIntentId && (
-                  <p className="text-[9px] font-mono text-muted-light/60 dark:text-muted-dark/60 mt-0.5 truncate">
-                    {o.paymentIntentId}
-                  </p>
+                  <p className="text-[9px] font-mono text-muted-light/60 dark:text-muted-dark/60 mt-0.5 truncate">{o.paymentIntentId}</p>
                 )}
               </div>
 
@@ -98,19 +99,14 @@ export function OrderSubscriptionHistory({
 
               {/* Status */}
               <span
-                className={`shrink-0 inline-flex px-2 py-0.5 border text-[8px] font-mono tracking-[0.15em] uppercase ${
-                  STATUS_STYLES[o.status] ??
-                  'border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark'
+                className={`shrink-0 inline-flex px-2 py-0.5 border text-[8px] font-mono tracking-tag uppercase ${
+                  STATUS_STYLES[o.status] ?? 'border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark'
                 }`}
               >
                 {o.status}
               </span>
 
-              <Link
-                href={`/order-confirmation/${o.id}?ref=admin`}
-                aria-label={`View order ${o.id.slice(-8)}`}
-                className="shrink-0"
-              >
+              <Link href={`/order-confirmation/${o.id}?ref=admin`} aria-label={`View order ${o.id.slice(-8)}`} className="shrink-0">
                 <ChevronRight
                   className="w-3.5 h-3.5 text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors"
                   aria-hidden="true"

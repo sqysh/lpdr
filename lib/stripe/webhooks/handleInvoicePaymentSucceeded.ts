@@ -3,7 +3,7 @@ import { stripeClient } from '../stripe-client'
 import prisma from 'prisma/client'
 import { RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
-import sendConfirmationEmail from 'lib/email/sendConfirmatioinEmail'
+import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 
 export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
@@ -99,9 +99,7 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         recurringFrequency: frequency as RecurringFrequency,
         coverFees: coverFees,
         feesCovered: feesCovered,
-        paidAt: invoice.status_transitions?.paid_at
-          ? new Date(invoice.status_transitions.paid_at * 1000)
-          : new Date(),
+        paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions.paid_at * 1000) : new Date(),
         nextBillingDate: getNextBillingDate(subscription),
         tierName: subscription.metadata.tierName || null,
         geoLatitude: geoUser?.lastGeoLatitude ?? null,
@@ -110,7 +108,8 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         geoRegion: geoUser?.lastGeoRegion ?? null,
         geoCountry: geoUser?.lastGeoCountry ?? null,
         geoSource: geoUser?.lastGeoLatitude != null ? 'ip' : null,
-        isFirstPayment
+        isFirstPayment,
+        isPhysical: false
       }
     })
 

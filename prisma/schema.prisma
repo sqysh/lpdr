@@ -194,7 +194,7 @@ model User {
   // Flexible user-specific data
   metadata Json? // ← Future-proof
 
-  anonymousBidding Boolean @default(true)
+  anonymousBidding Boolean @default(false)
   autoPay          Boolean @default(false)
   autoPayCoverFees Boolean @default(false)
 
@@ -261,11 +261,14 @@ model Order {
   source    String      @default("SITE") // 'SITE' | 'MONGO_MIGRATION'
 
   // ── Payment ─────────────────────────────────────────────
-  totalAmount        Decimal   @db.Decimal(10, 2)
+  subtotal           Decimal   @default(0) @db.Decimal(10, 2) // items only
+  shipping           Decimal   @default(0) @db.Decimal(10, 2)
+  totalAmount        Decimal   @db.Decimal(10, 2) // subtotal + shipping + feesCovered
   paymentIntentId    String?   @unique // Stripe payment intent ID
   paymentMethodId    String? // Stripe payment method ID used
   paidAt             DateTime? // When payment was completed
   coverFees          Boolean   @default(false)
+  autoPaid           Boolean   @default(false)
   feesCovered        Decimal   @default(0) @db.Decimal(10, 2)
   failureReason      String?
   failureCode        String?
@@ -375,12 +378,16 @@ model Auction {
 
   isPubliclyVisible Boolean @default(false)
 
+  winnersResolvedAt DateTime?
+
   items          AuctionItem[]
   bidders        AuctionBidder[]
   bids           AuctionBid[]
   instantBuyers  AuctionItemInstantBuyer[]
   winningBidders AuctionWinningBidder[]
   anomalies      AuctionAnomaly[]
+
+  @@index([status, endDate, winnersResolvedAt])
 }
 
 // ─── Auction Item ─────────────────────────────────────────────────────────────
@@ -498,6 +505,7 @@ model AuctionWinningBidder {
   elapsedTimeSinceAuctionItemWon             String?
   processingFee                              Decimal?                @db.Decimal(10, 2)
   totalPrice                                 Decimal?                @db.Decimal(10, 2)
+  itemsTotal                                 Decimal?                @db.Decimal(10, 2)
   itemSoldPrice                              Decimal?                @db.Decimal(10, 2)
   shipping                                   Decimal?                @db.Decimal(10, 2)
   shippingStatus                             ShippingStatus          @default(PENDING_PAYMENT_CONFIRMATION)
@@ -508,6 +516,8 @@ model AuctionWinningBidder {
   updatedAt                                  DateTime                @updatedAt
 
   auctionItems AuctionItem[]
+
+  paymentIntentId String?
 
   @@index([auctionId])
   @@index([userId])

@@ -1,6 +1,6 @@
 import { AuctionStatus } from '@prisma/client'
-import { IAuction } from 'types/auction.types'
-import { IAuctionBid } from 'types/auction-bid'
+import { BidStatus } from 'types/auction-bid'
+import { PublicAuction } from 'types/auction.types'
 import { AuctionItemStatus } from 'types/auction.types'
 
 export function getItemStatusConfig(status: AuctionItemStatus) {
@@ -16,8 +16,7 @@ export function getItemStatusConfig(status: AuctionItemStatus) {
     case 'UNSOLD':
       return {
         label: 'Unsold',
-        classes:
-          'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border-border-light dark:border-border-dark'
+        classes: 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border-border-light dark:border-border-dark'
       }
   }
 }
@@ -25,43 +24,48 @@ export function getItemStatusConfig(status: AuctionItemStatus) {
 export function getAuctionStatusConfig(status: AuctionStatus) {
   switch (status) {
     case 'ACTIVE':
-      return { label: 'Active', classes: 'bg-emerald-500/10 text-emerald-500' }
+      return {
+        label: 'Bidding open',
+        description: 'People can bid and buy right now',
+        dotClass: 'bg-emerald-500 animate-pulse',
+        textClass: 'text-emerald-500',
+        classes: 'bg-emerald-500/10 text-emerald-500'
+      }
     case 'DRAFT':
-      return { label: 'Draft', classes: 'bg-amber-500/10 text-amber-500' }
+      return {
+        label: 'Not started',
+        description: 'Nobody can bid yet',
+        dotClass: 'bg-amber-500',
+        textClass: 'text-amber-600 dark:text-amber-400',
+        classes: 'bg-amber-500/10 text-amber-500'
+      }
     case 'ENDED':
       return {
-        label: 'Ended',
+        label: 'Finished',
+        description: 'Bidding is closed',
+        dotClass: 'bg-muted-light dark:bg-muted-dark',
+        textClass: 'text-muted-light dark:text-muted-dark',
         classes:
           'bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark'
       }
   }
 }
 
-function calculateIncrementalTotal(bids: IAuction['bids']): number {
-  if (!bids || bids.length === 0) return 0
-
-  const bidsByItem = bids.reduce((acc: Record<string, typeof bids>, bid) => {
-    const itemId = bid.auctionItemId
-    if (!acc[itemId]) acc[itemId] = []
-    acc[itemId].push(bid)
+function calculateIncrementalTotal(bids: { auctionItemId: string; bidAmount: number }[]): number {
+  const highestByItem = bids.reduce<Record<string, number>>((acc, bid) => {
+    acc[bid.auctionItemId] = Math.max(acc[bid.auctionItemId] ?? 0, bid.bidAmount)
     return acc
   }, {})
 
-  let grandTotal = 0
-
-  Object.values(bidsByItem).forEach((itemBids) => {
-    const sorted = [...itemBids].sort((a, b) => a.bidAmount - b.bidAmount)
-    let itemTotal = 0
-    sorted.forEach((bid, i) => {
-      itemTotal += i === 0 ? bid.bidAmount : bid.bidAmount - sorted[i - 1].bidAmount
-    })
-    grandTotal += itemTotal
-  })
-
-  return grandTotal
+  return Object.values(highestByItem).reduce((sum, amount) => sum + amount, 0)
 }
 
-export function getDisplayRevenue(auction: IAuction): number {
+export function getDisplayRevenue(auction: {
+  status: AuctionStatus
+  totalAuctionRevenue: number
+  instantBuyers?: { totalPrice: number | null }[]
+  bids: { auctionItemId: string; bidAmount: number; status: BidStatus }[]
+}): number {
   if (auction.status === 'ENDED') return auction.totalAuctionRevenue
 
   const totalFromInstantBuys = auction.instantBuyers?.reduce((acc, item) => acc + (item.totalPrice ?? 0), 0) ?? 0
@@ -69,9 +73,14 @@ export function getDisplayRevenue(auction: IAuction): number {
   return calculateIncrementalTotal(auction.bids) + totalFromInstantBuys
 }
 
-export function bidderDisplay(bid: IAuctionBid) {
-  if (bid.user.anonymousBidding) return bid.bidderName ?? 'Anonymous'
-  return `${bid.user.firstName} ${bid.user.lastName[0]}.`
+export function bidderDisplay(bid: { user: { anonymousBidding: boolean; firstName: string | null; lastName: string | null } }): string {
+  if (bid.user.anonymousBidding) return 'Anonymous'
+
+  const first = bid.user.firstName?.trim()
+  const initial = bid.user.lastName?.trim()?.[0]
+
+  if (!first) return 'A supporter'
+  return initial ? `${first} ${initial}.` : first
 }
 
 export const AUCTION_MIN_HOUR = 6

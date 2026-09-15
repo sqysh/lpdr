@@ -64,7 +64,8 @@ export const createAuctionItem = async (input: unknown): Promise<ActionResult<{ 
           ? {
               create: photos.map((url, i) => ({ url, isPrimary: i === 0, sortOrder: i }))
             }
-          : undefined
+          : undefined,
+        status: auction.status === 'ACTIVE' ? 'ACTIVE' : 'UNSOLD'
       }
     })
 

@@ -43,6 +43,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
   const userId = gate.userId
 
+  let existingWinnerIntentId: string | null = null
+
   const windowStart = new Date(Date.now() - RATE_LIMIT_WINDOW_MS)
   const recentAttempts = await prisma.paymentAttempt.count({
     where: { userId, createdAt: { gt: windowStart } }
@@ -69,6 +71,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
     const verifiedEmail = user.email
 
     let baseCents = 0
+    let shippingCents = 0
     let purchaseDescription = `Order from ${displayName}`
 
     if (items?.length) {
@@ -87,11 +90,12 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         purchaseDescription = `${items.length}-item order from ${displayName}`
       }
 
-      let base = 0
+      let itemsBase = 0
+      let shippingBase = 0
 
       for (const item of items) {
         if (item.feedAFosterId) {
-          base += item.price * item.quantity
+          itemsBase += item.price * item.quantity
           continue
         }
 
@@ -104,7 +108,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           if (item.quantity > available) {
             throw new Error(`Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`)
           }
-          base += Number(product.price) * item.quantity + Number(product.shippingPrice)
+          itemsBase += Number(product.price) * item.quantity
+          shippingBase += Number(product.shippingPrice)
           continue
         }
 
@@ -116,10 +121,11 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         const option = options.find((o) => o.id === (item.welcomeWienerProductId ?? item.id))
         if (!option) throw new Error(`Invalid donation option for ${wiener.name}`)
 
-        base += Number(option.price) * item.quantity
+        itemsBase += Number(option.price) * item.quantity
       }
 
-      baseCents = Math.round(base * 100)
+      shippingCents = Math.round(shippingBase * 100)
+      baseCents = Math.round(itemsBase * 100) + shippingCents
     } else if (orderType === 'AUCTION_PURCHASE') {
       if (auctionItemId) {
         // Instant buy — a fixed-price item, priced from the database
@@ -142,7 +148,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
         const shipping = item.requiresShipping ? Number(item.shippingCosts ?? 0) : 0
 
-        baseCents = Math.round((Number(item.buyNowPrice) + shipping) * 100)
+        shippingCents = Math.round(shipping * 100)
+        baseCents = Math.round(Number(item.buyNowPrice) * 100) + shippingCents
         purchaseDescription = `${item.name} instant buy from ${displayName}`
       } else if (winningBidderId) {
         const winner = await prisma.auctionWinningBidder.findUnique({
@@ -150,6 +157,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           select: {
             userId: true,
             shipping: true,
+            paymentIntentId: true,
             winningBidPaymentStatus: true,
             auctionItems: { select: { soldPrice: true } }
           }
@@ -167,10 +175,13 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           throw new Error('This auction item has already been paid for')
         }
 
+        existingWinnerIntentId = winner.paymentIntentId
+
         const itemsTotal = winner.auctionItems.reduce((sum, i) => sum + Number(i.soldPrice ?? 0), 0)
         if (itemsTotal <= 0) throw new Error('This auction win has no items to pay for')
 
-        baseCents = Math.round((itemsTotal + Number(winner.shipping ?? 0)) * 100)
+        shippingCents = Math.round(Number(winner.shipping ?? 0) * 100)
+        baseCents = Math.round(itemsTotal * 100) + shippingCents
       } else {
         throw new Error('Missing auction reference')
       }
@@ -216,6 +227,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         name: displayName,
         email: verifiedEmail,
         saveCard: saveCard ? 'true' : 'false',
+        subtotal: ((baseCents - shippingCents) / 100).toFixed(2),
+        shipping: (shippingCents / 100).toFixed(2),
         coverFees: coverFees ? 'true' : 'false',
         feesCovered: (feesCoveredCents / 100).toFixed(2),
         ...(items?.length && {
@@ -239,7 +252,51 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       paymentIntentParams.confirm = true
     }
 
-    const paymentIntent = await stripeClient.paymentIntents.create(paymentIntentParams)
+    // A winner owes one amount once. Without this, a stuck confirmation screen and an admin or
+    // supporter pressing the button again mints a second intent and takes a second payment,
+    // which is exactly what happened on Sep 13.
+    const REUSABLE_STATUSES = new Set(['requires_payment_method', 'requires_confirmation', 'requires_action'])
+
+    let paymentIntent: Stripe.PaymentIntent | null = null
+
+    if (existingWinnerIntentId) {
+      const existing = await stripeClient.paymentIntents.retrieve(existingWinnerIntentId).catch(() => null)
+
+      if (existing?.status === 'succeeded' || existing?.status === 'processing') {
+        throw new Error('This auction win has already been paid for')
+      }
+
+      if (existing && REUSABLE_STATUSES.has(existing.status)) {
+        if (savedCardId) {
+          // The saved-card path creates and confirms in one call, so an unconfirmed intent can't
+          // be handed to it. Cancelling first keeps one live intent per winner.
+          await stripeClient.paymentIntents.cancel(existing.id).catch(() => null)
+        } else {
+          paymentIntent =
+            existing.amount === finalCents
+              ? existing
+              : await stripeClient.paymentIntents.update(existing.id, {
+                  amount: finalCents,
+                  metadata: paymentIntentParams.metadata
+                })
+        }
+      }
+    }
+
+    if (!paymentIntent) {
+      paymentIntent = await stripeClient.paymentIntents.create(
+        paymentIntentParams,
+        // Guards the simultaneous double-click that the lookup above can't see.
+        winningBidderId ? { idempotencyKey: `winner-${winningBidderId}-${finalCents}` } : undefined
+      )
+
+      if (winningBidderId) {
+        await prisma.auctionWinningBidder.update({
+          where: { id: winningBidderId },
+          data: { paymentIntentId: paymentIntent.id }
+        })
+      }
+    }
 
     await createLog('info', 'Payment intent created', {
       orderType,

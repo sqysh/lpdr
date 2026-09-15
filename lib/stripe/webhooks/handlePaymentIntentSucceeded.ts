@@ -2,7 +2,7 @@ import { OrderType, RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
 import { resend } from 'lib/email/resend'
-import sendConfirmationEmail from 'lib/email/sendConfirmatioinEmail'
+import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
 import { adminOrderNotificationTemplate } from 'lib/email/templates/admin-order-notification.template'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
@@ -100,13 +100,16 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
         state: address?.state ?? null,
         zipPostalCode: address?.zipPostalCode ?? null,
         country: 'US',
-        coverFees: metadata?.coverFees === 'true',
-        feesCovered: parseFloat(metadata?.feesCovered || '0') || 0,
+        subtotal: parseFloat(metadata.subtotal ?? '0'),
+        shipping: parseFloat(metadata.shipping ?? '0'),
+        coverFees: metadata.coverFees === 'true',
+        feesCovered: parseFloat(metadata.feesCovered ?? '0'),
         isRecurring,
         recurringFrequency: isRecurring ? ((metadata?.recurringFrequency as RecurringFrequency) ?? null) : null,
         stripeSubscriptionId: isRecurring ? (metadata?.stripeSubscriptionId ?? null) : null,
         nextBillingDate: nbd && !isNaN(+nbd) ? nbd : null,
         paymentMethodId: (paymentIntent.payment_method as string) || null,
+        isPhysical: hasPhysical,
         shippingStatus: hasPhysical ? 'PENDING_FULFILLMENT' : null,
         geoLatitude: geoUser?.lastGeoLatitude ?? null,
         geoLongitude: geoUser?.lastGeoLongitude ?? null,
@@ -372,31 +375,31 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       })
     )
 
-    if (hasPhysical && orderWithItems.addressLine1) {
-      void resend.emails
-        .send({
-          from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
-          to: 'lpdr@littlepawsdr.org',
-          subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
-          html: adminOrderNotificationTemplate({
-            orderId: orderWithItems.id,
-            customerName: orderWithItems.customerName,
-            customerEmail: orderWithItems.customerEmail,
-            items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
-            addressLine1: orderWithItems.addressLine1,
-            addressLine2: orderWithItems.addressLine2,
-            city: orderWithItems.city,
-            state: orderWithItems.state,
-            zipPostalCode: orderWithItems.zipPostalCode
-          })
-        })
-        .catch((error) =>
-          createLog('error', 'Failed to send admin shipping notification', {
-            orderId: order.id,
-            error: error instanceof Error ? error.message : 'Unknown error'
-          })
-        )
-    }
+    // if (hasPhysical && orderWithItems.addressLine1) {
+    //   void resend.emails
+    //     .send({
+    //       from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
+    //       to: 'lpdr@littlepawsdr.org',
+    //       subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
+    //       html: adminOrderNotificationTemplate({
+    //         orderId: orderWithItems.id,
+    //         customerName: orderWithItems.customerName,
+    //         customerEmail: orderWithItems.customerEmail,
+    //         items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
+    //         addressLine1: orderWithItems.addressLine1,
+    //         addressLine2: orderWithItems.addressLine2,
+    //         city: orderWithItems.city,
+    //         state: orderWithItems.state,
+    //         zipPostalCode: orderWithItems.zipPostalCode
+    //       })
+    //     })
+    //     .catch((error) =>
+    //       createLog('error', 'Failed to send admin shipping notification', {
+    //         orderId: order.id,
+    //         error: error instanceof Error ? error.message : 'Unknown error'
+    //       })
+    //     )
+    // }
 
     const channelId = userId
 

@@ -1,35 +1,44 @@
 import { SectionLabel } from 'components/_primitives'
 import { Zap } from 'lucide-react'
-import { AuctionItemCard } from './AuctionItemCard'
-import { IAuctionItemLive } from 'types/auction.types'
-import { IAuction } from 'types/auction.types'
+import { AuctionItemCard } from './auction-item-card/AuctionItemCard'
+import { PublicAuction, PublicAuctionListItem } from 'types/auction.types'
 import { Dispatch, SetStateAction } from 'react'
+import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
 
 type Props = {
   isActive: boolean
-  available: IAuctionItemLive[]
-  auction: IAuction
+  available: PublicAuctionListItem[]
+  auction: PublicAuction
   customAuctionLink: string
   setFilter: (filter: 'ALL' | 'AUCTION' | 'FIXED' | 'NO BIDS') => void
   filter: string
   setSlotTrigger: Dispatch<SetStateAction<number>>
+  myBids: Record<string, MyBid>
+  isAuthed: boolean
 }
 
-export function AuctionItemGrid({ isActive, available, auction, customAuctionLink, filter, setFilter, setSlotTrigger }: Props) {
+export function AuctionItemGrid({
+  isActive,
+  available,
+  auction,
+  customAuctionLink,
+  filter,
+  setFilter,
+  setSlotTrigger,
+  myBids,
+  isAuthed
+}: Props) {
   return (
     <section aria-labelledby="available-heading">
       <div className="flex items-center justify-between mb-6">
         <div className="space-y-1">
           <SectionLabel>{isActive ? 'Open for Bidding' : 'All Items'}</SectionLabel>
-          <h2
-            id="available-heading"
-            className="font-quicksand font-black text-2xl xs:text-3xl text-text-light dark:text-text-dark"
-          >
+          <h2 id="available-heading" className="font-quicksand font-black text-2xl xs:text-3xl text-text-light dark:text-text-dark">
             {available.length} Item{available.length !== 1 ? 's' : ''}
             {isActive && (
               <span className="ml-3 inline-flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />
-                <span className="text-[10px] font-mono text-emerald-500 tracking-[0.15em] uppercase font-normal">Live</span>
+                <span className="text-[10px] font-mono text-emerald-500 tracking-tag uppercase font-normal">Live</span>
               </span>
             )}
           </h2>
@@ -39,7 +48,7 @@ export function AuctionItemGrid({ isActive, available, auction, customAuctionLin
                 key={f}
                 type="button"
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+                className={`px-3 py-1.5 text-[9px] font-mono tracking-eyebrow uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                   filter === f
                     ? 'bg-primary-light dark:bg-primary-dark text-white'
                     : 'bg-bg-light dark:bg-bg-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark'
@@ -53,7 +62,7 @@ export function AuctionItemGrid({ isActive, available, auction, customAuctionLin
         {isActive && (
           <div className="hidden xs:flex items-center gap-1.5 px-3 py-2 border border-emerald-500/30 bg-emerald-500/5">
             <Zap size={10} className="text-emerald-500" aria-hidden="true" />
-            <span className="text-[9px] font-mono text-emerald-500 tracking-[0.15em] uppercase">Bidding Open</span>
+            <span className="text-[9px] font-mono text-emerald-500 tracking-tag uppercase">Bidding Open</span>
           </div>
         )}
       </div>
@@ -67,6 +76,8 @@ export function AuctionItemGrid({ isActive, available, auction, customAuctionLin
               index={i}
               customAuctionLink={customAuctionLink}
               onBidSuccess={() => setSlotTrigger((t) => t + 1)}
+              myBid={myBids[item.id] ?? null}
+              isAuthed={isAuthed}
             />
           </div>
         ))}

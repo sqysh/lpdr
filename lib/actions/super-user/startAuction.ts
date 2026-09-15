@@ -1,11 +1,10 @@
 'use server'
 
-import { revalidateTag } from 'next/cache'
 import { createLog } from 'lib/actions/log/createLog'
 import prisma from 'prisma/client'
-import { pusherTrigger } from 'lib/pusher/pusher.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireSuper } from 'lib/auth/guards'
+import { activateAuctions, AUCTION_START_SELECT } from 'lib/auction/activateAuctions'
 
 export async function startAuction(auctionId: string) {
   const gate = await requireSuper()
@@ -14,48 +13,23 @@ export async function startAuction(auctionId: string) {
   try {
     const auction = await prisma.auction.findUnique({
       where: { id: auctionId },
-      select: {
-        id: true,
-        title: true,
-        status: true,
-        endDate: true,
-        customAuctionLink: true,
-        _count: { select: { items: true } }
-      }
+      select: { ...AUCTION_START_SELECT, status: true }
     })
 
     if (!auction) return { success: false, error: 'Auction not found' }
     if (auction.status !== 'DRAFT') return { success: false, error: 'Auction is not in DRAFT status' }
 
-    await prisma.auction.update({
-      where: { id: auctionId },
-      data: { status: 'ACTIVE' }
+    await activateAuctions([auction])
+
+    await createLog('info', 'Auction started manually', {
+      auctionId,
+      auctionTitle: auction.title,
+      startedBy: gate.userId
     })
-
-    revalidateTag('auction', 'max')
-
-    await Promise.all([
-      pusherTrigger(`auction-${auctionId}`, 'auction-started', {
-        auctionId: auction.id,
-        auctionTitle: auction.title,
-        itemCount: auction._count.items,
-        endDate: auction.endDate.toISOString(),
-        timestamp: new Date().toISOString(),
-        customAuctionLink: auction.customAuctionLink
-      }),
-      createLog('info', 'Auction started manually', {
-        auctionId,
-        auctionTitle: auction.title,
-        startedBy: gate.userId
-      })
-    ])
 
     return { success: true }
   } catch (error) {
-    await createLog('error', 'Failed to start auction', {
-      auctionId,
-      error: getErrorMessage(error)
-    })
+    await createLog('error', 'Failed to start auction', { auctionId, error: getErrorMessage(error) })
     return { success: false, error: 'Failed to start auction' }
   }
 }

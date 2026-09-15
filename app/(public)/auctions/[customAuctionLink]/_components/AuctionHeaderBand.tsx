@@ -6,12 +6,13 @@ import { formatDate } from 'lib/utils/date.utils'
 import { Clock, TrendingUp, Users, Package, ArrowLeft } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { CountUnit } from 'components/_primitives'
-import { IAuction } from 'types/auction.types'
+import { PublicAuction } from 'types/auction.types'
 import { getDisplayRevenue } from 'lib/utils/auction.utils'
-import { SlotValue } from './SlotValue'
+import { AuctionSlotValue } from './AuctionSlotValue'
+import { LinkBody } from 'components/_common/LinkBody'
 
 type Props = {
-  auction: IAuction
+  auction: PublicAuction
   isActive: boolean
   isEnded: boolean
   isDraft: boolean
@@ -23,9 +24,10 @@ type Props = {
   trigger: number
 }
 
-export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, trigger }: Props) {
-  const headerRef = useRef(null)
+export function AuctionHeaderBand(props: Props) {
+  const { auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, trigger } = props
 
+  const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
   const displayRevenue = getDisplayRevenue(auction)
   const pct = getProgressPct(displayRevenue, auction.goal)
@@ -45,11 +47,11 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
           className="mb-6"
         >
           <Link
-            href="/auctions"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:underline"
+            href="/"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:underline"
             aria-label="Back to all auctions"
           >
-            <ArrowLeft size={12} aria-hidden="true" /> All Auctions
+            <LinkBody icon={<ArrowLeft size={12} aria-hidden="true" />} label="Back to site" />
           </Link>
         </motion.div>
 
@@ -69,7 +71,7 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
               <div className="flex items-center gap-2">
                 {isActive && <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />}
                 <span
-                  className={`text-[10px] font-mono tracking-[0.2em] uppercase ${isActive ? 'text-emerald-500' : 'text-primary-light dark:text-primary-dark'}`}
+                  className={`text-[10px] font-mono tracking-eyebrow uppercase ${isActive ? 'text-emerald-500' : 'text-primary-light dark:text-primary-dark'}`}
                 >
                   {isActive ? 'Live Now' : isEnded ? 'Auction Ended' : 'Upcoming'}
                 </span>
@@ -92,9 +94,7 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
               transition={{ duration: 0.4, delay: 0.16 }}
               className="text-[10px] font-mono text-muted-light dark:text-muted-dark"
             >
-              {isDraft
-                ? `Opens ${formatDate(auction.startDate)}`
-                : `${formatDate(auction.startDate)} — ${formatDate(auction.endDate)}`}
+              {isDraft ? `Opens ${formatDate(auction.startDate)}` : `${formatDate(auction.startDate)} — ${formatDate(auction.endDate)}`}
             </motion.p>
           </div>
 
@@ -110,7 +110,7 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
               <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
-                  <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+                  <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                     {isDraft ? 'Opens In' : 'Closing In'}
                   </span>
                 </div>
@@ -137,12 +137,8 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
                 ].map(({ icon: Icon, label, value }) => (
                   <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 xs:px-4 py-4">
                     <Icon size={11} className="text-muted-light dark:text-muted-dark mb-2" aria-hidden="true" />
-                    <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">
-                      {value}
-                    </p>
-                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">
-                      {label}
-                    </p>
+                    <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">{value}</p>
+                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
                   </div>
                 ))}
               </div>
@@ -166,15 +162,11 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
                   <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 xs:px-4 py-4">
                     <Icon size={11} className="text-muted-light dark:text-muted-dark mb-2" aria-hidden="true" />
                     {slot ? (
-                      <SlotValue value={value} trigger={trigger} />
+                      <AuctionSlotValue value={value} trigger={trigger} />
                     ) : (
-                      <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">
-                        {value}
-                      </p>
+                      <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">{value}</p>
                     )}
-                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">
-                      {label}
-                    </p>
+                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
                   </div>
                 ))}
               </div>
@@ -203,12 +195,8 @@ export function HeaderBand({ auction, isActive, isEnded, isDraft, days, hours, m
                   />
                 </div>
                 <div className="flex items-center justify-between mt-1.5">
-                  <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                    {formatMoney(displayRevenue)} raised
-                  </span>
-                  <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                    of {formatMoney(auction.goal)}
-                  </span>
+                  <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{formatMoney(displayRevenue)} raised</span>
+                  <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">of {formatMoney(auction.goal)}</span>
                 </div>
               </div>
             )}

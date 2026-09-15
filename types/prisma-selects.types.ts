@@ -23,33 +23,6 @@ export const bidSelect = {
   bidderId: true,
   status: true,
   createdAt: true,
-  updatedAt: true
+  updatedAt: true,
+  user: { select: { anonymousBidding: true, firstName: true, lastName: true } }
 } satisfies Prisma.AuctionBidSelect
-
-/** Auction header fields safe on any public page. */
-export const auctionPublicSelect = {
-  id: true,
-  title: true,
-  status: true,
-  startDate: true,
-  endDate: true,
-  customAuctionLink: true
-} satisfies Prisma.AuctionSelect
-
-/** Item card fields safe on any public page. */
-export const auctionItemPublicSelect = {
-  id: true,
-  name: true,
-  sellingFormat: true,
-  status: true,
-  startingPrice: true,
-  buyNowPrice: true,
-  currentBid: true,
-  photos: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }] },
-  _count: { select: { bids: true } }
-} satisfies Prisma.AuctionItemSelect
-
-/** Photos in display order — primary first. */
-export const photosOrdered = {
-  orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }]
-} satisfies Prisma.AuctionItemPhotoFindManyArgs

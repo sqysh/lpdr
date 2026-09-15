@@ -1,34 +1,21 @@
 import { formatMoney } from 'lib/utils/currency.utils'
-import { motion } from 'framer-motion'
 import { Gavel, ShieldCheck, Tag, Truck } from 'lucide-react'
 
-export function TitleBlock({ headerInView, isFixed, isSold, isActive, item }) {
+export function AuctionItemTitleBlock({ isFixed, isSold, isActive, item }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      animate={headerInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.45, delay: 0.08 }}
-    >
+    <div>
       {/* Format + status badges */}
       <div className="flex items-center gap-2 mb-3 flex-wrap">
         <div className="flex items-center gap-1.5 px-2.5 py-1 border border-border-light dark:border-border-dark">
           {isFixed ? (
             <>
               <Tag size={10} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
-              <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
-                Fixed Price
-              </span>
+              <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">Fixed Price</span>
             </>
           ) : (
             <>
-              <Gavel
-                size={10}
-                className="text-primary-light dark:text-primary-dark"
-                aria-hidden="true"
-              />
-              <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark">
-                Auction
-              </span>
+              <Gavel size={10} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
+              <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark">Auction</span>
             </>
           )}
         </div>
@@ -48,9 +35,7 @@ export function TitleBlock({ headerInView, isFixed, isSold, isActive, item }) {
           <div className="flex items-center gap-1.5 px-2.5 py-1 border border-border-light dark:border-border-dark">
             <Truck size={10} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
             <span className="text-[9px] font-mono text-muted-light dark:text-muted-dark">
-              {item?.shippingCosts
-                ? `Ships +${formatMoney(item?.shippingCosts)}`
-                : 'Shipping Included'}
+              {item?.shippingCosts ? `Ships +${formatMoney(item?.shippingCosts)}` : 'Shipping Included'}
             </span>
           </div>
         )}
@@ -61,10 +46,8 @@ export function TitleBlock({ headerInView, isFixed, isSold, isActive, item }) {
       </h1>
 
       {item?.description && (
-        <p className="text-sm font-nunito text-muted-light dark:text-muted-dark leading-relaxed">
-          {item?.description}
-        </p>
+        <p className="text-sm font-nunito text-muted-light dark:text-muted-dark leading-relaxed">{item?.description}</p>
       )}
-    </motion.div>
+    </div>
   )
 }

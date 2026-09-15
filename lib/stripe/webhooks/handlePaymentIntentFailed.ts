@@ -1,7 +1,7 @@
 import { OrderType } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { resend } from 'lib/email/resend'
-import { paymentFailedTemplate } from 'lib/email/templates/payment-failed-template'
+import { paymentFailedTemplate } from 'lib/email/templates/payment-failed.template'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'

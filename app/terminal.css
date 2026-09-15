@@ -1,0 +1,103 @@
+/* Terminal Minimalism primitives.
+   Import after Tailwind in globals.css:
+
+   @import 'tailwindcss';
+   @import './terminal.css';
+
+   Everything here is a real utility class, so it stays visible to editor autocomplete and to
+   the Prettier class sorter. A TS object of class strings would lose both. */
+
+@theme {
+  /* Sizes come from the existing f9/f10 scale in globals.css. Only the tracking values
+     were missing, so they are the only tokens added here. */
+  --tracking-eyebrow: 0.2em;
+  --tracking-tag: 0.15em;
+}
+
+/* ─── Text ──────────────────────────────────────────────────────────────── */
+
+/** Section label above a group of fields. */
+@utility eyebrow {
+  @apply text-f9 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark;
+}
+
+/** Inline status pill next to an eyebrow. Colour is set by the caller. */
+@utility tag {
+  @apply inline-flex items-center gap-1.5 text-f9 font-mono tracking-tag uppercase;
+}
+
+/** Helper text, counters, progress labels. */
+@utility meta {
+  @apply text-f10 font-mono text-muted-light dark:text-muted-dark;
+}
+
+/* ─── Surfaces ──────────────────────────────────────────────────────────── */
+
+@utility hairline {
+  @apply border-border-light dark:border-border-dark;
+}
+
+/** Bordered callout. Pair with a colour variant below. */
+@utility notice {
+  @apply flex items-start gap-2.5 px-3 py-3 border;
+}
+
+@utility notice-warning {
+  @apply border-amber-500/30 bg-amber-500/10 text-amber-500;
+}
+
+@utility notice-success {
+  @apply border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/5 dark:bg-primary-dark/5;
+}
+
+@utility notice-error {
+  @apply border-red-500/30 dark:border-red-400/30 bg-red-500/5 dark:bg-red-400/5;
+}
+
+/* ─── Controls ──────────────────────────────────────────────────────────── */
+
+/** Applied on its own to inputs and links that need the ring without the button shape. */
+@utility focus-ring {
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark;
+}
+
+/* The focus classes are repeated rather than @apply'd from focus-ring so the buttons don't
+   depend on utility-composing-utility resolution order. */
+@utility btn-terminal {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-f10 font-mono tracking-eyebrow uppercase transition-colors duration-150;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark;
+}
+
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-f10 font-mono tracking-eyebrow uppercase transition-colors duration-150;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark;
+  @apply bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white dark:text-bg-dark;
+}
+
+@utility btn-ghost {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-f10 font-mono tracking-eyebrow uppercase transition-colors duration-150;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark;
+  @apply border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark;
+  @apply hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40;
+}
+
+@utility btn-danger {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-3 text-f10 font-mono tracking-eyebrow uppercase transition-colors duration-150;
+  @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500;
+  @apply border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20;
+}
+
+/* ─── Field groups ──────────────────────────────────────────────────────── */
+
+/** Resets the browser's fieldset chrome so it can be used purely for grouping and disabling. */
+@utility field-group {
+  @apply min-w-0 m-0 p-0 border-0;
+}
+
+@utility field-stack {
+  @apply flex flex-col gap-5 min-w-0;
+}

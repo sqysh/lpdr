@@ -1,6 +1,7 @@
 import prisma from 'prisma/client'
 import { serialize } from 'lib/utils/serializers.utils'
 import { auctionItemLiveArgs } from 'types/auction.types'
+import { bidderDisplay } from 'lib/utils/auction.utils'
 
 export const getPublicAuctionItemById = async (id: string) => {
   const item = await prisma.auctionItem.findFirst({
@@ -10,5 +11,12 @@ export const getPublicAuctionItemById = async (id: string) => {
 
   if (!item) return { success: false, error: 'Auction item not found', data: null }
 
-  return { success: true, error: null, data: serialize(item) }
+  return {
+    success: true,
+    error: null,
+    data: serialize({
+      ...item,
+      bids: item.bids.map(({ user, ...bid }) => ({ ...bid, displayName: bidderDisplay({ user }) }))
+    })
+  }
 }

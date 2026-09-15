@@ -5,27 +5,16 @@ import { LogIn, Menu, User } from 'lucide-react'
 import GoogleTranslate from './GoogleTranslate'
 import { NavDropdown } from './NavDropdown'
 import { mainNavigationLinks } from 'lib/constants/navigation.constants'
-import AuctionAnnouncementStrip from './AuctionAnnouncementStrip'
 import { useScrollDirection } from 'lib/hooks/useScrollDirection.hook'
 import Picture from 'components/_common/Picture'
 import { useNavigationStore } from 'stores/navigation.store'
 import { useCartStore } from 'stores/cart.store'
 import { useModalsStore } from 'stores/modals.store'
-import { AuctionStatus } from '@prisma/client'
 import { LinkBody } from 'components/_common/LinkBody'
 import { LinkSpinner } from 'components/_common/LinkSpinner'
 import { CartLinkContent } from './CartLinkContent'
 
 type HeaderClientProps = {
-  auction: {
-    id: string
-    title: string
-    status: AuctionStatus
-    startDate?: Date | null
-    endDate?: Date | null
-    customAuctionLink: string
-    isPubliclyVisible: boolean
-  }
   hasActiveFee: boolean
   isAuthed: boolean
 }
@@ -44,7 +33,7 @@ const cartLink = `relative inline-flex items-center ${focusRing} rounded p-1`
 const donateButton =
   'inline-flex items-center justify-center bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white font-mono uppercase transition-colors duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
-export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientProps) {
+export function HeaderClient({ hasActiveFee, isAuthed }: HeaderClientProps) {
   const { hidden } = useScrollDirection()
   const mobileNavOpen = useNavigationStore((s) => s.mobileNavOpen)
   const openMobileNav = useNavigationStore((s) => s.openMobileNav)
@@ -66,9 +55,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
 
       {/* Whole header — slides up on scroll-down via CSS transform */}
       <div
-        className={`sticky top-0 z-50 w-full transition-transform duration-300 ease-out ${
-          hidden ? '-translate-y-full' : 'translate-y-0'
-        }`}
+        className={`sticky top-0 z-50 w-full transition-transform duration-300 ease-out ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
       >
         {/* ── Top Bar (desktop/tablet only) ── */}
         <header
@@ -106,16 +93,10 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
                   <Link
                     href={isAuthed ? '/my-pack' : '/auth/login'}
                     aria-label={isAuthed ? 'Go to My Pack' : 'Sign in to your account'}
-                    className={`inline-flex items-center gap-1.5 ${topBarLink} tracking-[0.2em] whitespace-nowrap ${focusRing} rounded`}
+                    className={`inline-flex items-center gap-1.5 ${topBarLink} tracking-eyebrow whitespace-nowrap ${focusRing} rounded`}
                   >
                     <LinkBody
-                      icon={
-                        isAuthed ? (
-                          <User className="w-3 h-3" aria-hidden="true" />
-                        ) : (
-                          <LogIn className="w-3 h-3" aria-hidden="true" />
-                        )
-                      }
+                      icon={isAuthed ? <User className="w-3 h-3" aria-hidden="true" /> : <LogIn className="w-3 h-3" aria-hidden="true" />}
                       label={isAuthed ? 'My Pack' : 'Sign In'}
                     />
                   </Link>
@@ -160,7 +141,7 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
               <Link
                 href="/donate"
                 aria-label="Donate to Little Paws Dachshund Rescue today"
-                className={`${donateButton} px-3 py-2 text-[9px] tracking-[0.15em]`}
+                className={`${donateButton} px-3 py-2 text-[9px] tracking-tag`}
               >
                 Donate
               </Link>
@@ -211,20 +192,13 @@ export function HeaderClient({ auction, hasActiveFee, isAuthed }: HeaderClientPr
               <Link
                 href="/donate"
                 aria-label="Donate to Little Paws Dachshund Rescue today"
-                className={`${donateButton} gap-2 px-6 py-3 text-[10px] tracking-[0.2em] focus-visible:ring-offset-2 focus-visible:ring-offset-primary-light dark:focus-visible:ring-offset-primary-dark w-25`}
+                className={`${donateButton} gap-2 px-6 py-3 text-[10px] tracking-eyebrow focus-visible:ring-offset-2 focus-visible:ring-offset-primary-light dark:focus-visible:ring-offset-primary-dark w-25`}
               >
                 <LinkSpinner label="Donate" />
               </Link>
             </div>
           </div>
         </nav>
-
-        {/* Auction strip */}
-        <div className="w-full mx-auto bg-topbar-light dark:bg-topbar-dark relative z-40">
-          <div className="mx-auto flex items-center justify-between">
-            <AuctionAnnouncementStrip auction={auction} />
-          </div>
-        </div>
       </div>
     </>
   )

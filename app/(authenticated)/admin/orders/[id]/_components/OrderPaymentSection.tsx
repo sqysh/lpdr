@@ -1,10 +1,10 @@
 import { CreditCard, AlertCircle } from 'lucide-react'
-import { SerializedOrder } from 'types/order.types'
+import { IOrder } from 'types/order.types'
 import { DECLINE_EXPLANATIONS } from 'lib/constants/order.constants'
 import { formatDate } from 'lib/utils/date.utils'
 import { Label } from './OrderLabel'
 
-export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
+export function OrderPaymentSection({ order }: { order: IOrder }) {
   const explanation = order.failureCode ? DECLINE_EXPLANATIONS[order.failureCode] : undefined
 
   return (
@@ -13,14 +13,8 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
       className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
     >
       <div className="px-4 py-3 border-b border-border-light dark:border-border-dark">
-        <h2
-          id="payment-heading"
-          className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark"
-        >
-          <CreditCard
-            className="w-4 h-4 text-primary-light dark:text-primary-dark"
-            aria-hidden="true"
-          />
+        <h2 id="payment-heading" className="flex items-center gap-2 font-quicksand font-black text-sm text-text-light dark:text-text-dark">
+          <CreditCard className="w-4 h-4 text-primary-light dark:text-primary-dark" aria-hidden="true" />
           Payment
         </h2>
       </div>
@@ -28,33 +22,25 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
       <div className="px-4 py-4 space-y-3">
         <div>
           <Label>Type</Label>
-          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">
-            {order.type.replaceAll('_', ' ')}
-          </p>
+          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">{order.type.replaceAll('_', ' ')}</p>
         </div>
 
         <div>
           <Label>Placed</Label>
-          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">
-            {formatDate(order.createdAt, true)}
-          </p>
+          <p className="text-xs font-mono text-text-light dark:text-text-dark mt-1">{formatDate(order.createdAt, true)}</p>
         </div>
 
         {order.paymentIntentId && (
           <div>
             <Label>Payment intent</Label>
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-1 break-all">
-              {order.paymentIntentId}
-            </p>
+            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-1 break-all">{order.paymentIntentId}</p>
           </div>
         )}
 
         {order.failureEmailSentAt && (
           <div>
             <Label>Failure email sent</Label>
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-1">
-              {formatDate(order.failureEmailSentAt, true)}
-            </p>
+            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-1">{formatDate(order.failureEmailSentAt, true)}</p>
           </div>
         )}
 
@@ -66,9 +52,7 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
             </p>
 
             <p className="text-xs font-mono text-text-light dark:text-text-dark leading-relaxed">
-              {explanation ??
-                order.failureReason ??
-                'The payment did not go through. No charge was made.'}
+              {explanation ?? order.failureReason ?? 'The payment did not go through. No charge was made.'}
             </p>
 
             <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
@@ -84,17 +68,13 @@ export function OrderPaymentSection({ order }: { order: SerializedOrder }) {
                   {order.failureCode && (
                     <div>
                       <Label>Code</Label>
-                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                        {order.failureCode}
-                      </p>
+                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">{order.failureCode}</p>
                     </div>
                   )}
                   {order.failureReason && (
                     <div>
                       <Label>Reason</Label>
-                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                        {order.failureReason}
-                      </p>
+                      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">{order.failureReason}</p>
                     </div>
                   )}
                 </div>

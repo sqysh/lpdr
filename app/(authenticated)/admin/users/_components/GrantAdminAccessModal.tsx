@@ -3,19 +3,21 @@
 import { useState, useMemo } from 'react'
 import { Search, X, CheckCircle } from 'lucide-react'
 import { EMAIL_REGEX } from 'lib/constants/regex.constants'
-import { IUser } from 'types/user'
 import { grantAdminAccess } from 'lib/actions/admin/user/grantAdminAccess'
+import { Role } from '@prisma/client'
+
+type User = { id: string; role: Role; firstName: string; lastName: string; email: string }
 
 type Props = {
   open: boolean
   onClose: () => void
-  users: IUser[]
+  users: User[]
   onGranted: () => void
 }
 
 export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props) {
   const [query, setQuery] = useState('')
-  const [selectedUser, setSelectedUser] = useState<IUser | null>(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState<{ success: boolean; message: string } | null>(null)
 
@@ -24,10 +26,7 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
     if (!q) return []
     return users
       .filter(
-        (u) =>
-          u.role !== 'ADMIN' &&
-          u.role !== 'SUPER_USER' &&
-          [u.firstName, u.lastName, u.email].some((v) => v?.toLowerCase().includes(q))
+        (u) => u.role !== 'ADMIN' && u.role !== 'SUPER_USER' && [u.firstName, u.lastName, u.email].some((v) => v?.toLowerCase().includes(q))
       )
       .slice(0, 5)
   }, [users, query])
@@ -72,9 +71,7 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
         <div className="fixed inset-0 z-100 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
           <div className="w-full max-w-sm bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
             <div className="flex items-center justify-between px-5 py-4 border-b border-border-light dark:border-border-dark">
-              <h2 className="font-quicksand font-black text-base text-text-light dark:text-text-dark">
-                Grant admin access
-              </h2>
+              <h2 className="font-quicksand font-black text-base text-text-light dark:text-text-dark">Grant admin access</h2>
               <button
                 type="button"
                 onClick={close}
@@ -115,9 +112,7 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                           <p className="text-xs font-semibold text-text-light dark:text-text-dark">
                             {u.firstName} {u.lastName}
                           </p>
-                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                            {u.email}
-                          </p>
+                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{u.email}</p>
                         </button>
                       ))}
                     </div>
@@ -134,8 +129,7 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                         No account yet for <span className="font-bold">{query.trim()}</span>
                       </p>
                       <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                        Grant admin access now — it applies automatically the first time they sign
-                        in.
+                        Grant admin access now — it applies automatically the first time they sign in.
                       </p>
                     </button>
                   )}
@@ -155,22 +149,20 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                     </span>{' '}
                     an admin?
                   </p>
-                  <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mb-4">
-                    {selectedUser.email}
-                  </p>
+                  <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mb-4">{selectedUser.email}</p>
                   <div className="flex gap-2">
                     <button
                       type="button"
                       onClick={() => handleGrant(selectedUser.email)}
                       disabled={loading}
-                      className="flex-1 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                      className="flex-1 py-2.5 text-[10px] font-mono tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       {loading ? 'Granting...' : 'Confirm'}
                     </button>
                     <button
                       type="button"
                       onClick={() => setSelectedUser(null)}
-                      className="px-4 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                      className="px-4 py-2.5 text-[10px] font-mono tracking-eyebrow uppercase border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       Back
                     </button>
@@ -182,9 +174,7 @@ export function GrantAdminAccessModal({ open, onClose, users, onGranted }: Props
                 <p
                   className={`text-[11px] font-mono mt-4 flex items-center gap-1.5 ${result.success ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-600 dark:text-red-400'}`}
                 >
-                  {result.success && (
-                    <CheckCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
-                  )}
+                  {result.success && <CheckCircle className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />}
                   {result.message}
                 </p>
               )}

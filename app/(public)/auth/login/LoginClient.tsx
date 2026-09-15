@@ -19,6 +19,8 @@ export function LoginClient() {
   const searchParams = useSearchParams()
   const errorMessage = ERROR_MESSAGES[searchParams.get('error') ?? '']
 
+  const redirectTo = searchParams.get('callbackUrl') || '/my-pack'
+
   return (
     <main
       id="main-content"
@@ -58,7 +60,7 @@ export function LoginClient() {
             <h1 className="font-quicksand font-black text-[30px] text-text-light dark:text-text-dark leading-none mb-1.5 tracking-tight">
               Welcome back.
             </h1>
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark tracking-[0.2em] uppercase">
+            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark tracking-eyebrow uppercase">
               Sign in to your account to continue
             </p>
           </div>
@@ -119,7 +121,7 @@ export function LoginClient() {
                       setSent(false)
                       setEmail('')
                     }}
-                    className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
                     Try a different email
                   </button>
@@ -143,21 +145,19 @@ export function LoginClient() {
                   )}
                   {/* OAuth group */}
                   <div className="flex flex-col gap-2">
-                    <GoogleButton redirectTo="/my-pack" />
-                    <FacebookButton redirectTo="/my-pack" />
+                    <GoogleButton redirectTo={redirectTo} />
+                    <FacebookButton redirectTo={redirectTo} />
                   </div>
 
                   {/* Divider */}
                   <div className="flex items-center gap-2.5" aria-hidden="true">
                     <span className="flex-1 h-px bg-border-light dark:bg-border-dark" />
-                    <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                      or
-                    </span>
+                    <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">or</span>
                     <span className="flex-1 h-px bg-border-light dark:bg-border-dark" />
                   </div>
 
                   {/* Email */}
-                  <MagicLink email={email} redirectTo="/my-pack" setEmail={setEmail} setSent={setSent} />
+                  <MagicLink email={email} redirectTo={redirectTo} setEmail={setEmail} setSent={setSent} />
 
                   {/* Footer note */}
                   <div className="-mx-6 mt-1 border-t border-border-light dark:border-border-dark px-6 py-3">
@@ -181,7 +181,7 @@ export function LoginClient() {
         <div className="mt-4 flex flex-col items-center gap-3">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             <ArrowLeft size={12} aria-hidden="true" />
             Back to site

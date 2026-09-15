@@ -1,13 +1,11 @@
 export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string }> = {
   ONE_TIME_DONATION: {
     label: 'Donation Confirmed',
-    message:
-      'Your generosity helps rescued dachshunds find their forever homes. Every dollar makes a real difference.'
+    message: 'Your generosity helps rescued dachshunds find their forever homes. Every dollar makes a real difference.'
   },
   RECURRING_DONATION: {
     label: 'Recurring Donation Active',
-    message:
-      'Your ongoing support means our dogs get consistent care all year long. Thank you for being a monthly hero.'
+    message: 'Your ongoing support means our dogs get consistent care all year long. Thank you for being a monthly hero.'
   },
   PURCHASE: {
     label: 'Order Confirmed',
@@ -25,14 +23,7 @@ export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string 
   }
 }
 
-export const FILTERS = [
-  'ALL',
-  'ONE_TIME_DONATION',
-  'RECURRING_DONATION',
-  'ADOPTION_FEE',
-  'AUCTION_PURCHASE',
-  'PURCHASE'
-] as const
+export const FILTERS = ['ALL', 'ONE_TIME_DONATION', 'RECURRING_DONATION', 'ADOPTION_FEE', 'AUCTION_PURCHASE', 'PURCHASE'] as const
 
 export type Filter = (typeof FILTERS)[number]
 

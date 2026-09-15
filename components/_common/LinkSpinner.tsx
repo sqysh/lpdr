@@ -9,6 +9,7 @@ export function LinkSpinner({ label, spinnerClass = 'w-3 h-3' }: { label: string
     return (
       <>
         <Loader2 className={`${spinnerClass} animate-spin`} aria-hidden="true" />
+        {label}
         <span className="sr-only">Loading</span>
       </>
     )

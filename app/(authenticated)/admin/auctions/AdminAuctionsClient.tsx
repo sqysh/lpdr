@@ -28,8 +28,6 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
     ENDED: auctions.filter((a) => a.status === 'ENDED').length
   }
 
-  let cardIndex = 0
-
   return (
     <>
       <CreateAuctionModal isOpen={openAuctionModal} onClose={() => setOpenAuctionModal(false)} />
@@ -78,9 +76,7 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
                   <div key={year}>
                     {/* Year heading */}
                     <div className="flex items-center gap-3 mb-4">
-                      <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                        {year}
-                      </span>
+                      <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">{year}</span>
                       <span className="flex-1 h-px bg-border-light dark:bg-border-dark" />
                     </div>
 
@@ -89,7 +85,7 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
                         <div key={quarter}>
                           {/* Quarter heading */}
                           <div className="flex items-center gap-2 mb-3">
-                            <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light/60 dark:text-muted-dark/60">
+                            <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light/60 dark:text-muted-dark/60">
                               Q{quarter}
                             </span>
                             <span className="flex-1 h-px bg-border-light/50 dark:bg-border-dark/50" />
@@ -100,8 +96,8 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
 
                           {/* Full-width cards */}
                           <div className="space-y-3">
-                            {auctions.map((auction) => (
-                              <AdminAuctionCard key={auction.id} auction={auction} index={cardIndex++} />
+                            {auctions.map((auction, i) => (
+                              <AdminAuctionCard key={auction.id} auction={auction} index={i++} />
                             ))}
                           </div>
                         </div>

@@ -1,196 +1,130 @@
+import type { ReactNode } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
-import { Loader2, Package, Zap } from 'lucide-react'
-import { FormField, Toggle } from 'components/_primitives'
-import { FormErrors, FormSuccess } from './AuctionItemForm'
+import { Control, useController } from 'react-hook-form'
+import { Loader2, Lock, Package, Pencil, Zap } from 'lucide-react'
+import { ControlledField, Toggle } from 'components/_primitives'
+import { StatusMessage, type Status } from 'components/_primitives/StatusMessage'
+import type { CreateAuctionItemFormValues } from 'lib/schemas/auction.schema'
+import type { SellingFormat } from 'types/auction.types'
+
+const LIVE_NOTICE_ID = 'auction-live-notice'
+
+type FieldAccess = 'locked' | 'editable' | 'none'
 
 type Props = {
   auctionId: string
+  control: Control<CreateAuctionItemFormValues>
+  status: Status | null
   isActive: boolean
   isUpdating: boolean
-  loading: boolean
+  isSubmitting: boolean
   uploadProgress: number
-  type: 'AUCTION' | 'FIXED'
+  type: SellingFormat
   showBuyNow: boolean
-  inputs: {
-    name: string
-    description: string
-    startingPrice: string
-    buyNowPrice: string
-    totalQuantity: string
-    requiresShipping: boolean
-    shippingCosts: string
-  }
-  errors: FormErrors
-  success: FormSuccess
-  handleInput: (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-  ) => void
-  patch: (data: Record<string, unknown>) => void
-  onSave: () => void
 }
 
-export function AuctionItemFields({
-  auctionId,
-  isActive,
-  isUpdating,
-  loading,
-  uploadProgress,
-  type,
-  showBuyNow,
-  inputs,
-  errors,
-  success,
-  handleInput,
-  patch,
-  onSave
-}: Props) {
+function AccessTag({ access }: { access: Exclude<FieldAccess, 'none'> }) {
+  const locked = access === 'locked'
+  const Icon = locked ? Lock : Pencil
+
   return (
-    <div className="space-y-5 min-w-0">
+    <span className={`tag ${locked ? 'text-amber-500' : 'text-primary-light dark:text-primary-dark'}`}>
+      <Icon size={9} aria-hidden="true" />
+      {locked ? 'Locked while live' : 'You can change these'}
+    </span>
+  )
+}
+
+/**
+ * A disabled <fieldset> switches off every control inside it, so the lock holds even for a
+ * field that doesn't take a `disabled` prop of its own. The old approach dimmed the inputs and
+ * killed pointer events, which left them reachable by keyboard and still submitted their values.
+ */
+function FieldGroup({ title, access, children }: { title: string; access: FieldAccess; children: ReactNode }) {
+  const locked = access === 'locked'
+
+  return (
+    <fieldset disabled={locked} aria-describedby={locked ? LIVE_NOTICE_ID : undefined} className="field-group">
+      <legend className="flex flex-wrap items-center gap-x-3 gap-y-1 w-full mb-3">
+        <span className="eyebrow">{title}</span>
+        {access !== 'none' && <AccessTag access={access} />}
+      </legend>
+      <div className={`field-stack ${locked ? 'opacity-45 cursor-not-allowed' : ''}`}>{children}</div>
+    </fieldset>
+  )
+}
+
+export function AuctionItemFields(props: Props) {
+  const { auctionId, control, status, isActive, isUpdating, isSubmitting, uploadProgress, type, showBuyNow } = props
+
+  const { field: requiresShipping } = useController({ control, name: 'requiresShipping' })
+
+  // New items can be added while bidding is open. It is the items already taking bids that lock,
+  // so a brand new item on a live auction is fully editable right up until it is saved.
+  const isLocked = isActive && isUpdating
+
+  return (
+    <div className="flex flex-col gap-6 min-w-0">
       {isActive && (
-        <div className="flex items-center gap-2 px-3 py-2.5 bg-amber-500/10 border border-amber-500/30">
-          <Zap size={11} className="text-amber-500 shrink-0" aria-hidden="true" />
-          <p className="text-[10px] font-mono text-amber-500 leading-snug">
-            This auction is live — only name, description, and photos can be changed.
-          </p>
+        <div id={LIVE_NOTICE_ID} className="notice notice-warning">
+          <Zap size={11} className="text-amber-500 shrink-0 mt-0.75" aria-hidden="true" />
+          <div className="flex flex-col gap-1.5">
+            <p className="text-f10 font-mono leading-relaxed">Bidding is open on this auction.</p>
+            <p className="text-f10 font-mono opacity-80 leading-relaxed">
+              {isLocked
+                ? 'You can still change the name, description and photos. Price, quantity and shipping stay locked until the auction ends, so nobody is bidding on different terms than the ones they started with.'
+                : 'This item goes up for bidding the moment you save it, so check the price and quantity first. They lock once it is live.'}
+            </p>
+          </div>
         </div>
       )}
 
-      <AnimatePresence>
-        {success && (
-          <div
-            role="status"
-            aria-live="polite"
-            className="border border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/5 dark:bg-primary-dark/5 px-4 py-3"
-          >
-            <p className="text-xs font-mono text-text-light dark:text-text-dark font-medium">
-              {success.message}
-            </p>
-            {success.description && (
-              <p className="mt-0.5 text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                {success.description}
-              </p>
+      <StatusMessage status={status} />
+
+      {/* Groups sit further apart than the fields inside them, so the locked/editable split reads first. */}
+      <div className="flex flex-col gap-8 min-w-0">
+        <FieldGroup title="Basic Info" access={isLocked ? 'editable' : 'none'}>
+          <ControlledField control={control} name="name" label="Name" placeholder="Item name" required />
+          <ControlledField
+            control={control}
+            name="description"
+            label="Description"
+            type="textarea"
+            placeholder="Item description..."
+            rows={3}
+          />
+        </FieldGroup>
+
+        <FieldGroup title="Pricing" access={isLocked ? 'locked' : 'none'}>
+          <div className="grid grid-cols-2 gap-x-3 gap-y-5">
+            {type === 'AUCTION' && (
+              <ControlledField control={control} name="startingPrice" label="Starting Price" type="number" placeholder="0.00" required />
             )}
+            {showBuyNow && (
+              <ControlledField control={control} name="buyNowPrice" label="Buy Now Price" type="number" placeholder="0.00" required />
+            )}
+            {showBuyNow && <ControlledField control={control} name="totalQuantity" label="Quantity" type="number" placeholder="1" />}
           </div>
-        )}
-      </AnimatePresence>
+        </FieldGroup>
 
-      <AnimatePresence>
-        {errors.form && (
-          <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            role="alert"
-            className="px-4 py-3 border border-red-500/30 bg-red-500/10 text-red-500 text-xs font-mono"
-          >
-            {errors.form}
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-        Basic Info
-      </p>
-
-      <FormField
-        id="name"
-        label="Name"
-        name="name"
-        value={inputs.name}
-        onChange={handleInput}
-        placeholder="Item name"
-        error={errors.name}
-        required
-      />
-
-      <FormField
-        id="description"
-        label="Description"
-        name="description"
-        type="textarea"
-        value={inputs.description}
-        onChange={handleInput}
-        placeholder="Item description..."
-        rows={3}
-      />
-
-      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-        Pricing
-      </p>
-
-      <div className="grid grid-cols-2 gap-3">
-        {type === 'AUCTION' && (
-          <FormField
-            id="startingPrice"
-            label="Starting Price"
-            name="startingPrice"
-            type="number"
-            value={inputs.startingPrice}
-            onChange={handleInput}
-            placeholder="0.00"
-            error={errors.startingPrice}
-            required
-            className={isActive ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
+        <FieldGroup title="Shipping" access={isLocked ? 'locked' : 'none'}>
+          <Toggle
+            id="requiresShipping"
+            label="Requires Shipping"
+            description="Item needs to be physically shipped"
+            checked={requiresShipping.value}
+            onToggle={() => requiresShipping.onChange(!requiresShipping.value)}
           />
-        )}
-        {showBuyNow && (
-          <FormField
-            id="buyNowPrice"
-            label="Buy Now Price"
-            name="buyNowPrice"
-            type="number"
-            value={inputs.buyNowPrice}
-            onChange={handleInput}
-            placeholder="0.00"
-            error={errors.buyNowPrice}
-            required
-            className={isActive ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
-          />
-        )}
-        {showBuyNow && (
-          <FormField
-            id="totalQuantity"
-            label="Quantity"
-            name="totalQuantity"
-            type="number"
-            value={inputs.totalQuantity}
-            onChange={handleInput}
-            placeholder="1"
-          />
-        )}
+
+          {requiresShipping.value && (
+            <ControlledField control={control} name="shippingCosts" label="Shipping Cost ($)" type="number" placeholder="0.00" />
+          )}
+        </FieldGroup>
       </div>
 
-      <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-        Shipping
-      </p>
-
-      <Toggle
-        id="requiresShipping"
-        label="Requires Shipping"
-        description="Item needs to be physically shipped"
-        checked={inputs.requiresShipping}
-        onToggle={() => patch({ requiresShipping: !inputs.requiresShipping })}
-      />
-
-      {inputs.requiresShipping && (
-        <FormField
-          id="shippingCosts"
-          label="Shipping Cost ($)"
-          name="shippingCosts"
-          type="number"
-          value={inputs.shippingCosts}
-          onChange={handleInput}
-          placeholder="0.00"
-          className={isActive ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}
-        />
-      )}
-
-      {loading && uploadProgress > 0 && uploadProgress < 100 && (
-        <div className="space-y-1">
-          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-            Uploading photos... {Math.round(uploadProgress)}%
-          </p>
+      {isSubmitting && uploadProgress > 0 && uploadProgress < 100 && (
+        <div className="flex flex-col gap-1.5">
+          <p className="meta">Uploading photos... {Math.round(uploadProgress)}%</p>
           <div className="w-full h-1 bg-border-light dark:bg-border-dark">
             <div
               className="h-1 bg-primary-light dark:bg-primary-dark transition-all duration-200"
@@ -200,15 +134,9 @@ export function AuctionItemFields({
         </div>
       )}
 
-      <div className="flex items-center gap-3 pt-4">
-        <button
-          type="button"
-          onClick={onSave}
-          disabled={loading}
-          aria-busy={loading}
-          className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white dark:text-bg-dark text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-        >
-          {loading ? (
+      <div className="flex items-center gap-3 pt-2 mt-2 border-t hairline">
+        <button type="submit" disabled={isSubmitting} aria-busy={isSubmitting} className="btn-primary flex-1 mt-2">
+          {isSubmitting ? (
             <>
               <Loader2 size={13} className="animate-spin" aria-hidden="true" /> Saving...
             </>
@@ -218,10 +146,7 @@ export function AuctionItemFields({
             </>
           )}
         </button>
-        <Link
-          href={`/admin/auctions/${auctionId}?tab=items`}
-          className="px-4 py-3 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-[0.2em] uppercase hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-        >
+        <Link href={`/admin/auctions/${auctionId}?tab=items`} className="btn-ghost mt-2">
           Cancel
         </Link>
       </div>

@@ -1,15 +1,8 @@
 'use client'
 
-import { CardElement, useElements, useStripe } from '@stripe/react-stripe-js'
 import { useRouter } from 'next/navigation'
-import { useCallback, useState } from 'react'
-import { createPaymentIntent } from 'lib/actions/_stripe/createPaymentIntent'
+import { useState } from 'react'
 import { updateAddress } from 'lib/actions/my-pack/updateAddress'
-import { CardElementField } from 'components/features/payment/CardElementField'
-import { FormError } from 'components/_primitives/FormError'
-import { SubmitButton } from 'components/_primitives/SubmitButton'
-import { Toggle } from 'components/_primitives/Toggle'
-import { useDefaultCard } from 'lib/hooks/useDefaultCard.hook'
 import type { IAuctionItemLive } from 'types/auction.types'
 import type { IPaymentMethod } from 'types/payment-method.types'
 import {
@@ -19,239 +12,146 @@ import {
   InstantBuyNameSection,
   InstantBuyOrderSummary
 } from 'app/(public)/auctions/[customAuctionLink]/[auctionItemId]/instant-buy/_components'
-import { CoverFeesToggle } from 'components/features/payment/CoverFeesToggle'
-import { SavedCardSelector } from 'components/features/payment/SavedCardSelector'
 import { calculateStripeFees } from 'lib/utils/fees.utils'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
-import { waitForOrder } from 'lib/pusher/waitForOrder'
-
-interface FormInputs {
-  // identity
-  firstName: string
-  lastName: string
-  // address
-  addressLine1: string
-  addressLine2: string
-  city: string
-  state: string
-  zipPostalCode: string
-  // card
-  cardComplete: boolean
-  selectedCardId: string | null
-  useNewCard: boolean
-  saveCard: boolean
-  // fees
-  coverFees: boolean
-  // ui
-  loading: boolean
-  error: string | null
-}
+import { AuctionPaymentInput, auctionPaymentSchema, AuctionPaymentValues } from 'lib/schemas/auction.schema'
+import { useForm, useWatch } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
+import { OrderType } from '@prisma/client'
+import { IAddress } from 'types/address.types'
+import { PaymentSection } from 'components/features/payment/PaymentSection'
 
 interface Props {
   auctionItem: IAuctionItemLive
   savedCards: IPaymentMethod[]
-  // from server page — no useSession flash
-  isAuthed: boolean
   userEmail: string
   userName: { firstName: string; lastName: string } | null
-  userAddress: {
-    addressLine1: string | null
-    addressLine2?: string | null
-    city: string | null
-    state: string | null
-    zipPostalCode: string | null
-  } | null
-  userId?: string | null
+  userAddress: Pick<IAddress, 'addressLine1' | 'addressLine2' | 'city' | 'state' | 'zipPostalCode'> | null
+  userId: string
 }
 
-export default function PublicAuctionInstantBuyClient({
-  auctionItem,
-  savedCards,
-  isAuthed,
-  userEmail,
-  userName,
-  userAddress,
-  userId
-}: Props) {
+export default function PublicAuctionInstantBuyClient({ auctionItem, savedCards, userEmail, userName, userAddress, userId }: Props) {
   const router = useRouter()
-  const stripe = useStripe()
-  const elements = useElements()
 
-  // ── Local form state ──────────────────────────────────────────────────────
-  const [inputs, setInputs] = useState<FormInputs>({
+  const DEFAULT_VALUES = {
     firstName: userName?.firstName ?? '',
     lastName: userName?.lastName ?? '',
     addressLine1: userAddress?.addressLine1 ?? '',
     addressLine2: userAddress?.addressLine2 ?? '',
     city: userAddress?.city ?? '',
     state: userAddress?.state ?? '',
-    zipPostalCode: userAddress?.zipPostalCode ?? '',
-    cardComplete: false,
-    selectedCardId: savedCards[0]?.stripePaymentId ?? null,
-    useNewCard: savedCards.length === 0,
-    saveCard: false,
-    coverFees: true,
-    loading: false,
-    error: null
+    zipPostalCode: userAddress?.zipPostalCode ?? ''
+  }
+
+  const {
+    register,
+    handleSubmit,
+    control,
+    trigger,
+    formState: { errors },
+    setError
+  } = useForm<AuctionPaymentInput, unknown, AuctionPaymentValues>({
+    resolver: zodResolver(auctionPaymentSchema),
+    mode: 'onBlur',
+    defaultValues: DEFAULT_VALUES
   })
 
-  const patch = (data: Partial<FormInputs>) => setInputs((prev) => ({ ...prev, ...data }))
+  const values = useWatch({ control })
 
-  // UI-only toggles — not part of the payment payload
+  const { payment, patch, usingSavedCard, pay, ready } = useStripeCheckout({
+    savedCards,
+    isAuthed: true,
+    userId,
+    billingName: `${values.firstName} ${values.lastName}`,
+    billingEmail: userEmail
+  })
+
+  // ── UI-only toggles — not part of the payment payload ──
   const [editingName, setEditingName] = useState(!userName?.firstName)
   const [editingAddress, setEditingAddress] = useState(!userAddress?.addressLine1)
 
-  // Per-section field errors
-  const [nameErrors, setNameErrors] = useState<Record<string, string>>({})
-  const [addressErrors, setAddressErrors] = useState<Record<string, string>>({})
-
-  // Per-section save loading
+  // ── Per-section save loading ──
   const [savingName, setSavingName] = useState(false)
   const [savingAddress, setSavingAddress] = useState(false)
 
-  // ── Derived amounts ───────────────────────────────────────────────────────
+  // ── Payment derived ──
   const baseAmount = Number(auctionItem?.buyNowPrice ?? 0)
   const shipping = Number(auctionItem?.shippingCosts ?? 0)
-  const processingFee = calculateStripeFees(baseAmount)
-  const feesCovered = inputs.coverFees ? processingFee : 0
-  const finalAmount = baseAmount + shipping + feesCovered
+  const subtotal = baseAmount + shipping
+  const processingFee = calculateStripeFees(subtotal)
+  const feesCovered = payment.coverFees ? processingFee : 0
+  const finalAmount = Math.round((subtotal + feesCovered) * 100) / 100
 
-  // ── Payment derived ───────────────────────────────────────────────────────
-  const usingSavedCard = isAuthed && !!inputs.selectedCardId && !inputs.useNewCard
-  const enteringNewCard = !isAuthed || savedCards.length === 0 || inputs.useNewCard
-
-  const hasName = !!inputs.firstName && !!inputs.lastName && !editingName
-  const hasAddress = !!inputs.addressLine1 && !!inputs.city && !!inputs.state && !!inputs.zipPostalCode && !editingAddress
-
+  // ── Name and address derived ──
+  const hasName = !!values.firstName && !!values.lastName && !editingName
+  const hasAddress = !!values.addressLine1 && !!values.city && !!values.state && !!values.zipPostalCode && !editingAddress
   const addressRequired = !!auctionItem?.requiresShipping
   const addressReady = !addressRequired || hasAddress
 
-  const isValid = hasName && addressReady && !inputs.loading && !!stripe && !!elements && (usingSavedCard ? true : inputs.cardComplete)
+  const isValid = hasName && addressReady && !payment.loading && ready && (usingSavedCard ? true : payment.cardComplete)
 
   // ── Cover photo ───────────────────────────────────────────────────────────
   const coverPhoto = auctionItem?.photos?.sort((a, b) => a.sortOrder - b.sortOrder)[0]?.url
 
-  // ── Default card ──────────────────────────────────────────────────────────
-  const setDefaultCard = useCallback((value: string) => patch({ selectedCardId: value }), [])
-  useDefaultCard(savedCards, isAuthed, setDefaultCard)
-
-  // ── Name handlers ─────────────────────────────────────────────────────────
-  async function handleSaveName() {
-    const errs: Record<string, string> = {}
-    if (!inputs.firstName.trim()) errs.firstName = 'Required'
-    if (!inputs.lastName.trim()) errs.lastName = 'Required'
-    if (Object.keys(errs).length) {
-      setNameErrors(errs)
-      return
-    }
+  const handleSaveName = async () => {
+    const ok = await trigger(['firstName', 'lastName'])
+    if (!ok) return
 
     setSavingName(true)
-    const result = await updateUserName({
-      firstName: inputs.firstName.trim(),
-      lastName: inputs.lastName.trim()
-    })
+    const result = await updateUserName({ firstName: values.firstName!, lastName: values.lastName! })
+    setSavingName(false)
 
     if (!result.success) {
-      setNameErrors({ firstName: result.error ?? 'Failed to save' })
-      setSavingName(false)
+      setError('firstName', { message: result.error ?? 'Failed to save' })
       return
     }
 
-    setNameErrors({})
     setEditingName(false)
-    setSavingName(false)
     router.refresh()
   }
 
-  // ── Address handlers ──────────────────────────────────────────────────────
-  async function handleSaveAddress() {
-    const errs: Record<string, string> = {}
-    if (!inputs.addressLine1.trim()) errs.addressLine1 = 'Required'
-    if (!inputs.city.trim()) errs.city = 'Required'
-    if (!inputs.state.trim()) errs.state = 'Required'
-    if (!inputs.zipPostalCode.trim()) errs.zipPostalCode = 'Required'
-    if (Object.keys(errs).length) {
-      setAddressErrors(errs)
+  const handleSaveAddress = async () => {
+    const ok = await trigger(['addressLine1', 'city', 'state', 'zipPostalCode'])
+    if (!ok) return
+
+    // The schema defaults these to empty, so required-ness is checked here
+    const missing = (['addressLine1', 'city', 'state', 'zipPostalCode'] as const).filter((f) => !values[f]?.trim())
+
+    if (missing.length) {
+      for (const f of missing) setError(f, { message: 'Required' })
       return
     }
 
     setSavingAddress(true)
+
     const result = await updateAddress({
-      name: `${inputs.firstName.trim()} ${inputs.lastName.trim()}`,
-      addressLine1: inputs.addressLine1.trim(),
-      addressLine2: inputs.addressLine2?.trim() || null,
-      city: inputs.city.trim(),
-      state: inputs.state.trim(),
-      zipPostalCode: inputs.zipPostalCode.trim(),
+      name: `${values.firstName} ${values.lastName}`,
+      addressLine1: values.addressLine1!,
+      addressLine2: values.addressLine2 || null,
+      city: values.city!,
+      state: values.state!,
+      zipPostalCode: values.zipPostalCode!,
       country: 'US'
     })
 
+    setSavingAddress(false)
+
     if (!result.success) {
-      setAddressErrors({ addressLine1: result.error ?? 'Failed to save' })
-      setSavingAddress(false)
+      setError('addressLine1', { message: result.error ?? 'Failed to save' })
       return
     }
 
-    setAddressErrors({})
     setEditingAddress(false)
-    setSavingAddress(false)
     router.refresh()
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
-  async function handleSubmit(e: { preventDefault: () => void }) {
-    e.preventDefault()
-    if (!stripe || !elements || !isValid) return
-
-    patch({ loading: true, error: null })
-
-    try {
-      const name = `${inputs.firstName.trim()} ${inputs.lastName.trim()}`
-
-      const basePayload = {
-        orderType: 'AUCTION_PURCHASE' as const,
-        coverFees: inputs.coverFees,
-        auctionItemId: auctionItem?.id
-      }
-
-      if (usingSavedCard) {
-        const result = await createPaymentIntent({
-          ...basePayload,
-          savedCardId: inputs.selectedCardId
-        })
-        if (!result.success) throw new Error(result.error)
-
-        await waitForOrder(userId, router)
-      } else {
-        const cardElement = elements.getElement(CardElement)
-        if (!cardElement) throw new Error('Card element not found')
-
-        const intentResult = await createPaymentIntent({
-          ...basePayload,
-          saveCard: inputs.saveCard
-        })
-        if (!intentResult.success) throw new Error(intentResult.error)
-
-        const result = await stripe.confirmCardPayment(intentResult.data.clientSecret!, {
-          payment_method: {
-            card: cardElement,
-            billing_details: { name, email: userEmail }
-          }
-        })
-
-        if (result.error) {
-          patch({ loading: false, error: result.error.message ?? 'Payment failed' })
-        } else if (result.paymentIntent?.status === 'succeeded') {
-          await waitForOrder(userId, router)
-        }
-      }
-    } catch (err) {
-      patch({
-        loading: false,
-        error: err instanceof Error ? err.message : 'Something went wrong. Please try again.'
-      })
-    }
-  }
+  const onSubmit = () =>
+    pay({
+      orderType: 'AUCTION_PURCHASE' as OrderType,
+      coverFees: payment.coverFees,
+      auctionItemId: auctionItem.id
+    })
 
   return (
     <main className="min-h-screen bg-bg-light dark:bg-bg-dark" id="main-content">
@@ -267,13 +167,13 @@ export default function PublicAuctionInstantBuyClient({
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-1">
             <div className="w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <span className="  text-f10 uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">Instant Buy</span>
+            <span className="text-f10 uppercase tracking-[0.25em] text-primary-light dark:text-primary-dark">Instant Buy</span>
           </div>
-          <h1 className="  text-2xl sm:text-3xl uppercase tracking-widest text-text-light dark:text-text-dark">Complete Purchase</h1>
+          <h1 className="text-2xl sm:text-3xl uppercase tracking-widest text-text-light dark:text-text-dark">Complete Purchase</h1>
         </div>
 
         <div className="space-y-6">
-          {/* Item card */}
+          {/* ── Item card ── */}
           <InstantBuyItemCard
             name={auctionItem.name}
             description={auctionItem.description}
@@ -283,97 +183,56 @@ export default function PublicAuctionInstantBuyClient({
             baseAmount={baseAmount}
           />
 
-          {/* Order summary */}
+          {/* ── Order summary ── */}
           <InstantBuyOrderSummary
             baseAmount={baseAmount}
             feesCovered={feesCovered}
             finalAmount={finalAmount}
-            coverFees={inputs.coverFees}
+            coverFees={payment.coverFees}
             requiresShipping={auctionItem.requiresShipping}
             shippingCosts={auctionItem.shippingCosts}
           />
 
           {/* ── Name section ── */}
           <InstantBuyNameSection
-            firstName={inputs.firstName}
-            lastName={inputs.lastName}
-            hasName={hasName}
-            savingName={savingName}
-            nameErrors={nameErrors}
+            register={register}
+            control={control}
+            errors={errors}
+            editing={editingName}
+            saving={savingName}
             showCancel={!!userName?.firstName}
-            onFirstNameChange={(v) => patch({ firstName: v })}
-            onLastNameChange={(v) => patch({ lastName: v })}
             onEdit={() => setEditingName(true)}
-            onCancel={() => {
-              setEditingName(false)
-              setNameErrors({})
-            }}
+            onCancel={() => setEditingName(false)}
             onSave={handleSaveName}
           />
 
           {/* ── Address section ── */}
           {addressRequired && (
             <InstantBuyAddressSection
-              inputs={inputs}
-              hasAddress={hasAddress}
-              savingAddress={savingAddress}
-              addressErrors={addressErrors}
+              register={register}
+              control={control}
+              errors={errors}
+              editing={editingAddress}
+              saving={savingAddress}
               showCancel={!!userAddress?.addressLine1}
-              onPatch={patch}
               onEdit={() => setEditingAddress(true)}
-              onCancel={() => {
-                setEditingAddress(false)
-                setAddressErrors({})
-              }}
+              onCancel={() => setEditingAddress(false)}
               onSave={handleSaveAddress}
             />
           )}
 
-          {/* Payment form */}
+          {/* ── Payment section ── */}
           <section aria-label="Payment details">
-            <form onSubmit={handleSubmit} noValidate className="space-y-4">
-              {isAuthed && savedCards.length > 0 && (
-                <SavedCardSelector
-                  savedCards={savedCards}
-                  selectedCardId={inputs.selectedCardId}
-                  useNewCard={inputs.useNewCard}
-                  onSelectCard={(id) => patch({ selectedCardId: id, useNewCard: false })}
-                  onUseNewCard={() => patch({ useNewCard: true, selectedCardId: null })}
-                  onUseSavedCard={() =>
-                    patch({
-                      useNewCard: false,
-                      selectedCardId: savedCards[0]?.stripePaymentId ?? null
-                    })
-                  }
-                />
-              )}
-
-              {enteringNewCard && (
-                <>
-                  <CardElementField onChange={({ complete, error }) => patch({ cardComplete: complete, error: error ?? null })} />
-                  <Toggle
-                    id="instant-buy-save-card"
-                    label="Save card for future purchases"
-                    description="One-click checkout next time"
-                    checked={inputs.saveCard}
-                    onToggle={() => patch({ saveCard: !inputs.saveCard })}
-                  />
-                </>
-              )}
-
-              <CoverFeesToggle
-                checked={inputs.coverFees}
-                onChange={() => patch({ coverFees: !inputs.coverFees })}
+            <form onSubmit={handleSubmit(onSubmit)} noValidate>
+              <PaymentSection
+                payment={payment}
+                patch={patch}
+                savedCards={savedCards}
                 processingFee={processingFee}
+                isValid={isValid}
+                submitLabel="Buy Now"
+                submitPrice={`$${finalAmount.toFixed(2)}`}
               />
-
-              <FormError error={inputs.error} />
-
-              <SubmitButton loading={inputs.loading} isValid={isValid} label="Buy Now" price={`$${finalAmount.toFixed(2)}`} />
-
-              <p className="font-lato text-xs text-muted-light dark:text-muted-dark text-center leading-relaxed">
-                Your payment is secured by Stripe. Little Paws Dachshund Rescue will never store your card details.
-              </p>
             </form>
           </section>
         </div>

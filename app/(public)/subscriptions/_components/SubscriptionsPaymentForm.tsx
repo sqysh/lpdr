@@ -18,7 +18,7 @@ import { useRouter } from 'next/navigation'
 import { useForm, useWatch } from 'react-hook-form'
 import { SubscriptionFormInput, subscriptionFormSchema, SubscriptionFormValues } from 'lib/schemas/subscription.schema'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { StripeSecurityNote } from './StripeSecurityNote'
+import { StripeSecurityNote } from '../../../../components/features/payment/StripeSecurityNote'
 import { waitForOrder } from 'lib/pusher/waitForOrder'
 
 type PaymentInputs = {

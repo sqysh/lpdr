@@ -1,12 +1,17 @@
-import { bidderDisplay } from 'lib/utils/auction.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDateTime } from 'lib/utils/date.utils'
 import { useInView, motion } from 'framer-motion'
 import { Trophy } from 'lucide-react'
 import { useRef } from 'react'
-import { IAuctionBid } from 'types/auction-bid'
+import { PublicAuctionItem } from 'types/auction.types'
 
-export function BidRow({ bid, rank, delay }: { bid: IAuctionBid; rank: number; delay: number }) {
+type Props = {
+  bid: PublicAuctionItem['bids'][number]
+  rank: number
+  delay: number
+}
+
+export function AuctionItemBidRow({ bid, rank, delay }: Props) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-20px' })
   const isTop = rank === 1
@@ -21,24 +26,14 @@ export function BidRow({ bid, rank, delay }: { bid: IAuctionBid; rank: number; d
     >
       <div className="flex items-center gap-3 min-w-0">
         <span
-          className={`text-[9px] font-mono font-black w-5 shrink-0 ${isTop ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'}`}
+          className={`text-f9 font-mono font-black w-5 shrink-0 ${isTop ? 'text-primary-light dark:text-primary-dark' : 'text-muted-light dark:text-muted-dark'}`}
         >
           #{rank}
         </span>
-        {isTop && (
-          <Trophy
-            size={11}
-            className="text-primary-light dark:text-primary-dark shrink-0"
-            aria-hidden="true"
-          />
-        )}
+        {isTop && <Trophy size={11} className="text-primary-light dark:text-primary-dark shrink-0" aria-hidden="true" />}
         <div className="min-w-0">
-          <p className="text-xs font-mono font-black text-text-light dark:text-text-dark truncate">
-            {bidderDisplay(bid)}
-          </p>
-          <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-            {formatDateTime(bid.createdAt)}
-          </p>
+          <p className="text-xs font-mono font-black text-text-light dark:text-text-dark truncate">{bid.displayName}</p>
+          <p className="text-f9 font-mono text-muted-light dark:text-muted-dark mt-0.5">{formatDateTime(bid.createdAt)}</p>
         </div>
       </div>
       <span

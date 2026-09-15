@@ -4,7 +4,7 @@ import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { resend } from 'lib/email/resend'
-import { paymentFailedTemplate } from 'lib/email/templates/payment-failed-template'
+import { paymentFailedTemplate } from 'lib/email/templates/payment-failed.template'
 
 export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   try {

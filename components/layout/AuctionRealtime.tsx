@@ -1,9 +1,9 @@
-import { getCachedAuction } from 'lib/actions/public/auction/getCachedAuction'
+import { getCachedNavAuction } from 'lib/actions/public/auction/getCachedNavAuction'
 import { AuctionRealtimeClient } from './AuctionRealTimeClient'
 
 export const AuctionRealtime = async () => {
-  const auction = await getCachedAuction()
+  const auction = await getCachedNavAuction()
   if (!auction) return null
 
-  return <AuctionRealtimeClient auctionId={auction.id} />
+  return <AuctionRealtimeClient auction={auction} />
 }

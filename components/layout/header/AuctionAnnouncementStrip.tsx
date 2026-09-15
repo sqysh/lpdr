@@ -1,6 +1,7 @@
 'use client'
 
 import { AuctionStatus } from '@prisma/client'
+import { LinkBody } from 'components/_common/LinkBody'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Gavel, ArrowRight } from 'lucide-react'
 import Link from 'next/link'
@@ -21,7 +22,7 @@ export default function AuctionAnnouncementStrip({ auction }: Props) {
   const status = auction?.status
   const isActive = status === 'ACTIVE'
 
-  if (!auction && !auction?.isPubliclyVisible) return
+  if (!auction || !auction?.isPubliclyVisible) return
 
   return (
     <AnimatePresence>
@@ -63,7 +64,7 @@ export default function AuctionAnnouncementStrip({ auction }: Props) {
 
             <Gavel size={13} className="text-white shrink-0" aria-hidden="true" />
 
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-white truncate">
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-white truncate">
               {isActive ? (
                 <>
                   <span className="font-black">Live Now</span>
@@ -85,13 +86,11 @@ export default function AuctionAnnouncementStrip({ auction }: Props) {
             <Link
               href={`/auctions/${auction?.customAuctionLink}`}
               aria-label={isActive ? `Bid now on ${auction?.title}` : `View upcoming auction: ${auction?.title}`}
-              className="group inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-white border border-white/40 hover:border-white hover:bg-white/10 px-3 py-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-transparent whitespace-nowrap"
+              className="group inline-flex items-center gap-1.5 text-[10px] font-mono tracking-eyebrow uppercase text-white border border-white/40 hover:border-white hover:bg-white/10 px-3 py-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-1 focus-visible:ring-offset-transparent whitespace-nowrap"
             >
-              {isActive ? 'Bid Now' : 'Learn More'}
-              <ArrowRight
-                size={10}
-                className="group-hover:translate-x-0.5 transition-transform duration-200"
-                aria-hidden="true"
+              <LinkBody
+                label={isActive ? 'Bid Now' : 'Learn More'}
+                icon={<ArrowRight size={10} className="group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true" />}
               />
             </Link>
           </div>

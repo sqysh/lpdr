@@ -4,7 +4,7 @@ import { ReactNode } from 'react'
 import Link from 'next/link'
 
 const baseClass =
-  'inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark text-[9px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 hover:bg-secondary-light dark:hover:bg-secondary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark shrink-0'
+  'inline-flex items-center gap-1.5 px-3 py-1.5 bg-primary-light dark:bg-primary-dark text-white text-[9px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 hover:bg-secondary-light dark:hover:bg-secondary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark shrink-0'
 
 type BaseProps = {
   children: ReactNode

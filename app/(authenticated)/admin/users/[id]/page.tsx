@@ -4,13 +4,7 @@ import { getUserById } from 'lib/actions/admin/user/getUserById'
 import { checkMigrationStatus } from 'lib/actions/admin/user/checkMigrationStatus'
 import { auth } from 'lib/auth'
 
-export const dynamic = 'force-dynamic'
-
-export default async function AdminUserDetailsPage({
-  params
-}: {
-  params: Promise<{ id: string }>
-}) {
+export default async function AdminUserDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
   const [userResult, session] = await Promise.all([getUserById(id), auth()])
 
@@ -18,9 +12,7 @@ export default async function AdminUserDetailsPage({
     notFound()
   }
 
-  const migrationResult = userResult.data.email
-    ? await checkMigrationStatus(userResult.data.email)
-    : null
+  const migrationResult = userResult.data.email ? await checkMigrationStatus(userResult.data.email) : null
 
   return (
     <AdminUserDetailsClient

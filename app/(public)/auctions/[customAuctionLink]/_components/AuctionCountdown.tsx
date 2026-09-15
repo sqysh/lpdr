@@ -1,29 +1,26 @@
 'use client'
 
 import { useCountdown } from 'lib/hooks/useCountdown.hook'
-import { IAuction } from 'types/auction.types'
-import { StickyHeader, HeaderBand } from './index'
+import { PublicAuction } from 'types/auction.types'
+import { AuctionStickyHeader, AuctionHeaderBand } from './index'
+import { Role } from '@prisma/client'
 
-export function AuctionCountdown({
-  auction,
-  isActive,
-  isEnded,
-  trigger,
-  isAuthed,
-  isDraft
-}: {
-  auction: IAuction
+type Props = {
+  auction: PublicAuction
   isActive: boolean
   isEnded: boolean
   trigger: number
   isAuthed: boolean
   isDraft: boolean
-}) {
+  role?: Role | null
+}
+
+export function AuctionCountdown({ auction, isActive, isEnded, trigger, isAuthed, isDraft, role }: Props) {
   const { days, hours, minutes, seconds, done } = useCountdown(new Date(isDraft ? auction.startDate : auction.endDate))
 
   return (
     <>
-      <StickyHeader
+      <AuctionStickyHeader
         auction={auction}
         days={days}
         done={done}
@@ -34,8 +31,10 @@ export function AuctionCountdown({
         seconds={seconds}
         isAuthed={isAuthed}
         isDraft={isDraft}
+        role={role}
       />
-      <HeaderBand
+
+      <AuctionHeaderBand
         auction={auction}
         days={days}
         done={done}

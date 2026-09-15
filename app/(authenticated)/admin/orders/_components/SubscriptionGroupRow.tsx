@@ -2,15 +2,12 @@
 
 import { formatMoney } from 'lib/utils/currency.utils'
 import { ChevronRight, RefreshCw } from 'lucide-react'
-import { OrderRow } from 'types/order.types'
 import { useRouter } from 'next/navigation'
 import { StatusPill } from 'components/_primitives'
+import { GroupRow } from 'types/order.types'
 
-type GroupRow = { kind: 'group'; subscriptionId: string; orders: OrderRow[] }
-
-function rowClass(o: OrderRow) {
-  if (o.status === 'FAILED')
-    return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
+function rowClass(o: { status: string; shippingStatus: string }) {
+  if (o.status === 'FAILED') return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
   if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
     return 'group border-l-2 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/8 transition-colors'
   return 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
@@ -18,19 +15,14 @@ function rowClass(o: OrderRow) {
 
 export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
   const router = useRouter()
-  const sorted = [...group.orders].sort(
-    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-  )
+  const sorted = [...group.orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
   const latest = sorted[0]
   const first = sorted[sorted.length - 1]
   const lifetimeValue = group.orders.reduce((s, o) => s + o.totalAmount, 0)
   const renewalCount = group.orders.length - 1
 
   return (
-    <tr
-      className={`${rowClass(latest)} cursor-pointer`}
-      onClick={() => router.push(`/admin/orders/${latest.id}`)}
-    >
+    <tr className={`${rowClass(latest)} cursor-pointer`} onClick={() => router.push(`/admin/orders/${latest.id}`)}>
       {/* Order — links to latest */}
       <td className="px-4 py-3 whitespace-nowrap">
         <div className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark">
@@ -50,12 +42,8 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
 
       {/* Customer */}
       <td className="px-4 py-3 min-w-0 max-w-50">
-        <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
-          {latest.customerName || '—'}
-        </p>
-        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
-          {latest.customerEmail}
-        </p>
+        <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">{latest.customerName || '—'}</p>
+        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">{latest.customerEmail}</p>
       </td>
 
       {/* Type */}
@@ -77,12 +65,8 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
 
       {/* Lifetime value */}
       <td className="px-4 py-3 whitespace-nowrap">
-        <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
-          {formatMoney(lifetimeValue)}
-        </p>
-        <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70 mt-0.5">
-          lifetime
-        </p>
+        <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">{formatMoney(lifetimeValue)}</p>
+        <p className="text-[9px] font-mono text-muted-light/70 dark:text-muted-dark/70 mt-0.5">lifetime</p>
       </td>
 
       {/* Status — latest */}

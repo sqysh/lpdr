@@ -33,6 +33,8 @@ import { AdoptionFees } from './_components/AdoptionFees'
 import { Subscriptions } from './_components/Subscriptions'
 import { OneTimeDonations } from './_components/OneTimeDonations'
 import { Auctions } from './_components/Auctions'
+import { ActiveAuctionBanner } from './_components/ActiveActionBanner'
+import { LinkBody } from 'components/_common/LinkBody'
 
 export default function MyPackClient({
   user,
@@ -43,7 +45,8 @@ export default function MyPackClient({
   adoptionFees,
   multiItemOrders,
   auctionPurchases,
-  hasPendingMigration
+  hasPendingMigration,
+  activeAuction
 }: MemberClientProps) {
   const router = useRouter()
   const session = useSession()
@@ -73,9 +76,7 @@ export default function MyPackClient({
   const totalGiven = [
     ...(donations ?? []).map((d) => Number(d.amount) || 0),
     ...(subscriptions ?? []).map((s) => Number(s.amount) || 0),
-    ...(auctionParticipation ?? []).flatMap((a) =>
-      a.items.filter((i) => i.isWinner).map((i) => Number(i.myHighestBid) || 0)
-    ),
+    ...(auctionParticipation ?? []).flatMap((a) => a.items.filter((i) => i.isWinner).map((i) => Number(i.myHighestBid) || 0)),
     ...(adoptionFees ?? []).map((a) => Number(a.feeAmount) || 0),
     ...(multiItemOrders ?? []).map((o) => Number(o.totalAmount) || 0),
     ...(auctionPurchases ?? []).map((o) => Number(o.totalAmount) || 0)
@@ -217,23 +218,26 @@ export default function MyPackClient({
 
   return (
     <>
-      {shippedOrderId && (
-        <ShippedCelebration
-          key={shippedOrderId}
-          orderId={shippedOrderId}
-          onClose={() => setShippedOrderId(null)}
-        />
-      )}
+      {shippedOrderId && <ShippedCelebration key={shippedOrderId} orderId={shippedOrderId} onClose={() => setShippedOrderId(null)} />}
 
       <AddPaymentMethodModal />
 
-      <main
-        id="main-content"
-        className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-      >
+      <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
         <TopBar />
 
         <MigrationBanner initiallyPending={hasPendingMigration} />
+
+        {activeAuction && (
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
+            <ActiveAuctionBanner
+              title={activeAuction.title}
+              customAuctionLink={activeAuction.customAuctionLink}
+              endDate={activeAuction.endDate}
+              itemCount={activeAuction.itemCount}
+              hasBids={activeAuction.hasBids}
+            />
+          </div>
+        )}
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-8">
           <Header
@@ -277,8 +281,7 @@ export default function MyPackClient({
                       onClick={openPaymentMethodModal}
                       className={`${addCardStyles} ${highlightPaymentMethod ? 'border-primary-light dark:border-primary-dark' : ''}`}
                     >
-                      <Plus className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      Add Card
+                      <LinkBody icon={<Plus className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Add Card" />
                     </button>
                   }
                 >
@@ -300,16 +303,11 @@ export default function MyPackClient({
                       className={`${addCardStyles} ${highlightAddress ? 'border-primary-light dark:border-primary-dark' : ''}`}
                       aria-label={user?.address ? 'Edit shipping address' : 'Add shipping address'}
                     >
-                      <Pencil className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      {user?.address ? 'Edit' : 'Add'}
+                      <LinkBody icon={<Pencil className="w-3 h-3 shrink-0" aria-hidden="true" />} label={user?.address ? 'Edit' : 'Add'} />
                     </button>
                   }
                 >
-                  <ShippingAddress
-                    addressModalOpen={addressModalOpen}
-                    setAddressModalOpen={setAddressModalOpen}
-                    user={user}
-                  />
+                  <ShippingAddress addressModalOpen={addressModalOpen} setAddressModalOpen={setAddressModalOpen} user={user} />
                 </SectionShell>
               </div>
             )}
@@ -319,13 +317,8 @@ export default function MyPackClient({
                 <SectionShell
                   heading="Merch, Wieners & Foster"
                   action={
-                    <Link
-                      href="/merch"
-                      className={addCardStyles}
-                      aria-label="Shop merch or sponsor a dog"
-                    >
-                      <Package className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      Shop
+                    <Link href="/merch" className={addCardStyles} aria-label="Shop merch or sponsor a dog">
+                      <LinkBody icon={<Package className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Shop" />
                     </Link>
                   }
                 >
@@ -336,8 +329,7 @@ export default function MyPackClient({
                   heading="Adoption Fees"
                   action={
                     <Link href="/adopt" className={addCardStyles}>
-                      <Dog className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      Adopt
+                      <LinkBody icon={<Dog className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Adopt" />
                     </Link>
                   }
                 >
@@ -352,8 +344,7 @@ export default function MyPackClient({
                   heading="Subscriptions"
                   action={
                     <Link href="/subscriptions" className={addCardStyles}>
-                      <Repeat className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      Subscribe
+                      <LinkBody icon={<Repeat className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Subscribe" />
                     </Link>
                   }
                 >
@@ -364,8 +355,7 @@ export default function MyPackClient({
                   heading="One-time Donations"
                   action={
                     <Link href="/donate" className={addCardStyles}>
-                      <Gift className="w-3 h-3 shrink-0" aria-hidden="true" />
-                      Donate
+                      <LinkBody icon={<Gift className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Donate" />
                     </Link>
                   }
                 >
@@ -379,15 +369,11 @@ export default function MyPackClient({
                 heading="Auctions"
                 action={
                   <Link href="/auctions" className={addCardStyles}>
-                    <Gavel className="w-3 h-3 shrink-0" aria-hidden="true" />
-                    Bid
+                    <LinkBody icon={<Gavel className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Bid" />
                   </Link>
                 }
               >
-                <Auctions
-                  auctionParticipation={auctionParticipation}
-                  auctionPurchases={auctionPurchases}
-                />
+                <Auctions auctionParticipation={auctionParticipation} auctionPurchases={auctionPurchases} />
               </SectionShell>
             )}
 

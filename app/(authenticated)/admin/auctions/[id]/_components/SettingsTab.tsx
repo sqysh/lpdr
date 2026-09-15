@@ -1,5 +1,5 @@
 import { useRouter } from 'next/navigation'
-import { IAuction } from 'types/auction.types'
+import { IAuctionDetail } from 'types/auction.types'
 import { ChangeEvent, useEffect, useRef, useState } from 'react'
 import { Flag, Loader2, RotateCcw, Trash2, Zap } from 'lucide-react'
 import { Role } from '@prisma/client'
@@ -11,10 +11,11 @@ import { endAuctionManually } from 'lib/actions/super-user/endAuctionManually'
 import { AuctionSettingsForm } from './AuctionSettingsForm'
 import { ActionPanel } from './ActionPanel'
 import { Status, StatusMessage } from 'components/_primitives/StatusMessage'
+import { useStatusMessage } from '@hooks/useStatusMessage.hook'
 
 const dangerButton = `shrink-0 inline-flex items-center gap-2 px-4 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`
 
-export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }) {
+export function SettingsTab({ auction, role }: { auction: IAuctionDetail; role: Role }) {
   const router = useRouter()
 
   const [inputs, setInputs] = useState(auction)
@@ -26,8 +27,9 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
   const [ending, setEnding] = useState(false)
   const [confirmEnd, setConfirmEnd] = useState(false)
 
+  const { flash } = useStatusMessage()
+
   const confirmEndTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const statusTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const isSuperUser = role === Role.SUPER_USER
   const isActive = inputs?.status === 'ACTIVE'
@@ -36,19 +38,6 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
   useEffect(() => {
     setInputs(auction)
   }, [auction])
-
-  useEffect(() => {
-    return () => {
-      if (confirmEndTimeout.current) clearTimeout(confirmEndTimeout.current)
-      if (statusTimeout.current) clearTimeout(statusTimeout.current)
-    }
-  }, [])
-
-  const flash = (next: Status) => {
-    if (statusTimeout.current) clearTimeout(statusTimeout.current)
-    setStatus(next)
-    statusTimeout.current = setTimeout(() => setStatus(null), 6000)
-  }
 
   const handleInput = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) =>
     setInputs((prev) => ({ ...prev, [e.target.name]: e.target.value }))
@@ -186,9 +175,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
         <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
           <div className="flex items-center gap-3">
             <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Auction Settings
-            </h2>
+            <h2 className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Auction Settings</h2>
           </div>
         </div>
 
@@ -216,11 +203,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
                 aria-label="Revert auction to draft"
                 className={`${dangerButton} border border-amber-500/40 text-amber-500 hover:bg-amber-500 hover:text-white focus-visible:ring-2 focus-visible:ring-amber-500`}
               >
-                {reverting ? (
-                  <Loader2 size={11} className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <RotateCcw size={11} aria-hidden="true" />
-                )}
+                {reverting ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <RotateCcw size={11} aria-hidden="true" />}
                 {reverting ? 'Reverting...' : 'Revert to Draft'}
               </button>
             </ActionPanel>
@@ -239,11 +222,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
                 aria-label="Start this auction manually"
                 className={`${dangerButton} bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`}
               >
-                {starting ? (
-                  <Loader2 size={11} className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <Zap size={11} aria-hidden="true" />
-                )}
+                {starting ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <Zap size={11} aria-hidden="true" />}
                 {starting ? 'Starting...' : 'Start Auction'}
               </button>
             </ActionPanel>
@@ -266,11 +245,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
                     : 'border border-red-500/40 text-red-500 hover:bg-red-500 hover:text-white'
                 }`}
               >
-                {ending ? (
-                  <Loader2 size={11} className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <Flag size={11} aria-hidden="true" />
-                )}
+                {ending ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <Flag size={11} aria-hidden="true" />}
                 {ending ? 'Ending...' : confirmEnd ? 'Confirm End' : 'End Auction'}
               </button>
             </ActionPanel>
@@ -289,11 +264,7 @@ export function SettingsTab({ auction, role }: { auction: IAuction; role: Role }
                 aria-label="Delete this auction permanently"
                 className={`${dangerButton} border border-red-500/40 dark:border-red-400/40 text-red-500 dark:text-red-400 hover:bg-red-500 dark:hover:bg-red-400 hover:text-white dark:hover:text-bg-dark focus-visible:ring-2 focus-visible:ring-red-500 dark:focus-visible:ring-red-400`}
               >
-                {deleting ? (
-                  <Loader2 size={11} className="animate-spin" aria-hidden="true" />
-                ) : (
-                  <Trash2 size={11} aria-hidden="true" />
-                )}
+                {deleting ? <Loader2 size={11} className="animate-spin" aria-hidden="true" /> : <Trash2 size={11} aria-hidden="true" />}
                 {deleting ? 'Deleting...' : 'Delete Auction'}
               </button>
             </ActionPanel>

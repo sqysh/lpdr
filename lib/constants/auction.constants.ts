@@ -9,3 +9,5 @@ export const TABS: { label: string; statuses: AuctionStatus[] }[] = [
   { label: 'Bidders', statuses: ['ACTIVE', 'ENDED'] },
   { label: 'Winning Bidders', statuses: ['ENDED'] }
 ]
+
+export const QUICK_BID_INCREMENT = 10
