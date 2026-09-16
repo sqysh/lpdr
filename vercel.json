@@ -5,6 +5,7 @@
     { "path": "/api/cron/end-auction", "schedule": "0 10-23,0-2 * * *" },
     { "path": "/api/cron/winner-payment-reminder", "schedule": "0 0 * * *" },
     { "path": "/api/cron/rotate-bypass-code", "schedule": "0 0 * * *" },
-    { "path": "/api/cron/cleanup-payment-attempts", "schedule": "0 0 * * *" }
+    { "path": "/api/cron/cleanup-payment-attempts", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/reconcile-payments/route.ts", "schedule": "0 1 * * *" }
   ]
 }
