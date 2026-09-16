@@ -3,6 +3,7 @@
 import { IOrder, ISubscriptionOrder } from 'types/order.types'
 import { OrderTopbar } from './_components/OrderTopbar'
 import { OrderFailureBanner } from './_components/OrderFailureBanner'
+import { OrderRefundBanner } from './_components/OrderRefundBanner'
 import { OrderItemsSection } from './_components/OrderItemsSection'
 import { OrderSubscriptionHistory } from './_components/OrderSubscriptionHistory'
 import { OrderFulfillmentSection } from './_components/OrderFulfillmentSection'
@@ -16,6 +17,7 @@ type Props = {
 }
 
 export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
+  const isRefunded = order.status === 'REFUNDED'
   const hasPhysical = order.items.some((i) => i.isPhysical)
   const hasSubscriptionHistory = subscriptionOrders?.length > 1
 
@@ -24,6 +26,7 @@ export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
       <OrderTopbar order={order} />
       <OrderAnomalyBanner order={order} />
       <OrderFailureBanner order={order} />
+      <OrderRefundBanner order={order} />
 
       <div className="w-full max-w-7xl px-4 sm:px-6 py-6 grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
         {/* Left */}
@@ -34,7 +37,9 @@ export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
 
         {/* Right */}
         <div className="space-y-6">
-          {hasPhysical && <OrderFulfillmentSection order={order} />}
+          {/* A refunded order is not going anywhere, so the fulfilment panel would be telling
+              Nadine to post something that has been paid back. */}
+          {hasPhysical && !isRefunded && <OrderFulfillmentSection order={order} />}
           <OrderCustomerSection order={order} />
           <OrderPaymentSection order={order} />
         </div>

@@ -1,7 +1,7 @@
 'use client'
 
 import { useMemo, useState } from 'react'
-import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle, Percent } from 'lucide-react'
+import { Package, DollarSign, Truck, XCircle, ChevronRight, AlertTriangle, Percent, Undo2 } from 'lucide-react'
 import { DisplayRow, FlatRow, GroupRow, IOrderRow } from 'types/order.types'
 import { FILTER_LABELS, FILTERS, type Filter } from 'lib/constants/order.constants'
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
@@ -19,8 +19,15 @@ export function rowClass(o: IOrderRow) {
     return 'group border-l-2 border-l-red-500 bg-red-500/10 hover:bg-red-500/15 transition-colors'
 
   if (o.status === 'FAILED') return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
+
+  // Refunded rows are muted rather than flagged: nothing needs doing, they just should not read
+  // as money the rescue still has.
+  if (o.status === 'REFUNDED')
+    return 'group border-l-2 border-l-zinc-400 dark:border-l-zinc-600 bg-zinc-500/5 opacity-60 hover:opacity-100 hover:bg-zinc-500/10 transition-all'
+
   if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
     return 'group border-l-2 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/8 transition-colors'
+
   return 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
 }
 
@@ -34,19 +41,24 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
 
   // Stat-card values
   const stats = useMemo(() => {
+    // Money the rescue actually kept. A refunded order was real revenue for a while, so it is
+    // counted separately rather than silently dropped: Cathy reconciles against Stripe, where
+    // the charge and the refund both appear.
     const confirmed = orders.filter((o) => o.status === 'CONFIRMED')
+    const refunded = orders.filter((o) => o.status === 'REFUNDED')
 
     const gross = confirmed.reduce((sum, o) => sum + Number(o.totalAmount), 0)
     const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered) : 0), 0)
     const feesAbsorbed = confirmed.reduce((sum, o) => sum + (o.coverFees ? 0 : Number(o.feesCovered)), 0)
 
     return {
-      // What customers paid, what the rescue keeps, and the gap between them
       gross,
       net: gross - feesCovered - feesAbsorbed,
       feesCovered,
       feesAbsorbed,
       confirmedCount: confirmed.length,
+      refundedCount: refunded.length,
+      refundedTotal: refunded.reduce((sum, o) => sum + Number(o.totalAmount), 0),
       needsShipping: orders.filter((o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT').length,
       failed: orders.filter((o) => o.status === 'FAILED').length
     }
@@ -117,7 +129,11 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
           <Stat icon={Percent} label="Fees Covered" value={formatMoney(stats.feesCovered)} />
           <Stat icon={Package} label="Confirmed" value={String(stats.confirmedCount)} />
           <Stat icon={Truck} label="Needs Shipping" value={String(stats.needsShipping)} />
-          <Stat icon={XCircle} label="Failed" value={String(stats.failed)} />
+          {stats.refundedCount > 0 ? (
+            <Stat icon={Undo2} label="Refunded" value={formatMoney(stats.refundedTotal)} />
+          ) : (
+            <Stat icon={XCircle} label="Failed" value={String(stats.failed)} />
+          )}
         </div>
 
         <AdminFilterTabs
@@ -138,7 +154,7 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
                   <th
                     key={i}
                     scope="col"
-                    className="px-4 py-2.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark font-normal whitespace-nowrap"
+                    className="px-4 py-2.5 text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark font-normal whitespace-nowrap"
                   >
                     {h}
                   </th>
