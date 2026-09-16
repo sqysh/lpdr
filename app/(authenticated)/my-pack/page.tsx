@@ -6,6 +6,8 @@ import prisma from 'prisma/client'
 import { auth } from 'lib/auth'
 import { getCachedNavAuction } from 'lib/actions/public/auction/getCachedNavAuction'
 
+export const dynamic = 'force-dynamic'
+
 export default function MyPackPage() {
   return (
     <Suspense fallback={null}>
@@ -36,8 +38,6 @@ async function MyPackContent() {
     getBannerAuction()
   ])
   const hasPendingMigration = migrationResult.success ? (migrationResult.data?.pending ?? false) : false
-
-  console.log('banner auction: ', bannerAuction)
 
   return (
     <MyPackClient
