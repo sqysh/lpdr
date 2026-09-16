@@ -17,6 +17,7 @@ import { stampUserGeoFromRequest } from '../_infra/stampUserGeoFromRequest'
 import type { ActionResult } from 'types/action.types'
 import { OrderType } from '@prisma/client'
 import { ADOPTION_FEE_CENTS, MIN_DONATION_CENTS } from 'lib/constants/adoption-fees.constants'
+import { hasActiveAdoptionFee } from '../adoption-fee/hasActiveAdoptionFee'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -186,6 +187,15 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         throw new Error('Missing auction reference')
       }
     } else if (orderType === 'ADOPTION_FEE') {
+      // Someone whose confirmation is slow will try again, and without this they pay twice for
+      // one week of access. Happened on Sep 15: two charges a minute apart, both confirmed.
+      const active = await hasActiveAdoptionFee()
+
+      if (active.isActive) {
+        await createLog('warn', 'Adoption fee attempted while one is already active', { userId })
+        throw new Error('You already have access to the adoption application.')
+      }
+
       baseCents = ADOPTION_FEE_CENTS
     } else {
       // Donor-chosen amount (one-time and recurring donations)
@@ -283,12 +293,14 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
     }
 
+    const idempotencyKey = winningBidderId
+      ? `winner-${winningBidderId}-${finalCents}`
+      : orderType === 'ADOPTION_FEE'
+        ? `adoption-${userId}-${finalCents}-${new Date().toISOString().slice(0, 10)}`
+        : undefined
+
     if (!paymentIntent) {
-      paymentIntent = await stripeClient.paymentIntents.create(
-        paymentIntentParams,
-        // Guards the simultaneous double-click that the lookup above can't see.
-        winningBidderId ? { idempotencyKey: `winner-${winningBidderId}-${finalCents}` } : undefined
-      )
+      paymentIntent = await stripeClient.paymentIntents.create(paymentIntentParams, idempotencyKey ? { idempotencyKey } : undefined)
 
       if (winningBidderId) {
         await prisma.auctionWinningBidder.update({

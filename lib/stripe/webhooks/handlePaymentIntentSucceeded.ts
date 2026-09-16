@@ -221,74 +221,85 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
     if (orderType === 'AUCTION_PURCHASE') {
       // ── Instant buy (fixed price) ────────────────────────────────
       if (metadata?.auctionItemId && !metadata?.winningBidderId) {
-        await prisma.$transaction(async (tx) => {
-          const auctionItem = await tx.auctionItem.findUnique({
-            where: { id: metadata.auctionItemId },
-            include: {
-              auction: { select: { id: true, supporterEmails: true, totalAuctionRevenue: true } },
-              photos: { take: 1 }
-            }
+        if (!metadata.userId) {
+          await createLog('error', 'Instant buy paid with no userId in metadata', { orderId: order.id, paymentIntentId: id })
+        } else {
+          await prisma.$transaction(async (tx) => {
+            const auctionItem = await tx.auctionItem.findUnique({
+              where: { id: metadata.auctionItemId },
+              include: {
+                auction: { select: { id: true, supporterEmails: true, totalAuctionRevenue: true } },
+                photos: { take: 1 }
+              }
+            })
+
+            if (!auctionItem) throw new Error(`AuctionItem not found: ${metadata.auctionItemId}`)
+
+            await tx.auctionItemInstantBuyer.create({
+              data: {
+                auctionId: auctionItem.auctionId,
+                auctionItemId: auctionItem.id,
+                userId: metadata.userId,
+                name: metadata.name ?? '',
+                email: metadata.email ?? '',
+                totalPrice: Number(auctionItem.buyNowPrice ?? 0),
+                paymentStatus: 'PAID',
+                shippingStatus: auctionItem.requiresShipping ? 'PENDING_FULFILLMENT' : 'DIGITAL'
+              }
+            })
+
+            const newQuantity = (auctionItem.totalQuantity ?? 1) - 1
+
+            await tx.auctionItem.update({
+              where: { id: auctionItem.id },
+              data: {
+                totalQuantity: newQuantity,
+                ...(newQuantity <= 0 ? { status: 'SOLD' } : {})
+              }
+            })
+
+            const auction = auctionItem.auction
+            const updatedEmails =
+              metadata.email && !auction.supporterEmails.includes(metadata.email)
+                ? [...auction.supporterEmails, metadata.email]
+                : auction.supporterEmails
+
+            await tx.auction.update({
+              where: { id: auction.id },
+              data: {
+                supporterEmails: updatedEmails,
+                supporters: updatedEmails.length,
+                totalAuctionRevenue: { increment: Number(auctionItem.buyNowPrice ?? 0) }
+              }
+            })
+
+            await tx.orderItem.create({
+              data: {
+                orderId: order.id,
+                itemType: 'AUCTION_INSTANT_BUY',
+                itemName: auctionItem.name,
+                itemImage: auctionItem.photos[0]?.url ?? null,
+                price: Number(auctionItem.buyNowPrice ?? 0),
+                quantity: 1,
+                subtotal: Number(auctionItem.buyNowPrice ?? 0),
+                totalPrice: Number(auctionItem.buyNowPrice ?? 0),
+                isPhysical: auctionItem.requiresShipping
+              }
+            })
           })
-
-          if (!auctionItem) throw new Error(`AuctionItem not found: ${metadata.auctionItemId}`)
-
-          await tx.auctionItemInstantBuyer.create({
-            data: {
-              auctionId: auctionItem.auctionId,
-              auctionItemId: auctionItem.id,
-              userId: metadata.userId,
-              name: metadata.name,
-              email: metadata.email,
-              totalPrice: Number(auctionItem.buyNowPrice ?? 0),
-              paymentStatus: 'PAID',
-              shippingStatus: auctionItem.requiresShipping ? 'PENDING_FULFILLMENT' : 'DIGITAL'
-            }
-          })
-
-          const newQuantity = (auctionItem.totalQuantity ?? 1) - 1
-
-          await tx.auctionItem.update({
-            where: { id: auctionItem.id },
-            data: {
-              totalQuantity: newQuantity,
-              ...(newQuantity <= 0 ? { status: 'SOLD' } : {})
-            }
-          })
-
-          const auction = auctionItem.auction
-          const updatedEmails =
-            metadata.email && !auction.supporterEmails.includes(metadata.email)
-              ? [...auction.supporterEmails, metadata.email]
-              : auction.supporterEmails
-
-          await tx.auction.update({
-            where: { id: auction.id },
-            data: {
-              supporterEmails: updatedEmails,
-              supporters: updatedEmails.length,
-              totalAuctionRevenue: { increment: Number(auctionItem.buyNowPrice ?? 0) }
-            }
-          })
-
-          await tx.orderItem.create({
-            data: {
-              orderId: order.id,
-              itemType: 'AUCTION_INSTANT_BUY',
-              itemName: auctionItem.name,
-              itemImage: auctionItem.photos[0]?.url ?? null,
-              price: Number(auctionItem.buyNowPrice ?? 0),
-              quantity: 1,
-              subtotal: Number(auctionItem.buyNowPrice ?? 0),
-              totalPrice: Number(auctionItem.buyNowPrice ?? 0),
-              isPhysical: auctionItem.requiresShipping
-            }
-          })
-        })
+        }
       }
 
       // ── Auction winner (bid) ─────────────────────────────────────
       else if (metadata?.winningBidderId) {
         await prisma.$transaction(async (tx) => {
+          const before = await tx.auctionWinningBidder.findUnique({
+            where: { id: metadata.winningBidderId },
+            select: { winningBidPaymentStatus: true }
+          })
+
+          const alreadyPaid = before?.winningBidPaymentStatus === 'PAID'
+
           const winningBidderRecord = await tx.auctionWinningBidder.update({
             where: { id: metadata.winningBidderId },
             data: {
@@ -315,23 +326,29 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
             data: {
               supporterEmails: updatedEmails,
               supporters: updatedEmails.length,
-              totalAuctionRevenue: { increment: winningBidderRecord.totalPrice ?? 0 }
+              ...(alreadyPaid ? {} : { totalAuctionRevenue: { increment: winningBidderRecord.totalPrice ?? 0 } })
             }
           })
 
           if (winningBidderRecord.auctionItems?.length > 0) {
             await tx.orderItem.createMany({
-              data: winningBidderRecord.auctionItems.map((item) => ({
-                orderId: order.id,
-                itemType: 'AUCTION_WINNING_BID',
-                itemName: item.name,
-                itemImage: null,
-                price: Number(item.soldPrice ?? item.currentBid ?? item.buyNowPrice ?? 0),
-                quantity: 1,
-                subtotal: Number(item.soldPrice ?? item.currentBid ?? item.buyNowPrice ?? 0),
-                totalPrice: Number(item.soldPrice ?? item.currentBid ?? item.buyNowPrice ?? 0),
-                isPhysical: item.requiresShipping
-              }))
+              data: winningBidderRecord.auctionItems.map((item) => {
+                const price = Number(item.soldPrice ?? item.currentBid ?? item.buyNowPrice ?? 0)
+                const shipping = item.requiresShipping ? Number(item.shippingCosts ?? 0) : 0
+
+                return {
+                  orderId: order.id,
+                  itemType: 'AUCTION_WINNING_BID' as const,
+                  itemName: item.name,
+                  itemImage: item.photos[0]?.url ?? null,
+                  price,
+                  shippingPrice: shipping,
+                  quantity: 1,
+                  subtotal: price,
+                  totalPrice: price + shipping,
+                  isPhysical: item.requiresShipping
+                }
+              })
             })
           }
         })
@@ -339,25 +356,36 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
     }
 
     if (orderType === 'ADOPTION_FEE') {
-      const existingFee = await prisma.adoptionFee.findFirst({
-        where: { userId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
-        select: { id: true }
-      })
+      if (!userId) {
+        await createLog('error', 'Adoption fee paid with no userId in metadata', { orderId: order.id, paymentIntentId: id })
+      } else {
+        const existingFee = await prisma.adoptionFee.findFirst({
+          where: { userId, status: 'ACTIVE', expiresAt: { gt: new Date() } },
+          select: { id: true }
+        })
 
-      // Paying while access is already active should not stack another week
-      if (!existingFee) {
-        await prisma.adoptionFee.create({
-          data: {
+        // Paying while access is already active should not stack another week
+        if (!existingFee) {
+          await prisma.adoptionFee.create({
+            data: {
+              userId,
+              orderId: order.id,
+              feeAmount: amount / 100,
+              status: 'ACTIVE',
+              expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+              email: metadata.email,
+              firstName: geoUser?.firstName ?? null,
+              lastName: geoUser?.lastName ?? null
+            }
+          })
+        } else {
+          // This is the Sep 15 case: a second payment while access was already active.
+          await createLog('warn', 'Adoption fee paid while access was already active', {
             userId,
             orderId: order.id,
-            feeAmount: amount / 100,
-            status: 'ACTIVE',
-            expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-            email: metadata.email,
-            firstName: geoUser?.firstName ?? null,
-            lastName: geoUser?.lastName ?? null
-          }
-        })
+            existingFeeId: existingFee.id
+          })
+        }
       }
     }
 
@@ -375,51 +403,66 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       })
     )
 
-    // if (hasPhysical && orderWithItems.addressLine1) {
-    //   void resend.emails
-    //     .send({
-    //       from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
-    //       to: 'lpdr@littlepawsdr.org',
-    //       subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
-    //       html: adminOrderNotificationTemplate({
-    //         orderId: orderWithItems.id,
-    //         customerName: orderWithItems.customerName,
-    //         customerEmail: orderWithItems.customerEmail,
-    //         items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
-    //         addressLine1: orderWithItems.addressLine1,
-    //         addressLine2: orderWithItems.addressLine2,
-    //         city: orderWithItems.city,
-    //         state: orderWithItems.state,
-    //         zipPostalCode: orderWithItems.zipPostalCode
-    //       })
-    //     })
-    //     .catch((error) =>
-    //       createLog('error', 'Failed to send admin shipping notification', {
-    //         orderId: order.id,
-    //         error: error instanceof Error ? error.message : 'Unknown error'
-    //       })
-    //     )
-    // }
+    if (hasPhysical && orderWithItems.addressLine1) {
+      void resend.emails
+        .send({
+          from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
+          to: 'lpdr@littlepawsdr.org',
+          subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
+          html: adminOrderNotificationTemplate({
+            orderId: orderWithItems.id,
+            customerName: orderWithItems.customerName,
+            customerEmail: orderWithItems.customerEmail,
+            items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
+            addressLine1: orderWithItems.addressLine1,
+            addressLine2: orderWithItems.addressLine2,
+            city: orderWithItems.city,
+            state: orderWithItems.state,
+            zipPostalCode: orderWithItems.zipPostalCode
+          })
+        })
+        .catch((error) =>
+          createLog('error', 'Failed to send admin shipping notification', {
+            orderId: order.id,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          })
+        )
+    }
 
-    const channelId = userId
+    // Notifications are best effort. The order exists and the money has moved; a Pusher outage
+    // must not turn that into a non-200 that Stripe retries into the existingOrder early return,
+    // which would leave the payer with no confirmation at all.
+    try {
+      if (userId) {
+        await pusherTrigger(`payment-${userId}`, 'order-created', {
+          orderId: order.id,
+          amount: order.totalAmount,
+          status: order.status,
+          type: order.type,
+          createdAt: order.createdAt
+        })
+      } else {
+        await createLog('warn', 'Order created with no userId, no confirmation sent', {
+          orderId: order.id,
+          paymentIntentId: id
+        })
+      }
 
-    await pusherTrigger(`payment-${channelId}`, 'order-created', {
-      orderId: order.id,
-      amount: order.totalAmount,
-      status: order.status,
-      type: order.type,
-      createdAt: order.createdAt
-    })
-
-    await pusherSuperuser('order-created', {
-      userId: userId ?? null,
-      email: order.customerEmail,
-      name: order.customerName,
-      amount: order.totalAmount,
-      type: orderType,
-      orderId: order.id,
-      paymentIntentId: id
-    })
+      await pusherSuperuser('order-created', {
+        userId: userId ?? null,
+        email: order.customerEmail,
+        name: order.customerName,
+        amount: order.totalAmount,
+        type: orderType,
+        orderId: order.id,
+        paymentIntentId: id
+      })
+    } catch (error) {
+      await createLog('warn', 'Pusher notification failed after order created', {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
+    }
 
     await createLog('info', 'Order created from payment intent', {
       orderId: order.id,

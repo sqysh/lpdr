@@ -20,13 +20,14 @@ export type PaymentState = {
 
 export function useStripeCheckout({
   savedCards,
-  isAuthed,
+  isAuthed = true,
   userId,
   billingName,
   billingEmail
 }: {
   savedCards: IPaymentMethod[]
-  isAuthed: boolean
+  /** Only the donation forms can be reached signed out; everything else redirects first. */
+  isAuthed?: boolean
   userId: string
   billingName: string
   billingEmail: string
@@ -54,9 +55,17 @@ export function useStripeCheckout({
 
   /** Payload is everything except the card choice — the caller owns what is being bought. */
   const pay = async (basePayload: Record<string, unknown>) => {
-    if (!stripe || !elements) return
+    if (!stripe || !elements || payment.loading) return
 
     patch({ loading: true, error: null })
+
+    // Subscribe before the payment goes anywhere near Stripe. Pusher does not replay, so a
+    // webhook that lands before the listener is attached is a confirmation that never arrives,
+    // and the person sits through the full timeout on a payment that actually succeeded.
+    const orderConfirmed = waitForOrder(userId, router)
+    // Attaching a handler here only stops an unhandled rejection warning while we work; the
+    // rejection is still delivered to the await below.
+    orderConfirmed.catch(() => {})
 
     try {
       if (usingSavedCard) {
@@ -65,7 +74,7 @@ export function useStripeCheckout({
 
         // Loading stays on until the webhook confirms and we navigate, so the
         // button cannot be pressed twice on a charge that already went through
-        await waitForOrder(userId, router)
+        await orderConfirmed
         return
       }
 
@@ -89,7 +98,7 @@ export function useStripeCheckout({
         return
       }
 
-      await waitForOrder(userId, router)
+      await orderConfirmed
     } catch (err) {
       patch({ loading: false, error: err instanceof Error ? err.message : 'Something went wrong. Please try again.' })
     }
