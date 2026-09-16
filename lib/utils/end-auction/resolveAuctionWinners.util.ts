@@ -1,12 +1,13 @@
 import { Prisma } from '@prisma/client'
 import prisma from 'prisma/client'
+import { recordAuctionAnomaly } from './recordAuctionAnomaly.util'
 
 const ZERO = new Prisma.Decimal(0)
 
 const shippingFor = (item: { requiresShipping: boolean; shippingCosts: Prisma.Decimal | null }) =>
   item.requiresShipping ? (item.shippingCosts ?? ZERO) : ZERO
 
-export async function resolveAuctionWinners(auctionId: string) {
+export async function resolveAuctionWinners(auctionId: string, auctionTitle: string) {
   // Resolving twice would create a second winner row per user, which means a second payment
   // request email and a second charge. A cron retry or an admin ending an auction the cron
   // already ended both land here, so the second run is a no-op. Resending a payment request
@@ -22,10 +23,30 @@ export async function resolveAuctionWinners(auctionId: string) {
     }
   })
 
-  // Two TOP_BID rows on one item means two people get billed for the same thing. That can happen
-  // if a bid lands as the auction closes and the status flip races. Fail the cron instead.
   const distinctItems = new Set(topBids.map((b) => b.auctionItemId))
+
   if (distinctItems.size !== topBids.length) {
+    const counts = topBids.reduce<Record<string, number>>((acc, b) => {
+      acc[b.auctionItemId] = (acc[b.auctionItemId] ?? 0) + 1
+      return acc
+    }, {})
+
+    const offending = Object.entries(counts).filter(([, n]) => n > 1)
+
+    for (const [auctionItemId, count] of offending) {
+      const item = topBids.find((b) => b.auctionItemId === auctionItemId)
+
+      await recordAuctionAnomaly({
+        auctionId,
+        auctionTitle,
+        type: 'DUPLICATE_TOP_BID',
+        itemId: auctionItemId,
+        itemName: item?.auctionItem.name ?? '',
+        message: `${count} bids are marked TOP_BID on this item`,
+        metadata: { bidIds: topBids.filter((b) => b.auctionItemId === auctionItemId).map((b) => b.id) }
+      })
+    }
+
     throw new Error(`Auction ${auctionId} has more than one TOP_BID on an item. Resolve by hand before ending.`)
   }
 
@@ -86,9 +107,9 @@ export async function resolveAuctionWinners(auctionId: string) {
 
       await tx.auctionBidder.updateMany({ where: { auctionId, userId: { notIn: winnerIds } }, data: { status: 'LOST' } })
 
-      // Items default to UNSOLD, so on a
-      // clean run this matches nothing; it earns its place after a revert-to-draft, resetting
-      // anything a previous resolution marked SOLD.
+      // Everything that did not sell, both formats. status: { not: 'SOLD' } protects an instant
+      // buy that already sold, and also resets anything a previous resolution marked SOLD when
+      // an auction has been reverted and re-run.
       await tx.auctionItem.updateMany({
         where: { auctionId, status: { not: 'SOLD' } },
         data: { status: 'UNSOLD' }

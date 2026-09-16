@@ -2,7 +2,6 @@ import { Prisma } from '@prisma/client'
 import { TABS } from 'lib/constants/auction.constants'
 import { bidSelect, userContactSelect, userPublicSelect } from './prisma-selects.types'
 import { DecimalToNumber } from './prisma.types'
-import { IAuctionAnomaly } from './auction-anomaly'
 
 export type { AuctionItemStatus, SellingFormat, AuctionStatus } from '@prisma/client'
 
@@ -98,13 +97,12 @@ export const auctionListArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
     instantBuyers: true,
     winningBidders: {
       include: { user: { select: userContactSelect }, auctionItems: true }
-    }
+    },
+    anomalies: { where: { dismissed: false }, orderBy: { createdAt: 'desc' } }
   }
 })
 
-export type IAuction = DecimalToNumber<Prisma.AuctionGetPayload<typeof auctionListArgs>> & {
-  anomalies?: IAuctionAnomaly[]
-}
+export type IAuction = DecimalToNumber<Prisma.AuctionGetPayload<typeof auctionListArgs>>
 
 /** List-view item shape, derived from the auction list query. */
 export type IAuctionItem = NonNullable<IAuction['items']>[number]

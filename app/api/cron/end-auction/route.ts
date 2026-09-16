@@ -3,16 +3,16 @@ import { pusherTrigger } from 'lib/pusher/pusher.utils'
 import { resolveAuctionWinners } from 'lib/utils/end-auction/resolveAuctionWinners.util'
 import { processAutoPay } from 'lib/utils/end-auction/processAutoPay.util'
 import { sendWinnerEmail } from 'lib/utils/end-auction/sendWinnerEmail.util'
+import { recordAuctionAnomaly } from 'lib/utils/end-auction/recordAuctionAnomaly.util'
 import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { sendResolverAlert } from 'lib/email/sendResolverAlert'
 
 export async function endAuctionCore(overrideAuctionId?: string): Promise<{ success: boolean; error?: string }> {
   const start = Date.now()
-  // Held outside the try so the catch can say which auction failed.
-  let failed: { id: string; title: string } | null = null
+  // Held outside the try so the catch knows which auction was being ended.
+  let endingAuction: { id: string; title: string } | null = null
 
   try {
     const now = new Date()
@@ -52,7 +52,7 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       return { error: 'No auctions found with ACTIVE status past their end date', success: false }
     }
 
-    failed = { id: auction.id, title: auction.title }
+    endingAuction = { id: auction.id, title: auction.title }
 
     // Both aggregates are scoped to this auction's id rather than re-deriving the date window,
     // so the broadcast total can't pick up rows from an auction we are not ending.
@@ -86,7 +86,7 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       })
     }
 
-    const winners = await resolveAuctionWinners(auction.id)
+    const winners = await resolveAuctionWinners(auction.id, auction.title)
 
     // allSettled so one winner's failure doesn't take down the others. A rejected auto-pay still
     // leaves that winner's row AWAITING_PAYMENT, which the reminder cron picks up.
@@ -131,8 +131,13 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
 
     // Only when an auction was actually being ended. A failure before that is a cron problem,
     // not an auction sitting unresolved, and does not need waking anyone up.
-    if (failed) {
-      await sendResolverAlert({ auctionId: failed.id, auctionTitle: failed.title, error })
+    if (endingAuction) {
+      await recordAuctionAnomaly({
+        auctionId: endingAuction.id,
+        auctionTitle: endingAuction.title,
+        type: 'WINNER_RESOLUTION_FAILED',
+        message: error instanceof Error ? error.message : 'Unknown error'
+      })
     }
 
     return { error: 'Failed to end auctions', success: false }

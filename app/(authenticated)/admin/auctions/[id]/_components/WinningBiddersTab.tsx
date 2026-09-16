@@ -1,9 +1,9 @@
-import { IAuction } from 'types/auction.types'
+import { IAuctionDetail } from 'types/auction.types'
 import { motion } from 'framer-motion'
 import { Copy } from 'lucide-react'
 import { useAuctionUiStore } from 'stores/auction-ui.store'
 
-export function WinningBiddersTab({ auction }: { auction: IAuction }) {
+export function WinningBiddersTab({ auction }: { auction: IAuctionDetail }) {
   const openWinningBidderDrawer = useAuctionUiStore((s) => s.openWinningBidderDrawer)
 
   return (

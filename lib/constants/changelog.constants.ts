@@ -14,6 +14,25 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9.2',
+    date: '2026-09-16',
+    title: 'Auction anomalies',
+    changes: [
+      {
+        type: 'feature',
+        text: 'The auction now records anything that should not be able to happen and emails it. Two things qualify: two bids marked as the top bid on one item, which would bill two people for the same thing, and an auction that ends without winners being worked out, which means nobody has been charged and no payment requests have gone out'
+      },
+      {
+        type: 'improvement',
+        text: 'Those emails say what to do about it rather than only that something went wrong, and note that the job retries on its own and nothing needs undoing first'
+      },
+      {
+        type: 'improvement',
+        text: 'A winning bidder record now keeps whether automatic payment was attempted and what went wrong if it failed, so a card problem can be told apart from someone who simply does not have automatic payment turned on'
+      }
+    ]
+  },
+  {
     version: '1.9.1',
     date: '2026-09-16',
     title: 'Missing payments, refunds and alerts',

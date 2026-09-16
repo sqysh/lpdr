@@ -520,6 +520,9 @@ model AuctionWinningBidder {
 
   paymentIntentId String?
 
+  autoPayAttemptedAt DateTime?
+  autoPayError       String?
+
   @@index([auctionId])
   @@index([userId])
 }
