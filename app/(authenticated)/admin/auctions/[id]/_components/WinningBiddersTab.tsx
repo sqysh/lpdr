@@ -92,7 +92,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuction }) {
                       {bidder.winningBidPaymentStatus !== 'PAID' && (
                         <button
                           type="button"
-                          onClick={() => navigator.clipboard.writeText(`https://littlepawsdr.org/auctions/winner/${bidder.id}`)}
+                          onClick={() => navigator.clipboard.writeText(`https://www.littlepawsdr.org/auctions/winner/${bidder.id}`)}
                           className="flex items-center gap-1.5 mt-1.5 text-[10px] font-mono text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                           aria-label={`Copy payment link for ${name}`}
                         >

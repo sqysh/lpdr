@@ -9,6 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ['/admin', '/auth', '/my-pack', '/api', '/checkout', '/order-confirmation', '/(authenticated)']
       }
     ],
-    sitemap: 'https://littlepawsdachshundrescue.com/sitemap.xml'
+    sitemap: 'https://www.littlepawsdr.org/sitemap.xml'
   }
 }

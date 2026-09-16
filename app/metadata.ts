@@ -1,7 +1,7 @@
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://littlepawsdr.org'),
+  metadataBase: new URL('https://www.littlepawsdr.org'),
 
   title: {
     default: 'Little Paws Dachshund Rescue',
@@ -24,7 +24,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    url: 'https://littlepawsdr.org',
+    url: 'https://www.littlepawsdr.org',
     siteName: 'Little Paws Dachshund Rescue',
     title: 'Little Paws Dachshund Rescue',
     description:
@@ -59,7 +59,7 @@ export const metadata: Metadata = {
   },
 
   alternates: {
-    canonical: 'https://littlepawsdr.org'
+    canonical: 'https://www.littlepawsdr.org'
   },
 
   icons: {

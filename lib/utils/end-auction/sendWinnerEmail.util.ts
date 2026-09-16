@@ -31,7 +31,7 @@ export async function sendWinnerEmail({
   /** 0 for the notice sent when the auction ends, then 1 upward for each reminder. */
   reminderNumber?: number
 }) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://littlepawsdr.org'
+  const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.littlepawsdr.org'
   const url = `${BASE}/auctions/winner/${winningBidderId}`
 
   try {

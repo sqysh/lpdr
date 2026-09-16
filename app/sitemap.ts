@@ -4,7 +4,7 @@ import { MetadataRoute } from 'next'
 import { getDachshundsByStatus } from '../lib/actions/_rescue-groups/getDachshundsByStatus'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://littlepawsdr.org'
+  const baseUrl = 'https://www.littlepawsdr.org'
 
   let dachshundPages: MetadataRoute.Sitemap = []
   try {
