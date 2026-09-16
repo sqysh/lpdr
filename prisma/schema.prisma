@@ -273,6 +273,7 @@ model Order {
   failureReason      String?
   failureCode        String?
   failureEmailSentAt DateTime?
+  refundEmailSentAt  DateTime?
 
   // ── Customer (denormalized snapshot) ────────────────────
   customerEmail String

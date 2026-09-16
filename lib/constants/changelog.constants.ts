@@ -14,6 +14,73 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.9.1',
+    date: '2026-09-16',
+    title: 'Missing payments, refunds and alerts',
+    changes: [
+      {
+        type: 'fix',
+        text: 'Five payments went through without being recorded. Stripe was told to notify littlepawsdr.org, which redirects to www, and redirects are not followed for notifications, so nothing arrived. The address is corrected and all five orders and adoption fees have been created'
+      },
+      {
+        type: 'fix',
+        text: 'Paying the adoption fee while access is already active is now refused, instead of taking a second payment for the same week'
+      },
+      {
+        type: 'fix',
+        text: 'The page now listens for its payment confirmation before the payment is taken. It was listening afterwards, so a fast confirmation could arrive before anyone was listening and the page would sit waiting on a payment that had already gone through'
+      },
+      {
+        type: 'fix',
+        text: 'The payment button can no longer be pressed a second time while the first press is still working'
+      },
+      {
+        type: 'fix',
+        text: 'Order statuses were all showing in grey, including failed ones, because the colours only matched subscription statuses'
+      },
+      {
+        type: 'feature',
+        text: 'Refunded orders now read as refunded: muted in the list, a total of what has been refunded at the top, and a note on the order itself explaining that the amounts shown are what was originally charged'
+      },
+      {
+        type: 'feature',
+        text: 'A refunded order has a button to email the supporter. Pick what happened and it sends, no message to write, and the order records that it went so nobody sends it twice'
+      },
+      {
+        type: 'feature',
+        text: 'A daily check compares payments taken in Stripe against orders on the site and emails if any are missing.'
+      },
+      {
+        type: 'feature',
+        text: 'If an auction ends but winners cannot be worked out, an email now goes out saying so. Nothing is charged and no winner emails go out in that situation, and until now nothing said it had happened'
+      },
+      {
+        type: 'feature',
+        text: 'When winners stop being chased for payment, the auction address is emailed with who never paid and how much is outstanding'
+      },
+      {
+        type: 'improvement',
+        text: 'Every address the site gives out now uses www, matching where the site actually serves. The sitemap also pointed at an old domain'
+      },
+      {
+        type: 'improvement',
+        text: 'A published draft auction now shows its items, so the crew can share a preview before bidding opens'
+      },
+      {
+        type: 'improvement',
+        text: 'The auction announcement bar updates when an auction opens or closes without needing a page reload, and no longer appears on auction pages'
+      },
+      {
+        type: 'improvement',
+        text: 'Ended auctions can be opened from the auctions list again, which is where winners and fulfilment live'
+      },
+      {
+        type: 'improvement',
+        text: 'Filters on the Welcome Wieners page wrap on a phone instead of running off the side of the screen'
+      }
+    ]
+  },
+  {
     version: '1.9.0',
     date: '2026-09-15',
     title: 'Auction bidding, winner payments and the end-of-auction run',

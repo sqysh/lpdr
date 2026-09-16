@@ -10,6 +10,7 @@ import { OrderFulfillmentSection } from './_components/OrderFulfillmentSection'
 import { OrderCustomerSection } from './_components/OrderCustomerSection'
 import { OrderPaymentSection } from './_components/OrderPaymentSection'
 import { OrderAnomalyBanner } from './_components/OrderAnomalyBanner'
+import { OrderRefundEmailPanel } from './_components/OrderRefundEmailPanel'
 
 type Props = {
   order: IOrder
@@ -40,6 +41,7 @@ export function AdminOrderDetailsClient({ order, subscriptionOrders }: Props) {
           {/* A refunded order is not going anywhere, so the fulfilment panel would be telling
               Nadine to post something that has been paid back. */}
           {hasPhysical && !isRefunded && <OrderFulfillmentSection order={order} />}
+          <OrderRefundEmailPanel order={order} />
           <OrderCustomerSection order={order} />
           <OrderPaymentSection order={order} />
         </div>
