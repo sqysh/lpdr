@@ -9,19 +9,25 @@ import { AuctionEndedModal } from './AuctionEndedModal'
 import { AuctionStatus } from '@prisma/client'
 import AuctionAnnouncementStrip from './header/AuctionAnnouncementStrip'
 
-export type NavAuction = {
-  id: string
-  title: string
-  status: AuctionStatus
-  startDate: Date | null
-  endDate: Date | null
-  customAuctionLink: string
-  isPubliclyVisible: boolean
-}
-
 const RANK: Record<AuctionStatus, number> = { DRAFT: 0, ACTIVE: 1, ENDED: 2 }
 
-export const AuctionRealtimeClient = ({ auction }: { auction: NavAuction }) => {
+/** Where the strip would be noise: the auction pages say it themselves, and the other two are
+ *  not places anyone needs telling. */
+const HIDE_STRIP_ON = ['/auctions', '/order-confirmation', '/super', '/admin']
+
+export const AuctionRealtimeClient = ({
+  auction
+}: {
+  auction: {
+    id: string
+    title: string
+    status: AuctionStatus
+    startDate: Date | null
+    endDate: Date | null
+    customAuctionLink: string
+    isPubliclyVisible: boolean
+  }
+}) => {
   const router = useRouter()
   const routerRef = useRef(router)
   const pathname = usePathname()
@@ -36,19 +42,23 @@ export const AuctionRealtimeClient = ({ auction }: { auction: NavAuction }) => {
   const status = liveStatus && RANK[liveStatus] > RANK[auction.status] ? liveStatus : auction.status
   const current = { ...auction, status }
 
+  // This component sits in the root layout, so every visitor on every page holds this
+  // subscription for as long as they browse. An ended auction emits nothing, so it does not
+  // need one.
+  const isOver = status === 'ENDED'
+
   // Announce a live auction to everyone, and an upcoming one only once the crew has made it
   // public. An ended auction has nothing left to announce.
   const showStrip =
-    (status === 'ACTIVE' || (status === 'DRAFT' && auction.isPubliclyVisible)) &&
-    !pathname.startsWith('/auctions') &&
-    !pathname.startsWith('/order-confirmation') &&
-    !pathname.startsWith('/super')
+    (status === 'ACTIVE' || (status === 'DRAFT' && auction.isPubliclyVisible)) && !HIDE_STRIP_ON.some((path) => pathname.startsWith(path))
 
   useEffect(() => {
     routerRef.current = router
   }, [router])
 
   useEffect(() => {
+    if (isOver) return
+
     const channelName = `auction-${auction.id}`
     const channel = pusherClient.subscribe(channelName)
 
@@ -68,7 +78,7 @@ export const AuctionRealtimeClient = ({ auction }: { auction: NavAuction }) => {
       channel.unbind_all()
       pusherClient.unsubscribe(channelName)
     }
-  }, [auction.id])
+  }, [auction.id, isOver])
 
   return (
     <>
