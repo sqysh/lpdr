@@ -5,6 +5,7 @@ import { bebas, nunito, quicksand, workSans } from './fonts'
 import { SiteNavigationDrawer } from 'components/layout/navigation-drawer/SiteNavigationDrawer'
 import { AuctionRealtime } from 'components/layout/AuctionRealtime'
 import { Header } from 'components/layout/header/Header'
+import { Analytics } from '@vercel/analytics/next'
 
 export { metadata } from './metadata'
 export { viewport } from './viewport'
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </RootLayoutWrapper>
         </SessionProvider>
+        <Analytics />
       </body>
     </html>
   )
