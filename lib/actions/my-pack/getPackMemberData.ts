@@ -1,116 +1,108 @@
 import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
-import {
-  AuctionParticipation,
-  AuctionPurchase,
-  Donation,
-  MultiItemOrder,
-  ParticipationItem,
-  Subscription
-} from 'types/my-pack.types'
+import { AuctionParticipation, AuctionPurchase, Donation, MultiItemOrder, ParticipationItem, Subscription } from 'types/my-pack.types'
 import { requireAuth } from 'lib/auth/guards'
 
 export const getPackMemberData = async () => {
+  const gate = await requireAuth()
+  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+
+  const userId = gate.userId
+
   try {
-    const gate = await requireAuth()
-    if (gate.ok === false) return { success: false, error: gate.error, data: null }
-
-    const userId = gate.userId
-
-    const [user, orders, auctionBids, paymentMethods, adoptionFees, instantBuyers] =
-      await Promise.all([
-        prisma.user.findUnique({
-          where: { id: userId },
-          select: {
-            id: true,
-            firstName: true,
-            lastName: true,
-            email: true,
-            phone: true,
-            anonymousBidding: true,
-            address: true,
-            createdAt: true,
-            autoPay: true,
-            autoPayCoverFees: true,
-            role: true,
-            image: true
+    const [user, orders, auctionBids, paymentMethods, adoptionFees, instantBuyers] = await Promise.all([
+      prisma.user.findUnique({
+        where: { id: userId },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          phone: true,
+          anonymousBidding: true,
+          address: true,
+          createdAt: true,
+          autoPay: true,
+          autoPayCoverFees: true,
+          role: true,
+          image: true
+        }
+      }),
+      prisma.order.findMany({
+        where: { userId },
+        include: {
+          items: {
+            select: {
+              id: true,
+              iconKey: true,
+              images: true,
+              isPhysical: true,
+              itemImage: true,
+              itemName: true,
+              price: true,
+              size: true,
+              totalPrice: true,
+              quantity: true,
+              itemType: true
+            }
           }
-        }),
-        prisma.order.findMany({
-          where: { userId },
-          include: {
-            items: {
-              select: {
-                id: true,
-                iconKey: true,
-                images: true,
-                isPhysical: true,
-                itemImage: true,
-                itemName: true,
-                price: true,
-                size: true,
-                totalPrice: true,
-                quantity: true,
-                itemType: true
+        },
+        orderBy: { createdAt: 'asc' }
+      }),
+      prisma.auctionBid.findMany({
+        where: { userId },
+        include: {
+          auctionItem: {
+            include: {
+              photos: {
+                orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }],
+                take: 1
+              },
+              winningBidder: {
+                select: { userId: true, id: true, winningBidPaymentStatus: true, paidOn: true }
               }
             }
           },
-          orderBy: { createdAt: 'asc' }
-        }),
-        prisma.auctionBid.findMany({
-          where: { userId },
-          include: {
-            auctionItem: {
-              include: {
-                photos: {
-                  orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }],
-                  take: 1
-                },
-                winningBidder: {
-                  select: { userId: true, id: true, winningBidPaymentStatus: true, paidOn: true }
-                }
-              }
-            },
-            auction: {
-              select: {
-                id: true,
-                title: true,
-                status: true,
-                endDate: true,
-                customAuctionLink: true
+          auction: {
+            select: {
+              id: true,
+              title: true,
+              status: true,
+              endDate: true,
+              customAuctionLink: true
+            }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.paymentMethod.findMany({
+        where: { userId },
+        orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }]
+      }),
+      prisma.adoptionFee.findMany({
+        where: { userId },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.auctionItemInstantBuyer.findMany({
+        where: { userId },
+        include: {
+          auctionItem: {
+            select: {
+              id: true,
+              name: true,
+              photos: {
+                orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }],
+                take: 1
               }
             }
           },
-          orderBy: { createdAt: 'desc' }
-        }),
-        prisma.paymentMethod.findMany({
-          where: { userId },
-          orderBy: [{ isDefault: 'desc' }, { createdAt: 'desc' }]
-        }),
-        prisma.adoptionFee.findMany({
-          where: { userId },
-          orderBy: { createdAt: 'desc' }
-        }),
-        prisma.auctionItemInstantBuyer.findMany({
-          where: { userId },
-          include: {
-            auctionItem: {
-              select: {
-                id: true,
-                name: true,
-                photos: {
-                  orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }],
-                  take: 1
-                }
-              }
-            },
-            auction: {
-              select: { id: true }
-            }
-          },
-          orderBy: { createdAt: 'desc' }
-        })
-      ])
+          auction: {
+            select: { id: true }
+          }
+        },
+        orderBy: { createdAt: 'desc' }
+      })
+    ])
 
     if (!user) return { success: false, error: 'User not found', data: null }
 
@@ -202,10 +194,7 @@ export const getPackMemberData = async () => {
 
     // ── Auction participation ─────────────────────────────────────────────────
 
-    const byAuction = new Map<
-      string,
-      AuctionParticipation & { itemMap: Map<string, ParticipationItem> }
-    >()
+    const byAuction = new Map<string, AuctionParticipation & { itemMap: Map<string, ParticipationItem> }>()
 
     for (const bid of auctionBids) {
       const auction = bid.auction
@@ -263,12 +252,10 @@ export const getPackMemberData = async () => {
       }
     }
 
-    const auctionParticipation: AuctionParticipation[] = [...byAuction.values()].map(
-      ({ itemMap, ...group }) => ({
-        ...group,
-        items: [...itemMap.values()]
-      })
-    )
+    const auctionParticipation: AuctionParticipation[] = [...byAuction.values()].map(({ itemMap, ...group }) => ({
+      ...group,
+      items: [...itemMap.values()]
+    }))
 
     // ── Adoption fees ─────────────────────────────────────────────────────────
 
@@ -299,7 +286,8 @@ export const getPackMemberData = async () => {
   } catch (error) {
     await createLog('error', 'Failed to fetch account data', {
       error: error instanceof Error ? error.message : 'Unknown error',
-      stack: error instanceof Error ? error.stack : null
+      stack: error instanceof Error ? error.stack : null,
+      userId
     })
     return { success: false, error: 'Failed to fetch account data', data: null }
   }

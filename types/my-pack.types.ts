@@ -1,6 +1,4 @@
-import type { Address, AuctionStatus, OrderItemType, OrderStatus, OrderType, PaymentStatus, ShippingStatus, User } from '@prisma/client'
-import { IAdoptionFee } from './adoption-fee'
-import { IPaymentMethod } from './payment-method.types'
+import type { Address, OrderItemType, OrderStatus, OrderType, PaymentStatus, ShippingStatus, User } from '@prisma/client'
 import { SUBSCRIPTION_TIERS } from 'lib/constants/subscriptions.constants'
 import { Dispatch, SetStateAction } from 'react'
 import { BillingInterval } from './subscriptions.types'
@@ -80,29 +78,6 @@ export type PackMember = Pick<
   'id' | 'firstName' | 'lastName' | 'email' | 'phone' | 'anonymousBidding' | 'createdAt' | 'autoPay' | 'autoPayCoverFees' | 'role' | 'image'
 > & {
   address: Address | null
-}
-
-export interface MemberClientProps {
-  user: PackMember
-  donations: Donation[]
-  subscriptions: Subscription[]
-  auctionParticipation: AuctionParticipation[]
-  paymentMethods: IPaymentMethod[]
-  adoptionFees: IAdoptionFee[]
-  multiItemOrders: MultiItemOrder[]
-  auctionPurchases: AuctionPurchase[]
-  hasPendingMigration: boolean
-  activeAuction: {
-    itemCount: number
-    hasBids: boolean
-    id: string
-    status: AuctionStatus
-    title: string
-    customAuctionLink: string
-    startDate: Date
-    endDate: Date
-    isPubliclyVisible: boolean
-  }
 }
 
 export type Tier = (typeof SUBSCRIPTION_TIERS)[number]

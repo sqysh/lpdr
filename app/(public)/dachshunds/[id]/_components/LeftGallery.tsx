@@ -23,7 +23,7 @@ export function LeftGallery({ a }) {
           priority={true}
           src={a?.photos[activePhoto]}
           alt={`${a?.name}, photo ${activePhoto + 1} of ${a?.photos?.length}`}
-          className="absolute inset-0 w-full h-full object-cover object-center transition-opacity duration-300"
+          className="absolute inset-0 w-full h-full object-contain object-center transition-opacity duration-300"
         />
 
         {/* Prev/next */}
@@ -32,14 +32,7 @@ export function LeftGallery({ a }) {
           aria-label="Previous photo"
           className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9  bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-4 h-4"
-            aria-hidden="true"
-          >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4" aria-hidden="true">
             <path d="M15 18l-6-6 6-6" />
           </svg>
         </button>
@@ -48,23 +41,13 @@ export function LeftGallery({ a }) {
           aria-label="Next photo"
           className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9  bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-4 h-4"
-            aria-hidden="true"
-          >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-4 h-4" aria-hidden="true">
             <path d="M9 18l6-6-6-6" />
           </svg>
         </button>
 
         {/* Counter */}
-        <div
-          className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-mono px-2.5 py-1 "
-          aria-live="polite"
-        >
+        <div className="absolute bottom-3 right-3 bg-black/50 text-white text-xs font-mono px-2.5 py-1 " aria-live="polite">
           {activePhoto + 1} / {a?.photos?.length}
         </div>
 
@@ -75,9 +58,7 @@ export function LeftGallery({ a }) {
           </div>
         )}
         {a?.isAdoptionPending && (
-          <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-3 py-1  tracking-wide">
-            Adoption Pending
-          </div>
+          <div className="absolute top-3 left-3 bg-amber-500 text-white text-xs font-bold px-3 py-1  tracking-wide">Adoption Pending</div>
         )}
       </div>
 
@@ -89,23 +70,12 @@ export function LeftGallery({ a }) {
             aria-label="Show previous thumbnails"
             className="shrink-0 w-8 h-8  border border-border-light dark:border-border-dark flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-3.5 h-3.5"
-              aria-hidden="true"
-            >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5" aria-hidden="true">
               <path d="M15 18l-6-6 6-6" />
             </svg>
           </button>
         )}
-        <div
-          className="flex gap-2 flex-1 overflow-hidden"
-          role="list"
-          aria-label="Photo thumbnails"
-        >
+        <div className="flex gap-2 flex-1 overflow-hidden" role="list" aria-label="Photo thumbnails">
           {visibleThumbs.map((photo, i) => {
             const realIdx = thumbStart + i
             return (
@@ -115,9 +85,7 @@ export function LeftGallery({ a }) {
                 aria-label={`View photo ${realIdx + 1}`}
                 aria-pressed={activePhoto === realIdx}
                 className={`relative flex-1 aspect-square overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark transition-all ${
-                  activePhoto === realIdx
-                    ? 'ring-2 ring-primary-light dark:ring-primary-dark opacity-100'
-                    : 'opacity-50 hover:opacity-80'
+                  activePhoto === realIdx ? 'ring-2 ring-primary-light dark:ring-primary-dark opacity-100' : 'opacity-50 hover:opacity-80'
                 }`}
               >
                 <Picture
@@ -137,14 +105,7 @@ export function LeftGallery({ a }) {
             aria-label="Show more thumbnails"
             className="shrink-0 w-8 h-8  border border-border-light dark:border-border-dark flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light"
           >
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth={2}
-              className="w-3.5 h-3.5"
-              aria-hidden="true"
-            >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2} className="w-3.5 h-3.5" aria-hidden="true">
               <path d="M9 18l6-6-6-6" />
             </svg>
           </button>

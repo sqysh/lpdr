@@ -12,8 +12,6 @@ export function AuctionWinnerReceipt({ winningBidder }: { winningBidder: IAuctio
   const subtotal = winningBidder.auctionItems.reduce((sum, item) => sum + item.soldPrice, 0)
   const total = subtotal + (winningBidder.processingFee ?? 0) + (winningBidder.shipping ?? 0)
 
-  console.log(winningBidder)
-
   return (
     <div className="min-h-dvh bg-white dark:bg-bg-dark flex items-center justify-center px-4 py-12">
       <motion.div

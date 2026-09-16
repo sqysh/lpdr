@@ -3,7 +3,7 @@
 import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { MemberClientProps, MyPackTab } from 'types/my-pack.types'
+import { AuctionParticipation, AuctionPurchase, Donation, MultiItemOrder, MyPackTab, PackMember, Subscription } from 'types/my-pack.types'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { pusherClient } from 'lib/pusher/pusher-client'
 import { Header } from 'app/(authenticated)/my-pack/_components/Header'
@@ -35,6 +35,9 @@ import { OneTimeDonations } from './_components/OneTimeDonations'
 import { Auctions } from './_components/Auctions'
 import { ActiveAuctionBanner } from './_components/ActiveActionBanner'
 import { LinkBody } from 'components/_common/LinkBody'
+import { AuctionStatus } from '@prisma/client'
+import { IAdoptionFee } from 'types/adoption-fee'
+import { IPaymentMethod } from 'types/payment-method.types'
 
 export default function MyPackClient({
   user,
@@ -46,8 +49,29 @@ export default function MyPackClient({
   multiItemOrders,
   auctionPurchases,
   hasPendingMigration,
-  activeAuction
-}: MemberClientProps) {
+  featuredAuction
+}: {
+  user: PackMember
+  donations: Donation[]
+  subscriptions: Subscription[]
+  auctionParticipation: AuctionParticipation[]
+  paymentMethods: IPaymentMethod[]
+  adoptionFees: IAdoptionFee[]
+  multiItemOrders: MultiItemOrder[]
+  auctionPurchases: AuctionPurchase[]
+  hasPendingMigration: boolean
+  featuredAuction: {
+    itemCount: number
+    hasBids: boolean
+    id: string
+    status: AuctionStatus
+    title: string
+    customAuctionLink: string
+    startDate: Date
+    endDate: Date
+    isPubliclyVisible: boolean
+  }
+}) {
   const router = useRouter()
   const session = useSession()
   const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
@@ -227,14 +251,14 @@ export default function MyPackClient({
 
         <MigrationBanner initiallyPending={hasPendingMigration} />
 
-        {activeAuction && (
+        {featuredAuction && (
           <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
             <ActiveAuctionBanner
-              title={activeAuction.title}
-              customAuctionLink={activeAuction.customAuctionLink}
-              endDate={activeAuction.endDate}
-              itemCount={activeAuction.itemCount}
-              hasBids={activeAuction.hasBids}
+              title={featuredAuction.title}
+              customAuctionLink={featuredAuction.customAuctionLink}
+              endDate={featuredAuction.endDate}
+              itemCount={featuredAuction.itemCount}
+              hasBids={featuredAuction.hasBids}
             />
           </div>
         )}
