@@ -17,11 +17,7 @@ interface GoogleProfile {
   locale?: string | null
 }
 
-export async function handleGoogleCallback(
-  user: NextAuthUser,
-  __: Account,
-  profile?: GoogleProfile
-): Promise<boolean | string> {
+export async function handleGoogleCallback(user: NextAuthUser, __: Account, profile?: GoogleProfile): Promise<boolean | string> {
   const existingUser = await prisma.user.findUnique({
     where: { email: user.email! }
   })
@@ -64,7 +60,8 @@ export async function handleGoogleCallback(
   await pusherSuperuser('user-signed-in', {
     email: existingUser.email,
     name: existingUser.firstName,
-    userId: existingUser.id
+    userId: existingUser.id,
+    method: 'Google'
   }).catch((error) =>
     createLog('warn', 'Pusher superuser trigger failed', {
       event: 'user-signed-in',

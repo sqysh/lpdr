@@ -5,16 +5,18 @@ import { getCronJobs } from 'lib/actions/super-user/getCronJobs'
 import { getManagedUsers } from 'lib/actions/super-user/getManagedUsers'
 import { getPulseStats } from 'lib/actions/super-user/getPulseStats'
 import { getServiceHealth } from 'lib/actions/super-user/getServiceHealth'
+import { getAuctionAnomalies } from 'lib/actions/super-user/getAuctionAnomalies'
 
 export default async function SuperDashboardPage() {
   const services = await getServiceHealth()
 
-  const [cronJobs, pulseStats, adminUsers, auditLogs, managedUsers] = await Promise.all([
+  const [cronJobs, pulseStats, adminUsers, auditLogs, managedUsers, anomalies] = await Promise.all([
     getCronJobs(),
     getPulseStats(services.data ?? []),
     getAdminUsers(),
     getAuditLogs(),
-    getManagedUsers()
+    getManagedUsers(),
+    getAuctionAnomalies()
   ])
 
   return (
@@ -25,6 +27,7 @@ export default async function SuperDashboardPage() {
       adminUsers={adminUsers.data ?? []}
       auditLogs={auditLogs.data ?? []}
       managedUsers={managedUsers.data ?? []}
+      anomalies={anomalies.data ?? []}
     />
   )
 }

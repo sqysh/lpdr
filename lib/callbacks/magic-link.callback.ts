@@ -46,7 +46,8 @@ export async function handleMagicLinkCallback(user: User): Promise<boolean | str
   await pusherSuperuser('user-signed-in', {
     email: existingUser.email,
     name: existingUser.firstName,
-    userId: existingUser.id
+    userId: existingUser.id,
+    method: 'magic link'
   }).catch((error) =>
     createLog('warn', 'Pusher superuser trigger failed', {
       event: 'user-signed-in',

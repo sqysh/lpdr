@@ -41,7 +41,8 @@ export const AuctionRealtimeClient = ({ auction }: { auction: NavAuction }) => {
   const showStrip =
     (status === 'ACTIVE' || (status === 'DRAFT' && auction.isPubliclyVisible)) &&
     !pathname.startsWith('/auctions') &&
-    !pathname.startsWith('/order-confirmation')
+    !pathname.startsWith('/order-confirmation') &&
+    !pathname.startsWith('/super')
 
   useEffect(() => {
     routerRef.current = router

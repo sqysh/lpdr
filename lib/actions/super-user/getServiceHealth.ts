@@ -47,30 +47,29 @@ async function checkPostgres(): Promise<ServiceHealth> {
 
 async function checkStripe(): Promise<ServiceHealth> {
   try {
-    // Pull the most recent webhook event to see when Stripe last talked to us
-    const events = await stripeClient.events.list({ limit: 1 })
-    const lastEvent = events.data[0]
-    const ageMs = lastEvent ? Date.now() - lastEvent.created * 1000 : null
-    const ageMin = ageMs ? Math.floor(ageMs / 60000) : null
-
-    // Also check for recent failures in the webhook log
-    const failedEvents = await stripeClient.events.list({
-      limit: 10,
-      type: 'payment_intent.payment_failed',
-      created: { gte: Math.floor((Date.now() - 3600000) / 1000) } // last 1hr
+    const events = await stripeClient.events.list({
+      limit: 20,
+      created: { gte: Math.floor((Date.now() - 3600000) / 1000) }
     })
 
-    const recentFailures = failedEvents.data.length
-    const status: HealthStatus = recentFailures >= 3 ? 'warn' : 'ok'
+    // pending_webhooks is what was actually broken on Sep 16: events existed and looked healthy
+    // while none of them reached us. A couple mid-retry is normal, a pile is not.
+    const undelivered = events.data.filter((e) => e.pending_webhooks > 0)
+
+    const lastEvent = events.data[0]
+    const ageMin = lastEvent ? Math.floor((Date.now() - lastEvent.created * 1000) / 60000) : null
+
+    const status: HealthStatus = undelivered.length >= 3 ? 'error' : undelivered.length > 0 ? 'warn' : 'ok'
 
     return {
       name: 'Stripe Webhooks',
       status,
       latency: '—',
-      detail:
-        ageMin !== null
-          ? `Last event received ${ageMin} min ago${recentFailures > 0 ? ` · ${recentFailures} payment failures in last hr` : ''}`
-          : 'No recent events',
+      detail: undelivered.length
+        ? `${undelivered.length} event${undelivered.length === 1 ? '' : 's'} not yet delivered to us`
+        : ageMin !== null
+          ? `Last event ${ageMin} min ago, all delivered`
+          : 'No events in the last hour',
       lastChecked: 'just now'
     }
   } catch (e) {
@@ -78,29 +77,6 @@ async function checkStripe(): Promise<ServiceHealth> {
       name: 'Stripe Webhooks',
       status: 'error',
       detail: e instanceof Error ? e.message : 'Stripe API unreachable',
-      lastChecked: 'just now'
-    }
-  }
-}
-
-async function checkResend(): Promise<ServiceHealth> {
-  const start = Date.now()
-  try {
-    const res = await fetch('https://resend.com', { method: 'HEAD' })
-    const latency = Date.now() - start
-    const status: HealthStatus = !res.ok ? 'warn' : latency > 1000 ? 'warn' : 'ok'
-    return {
-      name: 'Resend (Email)',
-      status,
-      latency: `${latency}ms`,
-      detail: status === 'warn' ? 'Elevated latency' : 'Service reachable',
-      lastChecked: 'just now'
-    }
-  } catch (e) {
-    return {
-      name: 'Resend (Email)',
-      status: 'error',
-      detail: e instanceof Error ? e.message : 'Unreachable',
       lastChecked: 'just now'
     }
   }
@@ -198,12 +174,6 @@ export async function getServiceHealth() {
     })),
     checkStripe().catch(() => ({
       name: 'Stripe Webhooks',
-      status: 'unknown' as HealthStatus,
-      detail: 'Check threw unexpectedly',
-      lastChecked: 'just now'
-    })),
-    checkResend().catch(() => ({
-      name: 'Resend (Email)',
       status: 'unknown' as HealthStatus,
       detail: 'Check threw unexpectedly',
       lastChecked: 'just now'

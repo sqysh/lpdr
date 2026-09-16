@@ -12,6 +12,13 @@ import { migrateMongoUser } from './actions/migrate/migrateMongoUser'
 import { handleFacebookCallback } from './callbacks/facebook.callback'
 import { googleProvider, facebookProvider, magicLinkProvider } from './auth/index'
 
+/** The provider ids are not what you would want to read in a feed. */
+const SIGN_IN_METHOD: Record<string, string> = {
+  google: 'Google',
+  facebook: 'Facebook',
+  email: 'magic link'
+}
+
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
   debug: false,
@@ -64,7 +71,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     }
   },
   events: {
-    async signIn({ user }) {
+    async signIn({ user, account, isNewUser }) {
       // Update lastLoginAt
       prisma.user
         .update({
@@ -77,6 +84,24 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
             userId: user.id
           })
         )
+
+      // The registration notice lives here rather than in createUser, which is only given the
+      // user and so has no idea how they signed up.
+      if (isNewUser) {
+        const method = SIGN_IN_METHOD[account?.provider ?? ''] ?? account?.provider ?? 'unknown'
+
+        await pusherSuperuser('user-registered', {
+          email: user.email,
+          userId: user.id,
+          method
+        }).catch((error) =>
+          createLog('error', 'Pusher superuser trigger failed', {
+            event: 'user-registered',
+            userId: user.id,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          })
+        )
+      }
 
       // Lazy Mongo migration — fires after user exists in DB
       if (user.email) {
@@ -138,17 +163,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           role: invite.role
         })
       }
-
-      await pusherSuperuser('user-registered', {
-        email: user.email,
-        userId: user.id
-      }).catch((error) =>
-        createLog('error', 'Pusher superuser trigger failed', {
-          event: 'user-registered',
-          userId: user.id,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        })
-      )
     }
   }
 })

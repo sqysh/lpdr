@@ -83,7 +83,8 @@ export async function handleFacebookCallback(user: User, account: Account, profi
       await pusherSuperuser('user-signed-in', {
         email: existingUser.email,
         name: existingUser.firstName,
-        userId: existingUser.id
+        userId: existingUser.id,
+        method: 'Facebook'
       }).catch((error) =>
         createLog('warn', 'Pusher superuser trigger failed', {
           event: 'user-signed-in',

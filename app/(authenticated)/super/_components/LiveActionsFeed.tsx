@@ -12,7 +12,8 @@ import {
   Star,
   Activity,
   FileText,
-  Mail
+  Mail,
+  MapPin
 } from 'lucide-react'
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -37,7 +38,7 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: User,
     label: 'Signed In',
     color: 'text-green-500',
-    format: (d) => `${d.email}`
+    format: (d) => `${d.email} via ${d.method}`
   },
   'user-registered': {
     icon: Star,
@@ -182,6 +183,12 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     label: 'Test Ping',
     color: 'text-green-500',
     format: (d) => `${d.message} — ${d._ts}`
+  },
+  'address-updated': {
+    icon: MapPin,
+    label: 'Address',
+    color: 'text-cyan-500',
+    format: (d) => `${d.email} ${d.isFirstAddress ? 'added' : 'updated'} an address in ${d.city}, ${d.state}`
   }
 }
 
@@ -276,19 +283,11 @@ export function LiveActionsFeed() {
       </div>
 
       {/* Feed */}
-      <div
-        ref={feedRef}
-        className="flex-1 overflow-y-auto"
-        aria-label="Live platform activity feed"
-        aria-live="polite"
-        aria-atomic="false"
-      >
+      <div ref={feedRef} className="flex-1 overflow-y-auto" aria-label="Live platform activity feed" aria-live="polite" aria-atomic="false">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2 py-12">
             <Activity size={20} className="text-muted-light dark:text-muted-dark opacity-30" aria-hidden="true" />
-            <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Waiting for activity...
-            </p>
+            <p className="font-mono text-[9px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Waiting for activity...</p>
           </div>
         ) : (
           <ul role="list">
@@ -319,13 +318,9 @@ export function LiveActionsFeed() {
                     {/* Content */}
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>
-                          {config.label}
-                        </span>
+                        <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>{config.label}</span>
                         {originChannel && (
-                          <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark opacity-60">
-                            via {originChannel}
-                          </span>
+                          <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark opacity-60">via {originChannel}</span>
                         )}
                       </div>
                       <p className="font-mono text-[10px] text-text-light dark:text-text-dark leading-snug truncate">
@@ -334,9 +329,7 @@ export function LiveActionsFeed() {
                     </div>
 
                     {/* Time */}
-                    <span className="font-mono text-[9px] text-muted-light dark:text-muted-dark tabular-nums shrink-0 mt-0.5">
-                      {time}
-                    </span>
+                    <span className="font-mono text-[9px] text-muted-light dark:text-muted-dark tabular-nums shrink-0 mt-0.5">{time}</span>
                   </motion.li>
                 )
               })}
