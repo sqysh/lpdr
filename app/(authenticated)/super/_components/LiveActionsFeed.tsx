@@ -18,6 +18,7 @@ import {
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.constants'
+import { pusherClient } from 'lib/pusher/pusher-client'
 
 interface EventConfig {
   icon: React.ElementType
@@ -221,11 +222,7 @@ export function LiveActionsFeed() {
   }
 
   useEffect(() => {
-    const pusher = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
-      cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
-    })
-
-    const channel = pusher.subscribe(SUPER_USER_CHANNEL)
+    const channel = pusherClient.subscribe(SUPER_USER_CHANNEL)
 
     channel.bind_global((event: string, data: Record<string, unknown>) => {
       if (event.startsWith('pusher:')) return
@@ -243,7 +240,7 @@ export function LiveActionsFeed() {
 
     return () => {
       channel.unbind_all()
-      pusher.disconnect()
+      pusherClient.unsubscribe(SUPER_USER_CHANNEL)
     }
   }, [])
 

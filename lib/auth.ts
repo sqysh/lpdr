@@ -120,6 +120,32 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
     },
 
+    async signOut(message) {
+      // The session is void on a JWT strategy and can be void here too, so it is checked rather
+      // than narrowed by key alone.
+      const session = 'session' in message ? message.session : undefined
+      const userId = session && 'userId' in session ? session.userId : undefined
+
+      if (!userId) return
+
+      const user = await prisma.user.findUnique({
+        where: { id: userId },
+        select: { email: true, firstName: true }
+      })
+
+      await pusherSuperuser('user-signed-out', {
+        userId,
+        email: user?.email ?? null,
+        name: user?.firstName ?? null
+      }).catch((error) =>
+        createLog('warn', 'Pusher superuser trigger failed', {
+          event: 'user-signed-out',
+          userId,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        })
+      )
+    },
+
     async createUser({ user }) {
       // Google gives user.name ("First Last"); magic link gives nothing, so derive from email
       const emailName = user.email!.split('@')[0]

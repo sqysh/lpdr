@@ -1,8 +1,10 @@
+import { Role } from '@prisma/client'
 import { DefaultSession, DefaultUser } from 'next-auth'
 
 declare module '@auth/core/adapters' {
   interface AdapterUser {
-    role: 'ADMIN' | 'SUPER_USER' | 'PACK_MEMBER'
+    id: string
+    role: Role
     firstName: string | null
     lastName: string | null
   }
@@ -13,13 +15,13 @@ declare module 'next-auth' {
     user: {
       id: string
       email: string
-      role: 'ADMIN' | 'SUPER_USER' | 'PACK_MEMBER'
+      role: Role
       hasSeenWelcome: boolean
     } & DefaultSession['user']
   }
 
   interface User extends DefaultUser {
     id: string
-    role: 'ADMIN' | 'SUPER_USER' | 'PACK_MEMBER'
+    role: Role
   }
 }
