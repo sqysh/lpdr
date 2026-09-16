@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { sendWinnerEmail } from 'lib/utils/end-auction/sendWinnerEmail.util'
+import { sendUnpaidWinnersAlert } from 'lib/email/sendUnpaidWinnersAlert'
 
 const MAX_REMINDERS = 5
 const REMINDER_WINDOW_DAYS = 5
@@ -45,16 +46,21 @@ export async function GET(request: Request) {
         winningBidPaymentStatus: 'AWAITING_PAYMENT',
         auction: { endDate: { lt: windowCutoff, gte: new Date(now - (2 + REMINDER_WINDOW_DAYS) * DAY_MS) } }
       },
-      select: { id: true, totalPrice: true, user: { select: { email: true } } }
+      select: { id: true, totalPrice: true, user: { select: { email: true } }, auction: { select: { title: true } } }
     })
 
     if (agedOut.length > 0) {
+      const winners = agedOut.map((w) => ({ id: w.id, email: w.user.email, owed: Number(w.totalPrice ?? 0) }))
+
       await createLog('warn', '[CRON] winner-payment-reminder', {
         cronName: 'winner-payment-reminder',
         status: 'attention',
         detail: `${agedOut.length} winner(s) never paid and are past the reminder window`,
-        winners: agedOut.map((w) => ({ id: w.id, email: w.user.email, owed: Number(w.totalPrice ?? 0) }))
+        winners
       })
+
+      // The window query only matches for one day, so this fires once rather than daily.
+      await sendUnpaidWinnersAlert({ winners, auctionTitle: agedOut[0].auction.title })
     }
 
     if (unpaidWinners.length === 0) {

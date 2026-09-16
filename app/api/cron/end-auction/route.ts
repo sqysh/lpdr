@@ -7,16 +7,22 @@ import { revalidateTag } from 'next/cache'
 import { NextResponse } from 'next/server'
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
+import { sendResolverAlert } from 'lib/email/sendResolverAlert'
 
 export async function endAuctionCore(overrideAuctionId?: string): Promise<{ success: boolean; error?: string }> {
   const start = Date.now()
+  // Held outside the try so the catch can say which auction failed.
+  let failed: { id: string; title: string } | null = null
+
   try {
     const now = new Date()
 
-    // An auction is picked up if it is past its end date and its winners have not been resolved.
-    // The ENDED flip happens before resolution so the public page updates immediately, which means
-    // a resolver failure would otherwise leave an ENDED auction that no later run ever retries.
-    // winnersResolvedAt is what makes the retry possible and stops a resolved auction recycling.
+    /**
+     * An auction is picked up if it is past its end date and its winners have not been resolved.
+     * The ENDED flip happens before resolution so the public page updates immediately, which means
+     * a resolver failure would otherwise leave an ENDED auction that no later run ever retries.
+     * winnersResolvedAt is what makes the retry possible and stops a resolved auction recycling.
+     */
     const auctionWhere: Prisma.AuctionWhereInput = overrideAuctionId
       ? { id: overrideAuctionId }
       : {
@@ -45,6 +51,8 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       })
       return { error: 'No auctions found with ACTIVE status past their end date', success: false }
     }
+
+    failed = { id: auction.id, title: auction.title }
 
     // Both aggregates are scoped to this auction's id rather than re-deriving the date window,
     // so the broadcast total can't pick up rows from an auction we are not ending.
@@ -100,16 +108,16 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       })
     )
 
-    const failed = results.filter((r) => r.status === 'rejected')
+    const failedPayments = results.filter((r) => r.status === 'rejected')
 
     await prisma.auction.update({ where: { id: auction.id }, data: { winnersResolvedAt: new Date() } })
 
-    await createLog(failed.length ? 'error' : 'info', '[CRON] end-auction', {
+    await createLog(failedPayments.length ? 'error' : 'info', '[CRON] end-auction', {
       cronName: 'end-auction',
-      status: failed.length ? 'error' : 'success',
+      status: failedPayments.length ? 'error' : 'success',
       durationMs: Date.now() - start,
-      detail: `Ended auction ${auction.id}, ${winners.length} winner(s), ${failed.length} payment step(s) failed`,
-      ...(failed.length ? { errors: failed.map((f) => String(f.reason)) } : {})
+      detail: `Ended auction ${auction.id}, ${winners.length} winner(s), ${failedPayments.length} payment step(s) failed`,
+      ...(failedPayments.length ? { errors: failedPayments.map((f) => String(f.reason)) } : {})
     })
 
     return { success: true }
@@ -120,6 +128,13 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       durationMs: Date.now() - start,
       detail: error instanceof Error ? error.message : 'Unknown error'
     })
+
+    // Only when an auction was actually being ended. A failure before that is a cron problem,
+    // not an auction sitting unresolved, and does not need waking anyone up.
+    if (failed) {
+      await sendResolverAlert({ auctionId: failed.id, auctionTitle: failed.title, error })
+    }
+
     return { error: 'Failed to end auctions', success: false }
   }
 }
