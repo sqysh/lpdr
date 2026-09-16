@@ -51,17 +51,6 @@ export function AuctionItemForm({ auctionItem, auctionId, type, auctionStatus }:
   const isActive = auctionStatus === 'ACTIVE'
   const showBuyNow = type === 'FIXED'
 
-  const DEFAULT_VALUES = {
-    name: auctionItem?.name ?? '',
-    description: auctionItem?.description ?? '',
-    sellingFormat: auctionItem?.sellingFormat ?? type,
-    startingPrice: auctionItem?.startingPrice?.toString() ?? '',
-    buyNowPrice: auctionItem?.buyNowPrice?.toString() ?? '',
-    totalQuantity: auctionItem?.totalQuantity?.toString() ?? '1',
-    requiresShipping: auctionItem?.requiresShipping ?? true,
-    shippingCosts: auctionItem?.shippingCosts?.toString() ?? ''
-  }
-
   const {
     control,
     handleSubmit,
@@ -70,14 +59,23 @@ export function AuctionItemForm({ auctionItem, auctionId, type, auctionStatus }:
   } = useForm<CreateAuctionItemFormValues>({
     resolver: zodResolver(createAuctionItemFormSchema),
     reValidateMode: 'onChange',
-    defaultValues: DEFAULT_VALUES
+    defaultValues: {
+      name: auctionItem?.name ?? '',
+      description: auctionItem?.description ?? '',
+      sellingFormat: auctionItem?.sellingFormat ?? type,
+      startingPrice: auctionItem?.startingPrice?.toString() ?? '',
+      buyNowPrice: auctionItem?.buyNowPrice?.toString() ?? '',
+      totalQuantity: auctionItem?.totalQuantity?.toString() ?? '1',
+      requiresShipping: auctionItem?.requiresShipping ?? true,
+      shippingCosts: auctionItem?.shippingCosts?.toString() ?? ''
+    }
   })
 
   // The title band echoes the name as it is typed, so it subscribes to that one field.
   const itemName = useWatch({ control, name: 'name' })
 
-  // Photos stay outside the form: they are files mid-upload until save, not values to validate.
-  const [photos, setPhotos] = useState<IAuctionItemPhoto[]>(auctionItem?.photos ?? [])
+  const [localPhotos, setLocalPhotos] = useState<IAuctionItemPhoto[] | null>(null)
+  const photos = localPhotos ?? auctionItem?.photos ?? []
   const [pendingPhotos, setPendingPhotos] = useState<PendingPhoto[]>([])
   const [uploadProgress, setUploadProgress] = useState(0)
 
@@ -110,6 +108,7 @@ export function AuctionItemForm({ auctionItem, auctionId, type, auctionStatus }:
       flash({ tone: 'success', message: `${payload.name} updated`, description: buildSummary(payload, uploaded.length) })
       // reset with the saved values so the form is no longer dirty and the refresh can't clobber typing.
       reset(values)
+      setLocalPhotos(null)
       setUploadProgress(0)
       setPendingPhotos([])
       router.refresh()
@@ -178,7 +177,7 @@ export function AuctionItemForm({ auctionItem, auctionId, type, auctionStatus }:
                 isUpdating={isUpdating}
                 photos={photos}
                 pendingPhotos={pendingPhotos}
-                onPatchPhotos={setPhotos}
+                onPatchPhotos={setLocalPhotos}
                 onSetPendingPhotos={setPendingPhotos}
               />
 
