@@ -7,6 +7,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { updateAuctionItemSchema } from 'lib/schemas/auction.schema'
 import type { ActionResult } from 'types/action.types'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 export const updateAuctionItem = async (id: string, input: unknown): Promise<ActionResult<null>> => {
   const gate = await requireAdmin()
@@ -91,6 +92,19 @@ export const updateAuctionItem = async (id: string, input: unknown): Promise<Act
       name,
       updatedBy: gate.userId
     })
+
+    // The edit is already saved, so a feed failure is logged instead of surfacing as a failed update
+    await pusherSuperuser('auction-item-updated', {
+      auctionItemId: id,
+      auctionId,
+      name,
+      updatedBy: gate.userId,
+      // Flags a live edit, where only name and description could have changed
+      duringLiveAuction: isActive,
+      photosAdded: photos.length
+    }).catch((error) =>
+      createLog('error', 'Failed to push auction-item-updated to super feed', { auctionItemId: id, error: getErrorMessage(error) })
+    )
 
     return { success: true, data: null }
   } catch (error) {

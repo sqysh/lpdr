@@ -8,6 +8,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { updateAuctionSchema } from 'lib/schemas/auction.schema'
 import type { ActionResult } from 'types/action.types'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 export const updateAuction = async (id: string, input: unknown): Promise<ActionResult<null>> => {
   const gate = await requireAdmin()
@@ -47,7 +48,7 @@ export const updateAuction = async (id: string, input: unknown): Promise<ActionR
       }
     }
 
-    await prisma.auction.update({
+    const auction = await prisma.auction.update({
       where: { id },
       data: {
         ...(title != null && { title }),
@@ -55,14 +56,33 @@ export const updateAuction = async (id: string, input: unknown): Promise<ActionR
         ...(customAuctionLink != null && { customAuctionLink }),
         ...(startDate != null && { startDate }),
         ...(endDate != null && { endDate })
-      }
+      },
+      // Title comes back from the row because a date-only edit doesn't send one
+      select: { title: true }
     })
+
+    // Keys can be present with undefined values, so only count what was actually written
+    const fields = Object.entries(parsed.data)
+      .filter(([, value]) => value != null)
+      .map(([key]) => key)
 
     await createLog('info', 'Auction updated', {
       auctionId: id,
       updatedBy: gate.userId,
-      fields: Object.keys(parsed.data)
+      fields
     })
+
+    // The edit is already saved, so a feed failure is logged instead of surfacing as a failed update
+    await pusherSuperuser('auction-updated', {
+      auctionId: id,
+      title: auction.title,
+      updatedBy: gate.userId,
+      fields,
+      // Crons activate and resolve on the hour, so a date change is the edit worth noticing
+      datesChanged: startDate != null || endDate != null
+    }).catch((error) =>
+      createLog('error', 'Failed to push auction-updated to super feed', { auctionId: id, error: getErrorMessage(error) })
+    )
 
     return { success: true, data: null }
   } catch (error) {

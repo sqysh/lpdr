@@ -74,10 +74,18 @@ export const createAuctionItem = async (input: unknown): Promise<ActionResult<{ 
       auctionId,
       name,
       sellingFormat,
-      createdBy: gate.userId
+      createdBy: gate.userId,
+      // An item added mid-auction goes straight to bidders, so it should stand out in the feed
+      duringLiveAuction: auction.status === 'ACTIVE'
     }
 
-    await Promise.all([createLog('info', 'Auction item created', payload), pusherSuperuser('auction-item-created', payload)])
+    // The item is already saved, so a feed failure is logged rather than reported as a failed create, which would invite a duplicate
+    await Promise.all([
+      createLog('info', 'Auction item created', payload),
+      pusherSuperuser('auction-item-created', payload).catch((error) =>
+        createLog('error', 'Failed to push auction-item-created to super feed', { auctionItemId: item.id, error: getErrorMessage(error) })
+      )
+    ])
 
     return { success: true, data: { sellingFormat: item.sellingFormat } }
   } catch (error) {

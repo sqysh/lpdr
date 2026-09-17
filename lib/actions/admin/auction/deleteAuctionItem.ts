@@ -4,6 +4,7 @@ import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import type { ActionResult } from 'types/action.types'
 
 export const deleteAuctionItem = async (id: string, auctionId: string): Promise<ActionResult<null>> => {
@@ -36,12 +37,20 @@ export const deleteAuctionItem = async (id: string, auctionId: string): Promise<
 
     await prisma.auctionItem.delete({ where: { id } })
 
-    await createLog('info', 'Auction item deleted', {
+    const payload = {
       auctionItemId: id,
       auctionId,
       name: item.name,
       deletedBy: gate.userId
-    })
+    }
+
+    // The item is already gone, so a feed failure is logged rather than reported as a failed delete
+    await Promise.all([
+      createLog('info', 'Auction item deleted', payload),
+      pusherSuperuser('auction-item-deleted', payload).catch((error) =>
+        createLog('error', 'Failed to push auction-item-deleted to super feed', { auctionItemId: id, error: getErrorMessage(error) })
+      )
+    ])
 
     return { success: true, data: null }
   } catch (error) {

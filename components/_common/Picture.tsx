@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { FC, memo, MouseEventHandler } from 'react'
+import { FC, memo, MouseEventHandler, ReactEventHandler } from 'react'
 
 interface PictureProps {
   src: string
@@ -7,6 +7,7 @@ interface PictureProps {
   className?: string
   priority?: boolean
   onClick?: MouseEventHandler<HTMLImageElement>
+  onError?: ReactEventHandler<HTMLImageElement>
   width?: number
   height?: number
   sizes?: string
@@ -22,6 +23,7 @@ const Picture: FC<PictureProps> = ({
   className,
   priority = false,
   onClick,
+  onError,
   width,
   height,
   sizes = '100vw',
@@ -36,6 +38,7 @@ const Picture: FC<PictureProps> = ({
   return (
     <Image
       onClick={onClick}
+      onError={onError}
       src={src || '/images/no-img.jpg'}
       alt={resolvedAlt}
       width={width || 1}
