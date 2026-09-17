@@ -1,5 +1,5 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { pusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releasePusherClient } from './pusher-client'
 
 type OrderCreatedEvent = {
   type?: string
@@ -27,37 +27,12 @@ export function waitForOrder(channelKey: string, router: AppRouterInstance): Pro
     }
 
     const channelName = `payment-${channelKey}`
-    const channel = pusherClient.subscribe(channelName)
+    const pusher = getPusherClient()
+    const channel = pusher.subscribe(channelName)
 
     let settled = false
 
-    // Unsubscribe only. The connection is shared with the bid panel and anything else listening,
-    // so disconnecting here tore down sockets this function does not own, and writing an
-    // unsubscribe frame to an already closing socket is what logged the CLOSING/CLOSED warning.
-    const cleanup = () => {
-      clearTimeout(timeout)
-      channel.unbind_all()
-      pusherClient.unsubscribe(channelName)
-    }
-
-    const succeed = (path: string) => {
-      if (settled) return
-      settled = true
-      cleanup()
-      router.push(path)
-      resolve()
-    }
-
-    const fail = (message: string) => {
-      if (settled) return
-      settled = true
-      cleanup()
-      reject(new Error(message))
-    }
-
-    const timeout = setTimeout(() => fail(TIMEOUT_MESSAGE), TIMEOUT_MS)
-
-    channel.bind('order-created', (data: OrderCreatedEvent) => {
+    const onCreated = (data: OrderCreatedEvent) => {
       // The adoption fee has no order to show, so it goes straight to the form
       if (data.type === 'ADOPTION_FEE') {
         succeed('/adopt/application?ref=orders')
@@ -70,14 +45,46 @@ export function waitForOrder(channelKey: string, router: AppRouterInstance): Pro
       }
 
       succeed(`/order-confirmation/${data.orderId}?ref=new`)
-    })
+    }
 
-    channel.bind('order-failed', (data: OrderFailedEvent) => {
+    const onFailed = (data: OrderFailedEvent) => {
       fail(data.error || 'Order processing failed')
-    })
+    }
 
-    channel.bind('pusher:subscription_error', () => {
+    const onSubscriptionError = () => {
       fail('Could not connect for payment updates. Please check your email for confirmation.')
-    })
+    }
+
+    const timeout = setTimeout(() => fail(TIMEOUT_MESSAGE), TIMEOUT_MS)
+
+    // Unsubscribe before releasing, so the frame is sent on an open socket. releasePusherClient only
+    // disconnects once no channels remain, which leaves the bid panel's connection alone.
+    const cleanup = () => {
+      clearTimeout(timeout)
+      channel.unbind('order-created', onCreated)
+      channel.unbind('order-failed', onFailed)
+      channel.unbind('pusher:subscription_error', onSubscriptionError)
+      pusher.unsubscribe(channelName)
+      releasePusherClient()
+    }
+
+    function succeed(path: string) {
+      if (settled) return
+      settled = true
+      cleanup()
+      router.push(path)
+      resolve()
+    }
+
+    function fail(message: string) {
+      if (settled) return
+      settled = true
+      cleanup()
+      reject(new Error(message))
+    }
+
+    channel.bind('order-created', onCreated)
+    channel.bind('order-failed', onFailed)
+    channel.bind('pusher:subscription_error', onSubscriptionError)
   })
 }

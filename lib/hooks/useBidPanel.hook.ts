@@ -3,12 +3,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { placeBid } from 'lib/actions/user/auction/placeBid'
-import { pusherClient } from 'lib/pusher/pusher-client'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { useSounds } from 'lib/hooks/useSounds.hook'
 import { useConfettiStore } from 'stores/confetti.store'
 import { PublicAuctionItem } from 'types/auction.types'
 import { QUICK_BID_INCREMENT } from 'lib/constants/auction.constants'
+import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
 
 const CONFIRM_WINDOW_MS = 5000
 
@@ -53,19 +53,22 @@ export function useBidPanel(item: PublicAuctionItem) {
     if (!item?.id) return
 
     const channelName = `auction-item-${item.id}`
-    const channel = pusherClient.subscribe(channelName)
+    const pusher = getPusherClient()
+    const channel = pusher.subscribe(channelName)
 
-    // The payload shape is the server's, so it is read defensively rather than assumed.
-    channel.bind('bid-placed', (data: { auctionItem?: BidPlacedPayload; item?: BidPlacedPayload }) => {
+    const onBidPlaced = (data: { auctionItem?: BidPlacedPayload; item?: BidPlacedPayload }) => {
       const payload = data?.auctionItem ?? data?.item
       if (!payload) return
 
       setLive(payload)
-    })
+    }
+
+    channel.bind('bid-placed', onBidPlaced)
 
     return () => {
-      channel.unbind_all()
-      pusherClient.unsubscribe(channelName)
+      channel.unbind('bid-placed', onBidPlaced)
+      pusher.unsubscribe(channelName)
+      releasePusherClient()
     }
   }, [item?.id])
 

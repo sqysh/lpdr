@@ -1,11 +1,9 @@
 'use client'
 
-import { useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { AuctionParticipation, AuctionPurchase, Donation, MultiItemOrder, MyPackTab, PackMember, Subscription } from 'types/my-pack.types'
 import { updateUserName } from 'lib/actions/my-pack/updateUserName'
-import { pusherClient } from 'lib/pusher/pusher-client'
 import { Header } from 'app/(authenticated)/my-pack/_components/Header'
 import { ShippingAddress } from 'app/(authenticated)/my-pack/_components/ShippingAddress'
 import { PaymentMethods } from 'app/(authenticated)/my-pack/_components/PaymentMethods'
@@ -74,7 +72,6 @@ export default function MyPackClient({
   }
 }) {
   const router = useRouter()
-  const session = useSession()
   const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
   const { status, flash } = useStatusMessage()
 
@@ -92,8 +89,6 @@ export default function MyPackClient({
   const [autoPayError, setAutoPayError] = useState<string | null>(null)
   const [highlightPaymentMethod, setHighlightPaymentMethod] = useState(false)
   const [highlightAddress, setHighlightAddress] = useState(false)
-
-  const isAuthed = session.status === 'authenticated'
 
   const searchParams = useSearchParams()
   const activeTab = (searchParams.get('tab') as MyPackTab) ?? 'account'
@@ -223,23 +218,6 @@ export default function MyPackClient({
       })
     }
   }
-
-  useEffect(() => {
-    if (!isAuthed || !session.data?.user?.id) return
-
-    const userId = session.data.user.id
-    const channel = pusherClient.subscribe(`user-${userId}`)
-
-    channel.bind('order-shipped', (data: { orderId: string }) => {
-      setShippedOrderId(data.orderId)
-      router.refresh()
-    })
-
-    return () => {
-      channel.unbind('order-shipped')
-      pusherClient.unsubscribe(`user-${userId}`)
-    }
-  }, [isAuthed, router, session.data?.user?.id])
 
   return (
     <>

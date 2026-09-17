@@ -1,4 +1,3 @@
-import Pusher from 'pusher-js'
 import { useEffect, useRef, useState } from 'react'
 import {
   XCircle,
@@ -18,7 +17,7 @@ import {
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.constants'
-import { pusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
 
 interface EventConfig {
   icon: React.ElementType
@@ -222,9 +221,11 @@ export function LiveActionsFeed() {
   }
 
   useEffect(() => {
-    const channel = pusherClient.subscribe(SUPER_USER_CHANNEL)
+    const channelName = SUPER_USER_CHANNEL
+    const pusher = getPusherClient()
+    const channel = pusher.subscribe(channelName)
 
-    channel.bind_global((event: string, data: Record<string, unknown>) => {
+    const onEvent = (event: string, data: Record<string, unknown>) => {
       if (event.startsWith('pusher:')) return
 
       const newEvent: LiveEvent = {
@@ -236,11 +237,14 @@ export function LiveActionsFeed() {
 
       setEvents((prev) => [newEvent, ...prev].slice(0, 200))
       feedRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
-    })
+    }
+
+    channel.bind_global(onEvent)
 
     return () => {
-      channel.unbind_all()
-      pusherClient.unsubscribe(SUPER_USER_CHANNEL)
+      channel.unbind_global(onEvent)
+      pusher.unsubscribe(SUPER_USER_CHANNEL)
+      releasePusherClient()
     }
   }, [])
 

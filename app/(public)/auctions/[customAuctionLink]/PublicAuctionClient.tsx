@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
-import { pusherClient } from 'lib/pusher/pusher-client'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { PublicAuction } from 'types/auction.types'
 import { AuctionCountdown, AuctionEmptyState, AuctionHowItWorks, AuctionItemGrid, AuctionSignInModal, AuctionSoldGrid } from './_components'
 import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
+import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
 
 export default function PublicAuctionClient({ auction, myBids }: { auction: PublicAuction; myBids: Record<string, MyBid> }) {
   const session = useSession()
@@ -38,16 +38,20 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
     if (!auction.id) return
 
     const channelName = `auction-${auction.id}`
-    const channel = pusherClient.subscribe(channelName)
+    const pusher = getPusherClient()
+    const channel = pusher.subscribe(channelName)
 
-    channel.bind('bid-placed', () => {
+    const onBidPlaced = () => {
       routerRef.current.refresh()
       setSlotTrigger((t) => t + 1)
-    })
+    }
+
+    channel.bind('bid-placed', onBidPlaced)
 
     return () => {
-      channel.unbind_all()
-      pusherClient.unsubscribe(channelName)
+      channel.unbind('bid-placed', onBidPlaced)
+      pusher.unsubscribe(channelName)
+      releasePusherClient()
     }
   }, [auction.id])
 
