@@ -7,13 +7,22 @@ import { SlideContent } from './SlideContent'
 import { HeroMobileBar } from './HeroMobileBar'
 import { HeroDesktopBar } from './HeroDesktopBar'
 import { CarouselArrows } from './CarouselArrows'
+import { AuctionStatus } from '@prisma/client'
 
-export const Hero = () => {
+export type HeroAuction = {
+  id: string
+  title: string
+  status: AuctionStatus
+  // These arrive serialized once they cross to the client, so the type admits both
+  startDate: Date | string | null
+  endDate: Date | string | null
+  customAuctionLink: string
+  isPubliclyVisible: boolean
+}
+
+export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
   const { current, goTo, goNext, goPrev, setPaused } = useCarousel(SLIDES.length)
   const slide = SLIDES[current]
-
-  // ToDo maybe
-  const hasEvent = false
 
   return (
     <section
@@ -26,14 +35,11 @@ export const Hero = () => {
       <div className="max-w-180 1000:max-w-240 1200:max-w-300 mx-auto relative z-10 flex h-full min-h-[inherit] flex-col justify-between">
         <SlideContent slide={slide} />
         <div className="relative z-10 w-full bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark">
-          <HeroMobileBar
-            current={current}
-            goNext={goNext}
-            goPrev={goPrev}
-            goTo={goTo}
-            hasEvent={hasEvent}
-          />
-          <HeroDesktopBar current={current} goTo={goTo} hasEvent={hasEvent} />
+          {/* The auction is the one thing worth interrupting the carousel for, so it sits above
+              the bars rather than competing with the slide copy. */}
+
+          <HeroMobileBar current={current} goNext={goNext} goPrev={goPrev} goTo={goTo} hasEvent={!!auction} auction={auction} />
+          <HeroDesktopBar current={current} goTo={goTo} hasEvent={!!auction} auction={auction} />
         </div>
       </div>
       <CarouselArrows goNext={goNext} goPrev={goPrev} />

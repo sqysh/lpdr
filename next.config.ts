@@ -1,5 +1,8 @@
 import type { NextConfig } from 'next'
 
+const isDev = process.env.NODE_ENV === 'development'
+const devScriptHosts = isDev ? ' https://va.vercel-scripts.com' : ''
+
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['10.0.0.89'],
   images: {
@@ -48,7 +51,7 @@ const nextConfig: NextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://maps.googleapis.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://challenges.cloudflare.com",
+              `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://www.googletagmanager.com https://maps.googleapis.com https://translate.google.com https://translate.googleapis.com https://translate-pa.googleapis.com https://challenges.cloudflare.com${devScriptHosts}`,
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://www.gstatic.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https://firebasestorage.googleapis.com https://cdn.rescuegroups.org https://lh3.googleusercontent.com https://platform-lookaside.fbsbx.com https://www.gstatic.com https://fonts.gstatic.com https://maps.gstatic.com https://*.googleapis.com",

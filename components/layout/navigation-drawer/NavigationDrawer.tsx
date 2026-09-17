@@ -6,7 +6,6 @@ import { useSession } from 'next-auth/react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useEffect } from 'react'
 import { DrawerHeader } from './DrawerHeader'
-import { DrawerAuctionBanner } from './DrawerAuctionBanner'
 import { DrawerAuthSection } from './DrawerAuthSection'
 import { DrawerCartLink } from './DrawerCartLink'
 import { NavigationDrawerNewsletterForm } from './NavigationDrawerNewsletterForm'
@@ -14,7 +13,7 @@ import { DrawerNavSection } from './DrawerNavSection'
 import { useNavigationStore } from 'stores/navigation.store'
 import { useCartStore } from 'stores/cart.store'
 
-export default function NavigationDrawer({ auction, hasActiveFee }) {
+export default function NavigationDrawer({ hasActiveFee }) {
   const mobileNavigation = useNavigationStore((s) => s.mobileNavOpen)
   const closeMobileNav = useNavigationStore((s) => s.closeMobileNav)
   const openMobileNav = useNavigationStore((s) => s.openMobileNav)
@@ -55,8 +54,6 @@ export default function NavigationDrawer({ auction, hasActiveFee }) {
             <DrawerHeader onClose={onClose} />
 
             <div className="flex-1 overflow-y-auto pb-20">
-              <DrawerAuctionBanner auction={auction} onClose={onClose} />
-
               <DrawerAuthSection session={session} isLinkActive={isLinkActive} onClose={onClose} />
 
               <div className="mx-4 border-t border-border-light/50 dark:border-border-dark" />

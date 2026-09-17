@@ -1,15 +1,18 @@
 import { SLIDES } from 'lib/constants/home.constants'
-import { EventCountdown } from './EventCountdown'
+import { AuctionCountdown } from './AuctionCountdown'
 import { VideoThumb } from './VideoThumb'
+import { HeroAuction } from './Hero'
 
 export function HeroDesktopBar({
   hasEvent,
   current,
-  goTo
+  goTo,
+  auction
 }: {
   hasEvent: boolean
   current: number
   goTo: (i: number) => void
+  auction: HeroAuction
 }) {
   return (
     <div className="hidden 968:block">
@@ -17,7 +20,7 @@ export function HeroDesktopBar({
         <div className="w-full h-full flex items-center justify-center">
           {hasEvent ? (
             <div className="px-6">
-              <EventCountdown />
+              <AuctionCountdown auction={auction} />
             </div>
           ) : (
             <VideoThumb />
@@ -41,10 +44,7 @@ export function HeroDesktopBar({
             className="relative flex items-center justify-center transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark cursor-pointer"
           >
             {i === current ? (
-              <span
-                className="relative flex items-center justify-center w-5 h-5"
-                aria-hidden="true"
-              >
+              <span className="relative flex items-center justify-center w-5 h-5" aria-hidden="true">
                 <span className="absolute inset-0  border-2 border-primary-light dark:border-primary-dark" />
                 <span className="w-2 h-2  bg-primary-light dark:bg-primary-dark" />
               </span>
@@ -58,7 +58,7 @@ export function HeroDesktopBar({
         ))}
         <span className="w-16 mx-2 h-px bg-border-light dark:bg-border-dark" aria-hidden="true" />
         <span
-          className="text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-[0.2em] tabular-nums"
+          className="text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-eyebrow tabular-nums"
           aria-live="polite"
           aria-atomic="true"
         >

@@ -31,7 +31,7 @@ export default function PublicAuctionsClient({ auctions }) {
             className="flex items-center gap-3 mb-4"
           >
             <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+            <span className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
               Little Paws Dachshund Rescue
             </span>
           </motion.div>
@@ -84,9 +84,7 @@ export default function PublicAuctionsClient({ auctions }) {
                   <Icon size={13} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
                   <div>
                     <p className="text-sm font-black font-mono text-text-light dark:text-text-dark leading-none">{value}</p>
-                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-0.5">
-                      {label}
-                    </p>
+                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-0.5">{label}</p>
                   </div>
                 </div>
               ))}
@@ -101,7 +99,7 @@ export default function PublicAuctionsClient({ auctions }) {
               <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2
                 id="active-heading"
-                className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
+                className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark"
               >
                 Live Now
               </h2>
@@ -122,7 +120,7 @@ export default function PublicAuctionsClient({ auctions }) {
               <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2
                 id="upcoming-heading"
-                className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
+                className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark"
               >
                 Upcoming
               </h2>
@@ -143,10 +141,7 @@ export default function PublicAuctionsClient({ auctions }) {
           <section aria-labelledby="past-heading">
             <div className="flex items-center gap-3 mb-6">
               <span className="block w-6 h-px bg-border-light dark:bg-border-dark shrink-0" aria-hidden="true" />
-              <h2
-                id="past-heading"
-                className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
-              >
+              <h2 id="past-heading" className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                 Past Auctions
               </h2>
             </div>

@@ -1,34 +1,33 @@
 import { SLIDES } from 'lib/constants/home.constants'
-import { EventCountdown } from './EventCountdown'
+import { AuctionCountdown } from './AuctionCountdown'
+import { HeroAuction } from './Hero'
 
 export function HeroMobileBar({
   hasEvent,
   current,
   goTo,
   goPrev,
-  goNext
+  goNext,
+  auction
 }: {
   hasEvent: boolean
   current: number
   goTo: (i: number) => void
   goPrev: () => void
   goNext: () => void
+  auction: HeroAuction
 }) {
   return (
     <div className="968:hidden">
       {/* Thin horizontal countdown */}
       <div className="border-b border-border-light dark:border-border-dark">
-        {hasEvent ? <EventCountdown variant="horizontal" /> : <></>}
+        {hasEvent ? <AuctionCountdown auction={auction} variant="horizontal" /> : <></>}
       </div>
 
       {/* Dots / counter / arrows row */}
       <div className="flex items-center justify-between gap-2 px-3 min-[400px]:px-4 py-3">
         {/* Dots */}
-        <div
-          className="flex items-center gap-2 min-[400px]:gap-3 shrink"
-          role="tablist"
-          aria-label="Slide indicators"
-        >
+        <div className="flex items-center gap-2 min-[400px]:gap-3 shrink" role="tablist" aria-label="Slide indicators">
           {SLIDES.map((s, i) => (
             <button
               key={s.id}
@@ -39,10 +38,7 @@ export function HeroMobileBar({
               className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               {i === current ? (
-                <span
-                  className="relative flex items-center justify-center w-4 h-4"
-                  aria-hidden="true"
-                >
+                <span className="relative flex items-center justify-center w-4 h-4" aria-hidden="true">
                   <span className="absolute inset-0 border-2 border-primary-light dark:border-primary-dark" />
                   <span className="w-1.5 h-1.5 bg-primary-light dark:bg-primary-dark" />
                 </span>
@@ -58,7 +54,7 @@ export function HeroMobileBar({
 
         {/* Counter */}
         <span
-          className="hidden min-[360px]:inline text-[10px] font-mono tracking-[0.2em] tabular-nums text-muted-light dark:text-muted-dark shrink-0"
+          className="hidden min-[360px]:inline text-[10px] font-mono tracking-eyebrow tabular-nums text-muted-light dark:text-muted-dark shrink-0"
           aria-live="polite"
           aria-atomic="true"
         >

@@ -3,7 +3,6 @@ import { SessionProvider } from 'next-auth/react'
 import { RootLayoutWrapper } from './root-layout'
 import { bebas, nunito, quicksand, workSans } from './fonts'
 import { SiteNavigationDrawer } from 'components/layout/navigation-drawer/SiteNavigationDrawer'
-import { AuctionRealtime } from 'components/layout/AuctionRealtime'
 import { Header } from 'components/layout/header/Header'
 import { Analytics } from '@vercel/analytics/next'
 
@@ -22,7 +21,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className={fontVariables}>
         <SessionProvider refetchOnWindowFocus={false}>
-          <RootLayoutWrapper header={<Header />} navDrawer={<SiteNavigationDrawer />} auctionRealtime={<AuctionRealtime />}>
+          <RootLayoutWrapper header={<Header />} navDrawer={<SiteNavigationDrawer />}>
             {children}
           </RootLayoutWrapper>
         </SessionProvider>

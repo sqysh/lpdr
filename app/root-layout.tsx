@@ -19,10 +19,9 @@ interface Props {
   children: ReactNode
   header: ReactNode
   navDrawer: ReactNode
-  auctionRealtime: ReactNode
 }
 
-export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime }: Props) {
+export function RootLayoutWrapper({ children, header, navDrawer }: Props) {
   const segments = useSelectedLayoutSegments()
   const isNotFound = segments[0] === '__DEFAULT__' || segments.includes('/_not-found')
   const pathname = usePathname()
@@ -42,7 +41,6 @@ export function RootLayoutWrapper({ children, header, navDrawer, auctionRealtime
       <CartToast />
       <PublicContactModal />
       <Suspense fallback={null}>{navDrawer}</Suspense>
-      <Suspense fallback={null}>{auctionRealtime}</Suspense>
       {!isHidden && header}
       {children}
       {!isHidden && <Footer />}
