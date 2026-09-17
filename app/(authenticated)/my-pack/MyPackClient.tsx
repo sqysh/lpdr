@@ -33,7 +33,7 @@ import { AdoptionFees } from './_components/AdoptionFees'
 import { Subscriptions } from './_components/Subscriptions'
 import { OneTimeDonations } from './_components/OneTimeDonations'
 import { Auctions } from './_components/Auctions'
-import { ActiveAuctionBanner } from './_components/ActiveActionBanner'
+import { FeaturedAuctionBanner } from './_components/FeaturedAuctionBanner'
 import { LinkBody } from 'components/_common/LinkBody'
 import { AuctionStatus } from '@prisma/client'
 import { IAdoptionFee } from 'types/adoption-fee'
@@ -61,6 +61,7 @@ export default function MyPackClient({
   auctionPurchases: AuctionPurchase[]
   hasPendingMigration: boolean
   featuredAuction: {
+    isLive: boolean
     itemCount: number
     hasBids: boolean
     id: string
@@ -251,17 +252,7 @@ export default function MyPackClient({
 
         <MigrationBanner initiallyPending={hasPendingMigration} />
 
-        {featuredAuction && (
-          <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
-            <ActiveAuctionBanner
-              title={featuredAuction.title}
-              customAuctionLink={featuredAuction.customAuctionLink}
-              endDate={featuredAuction.endDate}
-              itemCount={featuredAuction.itemCount}
-              hasBids={featuredAuction.hasBids}
-            />
-          </div>
-        )}
+        {featuredAuction && <FeaturedAuctionBanner {...featuredAuction} />}
 
         <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-8">
           <Header
