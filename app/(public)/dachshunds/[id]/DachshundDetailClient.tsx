@@ -9,10 +9,7 @@ export default function DachshundDetailClient({ data }: { data: Dog }) {
   const a = data?.attributes
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       {/* ── Breadcrumb ── */}
       <Breadcrumb a={a} />
 
