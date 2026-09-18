@@ -14,6 +14,41 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.10.0',
+    date: '2026-09-18',
+    title: 'Donations and subscriptions',
+    changes: [
+      {
+        type: 'feature',
+        text: 'A Donations page listing only one-time and recurring donations, from source SITE'
+      },
+      {
+        type: 'feature',
+        text: 'A Subscriptions page with one row per monthly donor rather than one row per payment, showing what they give each month, how many payments they have made, how much they have given in total, and the monthly total across every active donor'
+      },
+      {
+        type: 'improvement',
+        text: 'The Orders page is now called Transactions and still lists every payment in order. Donations and Subscriptions are narrower views of the same list, so a payment appears in whichever ones apply to it'
+      },
+      {
+        type: 'improvement',
+        text: 'The left menu is regrouped. Transactions, Donations, Subscriptions and Adoption Fees sit together under Money In, and Auctions, Products and Welcome Wieners under Programs'
+      },
+      {
+        type: 'improvement',
+        text: 'Clicking a row now shows that it is loading, and the link back at the top returns you to the page you came from rather than always to Transactions'
+      },
+      {
+        type: 'fix',
+        text: 'The traits listed on a dachshund page did not always match the dog. A dog not suited to a home with cats still read "Good with Cats", and a dog who had never been around children could show a green "Kids OK". Each line now says the actual answer in plain words'
+      },
+      {
+        type: 'fix',
+        text: 'Dachshund photos no longer leave a blank space when one fails to load, and the arrows are hidden for a dog with only one photo'
+      }
+    ]
+  },
+  {
     version: '1.9.2',
     date: '2026-09-16',
     title: 'Auction anomalies',
