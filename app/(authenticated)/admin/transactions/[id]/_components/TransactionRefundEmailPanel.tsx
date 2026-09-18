@@ -12,7 +12,7 @@ import { IOrder } from 'types/order.types'
 
 const EYEBROW = 'text-f9 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
 
-export function OrderRefundEmailPanel({ order }: { order: IOrder }) {
+export function TransactionRefundEmailPanel({ order }: { order: IOrder }) {
   const router = useRouter()
   const { status, flash } = useStatusMessage()
 

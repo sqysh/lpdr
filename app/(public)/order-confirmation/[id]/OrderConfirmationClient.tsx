@@ -40,7 +40,7 @@ export default function OrderConfirmationClient({ order }) {
   const typeCode = order?.type === 'RECURRING_DONATION' ? 'RD' : 'DN'
 
   const headerNav = isAdminView
-    ? { href: `/admin/orders/${order.id}`, icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Back to Order' }
+    ? { href: `/admin/transactions/${order.id}`, icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Back to Order' }
     : session?.data?.user
       ? { href: '/my-pack', icon: <User className="w-3 h-3" aria-hidden="true" />, label: 'My Pack' }
       : { href: '/', icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Home' }
@@ -253,7 +253,7 @@ export default function OrderConfirmationClient({ order }) {
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={3} className="flex flex-col 430:flex-row gap-3">
           {isAdminView ? (
             <Link
-              href={`/admin/orders/${order.id}`}
+              href={`/admin/transactions/${order.id}`}
               className="flex-1 flex items-center justify-center px-6 py-3.5 text-sm uppercase tracking-widest border border-zinc-200 dark:border-border-dark hover:border-cyan-600/30 dark:hover:border-violet-400/30 hover:bg-zinc-50 dark:hover:bg-white/5 text-zinc-500 dark:text-muted-dark transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400"
             >
               <ChevronLeft className="w-4 h-4 mr-2" aria-hidden="true" />

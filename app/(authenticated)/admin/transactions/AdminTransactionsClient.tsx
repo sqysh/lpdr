@@ -13,29 +13,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { SubscriptionGroupRow } from './_components/SubscriptionGroupRow'
 import { formatDate } from 'lib/utils/date.utils'
-
-export function rowClass(o: IOrderRow) {
-  if (!o.userId && !o.customerName && !o.customerEmail)
-    return 'group border-l-2 border-l-red-500 bg-red-500/10 hover:bg-red-500/15 transition-colors'
-
-  if (o.status === 'FAILED') return 'group border-l-2 border-l-red-500 bg-red-500/5 hover:bg-red-500/8 transition-colors'
-
-  // Refunded rows are muted rather than flagged: nothing needs doing, they just should not read
-  // as money the rescue still has.
-  if (o.status === 'REFUNDED')
-    return 'group border-l-2 border-l-zinc-400 dark:border-l-zinc-600 bg-zinc-500/5 opacity-60 hover:opacity-100 hover:bg-zinc-500/10 transition-all'
-
-  if (o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT')
-    return 'group border-l-2 border-l-amber-500 bg-amber-500/5 hover:bg-amber-500/8 transition-colors'
-
-  return 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
-}
+import { rowClass } from '../_lib/rowClass'
+import { isAnonymous } from '../_lib/isAnonymous'
 
 const COL_COUNT = 9
 
-const isAnonymous = (o: IOrderRow) => !o.userId && !o.customerName && !o.customerEmail
-
-export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
+export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
   const router = useRouter()
   const [filter, setFilter] = useState<Filter>('ALL')
 
@@ -120,7 +103,7 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
-      <AdminPageHeader title="Orders" count={{ value: orders.length, noun: 'order' }} />
+      <AdminPageHeader title="Transactions" count={{ value: orders.length, noun: 'order' }} />
 
       <div className="w-full px-4 sm:px-6 py-6 space-y-6">
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
@@ -166,7 +149,7 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
                 <tr>
                   <td
                     colSpan={COL_COUNT}
-                    className="px-4 py-12 text-center text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
+                    className="px-4 py-12 text-center text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
                   >
                     No {FILTER_LABELS[filter].toLowerCase()} orders
                   </td>
@@ -177,11 +160,11 @@ export function AdminOrdersClient({ orders }: { orders: IOrderRow[] }) {
                   <tr
                     key={row.order.id}
                     className={`${rowClass(row.order)} cursor-pointer`}
-                    onClick={() => router.push(`/admin/orders/${row.order.id}`)}
+                    onClick={() => router.push(`/admin/transactions/${row.order.id}`)}
                   >
                     <td className="px-4 py-3 whitespace-nowrap">
                       <Link
-                        href={`/admin/orders/${row.order.id}`}
+                        href={`/admin/transactions/${row.order.id}`}
                         className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                       >
                         #{row.order.id.slice(-8)}

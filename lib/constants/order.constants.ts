@@ -1,3 +1,5 @@
+import { OrderType } from '@prisma/client'
+
 export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string }> = {
   ONE_TIME_DONATION: {
     label: 'Donation Confirmed',
@@ -55,4 +57,34 @@ export const DECLINE_EXPLANATIONS: Record<string, string> = {
   lost_card: 'The card was reported lost.',
   stolen_card: 'The card was reported stolen.',
   authentication_required: 'The bank wanted extra verification that was never completed.'
+}
+
+// One place so Transactions, Donations and the dashboard can't drift on what counts as a donation
+export const DONATION_TYPES = [OrderType.ONE_TIME_DONATION, OrderType.RECURRING_DONATION] as const
+
+export const DONATION_FILTERS = ['ALL', 'ONE_TIME_DONATION', 'RECURRING_DONATION'] as const
+export type DonationFilter = (typeof DONATION_FILTERS)[number]
+
+export const DONATION_FILTER_LABELS: Record<DonationFilter, string> = {
+  ALL: 'All',
+  ONE_TIME_DONATION: 'One-time',
+  RECURRING_DONATION: 'Recurring'
+}
+
+export const isDonation = (type: OrderType) => (DONATION_TYPES as readonly OrderType[]).includes(type)
+
+// Where a given order lives in the admin nav, so breadcrumbs and back links agree
+export function getOrderSection(order: { type: OrderType; isRecurring?: boolean | null }) {
+  if (order.isRecurring) return { href: '/admin/subscriptions', label: 'Subscriptions' }
+  if (isDonation(order.type)) return { href: '/admin/donations', label: 'Donations' }
+  return { href: '/admin/transactions', label: 'Transactions' }
+}
+
+export const SUBSCRIPTION_FILTERS = ['ALL', 'ACTIVE', 'ENDED'] as const
+export type SubscriptionFilter = (typeof SUBSCRIPTION_FILTERS)[number]
+
+export const SUBSCRIPTION_FILTER_LABELS: Record<SubscriptionFilter, string> = {
+  ALL: 'All',
+  ACTIVE: 'Active',
+  ENDED: 'Ended'
 }

@@ -34,22 +34,16 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
       {shipments.map((shipment) => (
         <div key={shipment.id} className="flex items-start justify-between gap-4 px-4 py-3">
           <div className="min-w-0">
-            <p className="font-mono text-xs text-text-light dark:text-text-dark truncate">
-              {shipment.name}
-            </p>
-            <p className="font-mono text-[10px] text-muted-light dark:text-muted-dark truncate mt-0.5">
-              {shipment.items}
-            </p>
-            <p className="font-mono text-[10px] text-muted-light dark:text-muted-dark truncate">
-              {shipment.address}
-            </p>
+            <p className="font-mono text-xs text-text-light dark:text-text-dark truncate">{shipment.name}</p>
+            <p className="font-mono text-[10px] text-muted-light dark:text-muted-dark truncate mt-0.5">{shipment.items}</p>
+            <p className="font-mono text-[10px] text-muted-light dark:text-muted-dark truncate">{shipment.address}</p>
           </div>
           <div className="shrink-0 text-right">
             <p className="font-mono text-xs font-bold text-text-light dark:text-text-dark tabular-nums mb-1">
               {formatMoney(shipment.total)}
             </p>
             <Link
-              href={`/admin/orders/${shipment.id}`}
+              href={`/admin/transactions/${shipment.id}`}
               className="font-mono text-[10px] tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors"
             >
               Ship →
@@ -62,9 +56,7 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
 
   const chevron = (open: boolean) => (
     <ChevronUp
-      className={`w-4 h-4 text-muted-light dark:text-muted-dark shrink-0 transition-transform ${
-        open ? 'rotate-180' : ''
-      }`}
+      className={`w-4 h-4 text-muted-light dark:text-muted-dark shrink-0 transition-transform ${open ? 'rotate-180' : ''}`}
       aria-hidden="true"
     />
   )
@@ -83,9 +75,7 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
           {chevron(mobileOpen)}
         </button>
 
-        {mobileOpen && (
-          <div className="border-t border-border-light dark:border-border-dark">{list}</div>
-        )}
+        {mobileOpen && <div className="border-t border-border-light dark:border-border-dark">{list}</div>}
       </div>
 
       {/* Desktop — top right, collapsible */}
@@ -100,7 +90,7 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
           <div className="flex items-center gap-3 shrink-0">
             {desktopOpen && (
               <Link
-                href="/admin/orders"
+                href="/admin/transactions"
                 className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors"
               >
                 View all

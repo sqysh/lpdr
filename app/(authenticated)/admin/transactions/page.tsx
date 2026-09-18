@@ -1,14 +1,14 @@
 import prisma from 'prisma/client'
-import { AdminOrdersClient } from './AdminOrdersClient'
+import { AdminTransactionsClient } from './AdminTransactionsClient'
 import { serialize } from 'lib/utils/serializers.utils'
 import { orderListArgs } from 'types/order.types'
 
-export default async function AdminOrdersPage() {
+export default async function AdminTransactionsPagePage() {
   const orders = await prisma.order.findMany({
     where: { source: 'SITE' },
     orderBy: { createdAt: 'desc' },
     ...orderListArgs
   })
 
-  return <AdminOrdersClient orders={serialize(orders)} />
+  return <AdminTransactionsClient orders={serialize(orders)} />
 }

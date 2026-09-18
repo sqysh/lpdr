@@ -5,7 +5,7 @@ import { Package, Heart } from 'lucide-react'
 import Image from 'next/image'
 import { formatMoney } from 'lib/utils/currency.utils'
 
-export function OrderItemsSection({ order }: { order: IOrder }) {
+export function TransactionItemsSection({ order }: { order: IOrder }) {
   const subtotal = Number(order.subtotal)
   const shipping = Number(order.shipping)
   const feesCovered = Number(order.feesCovered)

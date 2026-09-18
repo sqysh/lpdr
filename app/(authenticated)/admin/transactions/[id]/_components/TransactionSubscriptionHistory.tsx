@@ -4,7 +4,7 @@ import { STATUS_STYLES } from 'lib/constants/order.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { OrderStatus } from '@prisma/client'
 
-export function OrderSubscriptionHistory({
+export function TransactionSubscriptionHistory({
   orders,
   currentOrderId
 }: {

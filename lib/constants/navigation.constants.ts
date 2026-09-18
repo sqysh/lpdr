@@ -204,9 +204,17 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [{ label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' }]
   },
   {
-    heading: 'Fundraising',
+    heading: 'Money In',
     items: [
-      { label: 'Orders', icon: Receipt, href: '/admin/orders' },
+      { label: 'Transactions', icon: Receipt, href: '/admin/transactions' },
+      { label: 'Donations', icon: Heart, href: '/admin/donations' },
+      { label: 'Subscriptions', icon: Repeat, href: '/admin/subscriptions' },
+      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees' }
+    ]
+  },
+  {
+    heading: 'Programs',
+    items: [
       { label: 'Auctions', icon: Gavel, href: '/admin/auctions' },
       { label: 'Products', icon: Package, href: '/admin/products' },
       { label: 'Welcome Wieners', icon: Dog, href: '/admin/welcome-wieners' }
@@ -214,10 +222,7 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   },
   {
     heading: 'Adoptions',
-    items: [
-      { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds' },
-      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees' }
-    ]
+    items: [{ label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds' }]
   },
   {
     heading: 'People',

@@ -8,7 +8,7 @@ import { IOrder } from 'types/order.types'
  * money the rescue has. Stripe is the record of the refund itself; this only says that it
  * happened, so nobody reconciles the page against a statement and finds a charge missing.
  */
-export function OrderRefundBanner({ order }: { order: IOrder }) {
+export function TransactionRefundBanner({ order }: { order: IOrder }) {
   if (order.status !== 'REFUNDED') return null
 
   return (

@@ -22,7 +22,7 @@ export function SubscriptionGroupRow({ group }: { group: GroupRow }) {
   const renewalCount = group.orders.length - 1
 
   return (
-    <tr className={`${rowClass(latest)} cursor-pointer`} onClick={() => router.push(`/admin/orders/${latest.id}`)}>
+    <tr className={`${rowClass(latest)} cursor-pointer`} onClick={() => router.push(`/admin/transactions/${latest.id}`)}>
       {/* Order — links to latest */}
       <td className="px-4 py-3 whitespace-nowrap">
         <div className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark">

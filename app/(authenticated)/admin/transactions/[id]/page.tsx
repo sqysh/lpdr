@@ -1,9 +1,9 @@
 import { notFound } from 'next/navigation'
 import prisma from 'prisma/client'
-import { AdminOrderDetailsClient } from './AdminOrderDetailsClient'
+import { AdminTransactionDetailsClient } from './AdminTransactionDetailsClient'
 import { serialize } from 'lib/utils/serializers.utils'
 
-export default async function AdminOrderDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+export default async function AdminTransactionDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
 
   const order = await prisma.order.findUnique({
@@ -35,5 +35,5 @@ export default async function AdminOrderDetailsPage({ params }: { params: Promis
       })
     : []
 
-  return <AdminOrderDetailsClient order={serialize(order)} subscriptionOrders={serialize(subscriptionOrders)} />
+  return <AdminTransactionDetailsClient order={serialize(order)} subscriptionOrders={serialize(subscriptionOrders)} />
 }

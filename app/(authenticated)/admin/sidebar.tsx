@@ -28,8 +28,7 @@ export default function AdminSidebar({ onClose, email, role, bypassCode, bypassC
     signOut({ redirectTo: '/' })
   }
 
-  const isActive = (href: string) =>
-    href === '/admin' ? pathname === '/admin' : pathname === href || pathname.startsWith(`${href}/`)
+  const isActive = (href: string) => (href === '/admin' ? pathname === '/admin' : pathname === href || pathname.startsWith(`${href}/`))
 
   const rowClass = (active: boolean) =>
     `relative w-full flex items-center gap-3 px-4 py-2 transition-colors ${
@@ -45,7 +44,7 @@ export default function AdminSidebar({ onClose, email, role, bypassCode, bypassC
     >
       {/* Brand */}
       <Link href="/" aria-label="Little Paws admin home" className="flex items-center gap-2.5 px-4 mb-6">
-        <span className="font-mono text-[11px] tracking-[0.2em] uppercase text-text-light dark:text-text-dark">Little Paws</span>
+        <span className="font-mono text-[11px] tracking-eyebrow uppercase text-text-light dark:text-text-dark">Little Paws</span>
       </Link>
 
       {/* Groups */}
@@ -67,10 +66,7 @@ export default function AdminSidebar({ onClose, email, role, bypassCode, bypassC
                   className={rowClass(active)}
                 >
                   {active && (
-                    <span
-                      className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-light dark:bg-primary-dark"
-                      aria-hidden="true"
-                    />
+                    <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                   )}
                   <NavRowBody Icon={Icon} label={item.label} />
                 </Link>
@@ -104,9 +100,7 @@ export default function AdminSidebar({ onClose, email, role, bypassCode, bypassC
           {email && (
             <div className="px-4 pb-3">
               <p className="font-mono text-[10px] text-text-light dark:text-text-dark truncate">{email}</p>
-              <p className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark mt-0.5">
-                {formatRole(role)}
-              </p>
+              <p className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark mt-0.5">{formatRole(role)}</p>
             </div>
           )}
           <button

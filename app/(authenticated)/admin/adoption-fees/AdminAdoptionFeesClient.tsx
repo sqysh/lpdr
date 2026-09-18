@@ -20,9 +20,7 @@ type FeeFilter = AdoptionFeeStatus | 'ALL'
 
 function StatusBadge({ status }: { status: AdoptionFeeStatus }) {
   return (
-    <span className={`inline-block font-mono text-[10px] tracking-[0.15em] uppercase px-2 py-1 border ${statusStyles[status]}`}>
-      {status}
-    </span>
+    <span className={`inline-block font-mono text-[10px] tracking-tag uppercase px-2 py-1 border ${statusStyles[status]}`}>{status}</span>
   )
 }
 
@@ -120,13 +118,7 @@ export default function AdminAdoptionFeesClient({ fees }: Props) {
         </div>
 
         {/* Filter */}
-        <AdminFilterTabs
-          options={FILTERS}
-          value={filter}
-          onChange={setFilter}
-          counts={counts}
-          label="Filter adoption fees by status"
-        />
+        <AdminFilterTabs options={FILTERS} value={filter} onChange={setFilter} counts={counts} label="Filter adoption fees by status" />
 
         {/* Table */}
         <AdminTable

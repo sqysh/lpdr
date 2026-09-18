@@ -53,7 +53,7 @@ export default function AdminPageHeader({ title, breadcrumbs = [], count, action
 
         {separator}
 
-        <h1 className="text-[9px] font-mono tracking-[0.2em] uppercase text-text-light dark:text-text-dark truncate" aria-current="page">
+        <h1 className="text-[9px] font-mono tracking-eyebrow uppercase text-text-light dark:text-text-dark truncate" aria-current="page">
           {title}
         </h1>
       </nav>

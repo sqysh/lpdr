@@ -339,7 +339,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                   {user.orders.map((order) => (
                     <Link
                       key={order.id}
-                      href={`/admin/orders/${order.id}`}
+                      href={`/admin/transactions/${order.id}`}
                       className="flex items-center justify-between gap-4 px-4 py-3.5 hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors group focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       <div className="flex items-center gap-3 min-w-0">

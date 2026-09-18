@@ -1,7 +1,7 @@
 import { Info } from 'lucide-react'
 import { IOrder } from 'types/order.types'
 
-export function OrderAnomalyBanner({ order }: { order: IOrder }) {
+export function TransactionAnomalyBanner({ order }: { order: IOrder }) {
   const noIdentity = !order.userId && !order.customerName && !order.customerEmail
   if (!noIdentity) return null
 
