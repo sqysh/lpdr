@@ -1,19 +1,13 @@
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 const LOG_LEVELS = { info: 20, warn: 30, error: 40 } as const
 type LogLevel = keyof typeof LOG_LEVELS
 
-const MIN_LEVEL =
-  LOG_LEVELS[
-    (process.env.LOG_LEVEL as LogLevel) ?? (process.env.NODE_ENV === 'production' ? 'info' : 'warn')
-  ]
+const MIN_LEVEL = LOG_LEVELS[(process.env.LOG_LEVEL as LogLevel) ?? (process.env.NODE_ENV === 'production' ? 'info' : 'warn')]
 
-export async function createLog(
-  level: LogLevel,
-  message: string,
-  metadata?: Record<string, unknown>
-) {
+export async function createLog(level: LogLevel, message: string, metadata?: Record<string, unknown>) {
   if (LOG_LEVELS[level] < MIN_LEVEL) return
 
   await prisma.log.create({
@@ -23,4 +17,11 @@ export async function createLog(
       metadata: metadata ? (metadata as Prisma.InputJsonValue) : undefined
     }
   })
+
+  if (level === 'error') {
+    // Nested rather than spread so a stray message key can't clobber the message.
+    // Swallowed and never re-logged, since this fires from inside error handling and a
+    // failed push that logged another error would loop
+    await pusherSuperuser('system-error', { message, metadata }).catch(() => {})
+  }
 }

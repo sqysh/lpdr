@@ -7,7 +7,6 @@ import { updateUserName } from 'lib/actions/my-pack/updateUserName'
 import { Header } from 'app/(authenticated)/my-pack/_components/Header'
 import { ShippingAddress } from 'app/(authenticated)/my-pack/_components/ShippingAddress'
 import { PaymentMethods } from 'app/(authenticated)/my-pack/_components/PaymentMethods'
-import { ShippedCelebration } from 'app/(authenticated)/my-pack/_components/ShippedCelebration'
 import { setDefaultPaymentMethod } from 'lib/actions/_stripe/setDefaultPaymentMethod'
 import { deletePaymentMethod } from 'lib/actions/_stripe/deletePaymentMethod'
 import { TopBar } from 'app/(authenticated)/my-pack/_components/TopBar'
@@ -75,7 +74,6 @@ export default function MyPackClient({
   const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
   const { status, flash } = useStatusMessage()
 
-  const [shippedOrderId, setShippedOrderId] = useState<string | null>(null)
   const [addressModalOpen, setAddressModalOpen] = useState(false)
   const [setDefaultSuccess, setSetDefaultSuccess] = useState<string | null>(null)
   const [deleteError, setDeleteError] = useState<Record<string, string>>({})
@@ -221,8 +219,6 @@ export default function MyPackClient({
 
   return (
     <>
-      {shippedOrderId && <ShippedCelebration key={shippedOrderId} orderId={shippedOrderId} onClose={() => setShippedOrderId(null)} />}
-
       <AddPaymentMethodModal />
 
       <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
