@@ -5,6 +5,8 @@ import { formatDate } from 'lib/utils/date.utils'
 
 type OrderWithItems = Order & { items: OrderItem[] }
 
+const SITE = 'https://www.littlepawsdr.org'
+
 export function getOrderEmailSubject(order: OrderWithItems): string {
   const freq = order.recurringFrequency === 'YEARLY' ? 'Annual' : 'Monthly'
   const subjects: Record<OrderType, string> = {
@@ -18,6 +20,11 @@ export function getOrderEmailSubject(order: OrderWithItems): string {
   }
   return subjects[order.type]
 }
+
+// Anything the donor typed goes through this before it reaches the HTML, so a message or name
+// containing markup renders as text rather than as part of the email
+const escapeHtml = (value: string) =>
+  value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')
 
 // Uses <th scope="row"> for the label so screen readers announce
 // "Label: Value" correctly instead of reading two unrelated cells.
@@ -40,68 +47,60 @@ const noticeBlock = (heading: string, body: string) => `
     </p>
   </div>`
 
-export function orderConfirmationTemplate(order: OrderWithItems): string {
-  const copy = ORDER_TYPE_EMAIL_CONFIG[order.type]
-  const hasItems = order.items.length > 0
-  const firstName = order.customerName.split(' ')[0]
+const link = (href: string, label: string) =>
+  `<a href="${href}" style="color: ${COLOR.accent}; text-decoration: underline; font-weight: 500;">${label}</a>`
 
-  // ── Details table rows ──────────────────────────────────
-  const detailRows: string[] = []
+const sectionLabel = (label: string) => `
+  <p style="margin: 0 0 12px 0; color: ${COLOR.body}; font-size: 9px; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; text-transform: uppercase;">
+    ${label}
+  </p>`
 
-  if (hasItems) {
-    const itemRows = order.items
-      .map((item) => row(item.itemName ?? 'Item', formatMoney(Number(item.price) * (item.quantity ?? 1))))
-      .join('')
+function buildDetailRows(order: OrderWithItems): string[] {
+  const rows: string[] = []
 
-    detailRows.push(itemRows)
-    if (Number(order.shipping) > 0) detailRows.push(row('Shipping', formatMoney(Number(order.shipping))))
-    if (order.coverFees) detailRows.push(row('Processing fee', formatMoney(Number(order.feesCovered))))
-    detailRows.push(accentRow('Total', formatMoney(Number(order.totalAmount))))
+  const total = Number(order.totalAmount)
+  const shipping = Number(order.shipping ?? 0)
+  const feesCovered = order.coverFees ? Number(order.feesCovered ?? 0) : 0
+  // Orders created before subtotal was recorded have 0 stored, so it is derived from what was
+  const subtotal = Number(order.subtotal) > 0 ? Number(order.subtotal) : total - feesCovered - shipping
+  const frequency = order.isRecurring ? (order.recurringFrequency === 'YEARLY' ? 'Annual' : 'Monthly') : null
+
+  // What they gave or bought
+  if (order.items.length > 0) {
+    for (const item of order.items) {
+      const label = escapeHtml(item.itemName ?? 'Item') + ((item.quantity ?? 1) > 1 ? ` &times; ${item.quantity}` : '')
+      rows.push(row(label, formatMoney(Number(item.price) * (item.quantity ?? 1))))
+    }
   } else {
-    if (order.coverFees) detailRows.push(row('Processing fee', formatMoney(Number(order.feesCovered))))
-    detailRows.push(accentRow('Amount', formatMoney(Number(order.totalAmount))))
+    rows.push(row(frequency ? `${frequency} gift` : 'Donation', formatMoney(subtotal)))
   }
 
-  if (order.isRecurring && order.recurringFrequency) {
-    const freq = order.recurringFrequency === 'YEARLY' ? 'Annual' : 'Monthly'
-    detailRows.push(row('Frequency', freq))
-    if (order.nextBillingDate) {
-      detailRows.push(row('Next charge', formatDate(order.nextBillingDate)))
-    }
+  // What was added to it
+  if (shipping > 0) rows.push(row('Shipping', formatMoney(shipping)))
+  if (feesCovered > 0) rows.push(row('Processing fees covered', formatMoney(feesCovered)))
 
-    if (order.recurringFrequency === 'MONTHLY') {
-      detailRows.push(row('Annual total', formatMoney(Number(order.totalAmount) * 12)))
-    }
+  // What was charged
+  rows.push(accentRow(frequency ? 'Charged today' : 'Total', formatMoney(total)))
+
+  // How it repeats
+  if (frequency) {
+    rows.push(row('Frequency', frequency))
+    if (order.nextBillingDate) rows.push(row('Next charge', formatDate(order.nextBillingDate)))
+    if (order.recurringFrequency === 'MONTHLY') rows.push(row('Annual total', formatMoney(total * 12)))
   }
 
-  detailRows.push(row('Date', formatDate(order.createdAt, true)))
-  detailRows.push(row('Confirmation ID', order.id))
+  rows.push(row('Date', formatDate(order.createdAt, true)))
+  rows.push(row('Confirmation ID', order.id))
 
-  // ── Shipping address ────────────────────────────────────
-  const shippingBlock =
-    order.items.some((i) => i.isPhysical) && order.addressLine1
-      ? `
-    <div style="margin-bottom: 36px;">
-      <p style="margin: 0 0 12px 0; color: ${COLOR.body}; font-size: 9px; font-family: 'Courier New', monospace; letter-spacing: 0.2em; text-transform: uppercase;">
-        Ships to
-      </p>
-      <div style="padding: 16px; background: ${COLOR.bgMuted}; border: 1px solid ${COLOR.border};">
-        <p style="margin: 0; color: ${COLOR.heading}; font-size: 14px; line-height: 1.8;">
-          ${order.addressLine1}${order.addressLine2 ? `, ${order.addressLine2}` : ''}<br>
-          ${order.city}, ${order.state} ${order.zipPostalCode}
-        </p>
-      </div>
-    </div>`
-      : ''
+  return rows
+}
 
+function buildNotices(order: OrderWithItems): string[] {
   const notices: string[] = []
 
   if (order.isRecurring) {
     notices.push(
-      noticeBlock(
-        'Need to cancel?',
-        `You can cancel your recurring donation at any time by contacting us at <a href="mailto:lpdr@littlepawsdr.org" style="color: ${COLOR.accent}; text-decoration: underline; font-weight: 500;">lpdr@littlepawsdr.org</a>`
-      )
+      noticeBlock('Need to cancel?', `You can cancel your recurring donation anytime from ${link(`${SITE}/my-pack`, 'My Pack')}.`)
     )
   }
 
@@ -109,7 +108,7 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
     notices.push(
       noticeBlock(
         'Paid automatically',
-        `This was charged to your saved card because auto-pay is on for your account. You can turn it off any time in <a href="https://www.littlepawsdr.org/my-pack" style="color: ${COLOR.accent}; text-decoration: underline; font-weight: 500;">My Pack</a>.`
+        `This was charged to your saved card because auto-pay is on for your account. You can turn it off any time in ${link(`${SITE}/my-pack`, 'My Pack')}.`
       )
     )
   }
@@ -122,6 +121,39 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
       )
     )
   }
+
+  return notices
+}
+
+export function orderConfirmationTemplate(order: OrderWithItems): string {
+  const copy = ORDER_TYPE_EMAIL_CONFIG[order.type]
+  const firstName = escapeHtml(order.customerName.split(' ')[0] ?? '')
+  const detailRows = buildDetailRows(order)
+  const notices = buildNotices(order)
+
+  const messageBlock = order.donorMessage
+    ? `
+    <div style="margin-bottom: 36px;">
+      ${sectionLabel('Your message')}
+      <div style="padding: 16px; background: ${COLOR.bgMuted}; border: 1px solid ${COLOR.border}; border-left: 3px solid ${COLOR.accent};">
+        <p style="margin: 0; color: ${COLOR.heading}; font-size: 14px; line-height: 1.7; white-space: pre-wrap;">${escapeHtml(order.donorMessage)}</p>
+      </div>
+    </div>`
+    : ''
+
+  const shippingBlock =
+    order.items.some((i) => i.isPhysical) && order.addressLine1
+      ? `
+    <div style="margin-bottom: 36px;">
+      ${sectionLabel('Ships to')}
+      <div style="padding: 16px; background: ${COLOR.bgMuted}; border: 1px solid ${COLOR.border};">
+        <p style="margin: 0; color: ${COLOR.heading}; font-size: 14px; line-height: 1.8;">
+          ${escapeHtml(order.addressLine1)}${order.addressLine2 ? `, ${escapeHtml(order.addressLine2)}` : ''}<br>
+          ${escapeHtml(order.city ?? '')}, ${escapeHtml(order.state ?? '')} ${escapeHtml(order.zipPostalCode ?? '')}
+        </p>
+      </div>
+    </div>`
+      : ''
 
   return `
     <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -187,7 +219,7 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
 
                   <!-- Heading -->
                   <h1 class="main-heading" style="margin: 0 0 12px 0; color: ${COLOR.heading}; font-size: 26px; font-weight: bold; line-height: 1.2;">
-                    ${copy.heading.replace('!', `, ${firstName}!`)}
+                    ${firstName ? copy.heading.replace('!', `, ${firstName}!`) : copy.heading}
                   </h1>
 
                   <!-- Body -->
@@ -196,13 +228,12 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
                   </p>
 
                   <!-- Details -->
-                  <p style="margin: 0 0 12px 0; color: ${COLOR.body}; font-size: 9px; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; text-transform: uppercase;">
-                    Order details
-                  </p>
+                  ${sectionLabel('Order details')}
                   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; margin-bottom: 32px;">
                     ${detailRows.join('')}
                   </table>
 
+                  ${messageBlock}
                   ${shippingBlock}
 
                   <!-- Divider -->
@@ -213,18 +244,16 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
                   ${notices.join('')}
 
                   <!-- Footer -->
-                  <p style="margin: 0 0 8px 0; color: ${COLOR.body}; font-size: 9px; font-family: 'Courier New', Courier, monospace; letter-spacing: 0.2em; text-transform: uppercase;">
-                    Questions? We&apos;re here to help.
-                  </p>
+                  ${sectionLabel('Questions? We&apos;re here to help.')}
                   <p style="margin: 0 0 24px 0;">
                     <a href="mailto:lpdr@littlepawsdr.org" style="color: ${COLOR.accent}; text-decoration: underline; font-size: 13px;">lpdr@littlepawsdr.org</a>
                   </p>
 
                   <!-- Legal -->
                   <p style="margin: 0 0 40px 0; font-size: 11px; color: ${COLOR.footer};">
-                    <a href="https://www.littlepawsdr.org/privacy-policy" style="color: ${COLOR.footer}; text-decoration: underline;">Privacy Policy</a>
+                    <a href="${SITE}/privacy-policy" style="color: ${COLOR.footer}; text-decoration: underline;">Privacy Policy</a>
                     &nbsp;&nbsp;
-                    <a href="https://www.littlepawsdr.org/terms" style="color: ${COLOR.footer}; text-decoration: underline;">Terms of Service</a>
+                    <a href="${SITE}/terms" style="color: ${COLOR.footer}; text-decoration: underline;">Terms of Service</a>
                   </p>
 
                   <!-- Bottom label -->

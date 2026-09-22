@@ -119,7 +119,7 @@ export const getPackMemberData = async () => {
 
     const subscriptions: Subscription[] = Object.values(
       orders
-        .filter((o) => o.type === 'RECURRING_DONATION' && o.status === 'CONFIRMED')
+        .filter((o) => o.type === 'RECURRING_DONATION')
         .reduce<Record<string, Subscription & { cycles: number }>>((acc, o) => {
           const key = o.stripeSubscriptionId ?? o.id
           const existing = acc[key]

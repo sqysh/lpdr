@@ -41,18 +41,10 @@ export function CancelSubscriptionModal({
         <div className="flex items-start justify-between px-6 py-5 border-b border-border-light dark:border-border-dark">
           <div>
             <div className="flex items-center gap-2 mb-1">
-              <AlertTriangle
-                className="w-3.5 h-3.5 text-red-500 dark:text-red-400"
-                aria-hidden="true"
-              />
-              <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-red-500 dark:text-red-400">
-                Cancel Subscription
-              </p>
+              <AlertTriangle className="w-3.5 h-3.5 text-red-500 dark:text-red-400" aria-hidden="true" />
+              <p className="text-[10px] font-mono tracking-eyebrow uppercase text-red-500 dark:text-red-400">Cancel Subscription</p>
             </div>
-            <h2
-              id="cancel-modal-title"
-              className="font-quicksand font-bold text-lg text-text-light dark:text-text-dark"
-            >
+            <h2 id="cancel-modal-title" className="font-quicksand font-bold text-lg text-text-light dark:text-text-dark">
               Are you sure?
             </h2>
           </div>
@@ -81,7 +73,7 @@ export function CancelSubscriptionModal({
               type="button"
               onClick={onConfirm}
               disabled={loading}
-              className={`w-full py-3.5 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500
+              className={`w-full py-3.5 text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-red-500
                 ${
                   loading
                     ? 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark cursor-not-allowed'
@@ -105,7 +97,7 @@ export function CancelSubscriptionModal({
             <button
               type="button"
               onClick={onClose}
-              className="w-full py-3.5 text-[10px] font-mono tracking-[0.2em] uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="w-full py-3.5 text-[10px] font-mono tracking-eyebrow uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Keep subscription
             </button>

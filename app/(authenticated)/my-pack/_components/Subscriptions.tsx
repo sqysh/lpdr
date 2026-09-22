@@ -3,6 +3,8 @@ import { EmptyState } from './EmptyState'
 import { StatusPill } from 'components/_primitives/StatusPill'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
+import { LinkBody } from 'components/_common/LinkBody'
+import { ArrowRight } from 'lucide-react'
 
 export function Subscriptions({ subscriptions }) {
   return (
@@ -24,9 +26,7 @@ export function Subscriptions({ subscriptions }) {
                       {sub.tierName}
                     </p>
                     {isCancelled && (
-                      <p className="text-[9px] font-mono tracking-[0.15em] uppercase text-red-500 dark:text-red-400 mt-0.5">
-                        Cancelled
-                      </p>
+                      <p className="text-[9px] font-mono tracking-tag uppercase text-red-500 dark:text-red-400 mt-0.5">Cancelled</p>
                     )}
                   </div>
                   <StatusPill status={sub.status} />
@@ -36,9 +36,7 @@ export function Subscriptions({ subscriptions }) {
                   className={`font-quicksand font-black text-2xl ${isCancelled ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'}`}
                 >
                   {formatMoney(sub.amount)}
-                  <span className="text-xs font-mono font-normal text-muted-light dark:text-muted-dark ml-1">
-                    / {sub.interval}
-                  </span>
+                  <span className="text-xs font-mono font-normal text-muted-light dark:text-muted-dark ml-1">/ {sub.interval}</span>
                 </p>
 
                 {sub.nextBillingDate && sub.status === 'CONFIRMED' && (
@@ -55,12 +53,11 @@ export function Subscriptions({ subscriptions }) {
 
                 <div className="mt-3 pt-3 border-t border-border-light dark:border-border-dark">
                   <Link
-                    href={`/my-pack/subscription/${sub.id}?ref=giving`}
+                    href={`/my-pack/subscription/${sub.id}`}
                     aria-label={`View details for ${sub.tierName} subscription`}
-                    title={`View details for ${sub.tierName} subscription`}
-                    className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
+                    className="inline-flex items-center gap-1 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
                   >
-                    View details →
+                    <LinkBody icon={<ArrowRight className="w-3 h-3" aria-hidden="true" />} label="View details" iconAfter />
                   </Link>
                 </div>
               </li>
