@@ -30,7 +30,7 @@ export async function createSubscriptionWithSavedCard(input: unknown): Promise<A
   const parsed = parseInput(createSubscriptionSchema, input)
   if (parsed.ok === false) return parsed.result
 
-  const { tierId, frequency, coverFees, savedCardId } = parsed.data
+  const { tierId, frequency, coverFees, savedCardId, donorMessage } = parsed.data
   const { userId } = gate
 
   try {
@@ -88,7 +88,7 @@ export async function createSubscriptionWithSavedCard(input: unknown): Promise<A
         items: [{ price: price.id }],
         default_payment_method: savedCardId,
         payment_settings: { save_default_payment_method: 'on_subscription' },
-        description: `${tier.name} donation — ${displayName}`,
+        description: `${tier.name} donation from ${displayName}`,
         metadata: {
           userId,
           email: user.email,
@@ -96,8 +96,11 @@ export async function createSubscriptionWithSavedCard(input: unknown): Promise<A
           frequency,
           orderType: 'RECURRING_DONATION',
           coverFees: coverFees ? 'true' : 'false',
+          subtotal: (baseCents / 100).toFixed(2),
           feesCovered: (feesCoveredCents / 100).toFixed(2),
-          tierName: tier.name
+          tierId: tier.id,
+          tierName: tier.name,
+          ...(donorMessage && { donorMessage })
         }
       },
       { idempotencyKey: `sub_${userId}_${tier.name}_${frequency}` }

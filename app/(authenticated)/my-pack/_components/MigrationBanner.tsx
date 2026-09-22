@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { RefreshCw, CheckCircle } from 'lucide-react'
 import { MigrationGridEffect } from './MigrationScanEffect'
-import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 export function MigrationBanner({ initiallyPending }: { initiallyPending: boolean }) {
   const [pending, setPending] = useState(initiallyPending)
@@ -33,7 +33,7 @@ export function MigrationBanner({ initiallyPending }: { initiallyPending: boolea
     return () => {
       channel.unbind('migration-complete', onComplete)
       pusher.unsubscribe(channelName)
-      releasePusherClient()
+      releaseChannel(channelName)
     }
   }, [userId, pending, router])
 

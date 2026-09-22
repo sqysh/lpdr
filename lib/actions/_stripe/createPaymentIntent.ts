@@ -18,6 +18,7 @@ import type { ActionResult } from 'types/action.types'
 import { OrderType } from '@prisma/client'
 import { ADOPTION_FEE_CENTS, MIN_DONATION_CENTS } from 'lib/constants/adoption-fees.constants'
 import { hasActiveAdoptionFee } from '../adoption-fee/hasActiveAdoptionFee'
+import { isDonation } from 'lib/constants/order.constants'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -37,10 +38,13 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
 
+  console.log('INPUT: ', input)
+
   const parsed = parseInput(createPaymentIntentSchema, input)
+  console.log('PARSED: ', parsed)
   if (parsed.ok === false) return parsed.result
 
-  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId } = parsed.data
+  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId, donorMessage } = parsed.data
 
   const userId = gate.userId
 
@@ -219,6 +223,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       ONE_TIME_DONATION: `One-time donation from ${displayName}`,
       RECURRING_DONATION: `Recurring donation from ${displayName}`,
       ADOPTION_FEE: `Adoption fee from ${displayName}`,
+      ADOPTION_AGREEMENT: `Adoption from ${displayName}`,
       AUCTION_PURCHASE: auctionItemId ? purchaseDescription : `Auction payment from ${displayName}`,
       PURCHASE: purchaseDescription,
       ECARD: `Ecard purchase from ${displayName}`
@@ -251,7 +256,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           )
         }),
         winningBidderId: winningBidderId ?? '',
-        auctionItemId: auctionItemId ?? ''
+        auctionItemId: auctionItemId ?? '',
+        ...(isDonation(orderType) && donorMessage && { donorMessage })
       }
     }
 

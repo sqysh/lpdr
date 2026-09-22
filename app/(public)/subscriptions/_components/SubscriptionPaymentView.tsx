@@ -6,7 +6,7 @@ import { StepIndicator } from 'components/features/payment/StepIndicator'
 import { SignedInRow } from 'components/features/payment/SignedInRow'
 import { StepSignIn } from 'components/features/payment/SignInStep'
 import { PlanSummary } from './PlanSummary'
-import { SubscriptionPaymentForm } from './SubscriptionsPaymentForm'
+import { SubscriptionPaymentForm } from './SubscriptionPaymentForm'
 
 const paymentStepLabels = ['Choose Plan', 'Sign-In', 'Payment']
 
@@ -28,12 +28,12 @@ export function SubscriptionPaymentView({ setView, selectedTier, billing, savedP
       <div className="border-b border-border-dark px-6 sm:px-10 py-4 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <span className="block w-5 h-px bg-primary-dark" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">Little Paws Dachshund Rescue</p>
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-dark">Little Paws Dachshund Rescue</p>
         </div>
         <button
           type="button"
           onClick={() => setView('select')}
-          className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
+          className="inline-flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-dark hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
         >
           <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
           Change plan
@@ -52,9 +52,7 @@ export function SubscriptionPaymentView({ setView, selectedTier, billing, savedP
 
             <SignedInRow />
 
-            {currentStep === 2 && (
-              <StepSignIn redirectTo={`/subscriptions?tier=${selectedTier.id}&billing=${billing}&view=payment`} />
-            )}
+            {currentStep === 2 && <StepSignIn redirectTo={`/subscriptions?tier=${selectedTier.id}&billing=${billing}&view=payment`} />}
 
             {currentStep === 3 && (
               <div className="mt-8">

@@ -7,77 +7,47 @@ import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 
 export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
-  try {
-    const invoiceWithSub = invoice as any
-    // Subscription ID - basil uses parent.subscription_details
-    let subscriptionId: string | null = null
-    if (invoiceWithSub.parent?.subscription_details?.subscription) {
-      subscriptionId = invoiceWithSub.parent.subscription_details.subscription
-    }
+  const subscriptionId =
+    invoice.parent?.type === 'subscription_details' ? (invoice.parent.subscription_details?.subscription as string | undefined) : undefined
 
-    if (!subscriptionId) {
-      return
-    }
+  if (!subscriptionId) return
+
+  try {
+    // Each billing cycle has its own invoice, so it can't collide across renewals the way a
+    // subscription id can when the payment intent lookup comes back empty
+    const existingOrder = await prisma.order.findUnique({ where: { stripeInvoiceId: invoice.id }, select: { id: true } })
+    if (existingOrder) return
 
     const isFirstPayment = invoice.billing_reason === 'subscription_create'
 
-    let paymentIntentId: string | null = null
     const invoicePayments = await stripeClient.invoicePayments.list({ invoice: invoice.id })
-    const defaultPayment = invoicePayments.data.find((p) => p.is_default)
-    if (defaultPayment?.payment?.type === 'payment_intent') {
-      paymentIntentId =
-        typeof defaultPayment.payment.payment_intent === 'string'
-          ? defaultPayment.payment.payment_intent
-          : (defaultPayment.payment.payment_intent as any)?.id || null
-    }
+    const payment = invoicePayments.data.find((p) => p.is_default)?.payment
+    const paymentIntentId =
+      payment?.type === 'payment_intent'
+        ? typeof payment.payment_intent === 'string'
+          ? payment.payment_intent
+          : (payment.payment_intent?.id ?? null)
+        : null
 
-    // Check if order already exists
-    const existingOrder = await prisma.order.findFirst({
-      where: {
-        stripeSubscriptionId: subscriptionId,
-        ...(paymentIntentId && { paymentIntentId })
-      }
-    })
+    const subscription = await stripeClient.subscriptions.retrieve(subscriptionId, { expand: ['default_payment_method'] })
 
-    if (existingOrder) {
-      return
-    }
-
-    // Get the subscription details
-    const subscriptionResponse = await stripeClient.subscriptions.retrieve(subscriptionId, {
-      expand: ['default_payment_method']
-    })
-
-    const subscription = subscriptionResponse as Stripe.Subscription
-
-    const userId = subscription.metadata?.userId
-
-    const frequency = subscription.metadata?.frequency || 'MONTHLY'
+    const meta = subscription.metadata ?? {}
+    const userId = meta.userId || null
+    const frequency = (meta.frequency || 'MONTHLY') as RecurringFrequency
     const amount = invoice.amount_paid / 100
-    const coverFees = subscription.metadata?.coverFees === 'true'
-    const feesCovered = parseFloat(subscription.metadata?.feesCovered || '0')
+    const coverFees = meta.coverFees === 'true'
+    const feesCovered = parseFloat(meta.feesCovered || '0')
 
-    function getNextBillingDate(subscription: any): Date {
-      const frequency = subscription.metadata?.frequency || 'MONTHLY'
-      const anchor = new Date(subscription.billing_cycle_anchor * 1000)
-
-      if (frequency === 'YEARLY') {
-        return new Date(anchor.setFullYear(anchor.getFullYear() + 1))
-      }
-
-      return new Date(anchor.setMonth(anchor.getMonth() + 1))
-    }
+    // The period this invoice paid for ends at the next charge. The subscription line is found rather
+    // than assumed first, since prorations and pending items sort ahead of it
+    const subscriptionLine = invoice.lines?.data?.find((l) => l.parent?.type === 'subscription_item_details')
+    const periodEnd = subscriptionLine?.period?.end
+    const nextBillingDate = periodEnd ? new Date(periodEnd * 1000) : null
 
     const geoUser = userId
       ? await prisma.user.findUnique({
           where: { id: userId },
-          select: {
-            lastGeoLatitude: true,
-            lastGeoLongitude: true,
-            lastGeoCity: true,
-            lastGeoRegion: true,
-            lastGeoCountry: true
-          }
+          select: { lastGeoLatitude: true, lastGeoLongitude: true, lastGeoCity: true, lastGeoRegion: true, lastGeoCountry: true }
         })
       : null
 
@@ -86,77 +56,94 @@ export async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
         type: 'RECURRING_DONATION',
         status: 'CONFIRMED',
         totalAmount: amount,
-        customerEmail: subscription.metadata?.email || invoice.customer_email || '',
-        customerName: subscription.metadata?.name || '',
-        userId: userId && userId !== 'guest' ? userId : null,
+        subtotal: parseFloat(meta.subtotal ?? '0'),
+        coverFees,
+        feesCovered,
+        customerEmail: meta.email || invoice.customer_email || '',
+        customerName: meta.name || '',
+        userId,
         stripeSubscriptionId: subscriptionId,
-        paymentIntentId: paymentIntentId || null,
+        stripeInvoiceId: invoice.id,
+        paymentIntentId,
         paymentMethodId:
           typeof subscription.default_payment_method === 'string'
             ? subscription.default_payment_method
-            : subscription.default_payment_method?.id || null,
+            : (subscription.default_payment_method?.id ?? null),
         isRecurring: true,
-        recurringFrequency: frequency as RecurringFrequency,
-        coverFees: coverFees,
-        feesCovered: feesCovered,
+        recurringFrequency: frequency,
         paidAt: invoice.status_transitions?.paid_at ? new Date(invoice.status_transitions.paid_at * 1000) : new Date(),
-        nextBillingDate: getNextBillingDate(subscription),
-        tierName: subscription.metadata.tierName || null,
+        nextBillingDate,
+        tierName: meta.tierName || null,
+        isFirstPayment,
+        isPhysical: false,
+        // A dedication belongs to the gift, not to every renewal of it
+        donorMessage: isFirstPayment ? meta.donorMessage || null : null,
         geoLatitude: geoUser?.lastGeoLatitude ?? null,
         geoLongitude: geoUser?.lastGeoLongitude ?? null,
         geoCity: geoUser?.lastGeoCity ?? null,
         geoRegion: geoUser?.lastGeoRegion ?? null,
         geoCountry: geoUser?.lastGeoCountry ?? null,
-        geoSource: geoUser?.lastGeoLatitude != null ? 'ip' : null,
-        isFirstPayment,
-        isPhysical: false
+        geoSource: geoUser?.lastGeoLatitude != null ? 'ip' : null
       }
     })
 
     await createLog('info', `Recurring donation ${isFirstPayment ? 'created' : 'renewed'}`, {
       orderId: order.id,
       subscriptionId,
+      invoiceId: invoice.id,
       amount,
       isFirstPayment
     })
 
-    const orderWithItems = await prisma.order.findUniqueOrThrow({
-      where: { id: order.id },
-      include: { items: true }
-    })
+    // Notifications are best effort. The order exists and the money has moved, so a failure here must
+    // not become a retry that hits the existing-order check and leaves the donor with no confirmation
+    try {
+      if (isFirstPayment) {
+        const orderWithItems = await prisma.order.findUniqueOrThrow({ where: { id: order.id }, include: { items: true } })
+        void sendConfirmationEmail(orderWithItems).catch((error) =>
+          createLog('error', 'Failed to send recurring donation confirmation', {
+            orderId: order.id,
+            error: error instanceof Error ? error.message : 'Unknown error'
+          })
+        )
+      }
 
-    // Only send confirmation email on first payment
-    if (isFirstPayment) {
-      await sendConfirmationEmail(orderWithItems)
+      await pusherTrigger(`payment-${subscriptionId}`, 'order-created', {
+        orderId: order.id,
+        amount: order.totalAmount,
+        status: order.status,
+        type: order.type,
+        frequency,
+        coverFees,
+        feesCovered,
+        createdAt: order.createdAt
+      })
+
+      await pusherSuperuser('recurring-donation', {
+        userId,
+        email: order.customerEmail,
+        name: order.customerName,
+        amount,
+        frequency,
+        isFirstPayment,
+        orderId: order.id,
+        stripeSubscriptionId: subscriptionId,
+        donorMessage: order.donorMessage
+      })
+    } catch (error) {
+      await createLog('warn', 'Notification failed after recurring order created', {
+        orderId: order.id,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      })
     }
-
-    const channelId = `payment-${subscriptionId}`
-
-    await pusherTrigger(channelId, 'order-created', {
-      orderId: order.id,
-      amount: order.totalAmount,
-      status: order.status,
-      type: order.type,
-      frequency,
-      coverFees,
-      feesCovered,
-      createdAt: order.createdAt
-    })
-
-    await pusherSuperuser('recurring-donation', {
-      userId: userId ?? null,
-      email: order.customerEmail,
-      name: order.customerName,
-      amount,
-      frequency,
-      isFirstPayment,
-      orderId: order.id,
-      stripeSubscriptionId: subscriptionId
-    })
   } catch (error) {
-    await createLog('error', 'Error handling invoice payment', {
+    await createLog('error', 'Failed to create order from invoice', {
       invoiceId: invoice.id,
+      subscriptionId,
       error: error instanceof Error ? error.message : 'Unknown error'
     })
+
+    // Rethrow so the route returns a non-200 and Stripe retries. The invoice check makes the retry safe
+    throw error
   }
 }

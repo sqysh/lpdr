@@ -14,18 +14,30 @@ export function getPusherClient() {
   if (!globalForPusher.pusherClient) {
     globalForPusher.pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
-      // ...keep any other options from the current file
     })
   }
 
   return globalForPusher.pusherClient
 }
 
-export function releasePusherClient() {
+/**
+ * Leaves a channel and closes the socket once nothing else is using it. Every subscriber should
+ * clean up through this rather than calling unsubscribe itself.
+ */
+export function releaseChannel(channelName: string) {
   const client = globalForPusher.pusherClient
+  if (!client) return
+
+  if (client.connection.state === 'connected') {
+    client.unsubscribe(channelName)
+  } else {
+    // The unsubscribe message would be written to a socket that is closing or gone, which the browser
+    // logs as an error. Dropping it locally is enough, and stops pusher-js resubscribing it on reconnect
+    client.channels.remove(channelName)
+  }
 
   // Only drop the socket once nothing is subscribed, so two components on one page don't cut each other off
-  if (client && client.allChannels().length === 0) {
+  if (client.allChannels().length === 0) {
     client.disconnect()
     globalForPusher.pusherClient = null
   }

@@ -11,7 +11,6 @@ import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHead
 import { StatusPill } from 'components/_primitives'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { DonationSubscriptionRow } from './_components/DonationSubscriptionRow'
 import { formatDate } from 'lib/utils/date.utils'
 import { rowClass } from '../_lib/rowClass'
 import { isAnonymous } from '../_lib/isAnonymous'
@@ -157,68 +156,65 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
                   </td>
                 </tr>
               )}
-              {displayRows.map((row) =>
-                row.kind === 'flat' ? (
-                  <tr
-                    key={row.order.id}
-                    className={`${rowClass(row.order)} cursor-pointer`}
-                    onClick={() => open(row.order.id, row.order.id)}
-                  >
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <Link
-                        href={`/admin/transactions/${row.order.id}`}
-                        onClick={(e) => e.stopPropagation()}
-                        className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-                      >
-                        #{row.order.id.slice(-8)}
-                      </Link>
-                    </td>
-                    <td className="px-4 py-3 text-xs font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
-                      {formatDate(row.order.createdAt, true)}
-                    </td>
-                    <td className="px-4 py-3 min-w-0 max-w-50">
-                      {isAnonymous(row.order) ? (
-                        <span className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-red-500 dark:text-red-400">
-                          <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden="true" />
-                          No customer data
-                        </span>
-                      ) : (
-                        <>
-                          <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
-                            {row.order.customerName || '—'}
-                          </p>
-                          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
-                            {row.order.customerEmail || '—'}
-                          </p>
-                        </>
-                      )}
-                    </td>
-                    <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">One-time</td>
-                    <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
-                      {formatMoney(row.order.totalAmount)}
-                    </td>
-                    <td className="px-4 py-3 whitespace-nowrap">
-                      <StatusPill status={row.order.status} />
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      {isPending && openingId === row.order.id ? (
-                        <Loader2 className="w-3.5 h-3.5 inline animate-spin text-primary-light dark:text-primary-dark" aria-hidden="true" />
-                      ) : (
-                        <ChevronRight
-                          className="w-3.5 h-3.5 inline text-muted-light dark:text-muted-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors"
-                          aria-hidden="true"
-                        />
-                      )}
-                    </td>
-                  </tr>
-                ) : (
-                  <DonationSubscriptionRow
-                    key={row.subscriptionId}
-                    group={row}
-                    pending={isPending && openingId === row.subscriptionId}
-                    onOpen={() => open(row.subscriptionId, latestOf(row.orders).id)}
-                  />
-                )
+              {displayRows.map(
+                (row) =>
+                  row.kind === 'flat' && (
+                    <tr
+                      key={row.order.id}
+                      className={`${rowClass(row.order)} cursor-pointer`}
+                      onClick={() => open(row.order.id, row.order.id)}
+                    >
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <Link
+                          href={`/admin/transactions/${row.order.id}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className="text-xs font-mono text-primary-light dark:text-primary-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                        >
+                          #{row.order.id.slice(-8)}
+                        </Link>
+                      </td>
+                      <td className="px-4 py-3 text-xs font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
+                        {formatDate(row.order.createdAt, true)}
+                      </td>
+                      <td className="px-4 py-3 min-w-0 max-w-50">
+                        {isAnonymous(row.order) ? (
+                          <span className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-red-500 dark:text-red-400">
+                            <AlertTriangle className="w-3 h-3 shrink-0" aria-hidden="true" />
+                            No customer data
+                          </span>
+                        ) : (
+                          <>
+                            <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
+                              {row.order.customerName || '—'}
+                            </p>
+                            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate">
+                              {row.order.customerEmail || '—'}
+                            </p>
+                          </>
+                        )}
+                      </td>
+                      <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">One-time</td>
+                      <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
+                        {formatMoney(row.order.totalAmount)}
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        <StatusPill status={row.order.status} />
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        {isPending && openingId === row.order.id ? (
+                          <Loader2
+                            className="w-3.5 h-3.5 inline animate-spin text-primary-light dark:text-primary-dark"
+                            aria-hidden="true"
+                          />
+                        ) : (
+                          <ChevronRight
+                            className="w-3.5 h-3.5 inline text-muted-light dark:text-muted-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors"
+                            aria-hidden="true"
+                          />
+                        )}
+                      </td>
+                    </tr>
+                  )
               )}
             </tbody>
           </table>

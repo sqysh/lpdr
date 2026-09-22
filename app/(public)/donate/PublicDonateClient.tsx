@@ -28,7 +28,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
           <Link
             href="/"
             aria-label="Back to Little Paws Dachshund Rescue home"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark rounded"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark rounded"
           >
             <LinkBody icon={<ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />} label="Home" spinnerClass="w-3.5 h-3.5" />
           </Link>
@@ -52,9 +52,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
           <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12">
             <div className="flex items-center gap-3 mb-4">
               <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-              <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                One-Time Donation
-              </p>
+              <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">One-Time Donation</p>
             </div>
             <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight mb-5">
               Make a <span className="font-light text-muted-light dark:text-muted-dark">Difference</span>
@@ -79,13 +77,11 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
               <div>
                 <div className="flex items-center gap-3 mb-4">
                   <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                    Our Mission
-                  </p>
+                  <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Our Mission</p>
                 </div>
                 <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
-                  Little Paws Dachshund Rescue is a volunteer-run nonprofit dedicated to saving dachshunds and dachshund mixes
-                  from shelters, surrenders, and neglect — giving every long dog a second chance at a loving forever home.
+                  Little Paws Dachshund Rescue is a volunteer-run nonprofit dedicated to saving dachshunds and dachshund mixes from
+                  shelters, surrenders, and neglect — giving every long dog a second chance at a loving forever home.
                 </p>
               </div>
 
@@ -94,9 +90,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
 
               {/* Impact stats */}
               <div>
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-5">
-                  Your Impact
-                </p>
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-5">Your Impact</p>
                 <dl className="space-y-5">
                   {[
                     { stat: '1,900+', label: 'Dogs rescued since 2012' },
@@ -118,9 +112,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
 
               {/* What your donation covers */}
               <div>
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-4">
-                  Where It Goes
-                </p>
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-4">Where It Goes</p>
                 <ul className="space-y-3" aria-label="What your donation covers">
                   {[
                     { amount: '$25', desc: 'covers a vet wellness visit' },
@@ -157,9 +149,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
                       </span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-                        Signed in as
-                      </p>
+                      <p className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark">Signed in as</p>
                       <p className="text-xs font-mono text-text-light dark:text-text-dark truncate">{email}</p>
                     </div>
                     {/* Active dot */}

@@ -8,7 +8,7 @@ import { useSounds } from 'lib/hooks/useSounds.hook'
 import { useConfettiStore } from 'stores/confetti.store'
 import { PublicAuctionItem } from 'types/auction.types'
 import { QUICK_BID_INCREMENT } from 'lib/constants/auction.constants'
-import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 const CONFIRM_WINDOW_MS = 5000
 
@@ -68,7 +68,7 @@ export function useBidPanel(item: PublicAuctionItem) {
     return () => {
       channel.unbind('bid-placed', onBidPlaced)
       pusher.unsubscribe(channelName)
-      releasePusherClient()
+      releaseChannel(channelName)
     }
   }, [item?.id])
 

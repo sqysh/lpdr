@@ -1,5 +1,5 @@
 import { AppRouterInstance } from 'next/dist/shared/lib/app-router-context.shared-runtime'
-import { getPusherClient, releasePusherClient } from './pusher-client'
+import { getPusherClient, releaseChannel } from './pusher-client'
 
 type OrderCreatedEvent = {
   type?: string
@@ -65,7 +65,7 @@ export function waitForOrder(channelKey: string, router: AppRouterInstance): Pro
       channel.unbind('order-failed', onFailed)
       channel.unbind('pusher:subscription_error', onSubscriptionError)
       pusher.unsubscribe(channelName)
-      releasePusherClient()
+      releaseChannel(channelName)
     }
 
     function succeed(path: string) {

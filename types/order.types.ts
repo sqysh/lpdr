@@ -37,7 +37,8 @@ export const orderListArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
     userId: true,
     createdAt: true,
     _count: { select: { items: true } },
-    items: { select: { quantity: true } }
+    items: { select: { quantity: true } },
+    donorMessage: true
   }
 })
 

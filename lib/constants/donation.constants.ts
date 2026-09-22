@@ -1,1 +1,2 @@
 export const DONATION_PRESETS = [10, 25, 50, 100, 250, 500]
+export const MAX_DONATION_CENTS = 99_999_999

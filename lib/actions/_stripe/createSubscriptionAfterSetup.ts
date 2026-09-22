@@ -17,11 +17,9 @@ type SubscriptionData = {
   status: string
 }
 
-const fail = (error: string): ActionResult<SubscriptionData> => ({
-  success: false,
-  data: null,
-  error
-})
+const FREQUENCIES: RecurringFrequency[] = ['MONTHLY', 'YEARLY']
+
+const fail = (error: string): ActionResult<SubscriptionData> => ({ success: false, data: null, error })
 
 export async function createSubscriptionAfterSetup(input: unknown): Promise<ActionResult<SubscriptionData>> {
   const gate = await requireAuth()
@@ -36,34 +34,29 @@ export async function createSubscriptionAfterSetup(input: unknown): Promise<Acti
   try {
     const setupIntent = await stripeClient.setupIntents.retrieve(setupIntentId)
 
-    if (setupIntent.status !== 'succeeded') {
-      return fail('Card confirmation failed. Please try again.')
-    }
+    if (setupIntent.status !== 'succeeded') return fail('Card confirmation failed. Please try again.')
 
     // The setup intent was created by us with the caller's id baked in.
     // Everything below comes from there, never from the client.
-    if (setupIntent.metadata?.userId !== userId) {
-      await createLog('warn', 'Setup intent does not belong to this user', {
-        setupIntentId,
-        userId
-      })
+    const meta = setupIntent.metadata ?? {}
+
+    if (meta.userId !== userId) {
+      await createLog('warn', 'Setup intent does not belong to this user', { setupIntentId, userId })
       return fail('Something went wrong. Please try again.')
     }
 
     const customerId = setupIntent.customer as string
     const paymentMethodId = setupIntent.payment_method as string
+    if (!customerId || !paymentMethodId) return fail('Card setup is incomplete. Please try again.')
 
-    if (!customerId || !paymentMethodId) {
-      return fail('Card setup is incomplete. Please try again.')
-    }
-
-    const tier = SUBSCRIPTION_TIERS.find((t) => t.id === setupIntent.metadata?.tierId)
+    const tier = SUBSCRIPTION_TIERS.find((t) => t.id === meta.tierId)
     if (!tier) return fail('That membership tier is no longer available.')
 
-    const frequency = setupIntent.metadata?.frequency as RecurringFrequency
-    const amountCents = Number(setupIntent.metadata?.amount)
+    // Metadata is only strings, so both are checked rather than cast
+    const frequency = meta.frequency as RecurringFrequency
+    const amountCents = Number(meta.amount)
 
-    if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    if (!FREQUENCIES.includes(frequency) || !Number.isFinite(amountCents) || amountCents <= 0) {
       return fail('Something went wrong. Please try again.')
     }
 
@@ -81,8 +74,8 @@ export async function createSubscriptionAfterSetup(input: unknown): Promise<Acti
     const details = await stampUserGeoFromRequest(userId)
 
     const product = await stripeClient.products.create({
-      name: `${tier.name} — ${intervalLabel} Donation`,
-      description: `Recurring donation of $${tier.price[frequency].toFixed(2)}/${intervalWord} — ${tier.name} tier`,
+      name: `${tier.name}: ${intervalLabel} Donation`,
+      description: `Recurring donation of $${tier.price[frequency].toFixed(2)}/${intervalWord}, ${tier.name} tier`,
       metadata: { userId, donorName: displayName }
     })
 
@@ -100,17 +93,20 @@ export async function createSubscriptionAfterSetup(input: unknown): Promise<Acti
         items: [{ price: price.id }],
         default_payment_method: paymentMethodId,
         payment_settings: { save_default_payment_method: 'on_subscription' },
-        description: `${tier.name} donation — ${displayName}`,
+        description: `${tier.name} donation from ${displayName}`,
         metadata: {
           userId,
           email: user.email,
           name: displayName,
           orderType: 'RECURRING_DONATION',
           frequency,
-          coverFees: setupIntent.metadata?.coverFees ?? 'false',
-          feesCovered: setupIntent.metadata?.feesCovered ?? '0',
+          coverFees: meta.coverFees ?? 'false',
+          subtotal: meta.subtotal ?? '0',
+          feesCovered: meta.feesCovered ?? '0',
           tierId: tier.id,
-          tierName: tier.name
+          tierName: tier.name,
+          // Carried from the setup intent; the invoice handler reads it onto the first payment's order
+          ...(meta.donorMessage && { donorMessage: meta.donorMessage })
         }
       },
       { idempotencyKey: `sub_${setupIntentId}` }
@@ -127,16 +123,9 @@ export async function createSubscriptionAfterSetup(input: unknown): Promise<Acti
       country: details?.geoCountry
     })
 
-    return {
-      success: true,
-      data: { subscriptionId: subscription.id, status: subscription.status }
-    }
+    return { success: true, data: { subscriptionId: subscription.id, status: subscription.status } }
   } catch (error) {
-    await createLog('error', 'Subscription creation failed', {
-      error: getErrorMessage(error),
-      userId
-    })
-
+    await createLog('error', 'Subscription creation failed', { error: getErrorMessage(error), userId })
     return fail('Could not start your subscription. Please try again.')
   }
 }

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { OrderType } from '@prisma/client'
+import { MAX_DONATION_CENTS } from 'lib/constants/donation.constants'
 
 export const paymentItemSchema = z.object({
   id: z.string().optional(),
@@ -15,14 +16,15 @@ export const paymentItemSchema = z.object({
 })
 
 export const createPaymentIntentSchema = z.object({
-  amount: z.number().int().nonnegative().max(2_000_000).optional(),
+  amount: z.number().int().nonnegative().max(MAX_DONATION_CENTS).optional(),
   orderType: z.enum(OrderType),
   saveCard: z.boolean().default(false),
   coverFees: z.boolean().default(false),
   savedCardId: z.string().nullable().optional(),
   items: z.array(paymentItemSchema).max(50).optional(),
   winningBidderId: z.string().optional(),
-  auctionItemId: z.string().optional()
+  auctionItemId: z.string().optional(),
+  donorMessage: z.string().trim().max(500).optional()
 })
 
 export type CreatePaymentIntentInput = z.infer<typeof createPaymentIntentSchema>

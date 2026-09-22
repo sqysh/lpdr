@@ -11,6 +11,7 @@ import { TransactionCustomerSection } from './_components/TransactionCustomerSec
 import { TransactionPaymentSection } from './_components/TransactionPaymentSection'
 import { TransactionAnomalyBanner } from './_components/TransactionAnomalyBanner'
 import { TransactionRefundEmailPanel } from './_components/TransactionRefundEmailPanel'
+import { TransactionDonorMessage } from './_components/TransactionDonorMessage'
 
 type Props = {
   order: IOrder
@@ -32,6 +33,7 @@ export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Pro
       <div className="w-full max-w-7xl px-4 sm:px-6 py-6 grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
         {/* Left */}
         <div className="space-y-6 min-w-0">
+          {order.donorMessage && <TransactionDonorMessage message={order.donorMessage} />}
           <TransactionItemsSection order={order} />
           {hasSubscriptionHistory && <TransactionSubscriptionHistory orders={subscriptionOrders} currentOrderId={order.id} />}
         </div>

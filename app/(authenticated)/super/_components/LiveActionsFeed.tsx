@@ -17,7 +17,7 @@ import {
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.constants'
-import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 interface EventConfig {
   icon: React.ElementType
@@ -244,7 +244,7 @@ export function LiveActionsFeed() {
     return () => {
       channel.unbind_global(onEvent)
       pusher.unsubscribe(SUPER_USER_CHANNEL)
-      releasePusherClient()
+      releaseChannel(SUPER_USER_CHANNEL)
     }
   }, [])
 

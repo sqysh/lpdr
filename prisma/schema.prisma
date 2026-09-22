@@ -77,6 +77,7 @@ enum OrderType {
   AUCTION_PURCHASE
   PURCHASE
   ECARD
+  ADOPTION_AGREEMENT
 }
 
 enum OrderItemType {
@@ -112,6 +113,31 @@ enum UserStatus {
   ACTIVE
   SUSPENDED
   TERMINATED
+}
+
+enum AdoptionAgreementStatus {
+  DRAFT // admin preparing
+  SENT // emailed to adopter
+  SIGNED // adopter signed, payment outstanding
+  PAID // signed and paid, awaiting countersignature
+  COMPLETE // countersigned by LPDR
+  VOID
+}
+
+enum AdoptionPaymentMethod {
+  CARD
+  ZELLE
+  VENMO
+  PAYPAL
+}
+
+// The adopter signs twice: once agreeing to the terms, then again on the financial page,
+// where a second adopter can also sign. The representative countersigns last
+enum AgreementSignatureRole {
+  TERMS_ADOPTER
+  FINANCIAL_FIRST_ADOPTER
+  FINANCIAL_SECOND_ADOPTER
+  REPRESENTATIVE
 }
 
 // ─── Next Auth ────────────────────────────────────────────────────────────────────
@@ -175,55 +201,67 @@ model Address {
 
 // ─── User ────────────────────────────────────────────────────────────────────
 model User {
-  id          String    @id @default(cuid())
-  email       String    @unique
-  name        String?
-  image       String?
-  role        Role      @default(PACK_MEMBER)
-  lastLoginAt DateTime?
+  id    String @id @default(cuid())
+  email String @unique
 
-  // Generic person info (optional)
+  // Profile
+  name      String?
   firstName String?
   lastName  String?
   phone     String?
+  image     String?
 
-  emailVerified DateTime?
+  // Account
+  role           Role       @default(PACK_MEMBER)
+  status         UserStatus @default(ACTIVE)
+  emailVerified  DateTime?
+  lastLoginAt    DateTime?
+  hasSeenWelcome Boolean    @default(false)
+  metadata       Json?
 
-  hasSeenWelcome Boolean @default(false)
-
-  // Flexible user-specific data
-  metadata Json? // ← Future-proof
-
+  // Auction preferences
   anonymousBidding Boolean @default(false)
   autoPay          Boolean @default(false)
   autoPayCoverFees Boolean @default(false)
 
-  stripeCustomerId  String?
-  paymentMethods    PaymentMethod[]
-  accounts          Account[]
-  sessions          Session[]
-  orders            Order[]
-  address           Address?
-  bidder            AuctionBidder[]
-  winningBids       AuctionWinningBidder[]
-  instantBuys       AuctionItemInstantBuyer[]
-  bids              AuctionBid[]
-  adoptionFees      AdoptionFee[]
-  emailChangeTokens EmailChangeToken[]
+  // Payments
+  stripeCustomerId String?
 
-  status UserStatus @default(ACTIVE)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
+  // Last known location, stamped on sign-in
   lastGeoLatitude  Float?
   lastGeoLongitude Float?
   lastGeoCity      String?
   lastGeoRegion    String?
   lastGeoCountry   String?
 
+  // Migration from the old site
   hasMigrated Boolean   @default(false)
   migratedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Auth
+  accounts          Account[]
+  sessions          Session[]
+  emailChangeTokens EmailChangeToken[]
+
+  // Profile and payments
+  address        Address?
+  paymentMethods PaymentMethod[]
+  orders         Order[]
+
+  // Auctions
+  bidder      AuctionBidder[]
+  bids        AuctionBid[]
+  winningBids AuctionWinningBidder[]
+  instantBuys AuctionItemInstantBuyer[]
+
+  // Adoptions
+  adoptionFees         AdoptionFee[]
+  adoptionAgreements   AdoptionAgreement[]
+  agreementsCreated    AdoptionAgreement[] @relation("AgreementCreatedBy")
+  agreementsMarkedPaid AdoptionAgreement[] @relation("AgreementMarkedPaidBy")
 }
 
 // ─── Payment Method ────────────────────────────────────────────────────────────────────
@@ -261,7 +299,7 @@ model Order {
   source    String      @default("SITE") // 'SITE' | 'MONGO_MIGRATION'
 
   // ── Payment ─────────────────────────────────────────────
-  subtotal           Decimal   @default(0) @db.Decimal(10, 2) // items only
+  subtotal           Decimal   @default(0) @db.Decimal(10, 2) // items, or fees for orders without items
   shipping           Decimal   @default(0) @db.Decimal(10, 2)
   totalAmount        Decimal   @db.Decimal(10, 2) // subtotal + shipping + feesCovered
   paymentIntentId    String?   @unique // Stripe payment intent ID
@@ -274,6 +312,7 @@ model Order {
   failureCode        String?
   failureEmailSentAt DateTime?
   refundEmailSentAt  DateTime?
+  stripeInvoiceId    String?   @unique
 
   // ── Customer (denormalized snapshot) ────────────────────
   customerEmail String
@@ -313,13 +352,18 @@ model Order {
   items OrderItem[]
   notes String?
 
-  adoptionFee AdoptionFee?
+  adoptionFee       AdoptionFee?
+  adoptionAgreement AdoptionAgreement?
 
-  @@index([type])
+  // ── Donor message (e.g. in memory of someone) ───────────
+  donorMessage String?
+
+  @@index([type, createdAt])
   @@index([status])
   @@index([userId])
   @@index([customerEmail])
   @@index([createdAt])
+  @@index([stripeSubscriptionId])
 }
 
 // ─── Order Item ─────────────────────────────────────────────────────────────────
@@ -652,6 +696,103 @@ model NewsletterIssue {
   isLive    Boolean  @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model AdoptionAgreement {
+  id     String                  @id @default(cuid())
+  status AdoptionAgreementStatus @default(DRAFT)
+
+  // Admin picks the adopter's existing account; the page only opens for that user
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  // Dog, snapshotted: the listing changes and is removed once the dog is adopted
+  dogRescueGroupsId String
+  dogName           String
+  dogRescueId       String
+  dogSex            String
+  dogAge            String
+  dogColorMarkings  String?
+  dogPhoto          String?
+  dogSnapshot       Json
+
+  microchipNumber       String?
+  microchipManufacturer String?
+  microchipRegistration String?
+
+  // Medical, entered by admin from the foster's records
+  rabiesDate              DateTime?
+  rabiesDuration          String?
+  bordetellaDate          DateTime?
+  bordetellaDuration      String?
+  distemperDate           DateTime?
+  spayNeuterDate          DateTime?
+  // Free text on the form ("Date & Results"), so kept as one field rather than split
+  heartwormTest           String?
+  fecalTest               String?
+  heartwormPreventionDate DateTime?
+  fleaTickPreventionDate  DateTime?
+  knownIssues             String?
+
+  // Adopter details as signed, prefilled from their account. Kept on the agreement because it is a
+  // legal record: it should still say what they signed even if they later change their email or move
+  firstName     String?
+  lastName      String?
+  email         String
+  phone         String?
+  addressLine1  String?
+  addressLine2  String?
+  city          String?
+  state         String?
+  zipPostalCode String?
+
+  // Parsed from adoptionFeeString and not editable here: the fee is set in RescueGroups, and this is
+  // the snapshot of what the adopter agreed to. Subtotal and total are derived, not stored
+  adoptionFee          Decimal  @db.Decimal(10, 2)
+  // Varies by dog: what the vet actually charged for the certificate
+  healthCertificateFee Decimal? @db.Decimal(10, 2)
+  additionalDonation   Decimal? @db.Decimal(10, 2)
+
+  // Chosen by admin. Anything but CARD skips the payment step and emails instructions instead
+  paymentMethod  AdoptionPaymentMethod @default(CARD)
+  orderId        String?               @unique
+  order          Order?                @relation(fields: [orderId], references: [id])
+  paidAt         DateTime?
+  // Set when someone records a Zelle, Venmo or PayPal payment by hand
+  markedPaidById String?
+  markedPaidBy   User?                 @relation("AgreementMarkedPaidBy", fields: [markedPaidById], references: [id])
+
+  // Which terms were agreed to: the clauses will be revised, and a signed agreement must keep its own
+  termsVersion String
+
+  signatures AdoptionAgreementSignature[]
+
+  // The admin who prepares the agreement is also the LPDR representative who countersigns it
+  createdById String
+  createdBy   User      @relation("AgreementCreatedBy", fields: [createdById], references: [id])
+  sentAt      DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([status, createdAt])
+  @@index([userId])
+  @@index([dogRescueGroupsId])
+}
+
+model AdoptionAgreementSignature {
+  id          String                 @id @default(cuid())
+  agreementId String
+  agreement   AdoptionAgreement      @relation(fields: [agreementId], references: [id], onDelete: Cascade)
+  role        AgreementSignatureRole
+
+  typedName String
+
+  // What makes a typed signature hold up: who, when, and from where
+  signedAt  DateTime @default(now())
+  ipAddress String?
+  userAgent String?
+
+  @@unique([agreementId, role])
 }
 
 // ─── AuctionAnomaly ───────────────────────────────────────────────────

@@ -7,7 +7,7 @@ export const ORDER_TYPE_EMAIL_CONFIG: Record<OrderType, { heading: string; body:
   },
   RECURRING_DONATION: {
     heading: 'Your recurring gift is active!',
-    body: "Your recurring donation has been set up successfully. Your ongoing support means the world to the dogs in our care — you'll be charged automatically until you choose to cancel."
+    body: "Your recurring donation has been set up successfully. Your ongoing support means the world to the dogs in our care, and you'll be charged automatically until you choose to cancel."
   },
   ADOPTION_FEE: {
     heading: 'Your adoption fee is received!',
@@ -24,6 +24,10 @@ export const ORDER_TYPE_EMAIL_CONFIG: Record<OrderType, { heading: string; body:
   AUCTION_PURCHASE: {
     heading: 'Your auction payment is confirmed!',
     body: 'Thank you for your purchase. Your payment has been received and your item will be on its way soon.'
+  },
+  ADOPTION_AGREEMENT: {
+    heading: 'Your adoption is confirmed!',
+    body: "We've received your signed adoption agreement and payment. A copy of the agreement is attached for your records, and our team will be in touch about bringing your new dachshund home."
   }
 }
 

@@ -69,6 +69,7 @@ export function useStripeCheckout({
 
     try {
       if (usingSavedCard) {
+        console.log('PING1')
         const result = await createPaymentIntent({ ...basePayload, savedCardId: payment.selectedCardId })
         if (!result.success) throw new Error(result.error)
 

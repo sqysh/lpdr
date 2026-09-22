@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import { PublicAuction } from 'types/auction.types'
 import { AuctionCountdown, AuctionEmptyState, AuctionHowItWorks, AuctionItemGrid, AuctionSignInModal, AuctionSoldGrid } from './_components'
 import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
-import { getPusherClient, releasePusherClient } from 'lib/pusher/pusher-client'
+import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 export default function PublicAuctionClient({ auction, myBids }: { auction: PublicAuction; myBids: Record<string, MyBid> }) {
   const session = useSession()
@@ -51,7 +51,7 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
     return () => {
       channel.unbind('bid-placed', onBidPlaced)
       pusher.unsubscribe(channelName)
-      releasePusherClient()
+      releaseChannel(channelName)
     }
   }, [auction.id])
 

@@ -93,6 +93,8 @@ export function AdminSubscriptionsClient({ orders }: { orders: IOrderRow[] }) {
     [subscriptions, filter]
   )
 
+  const renewals = orders.length - 1
+
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
       <AdminPageHeader title="Subscriptions" count={{ value: subscriptions.length, noun: 'subscription' }} />
@@ -119,7 +121,7 @@ export function AdminSubscriptionsClient({ orders }: { orders: IOrderRow[] }) {
             <caption className="sr-only">All subscriptions, most recent payment first</caption>
             <thead>
               <tr className="border-b border-border-light dark:border-border-dark">
-                {['Latest', 'Donor', 'Tier', 'Amount', 'Payments', 'Lifetime', 'Status', ''].map((h, i) => (
+                {['Latest', 'Donor', 'Amount', 'Tier', 'Frequency', 'Payments', 'Lifetime', 'Status', ''].map((h, i) => (
                   <th
                     key={i}
                     scope="col"
@@ -172,12 +174,20 @@ export function AdminSubscriptionsClient({ orders }: { orders: IOrderRow[] }) {
                       </>
                     )}
                   </td>
-                  <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
-                    {s.latest.tierName || '—'}
-                    {s.latest.recurringFrequency && <span className="block tracking-widest uppercase">{s.latest.recurringFrequency}</span>}
-                  </td>
                   <td className="px-4 py-3 text-xs font-mono tabular-nums text-text-light dark:text-text-dark whitespace-nowrap">
                     {formatMoney(s.latest.totalAmount)}
+                  </td>
+                  <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
+                    {s.latest.tierName || '—'}
+                  </td>
+                  <td className="px-4 py-3 whitespace-nowrap">
+                    <span className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-primary-light dark:text-primary-dark">
+                      <Repeat className="w-3 h-3 shrink-0" aria-hidden="true" />
+                      {s.latest.recurringFrequency ?? 'Monthly'}
+                    </span>
+                    <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
+                      {renewals === 0 ? 'First payment' : `${renewals} renewal${renewals === 1 ? '' : 's'}`}
+                    </p>
                   </td>
                   <td className="px-4 py-3 text-xs font-mono tabular-nums text-muted-light dark:text-muted-dark">{s.charges}</td>
                   <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">

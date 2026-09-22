@@ -31,7 +31,7 @@ export async function createSetupIntentForSubscription(input: unknown): Promise<
   const parsed = parseInput(createSetupIntentForSubscriptionSchema, input)
   if (parsed.ok === false) return parsed.result
 
-  const { tierId, frequency, coverFees } = parsed.data
+  const { tierId, frequency, coverFees, donorMessage } = parsed.data
   const { userId } = gate
 
   try {
@@ -65,9 +65,10 @@ export async function createSetupIntentForSubscription(input: unknown): Promise<
         tierId: tier.id,
         tierName: tier.name,
         amount: amountCents.toString(),
-        type: 'RECURRING_DONATION',
+        subtotal: (baseCents / 100).toFixed(2),
         coverFees: coverFees ? 'true' : 'false',
-        feesCovered: (feesCoveredCents / 100).toFixed(2)
+        feesCovered: (feesCoveredCents / 100).toFixed(2),
+        ...(donorMessage && { donorMessage })
       }
     })
 

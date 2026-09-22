@@ -2,7 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
-import { CheckCircle, ArrowRight, Receipt, Package, Heart, ChevronLeft, User } from 'lucide-react'
+import { CheckCircle, ArrowRight, Receipt, Package, Heart, ChevronLeft, User, Repeat } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import Picture from 'components/_common/Picture'
 import { useSession } from 'next-auth/react'
@@ -18,26 +18,39 @@ import { LinkSpinner } from 'components/_common/LinkSpinner'
 const headerLink =
   'flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
 
+const FREQUENCY = {
+  MONTHLY: { label: 'Monthly', short: 'mo', every: 'every month' },
+  YEARLY: { label: 'Yearly', short: 'yr', every: 'every year' }
+} as const
+
+const formatLongDate = (date: string | Date) =>
+  new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })
+
 export default function OrderConfirmationClient({ order }) {
   const clearCart = useCartStore((s) => s.clearCart)
   const showConfetti = useConfettiStore((s) => s.show)
   const config = ORDER_TYPE_CONFIG[order?.type] ?? ORDER_TYPE_CONFIG['ONE_TIME_DONATION']
   const session = useSession()
   const searchParams = useSearchParams()
-  const isNewOrder = searchParams.get('ref') === 'new'
-  const isAdminView = searchParams.get('ref') === 'admin'
-  const params = useSearchParams()
-  const myPackTab = params.get('ref')
-  const myPackHref = myPackTab ? `/my-pack?ref=${myPackTab}` : '/my-pack'
+
+  const ref = searchParams.get('ref')
+  const isNewOrder = ref === 'new'
+  const isAdminView = ref === 'admin'
+  const myPackHref = ref ? `/my-pack?ref=${ref}` : '/my-pack'
 
   useEffect(() => {
     clearCart()
-    if (isNewOrder) {
-      showConfetti()
-    }
+    if (isNewOrder) showConfetti()
   }, [clearCart, isNewOrder, showConfetti])
 
-  const typeCode = order?.type === 'RECURRING_DONATION' ? 'RD' : 'DN'
+  const frequency = order?.isRecurring ? FREQUENCY[order?.recurringFrequency as keyof typeof FREQUENCY] : null
+  const typeCode = frequency ? 'RD' : 'DN'
+
+  const shipping = Number(order?.shipping ?? 0)
+  const feesCovered = order?.coverFees ? Number(order?.feesCovered ?? 0) : 0
+  // Recurring orders created before the invoice handler recorded a subtotal have 0 stored, so it is
+  // derived from what was recorded rather than showing a $0.00 line above a real total
+  const subtotal = Number(order?.subtotal) > 0 ? Number(order.subtotal) : Number(order?.totalAmount ?? 0) - feesCovered - shipping
 
   const headerNav = isAdminView
     ? { href: `/admin/transactions/${order.id}`, icon: <ChevronLeft className="w-3 h-3" aria-hidden="true" />, label: 'Back to Order' }
@@ -66,7 +79,7 @@ export default function OrderConfirmationClient({ order }) {
         </div>
       </motion.header>
 
-      {/* ── Constrained content — padded to clear the fixed bar ── */}
+      {/* ── Constrained content, padded to clear the fixed bar ── */}
       <div className="max-w-2xl mx-auto px-4 430:px-6 pt-24 430:pt-28 pb-12 430:pb-16">
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
           <div className="flex items-start gap-4">
@@ -80,23 +93,15 @@ export default function OrderConfirmationClient({ order }) {
                 <CheckCircle className="w-5 h-5 text-cyan-600 dark:text-violet-400" aria-hidden="true" />
               </div>
               <motion.div
-                animate={{
-                  scale: [0.8, 1.8, 0.8],
-                  opacity: [0.5, 0, 0]
-                }}
-                transition={{
-                  duration: 1.4,
-                  repeat: Infinity,
-                  ease: 'easeOut',
-                  times: [0, 0.7, 1]
-                }}
+                animate={{ scale: [0.8, 1.8, 0.8], opacity: [0.5, 0, 0] }}
+                transition={{ duration: 1.4, repeat: Infinity, ease: 'easeOut', times: [0, 0.7, 1] }}
                 className="absolute inset-0 bg-cyan-600/20 dark:bg-violet-400/20"
                 aria-hidden="true"
               />
             </motion.div>
             <div>
-              <p className="  text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400 mb-1">{config.label}</p>
-              <h1 className="  text-3xl 430:text-4xl uppercase leading-none text-zinc-950 dark:text-text-dark mb-2">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400 mb-1">{config.label}</p>
+              <h1 className="text-3xl 430:text-4xl uppercase leading-none text-zinc-950 dark:text-text-dark mb-2">
                 Thank you, {order?.customerName}!
               </h1>
               <p className="font-lato text-sm text-zinc-500 dark:text-muted-dark leading-relaxed max-w-lg">{config.message}</p>
@@ -116,9 +121,9 @@ export default function OrderConfirmationClient({ order }) {
           <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-200 dark:border-border-dark bg-zinc-50 dark:bg-white/2">
             <div className="flex items-center gap-2">
               <Receipt className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50" aria-hidden="true" />
-              <span className="  text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Receipt</span>
+              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Receipt</span>
             </div>
-            <span className="  text-[10px] uppercase tracking-tag text-zinc-400 dark:text-muted-dark/50 font-mono">
+            <span className="text-[10px] uppercase tracking-tag text-zinc-400 dark:text-muted-dark/50 font-mono">
               #{order?.id.slice(-8).toUpperCase()}
             </span>
           </div>
@@ -155,49 +160,71 @@ export default function OrderConfirmationClient({ order }) {
               <div className="shrink-0 w-10 h-10 border border-zinc-200 dark:border-border-dark flex items-center justify-center">
                 <span className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 dark:text-muted-dark/50">{typeCode}</span>
               </div>
-              <div className="flex flex-col">
-                <p className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
-                  {order?.type === 'RECURRING_DONATION' ? 'Recurring Donation' : 'One-Time Donation'}
+              <div className="flex flex-col min-w-0">
+                <p className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+                  {frequency ? `${frequency.label} Donation` : 'One-Time Donation'}
                 </p>
                 {order?.tierName && (
-                  <p className="  text-xs uppercase tracking-wide text-zinc-400 dark:text-muted-dark/50">{order.tierName}</p>
+                  <p className="text-xs uppercase tracking-wide text-zinc-400 dark:text-muted-dark/50">{order.tierName}</p>
                 )}
               </div>
+              {frequency && (
+                <span className="ml-auto shrink-0 inline-flex items-center gap-1.5 px-2 py-1 border border-cyan-600/30 dark:border-violet-400/30 text-[10px] font-mono uppercase tracking-wider text-cyan-600 dark:text-violet-400">
+                  <Repeat className="w-3 h-3" aria-hidden="true" />
+                  {frequency.label}
+                </span>
+              )}
+            </div>
+          )}
+
+          {/* Donor message, when one was left */}
+          {order?.donorMessage && (
+            <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark">
+              <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark/50 mb-2">Your message</p>
+              <p className="font-lato text-sm text-zinc-700 dark:text-muted-dark leading-relaxed whitespace-pre-wrap wrap-break-word">
+                {order.donorMessage}
+              </p>
             </div>
           )}
 
           {/* Totals */}
-          <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark space-y-2.5">
-            <div className="py-4 space-y-2 border-t border-zinc-100 dark:border-white/5">
+          <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark space-y-2">
+            <div className="flex justify-between text-sm">
+              <span className="text-zinc-500 dark:text-muted-dark">{frequency ? `${frequency.label} gift` : 'Subtotal'}</span>
+              <span className="text-zinc-900 dark:text-white tabular-nums">{formatMoney(subtotal)}</span>
+            </div>
+
+            {shipping > 0 && (
               <div className="flex justify-between text-sm">
-                <span className="text-zinc-500 dark:text-muted-dark">Subtotal</span>
-                <span className="text-zinc-900 dark:text-white tabular-nums">{formatMoney(order.subtotal)}</span>
+                <span className="text-zinc-500 dark:text-muted-dark">Shipping</span>
+                <span className="text-zinc-900 dark:text-white tabular-nums">{formatMoney(shipping)}</span>
               </div>
+            )}
 
-              {Number(order.shipping) > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-zinc-500 dark:text-muted-dark">Shipping</span>
-                  <span className="text-zinc-900 dark:text-white tabular-nums">{formatMoney(Number(order.shipping))}</span>
-                </div>
-              )}
+            {feesCovered > 0 && (
+              <div className="flex justify-between text-sm">
+                <span className="text-cyan-600 dark:text-violet-400">Processing fees covered</span>
+                <span className="text-cyan-600 dark:text-violet-400 tabular-nums">+{formatMoney(feesCovered)}</span>
+              </div>
+            )}
 
-              {order.coverFees && Number(order.feesCovered) > 0 && (
-                <div className="flex justify-between text-sm">
-                  <span className="text-cyan-600 dark:text-violet-400">Processing fees covered</span>
-                  <span className="text-cyan-600 dark:text-violet-400 tabular-nums">+{formatMoney(Number(order.feesCovered))}</span>
-                </div>
-              )}
+            <div className="flex justify-between items-end pt-3 mt-1 border-t border-zinc-200 dark:border-border-dark">
+              <span className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
+                {frequency ? 'Charged today' : 'Total'}
+              </span>
+              <span className="text-2xl tabular-nums text-cyan-600 dark:text-violet-400">
+                {formatMoney(order?.totalAmount)}
+                {frequency && <span className="text-sm text-zinc-400 dark:text-muted-dark">/{frequency.short}</span>}
+              </span>
             </div>
-            <div
-              className={`flex justify-between items-center ${
-                (order?.coverFees && Number(order?.feesCovered) > 0) || (order?.isRecurring && order?.recurringFrequency)
-                  ? 'pt-2.5 border-t border-zinc-200 dark:border-border-dark'
-                  : ''
-              }`}
-            >
-              <span className="  text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">Total</span>
-              <span className="  text-2xl tabular-nums text-cyan-600 dark:text-violet-400">{formatMoney(order?.totalAmount)}</span>
-            </div>
+
+            {/* Says plainly that this repeats, since the receipt otherwise reads like a single charge */}
+            {frequency && (
+              <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark pt-1">
+                You&apos;ll be charged {formatMoney(order?.totalAmount)} {frequency.every} until you cancel. You can cancel anytime from My
+                Pack.
+              </p>
+            )}
           </div>
 
           {/* Meta */}
@@ -209,25 +236,19 @@ export default function OrderConfirmationClient({ order }) {
             {order?.paidAt && (
               <div className="flex justify-between items-center">
                 <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Date</span>
-                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">
-                  {new Date(order?.paidAt).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </span>
+                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">{formatLongDate(order.paidAt)}</span>
               </div>
             )}
-            {order?.isRecurring && order?.nextBillingDate && (
+            {frequency && (
               <div className="flex justify-between items-center">
-                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Next billing</span>
-                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">
-                  {new Date(order?.nextBillingDate).toLocaleDateString('en-US', {
-                    month: 'long',
-                    day: 'numeric',
-                    year: 'numeric'
-                  })}
-                </span>
+                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Billed</span>
+                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">{frequency.label}</span>
+              </div>
+            )}
+            {frequency && order?.nextBillingDate && (
+              <div className="flex justify-between items-center">
+                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Next charge</span>
+                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">{formatLongDate(order.nextBillingDate)}</span>
               </div>
             )}
           </div>
@@ -244,8 +265,7 @@ export default function OrderConfirmationClient({ order }) {
         >
           <Heart className="w-3.5 h-3.5 text-cyan-600 dark:text-violet-400 shrink-0 mt-0.5" aria-hidden="true" />
           <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark leading-relaxed">
-            A confirmation email has been sent to &nbsp;{' '}
-            <strong className="text-zinc-950 dark:text-text-dark">{order?.customerEmail}</strong>
+            A confirmation email has been sent to <strong className="text-zinc-950 dark:text-text-dark">{order?.customerEmail}</strong>
           </p>
         </motion.div>
 

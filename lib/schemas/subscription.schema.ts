@@ -20,7 +20,8 @@ export const createSubscriptionSchema = z.object({
   tierId: z.string().min(1),
   frequency: z.enum(RecurringFrequency),
   coverFees: z.boolean().default(false),
-  savedCardId: z.string().min(1)
+  savedCardId: z.string().min(1),
+  donorMessage: z.string().trim().max(500).optional()
 })
 
 export type CreateSubscriptionInput = z.infer<typeof createSubscriptionSchema>
@@ -43,14 +44,16 @@ export type CreateSetupIntentForSubscriptionInput = z.infer<typeof createSetupIn
  * step 1, so a client can't change the terms between the two calls.
  */
 export const createSubscriptionAfterSetupSchema = z.object({
-  setupIntentId: z.string().min(1)
+  setupIntentId: z.string().min(1),
+  donorMessage: z.string().trim().max(500).optional()
 })
 
 export type CreateSubscriptionAfterSetupInput = z.infer<typeof createSubscriptionAfterSetupSchema>
 
 export const subscriptionFormSchema = z.object({
   firstName: z.string().trim().min(1, 'First name is required').max(60),
-  lastName: z.string().trim().min(1, 'Last name is required').max(60)
+  lastName: z.string().trim().min(1, 'Last name is required').max(60),
+  donorMessage: z.string().trim().max(500).optional()
 })
 
 export type SubscriptionFormInput = z.input<typeof subscriptionFormSchema>

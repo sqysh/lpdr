@@ -11,9 +11,10 @@ export function getOrderEmailSubject(order: OrderWithItems): string {
     ONE_TIME_DONATION: 'Thank You for Supporting Little Paws!',
     RECURRING_DONATION: `Your ${freq} Gift to Little Paws is Active`,
     ADOPTION_FEE: 'Your Adoption Fee Payment is Received',
+    ADOPTION_AGREEMENT: 'Your Little Paws Adoption is Confirmed',
     PURCHASE: 'Your Little Paws Order is Confirmed',
     ECARD: 'Your Little Paws Ecard is Confirmed',
-    AUCTION_PURCHASE: 'Your Auction Payment is Confirmed — Thank You!'
+    AUCTION_PURCHASE: 'Your Auction Payment is Confirmed. Thank You!'
   }
   return subjects[order.type]
 }

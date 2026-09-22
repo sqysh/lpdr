@@ -14,6 +14,41 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.11.0',
+    date: '2026-09-22',
+    title: 'Donor messages and clearer monthly receipts',
+    changes: [
+      {
+        type: 'feature',
+        text: 'Donors can leave a message when they give, one-time or monthly, for example when giving in memory of someone. The message shows on the transaction page.'
+      },
+      {
+        type: 'feature',
+        text: 'The donate page now links to the monthly giving plans, for anyone who would rather give every month'
+      },
+      {
+        type: 'improvement',
+        text: 'The receipt for a monthly or yearly gift now says so plainly: it shows the amount charged today, that it repeats until cancelled, how often, and the date of the next charge'
+      },
+      {
+        type: 'improvement',
+        text: 'Donations are no longer capped at $20,000. The only limit now is the one set by the card processor'
+      },
+      {
+        type: 'improvement',
+        text: 'The featured auction banner in My Pack fits better on phones, and the tabs at the bottom of My Pack show that they are loading and now look right in dark mode'
+      },
+      {
+        type: 'fix',
+        text: 'Monthly gifts showed a subtotal of $0.00 on the receipt. They now show the gift amount'
+      },
+      {
+        type: 'fix',
+        text: 'Monthly renewals would have shown the same next charge date every month, and could occasionally have been skipped without being recorded. Each renewal now records its own next charge date, and one that fails to save is retried rather than lost'
+      }
+    ]
+  },
+  {
     version: '1.10.0',
     date: '2026-09-18',
     title: 'Donations and subscriptions',
