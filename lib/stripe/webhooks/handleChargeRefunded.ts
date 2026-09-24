@@ -18,6 +18,7 @@ export async function applyChargeRefund(charge: Stripe.Charge): Promise<boolean>
       type: true,
       customerEmail: true,
       refundedAmount: true,
+      refundedAt: true,
       status: true,
       adoptionAgreement: { select: { dogName: true } }
     }
@@ -31,12 +32,17 @@ export async function applyChargeRefund(charge: Stripe.Charge): Promise<boolean>
   const refundedAmount = charge.amount_refunded / 100
   const fullyRefunded = charge.refunded
 
-  // Already matches Stripe, so a repeat run doesn't rewrite it or announce it again
-  if (Number(order.refundedAmount ?? 0) === refundedAmount && (!fullyRefunded || order.status === 'REFUNDED')) return false
-
   // The latest refund's own date, so a refund recorded late still shows when it actually happened
   const latest = charge.refunds?.data?.[0]?.created
   const refundedAt = latest ? new Date(latest * 1000) : new Date()
+
+  // Already matches Stripe, date included, so a repeat run doesn't rewrite it or announce it again
+  const matches =
+    Number(order.refundedAmount ?? 0) === refundedAmount &&
+    (!fullyRefunded || order.status === 'REFUNDED') &&
+    (!latest || order.refundedAt?.getTime() === refundedAt.getTime())
+
+  if (matches) return false
 
   await prisma.order.update({
     where: { id: order.id },

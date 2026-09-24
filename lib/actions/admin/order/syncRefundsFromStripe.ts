@@ -20,7 +20,7 @@ export async function syncRefundsFromStripe(): Promise<ActionResult<{ checked: n
     let checked = 0
     let updated = 0
 
-    for await (const charge of stripeClient.charges.list({ created: { gte: since }, limit: 100 })) {
+    for await (const charge of stripeClient.charges.list({ created: { gte: since }, limit: 100, expand: ['data.refunds'] })) {
       if (charge.amount_refunded === 0) continue
       checked += 1
       if (await applyChargeRefund(charge)) updated += 1
