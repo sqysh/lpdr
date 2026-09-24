@@ -61,7 +61,7 @@ export function FooterNewsletterForm() {
           aria-invalid={!!errors.email}
           {...register('email')}
           aria-describedby={status ? 'newsletter-status' : undefined}
-          className="w-full bg-white/5 border border-white/10 px-3.5 py-2.5 text-sm font-mono text-white placeholder:text-on-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark transition-colors"
+          className="w-full bg-white/5 border border-white/10 px-3.5 py-2.5 text-base sm:text-sm font-mono text-white placeholder:text-on-dark focus:outline-none focus:border-primary-light dark:focus:border-primary-dark transition-colors"
         />
         {errors.email && (
           <p role="alert" className="text-[10px] font-mono text-red-500 dark:text-red-400 mt-1">
@@ -72,7 +72,7 @@ export function FooterNewsletterForm() {
       <button
         type="submit"
         disabled={isSubmitting}
-        className="w-full py-2.5 px-4 text-[10px] font-mono tracking-[0.2em] uppercase border border-primary-light dark:border-primary-dark text-white hover:bg-primary-light/10 dark:hover:bg-primary-dark/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+        className="w-full py-2.5 px-4 text-[10px] font-mono tracking-eyebrow uppercase border border-primary-light dark:border-primary-dark text-white hover:bg-primary-light/10 dark:hover:bg-primary-dark/10 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
       >
         {isSubmitting ? 'Subscribing...' : 'Subscribe'}
       </button>

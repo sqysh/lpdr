@@ -18,18 +18,9 @@ type Props = {
 }
 
 const inputClass =
-  'flex-1 px-4 py-3 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark text-sm focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark transition w-full'
+  'flex-1 px-4 py-3 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary-light dark:focus:ring-primary-dark transition w-full'
 
-export function PreApp3Details({
-  register,
-  errors,
-  email,
-  bypassError,
-  redeeming,
-  onRedeemCode,
-  onContinueToPayment,
-  setStep
-}: Props) {
+export function PreApp3Details({ register, errors, email, bypassError, redeeming, onRedeemCode, onContinueToPayment, setStep }: Props) {
   return (
     <motion.section
       key="details"
@@ -93,8 +84,8 @@ export function PreApp3Details({
                 <span className="font-semibold text-text-light dark:text-text-dark">$15</span>
               </div>
               <p className="text-muted-light dark:text-on-dark text-xs leading-relaxed">
-                This non-refundable fee covers application processing and background checks. The final adoption fee will be
-                discussed if your application is approved.
+                This non-refundable fee covers application processing and background checks. The final adoption fee will be discussed if
+                your application is approved.
               </p>
             </div>
           </div>
@@ -115,13 +106,11 @@ export function PreApp3Details({
       <div className="border border-border-light dark:border-border-dark p-5 mt-8">
         <div className="flex items-center gap-3 mb-4">
           <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-          <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-            Have a Bypass Code?
-          </p>
+          <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Have a Bypass Code?</p>
         </div>
         <p className="text-xs text-muted-light dark:text-muted-dark mb-4 leading-relaxed">
-          If you have a code to waive the application fee, enter it below. A valid code takes you straight to the application, no
-          payment required.
+          If you have a code to waive the application fee, enter it below. A valid code takes you straight to the application, no payment
+          required.
         </p>
         <div className="flex gap-2">
           <input id="bypassCode" type="text" {...register('bypassCode')} placeholder="Enter bypass code" className={inputClass} />

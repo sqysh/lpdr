@@ -39,17 +39,20 @@ export function AuctionItemBidPanelBidAmountForm(props: Props) {
             id="bid-amount"
             name="bidAmount"
             type="number"
-            inputMode="decimal"
+            inputMode="numeric"
+            onWheel={(e) => e.currentTarget.blur()}
             min={minimumBid}
             step="1"
             value={value}
             onChange={(e) => onChange(e.target.value)}
             onKeyDown={(e) => {
-              if (e.key === 'Enter') onSubmit()
+              if (e.key !== 'Enter') return
+              e.preventDefault()
+              if (!disabled && !submitting) onSubmit()
             }}
             placeholder={String(minimumBid)}
             aria-describedby="bid-amount-hint"
-            className="w-full pl-8 pr-3 py-3 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark font-mono font-black tabular-nums focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"
+            className="w-full pl-8 pr-3 py-3 bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark text-lg font-mono font-black tabular-nums focus:outline-none focus:border-primary-light dark:focus:border-primary-dark"
           />
         </div>
 
@@ -64,7 +67,7 @@ export function AuctionItemBidPanelBidAmountForm(props: Props) {
         </button>
       </div>
 
-      <p id="bid-amount-hint" className="text-f9 font-mono text-muted-light dark:text-muted-dark">
+      <p id="bid-amount-hint" className="text-[11px] font-mono text-muted-light dark:text-muted-dark">
         Current bid {formatMoney(currentBid)}. Bids of {formatMoney(minimumBid)} or more are accepted.
       </p>
     </div>

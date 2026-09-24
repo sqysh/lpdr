@@ -46,7 +46,7 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }: Props) {
       <div>
         <label
           htmlFor="email"
-          className="block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-1.5"
+          className="block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-1.5"
         >
           Email Address
         </label>
@@ -69,7 +69,7 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }: Props) {
             autoComplete="email"
             inputMode="email"
             aria-describedby={error ? 'email-error' : undefined}
-            className="w-full pl-9 pr-3.5 py-3 text-xs font-mono border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark"
+            className="w-full pl-9 pr-3.5 py-3 text-base sm:text-xs font-mono border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark"
           />
         </div>
       </div>

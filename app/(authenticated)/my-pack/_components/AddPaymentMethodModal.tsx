@@ -14,8 +14,7 @@ import { useThemeStore } from 'stores/theme.store'
 
 const accentText = 'text-cyan-600 dark:text-violet-400'
 const accentBg = 'bg-cyan-600 dark:bg-violet-400'
-const accentRing =
-  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
+const accentRing = 'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
 
 const fieldLabel = `block text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark mb-2`
 
@@ -69,22 +68,16 @@ export default function AddPaymentMethodModal() {
       const cardElement = elements.getElement(CardElement)
       if (!cardElement) throw new Error('Card element not found')
 
-      const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(
-        setupRes.data.clientSecret,
-        {
-          payment_method: {
-            card: cardElement,
-            billing_details: { name: cardholderName || undefined }
-          }
+      const { setupIntent, error: stripeError } = await stripe.confirmCardSetup(setupRes.data.clientSecret, {
+        payment_method: {
+          card: cardElement,
+          billing_details: { name: cardholderName || undefined }
         }
-      )
+      })
 
       if (stripeError) throw stripeError
 
-      const paymentMethodId =
-        typeof setupIntent?.payment_method === 'string'
-          ? setupIntent.payment_method
-          : setupIntent?.payment_method?.id
+      const paymentMethodId = typeof setupIntent?.payment_method === 'string' ? setupIntent.payment_method : setupIntent?.payment_method?.id
 
       if (!paymentMethodId) throw new Error('No payment method ID returned')
 
@@ -141,17 +134,11 @@ export default function AddPaymentMethodModal() {
           <div className={`absolute top-0 right-0 w-full h-px ${accentBg}`} />
           <div className={`absolute top-0 right-0 w-px h-full ${accentBg}`} />
         </div>
-        <div
-          className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10"
-          aria-hidden="true"
-        >
+        <div className="absolute bottom-0 left-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
           <div className={`absolute bottom-0 left-0 w-full h-px ${accentBg}`} />
           <div className={`absolute bottom-0 left-0 w-px h-full ${accentBg}`} />
         </div>
-        <div
-          className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10"
-          aria-hidden="true"
-        >
+        <div className="absolute bottom-0 right-0 w-6 h-6 pointer-events-none z-10" aria-hidden="true">
           <div className={`absolute bottom-0 right-0 w-full h-px ${accentBg}`} />
           <div className={`absolute bottom-0 right-0 w-px h-full ${accentBg}`} />
         </div>
@@ -167,14 +154,9 @@ export default function AddPaymentMethodModal() {
           <div>
             <div className="flex items-center gap-2 mb-3">
               <div className={`w-4 h-px ${accentBg}`} aria-hidden="true" />
-              <span className={`text-[10px] uppercase tracking-[0.25em] ${accentText}`}>
-                Payment Method
-              </span>
+              <span className={`text-[10px] uppercase tracking-[0.25em] ${accentText}`}>Payment Method</span>
             </div>
-            <h2
-              id="add-card-title"
-              className="text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark"
-            >
+            <h2 id="add-card-title" className="text-xl 430:text-2xl uppercase leading-none text-zinc-950 dark:text-text-dark">
               Add New Card
             </h2>
           </div>
@@ -195,12 +177,8 @@ export default function AddPaymentMethodModal() {
               <div className="w-12 h-12 flex items-center justify-center bg-cyan-600/10 dark:bg-violet-400/10">
                 <CheckCircle className={`w-6 h-6 ${accentText}`} aria-hidden="true" />
               </div>
-              <p className="text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">
-                Card Added
-              </p>
-              <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark">
-                Your card has been saved.
-              </p>
+              <p className="text-sm uppercase tracking-wide text-zinc-950 dark:text-text-dark">Card Added</p>
+              <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark">Your card has been saved.</p>
             </div>
           ) : (
             <>
@@ -216,7 +194,7 @@ export default function AddPaymentMethodModal() {
                   value={cardholderName}
                   onChange={(e) => setCardholderName(e.target.value)}
                   placeholder="Name on card"
-                  className={`w-full px-3.5 py-3 ${fieldShell} text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40 font-lato text-sm outline-none transition-all focus:border-cyan-600 dark:focus:border-violet-400`}
+                  className={`w-full px-3.5 py-3 ${fieldShell} text-zinc-950 dark:text-text-dark placeholder:text-zinc-400 dark:placeholder:text-muted-dark/40 font-lato text-base sm:text-sm outline-none transition-all focus:border-cyan-600 dark:focus:border-violet-400`}
                 />
               </div>
 
@@ -241,8 +219,7 @@ export default function AddPaymentMethodModal() {
                           color: isDark ? '#f1f0ff' : '#09090b',
                           backgroundColor: isDark ? '#13131f' : '#f9fafb',
                           fontSize: '14px',
-                          fontFamily:
-                            '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+                          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                           '::placeholder': { color: isDark ? '#4a4a6a' : '#a1a1aa' },
                           iconColor: isDark ? '#7c3aed' : '#0891b2'
                         },
@@ -255,13 +232,8 @@ export default function AddPaymentMethodModal() {
 
               {/* Security note */}
               <div className="flex items-center gap-2">
-                <ShieldCheck
-                  className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50 shrink-0"
-                  aria-hidden="true"
-                />
-                <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">
-                  Your card is secured and encrypted by Stripe
-                </p>
+                <ShieldCheck className="w-3.5 h-3.5 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
+                <p className="font-lato text-xs text-zinc-400 dark:text-muted-dark/50">Your card is secured and encrypted by Stripe</p>
               </div>
 
               {/* Error */}

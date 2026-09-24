@@ -80,7 +80,7 @@ export function NavigationDrawerNewsletterForm({ onClose }: { onClose: () => voi
             aria-invalid={!!errors.email}
             {...register('email')}
             aria-describedby={status ? 'newsletter-status' : undefined}
-            className="w-full px-3.5 py-2.5 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark font-lato text-sm focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors"
+            className="w-full px-3.5 py-2.5 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark font-lato text-base sm:text-sm focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark transition-colors"
           />
           {errors.email && (
             <p role="alert" className="text-[10px] font-mono text-red-500 dark:text-red-400 mt-1">

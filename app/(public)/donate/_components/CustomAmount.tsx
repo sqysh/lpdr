@@ -48,7 +48,7 @@ export function CustomAmount({
           onBlur={() => setAmountBlurred(true)}
           aria-describedby="custom-amount-hint"
           className={`
-              w-full pl-8 pr-4 py-3 text-sm font-quicksand font-bold border-2 bg-surface-light dark:bg-surface-dark
+              w-full pl-8 pr-4 py-3 text-base sm:text-sm font-quicksand font-bold border-2 bg-surface-light dark:bg-surface-dark
               text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50
               transition-colors duration-200 focus:outline-none
               ${amount?.useCustom ? 'border-primary-light dark:border-primary-dark' : 'border-border-light dark:border-border-dark'}

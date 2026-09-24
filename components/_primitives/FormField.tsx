@@ -57,14 +57,14 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
 
   const fieldClass = unstyled
     ? className
-    : `w-full px-3.5 py-3 text-sm font-mono border-2 border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark ${readOnly || disabled ? 'cursor-not-allowed opacity-70' : ''}`
+    : `w-full px-3.5 py-3 text-base sm:text-sm font-mono border-2 border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark ${readOnly || disabled ? 'cursor-not-allowed opacity-70' : ''}`
 
   // The native select draws its own background, so appearance-none is needed
   // for the field colours to apply. That removes the arrow, drawn back below.
   const selectClass = `${fieldClass} appearance-none pr-10 cursor-pointer`
 
   const labelClass = `block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2`
-  const errorClass = `text-[11px] text-red-500 dark:text-red-400 font-mono mt-1.5`
+  const errorClass = `text-[11px] text-red-600 dark:text-red-400 font-mono mt-1.5`
 
   const handleChange: React.ChangeEventHandler<FieldElement> = (e) => {
     if (format) e.target.value = format(e.target.value)
@@ -80,7 +80,7 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
     required,
     'aria-required': required,
     'aria-invalid': !!error,
-    'aria-describedby': error ? `${id}-error` : hint ? `${id}-hint` : undefined
+    'aria-describedby': [error && `${id}-error`, hint && `${id}-hint`].filter(Boolean).join(' ') || undefined
   }
 
   return (

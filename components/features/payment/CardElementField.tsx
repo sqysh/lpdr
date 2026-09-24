@@ -12,10 +12,7 @@ export function CardElementField({ onChange, isDark }: Props) {
 
   return (
     <div>
-      <label
-        id="card-label"
-        className="block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2"
-      >
+      <label id="card-label" className="block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-2">
         Card Details
       </label>
       <div
@@ -30,7 +27,7 @@ export function CardElementField({ onChange, isDark }: Props) {
               base: {
                 color: dark ? '#f1f0ff' : '#09090b',
                 backgroundColor: 'transparent',
-                fontSize: '14px',
+                fontSize: '16px',
                 fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
                 '::placeholder': { color: dark ? '#4a4a6a' : '#a1a1aa' }
               },

@@ -93,7 +93,7 @@ export default function PublicContactModal() {
                 <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
                 <h2
                   id="contact-modal-title"
-                  className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
+                  className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark"
                 >
                   Contact Us
                 </h2>
@@ -111,16 +111,14 @@ export default function PublicContactModal() {
             {/* Success */}
             {success ? (
               <div className="px-5 py-12 text-center space-y-2">
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                  Message Sent
-                </p>
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Message Sent</p>
                 <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
                   Thanks for reaching out. We&apos;ll get back to you as soon as we can.
                 </p>
                 <button
                   type="button"
                   onClick={handleClose}
-                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                  className="mt-4 inline-flex items-center gap-2 px-4 py-2 text-[10px] font-mono tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                 >
                   Close
                 </button>
@@ -189,7 +187,7 @@ export default function PublicContactModal() {
                     type="button"
                     onClick={handleClose}
                     disabled={isSubmitting}
-                    className="px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark hover:text-text-light dark:hover:text-text-dark hover:border-text-light dark:hover:border-text-dark transition-colors duration-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    className="px-4 py-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark border border-border-light dark:border-border-dark hover:text-text-light dark:hover:text-text-dark hover:border-text-light dark:hover:border-text-dark transition-colors duration-200 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
                     Cancel
                   </button>
@@ -197,7 +195,7 @@ export default function PublicContactModal() {
                     type="submit"
                     disabled={isSubmitting}
                     aria-busy={isSubmitting}
-                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light dark:bg-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center gap-2 px-4 py-2 bg-primary-light dark:bg-primary-dark text-[10px] font-mono tracking-eyebrow uppercase text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isSubmitting && <Loader2 size={11} className="animate-spin" aria-hidden="true" />}
                     {isSubmitting ? 'Sending...' : 'Send Message'}
