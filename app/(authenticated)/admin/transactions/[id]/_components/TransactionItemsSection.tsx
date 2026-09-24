@@ -11,9 +11,12 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
   const feesCovered = Number(order.feesCovered)
   const total = Number(order.totalAmount)
 
-  // What the rescue actually keeps: the donor covering the fee is the
-  // difference between netting the full amount and absorbing the cost
-  const netToRescue = order.coverFees ? subtotal + shipping : subtotal + shipping - feesCovered
+  // Refunds recorded by hand before they were tracked have no amount, so a REFUNDED order counts as its full total
+  const refunded = order.refundedAmount != null ? Number(order.refundedAmount) : order.status === 'REFUNDED' ? total : 0
+
+  // What the rescue keeps: everything charged, less anything refunded, less the processing fee. Stripe keeps
+  // its fee even on a refund, so a fully refunded order nets slightly below zero, which is the true cost of it
+  const netToRescue = total - refunded - feesCovered
 
   return (
     <section
@@ -21,7 +24,7 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
       className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
     >
       <div className="px-4 py-3 border-b border-border-light dark:border-border-dark flex items-center justify-between">
-        <h2 id="order-items-heading" className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+        <h2 id="order-items-heading" className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
           Items
         </h2>
         <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
@@ -55,7 +58,7 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
                 <div className="flex items-center gap-2 min-w-0">
                   <p className="text-sm font-nunito text-text-light dark:text-text-dark truncate">{item.itemName ?? 'Unnamed item'}</p>
                   {!item.isPhysical && (
-                    <span className="shrink-0 px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-[8px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark">
+                    <span className="shrink-0 px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-[8px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark">
                       Donation
                     </span>
                   )}
@@ -64,18 +67,18 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
                 {/* One fact per cell, so the numbers can be scanned rather than read */}
                 <dl className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-[10px] font-mono text-muted-light dark:text-muted-dark">
                   <div className="flex gap-1">
-                    <dt className="uppercase tracking-[0.15em]">Unit</dt>
+                    <dt className="uppercase tracking-tag">Unit</dt>
                     <dd className="tabular-nums text-text-light dark:text-text-dark">{formatMoney(unitPrice)}</dd>
                   </div>
 
                   <div className="flex gap-1">
-                    <dt className="uppercase tracking-[0.15em]">Qty</dt>
+                    <dt className="uppercase tracking-tag">Qty</dt>
                     <dd className="tabular-nums text-text-light dark:text-text-dark">{quantity}</dd>
                   </div>
 
                   {item.size && (
                     <div className="flex gap-1">
-                      <dt className="uppercase tracking-[0.15em]">Size</dt>
+                      <dt className="uppercase tracking-tag">Size</dt>
                       <dd className="text-text-light dark:text-text-dark">{item.size}</dd>
                     </div>
                   )}
@@ -106,7 +109,7 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
           <dt className="text-muted-light dark:text-muted-dark">
             Processing fee
             <span
-              className={`ml-1.5 text-[9px] tracking-[0.15em] uppercase ${
+              className={`ml-1.5 text-[9px] tracking-tag uppercase ${
                 order.coverFees ? 'text-emerald-500' : 'text-amber-600 dark:text-amber-400'
               }`}
             >
@@ -119,13 +122,22 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
         </div>
 
         <div className="flex justify-between pt-2 mt-1 border-t border-border-light dark:border-border-dark">
-          <dt className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Charged</dt>
+          <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Charged</dt>
           <dd className="text-sm font-mono font-black tabular-nums text-text-light dark:text-text-dark">{formatMoney(total)}</dd>
         </div>
 
+        {refunded > 0 && (
+          <div className="flex justify-between">
+            <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-sky-600 dark:text-sky-400">Refunded</dt>
+            <dd className="text-sm font-mono font-black tabular-nums text-sky-600 dark:text-sky-400">−{formatMoney(refunded)}</dd>
+          </div>
+        )}
+
         <div className="flex justify-between">
-          <dt className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Net to rescue</dt>
-          <dd className="text-sm font-mono font-black tabular-nums text-primary-light dark:text-primary-dark">
+          <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Net to rescue</dt>
+          <dd
+            className={`text-sm font-mono font-black tabular-nums ${netToRescue < 0 ? 'text-red-500 dark:text-red-400' : 'text-primary-light dark:text-primary-dark'}`}
+          >
             {formatMoney(netToRescue)}
           </dd>
         </div>

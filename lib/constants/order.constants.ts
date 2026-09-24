@@ -26,10 +26,22 @@ export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string 
   ADOPTION_AGREEMENT: {
     label: 'Adoption',
     message: 'Your payment is in and your adoption agreement is signed. Little Paws will countersign it shortly and email you a copy.'
+  },
+  ECARD: {
+    label: 'Ecard Confirmed',
+    message: 'Thank you for your ecard purchase. It supports the dogs in our rescue program.'
   }
 }
 
-export const FILTERS = ['ALL', 'ONE_TIME_DONATION', 'RECURRING_DONATION', 'ADOPTION_FEE', 'AUCTION_PURCHASE', 'PURCHASE'] as const
+export const FILTERS = [
+  'ALL',
+  'ONE_TIME_DONATION',
+  'RECURRING_DONATION',
+  'ADOPTION_FEE',
+  'ADOPTION_AGREEMENT',
+  'AUCTION_PURCHASE',
+  'PURCHASE'
+] as const
 
 export type Filter = (typeof FILTERS)[number]
 
@@ -37,16 +49,19 @@ export const FILTER_LABELS: Record<Filter, string> = {
   ALL: 'All',
   ONE_TIME_DONATION: 'One-time',
   RECURRING_DONATION: 'Recurring',
-  ADOPTION_FEE: 'Adoption fee',
+  ADOPTION_FEE: 'Application fee',
+  ADOPTION_AGREEMENT: 'Adoption',
   PURCHASE: 'Purchase',
   AUCTION_PURCHASE: 'Auction'
 }
 
-// Order STATUS badge styles (CONFIRMED / FAILED / etc.) — separate from the type filter
+// Order status badge styles (CONFIRMED, FAILED and so on), separate from the type filter
 export const STATUS_STYLES: Record<string, string> = {
   CONFIRMED: 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5',
   PENDING: 'border-amber-500/40 text-amber-600 dark:text-amber-400 bg-amber-500/5',
-  FAILED: 'border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/5'
+  FAILED: 'border-red-500/40 text-red-600 dark:text-red-400 bg-red-500/5',
+  PARTIALLY_REFUNDED: 'border-sky-500/40 text-sky-600 dark:text-sky-400 bg-sky-500/5',
+  REFUNDED: 'border-sky-500/40 text-sky-600 dark:text-sky-400 bg-sky-500/5'
 }
 
 export const DECLINE_EXPLANATIONS: Record<string, string> = {
@@ -60,7 +75,9 @@ export const DECLINE_EXPLANATIONS: Record<string, string> = {
   fraudulent: 'The bank flagged this as suspicious and stopped it.',
   lost_card: 'The card was reported lost.',
   stolen_card: 'The card was reported stolen.',
-  authentication_required: 'The bank wanted extra verification that was never completed.'
+  authentication_required: 'The bank wanted extra verification that was never completed.',
+  generic_decline: 'The bank declined the card without giving a reason. The donor would need to call their bank or try a different card.',
+  do_not_honor: 'The bank declined the card without giving a reason. The donor would need to call their bank or try a different card.'
 }
 
 // One place so Transactions, Donations and the dashboard can't drift on what counts as a donation
@@ -81,6 +98,8 @@ export const isDonation = (type: OrderType) => (DONATION_TYPES as readonly Order
 export function getOrderSection(order: { type: OrderType; isRecurring?: boolean | null }) {
   if (order.isRecurring) return { href: '/admin/subscriptions', label: 'Subscriptions' }
   if (isDonation(order.type)) return { href: '/admin/donations', label: 'Donations' }
+  if (order.type === 'ADOPTION_AGREEMENT') return { href: '/admin/adoption-payments', label: 'Adoption Payments' }
+  if (order.type === 'ADOPTION_FEE') return { href: '/admin/adoption-fees', label: 'Adoption Fees' }
   return { href: '/admin/transactions', label: 'Transactions' }
 }
 

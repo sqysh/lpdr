@@ -57,6 +57,18 @@ export const CHANGELOG: ChangelogEntry[] = [
       {
         type: 'fix',
         text: 'The receipt email for an adoption payment listed the whole amount as a donation. It now shows the adoption fee, health certificate and any additional donation separately'
+      },
+      {
+        type: 'feature',
+        text: 'Any payment can now be refunded from its transaction page, in full or in part, without opening Stripe. Refunds made directly in Stripe are recorded on the site too, and a Sync refunds button on Transactions catches up any that were missed'
+      },
+      {
+        type: 'improvement',
+        text: 'Refunded and partly refunded orders are marked clearly in blue, and the totals on Transactions, the dashboard and each order subtract what was refunded'
+      },
+      {
+        type: 'improvement',
+        text: 'Transactions has an Adoption filter, and adoption payments and application fees link back to their own pages'
       }
     ]
   },

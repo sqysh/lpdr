@@ -3,6 +3,7 @@ import { STATUS_STYLES, getOrderSection } from 'lib/constants/order.constants'
 import { IOrder } from 'types/order.types'
 import { useLinkStatus } from 'next/link'
 import { Loader2 } from 'lucide-react'
+import { orderDisplayStatus } from 'lib/utils/order.utils'
 
 /** Sits inside the breadcrumb Link so useLinkStatus can see it; the slash becomes the spinner mid-navigation */
 export function BreadcrumbSlash() {
@@ -19,6 +20,7 @@ export function BreadcrumbSlash() {
 
 export function TransactionTopbar({ order }: { order: IOrder }) {
   const section = getOrderSection(order)
+  const status = orderDisplayStatus(order)
 
   return (
     <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between">
@@ -39,10 +41,10 @@ export function TransactionTopbar({ order }: { order: IOrder }) {
       </nav>
       <span
         className={`shrink-0 inline-flex items-center px-2 py-0.5 border text-[8px] font-mono tracking-eyebrow uppercase ${
-          STATUS_STYLES[order.status] ?? 'border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark'
+          STATUS_STYLES[status] ?? 'border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark'
         }`}
       >
-        {order.status}
+        {status.replaceAll('_', ' ')}
       </span>
     </header>
   )

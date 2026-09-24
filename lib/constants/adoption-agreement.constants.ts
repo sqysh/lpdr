@@ -115,9 +115,9 @@ export const getAdoptionTerms = (version: string) => ADOPTION_TERMS[version] ?? 
 
 // Card is paid on the site, so it has no instructions
 export const OFFLINE_PAYMENT_INSTRUCTIONS: Record<Exclude<AdoptionPaymentMethod, 'CARD'>, { label: string; instruction: string }> = {
-  ZELLE: { label: 'Zelle', instruction: 'Send payment by Zelle to treasurer@littlepawsdr.org' },
+  ZELLE: { label: 'Zelle', instruction: 'Send payment by Zelle to lpdrbills@littlepawsdr.org' },
   VENMO: { label: 'Venmo', instruction: 'Send payment by Venmo to @littlepawsdr' },
-  PAYPAL: { label: 'PayPal', instruction: 'Send payment by PayPal to treasurer@littlepawsdr.org' }
+  PAYPAL: { label: 'PayPal', instruction: 'Send payment by PayPal to lpdrbills@littlepawsdr.org' }
 }
 
 export const AGREEMENT_FILTERS = ['ALL', 'DRAFT', 'SENT', 'SIGNED', 'PAID', 'COMPLETE', 'VOID', 'RETURNED'] as const
