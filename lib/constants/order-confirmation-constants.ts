@@ -26,8 +26,8 @@ export const ORDER_TYPE_EMAIL_CONFIG: Record<OrderType, { heading: string; body:
     body: 'Thank you for your purchase. Your payment has been received and your item will be on its way soon.'
   },
   ADOPTION_AGREEMENT: {
-    heading: 'Your adoption is confirmed!',
-    body: "We've received your signed adoption agreement and payment. A copy of the agreement is attached for your records, and our team will be in touch about bringing your new dachshund home."
+    heading: 'Your adoption payment is received!',
+    body: "Thank you. Your agreement is signed and paid. Little Paws will countersign it shortly, and we'll email you when your adoption is complete."
   }
 }
 

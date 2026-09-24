@@ -1,9 +1,19 @@
-import { Order, OrderItem, OrderType } from '@prisma/client'
+import { Order, OrderItem, OrderType, Prisma } from '@prisma/client'
 import { COLOR, ORDER_TYPE_EMAIL_CONFIG } from 'lib/constants/order-confirmation-constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
+import { escapeHtml } from 'lib/utils/html.utils'
 
-type OrderWithItems = Order & { items: OrderItem[] }
+type OrderWithItems = Order & {
+  items: OrderItem[]
+  adoptionAgreement?: {
+    id: string
+    dogName: string
+    adoptionFee: Prisma.Decimal | number
+    healthCertificateFee: Prisma.Decimal | number | null
+    additionalDonation: Prisma.Decimal | number | null
+  } | null
+}
 
 const SITE = 'https://www.littlepawsdr.org'
 
@@ -13,18 +23,13 @@ export function getOrderEmailSubject(order: OrderWithItems): string {
     ONE_TIME_DONATION: 'Thank You for Supporting Little Paws!',
     RECURRING_DONATION: `Your ${freq} Gift to Little Paws is Active`,
     ADOPTION_FEE: 'Your Adoption Fee Payment is Received',
-    ADOPTION_AGREEMENT: 'Your Little Paws Adoption is Confirmed',
+    ADOPTION_AGREEMENT: 'Your Adoption Payment is Received',
     PURCHASE: 'Your Little Paws Order is Confirmed',
     ECARD: 'Your Little Paws Ecard is Confirmed',
     AUCTION_PURCHASE: 'Your Auction Payment is Confirmed. Thank You!'
   }
   return subjects[order.type]
 }
-
-// Anything the donor typed goes through this before it reaches the HTML, so a message or name
-// containing markup renders as text rather than as part of the email
-const escapeHtml = (value: string) =>
-  value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;').replaceAll("'", '&#39;')
 
 // Uses <th scope="row"> for the label so screen readers announce
 // "Label: Value" correctly instead of reading two unrelated cells.
@@ -65,8 +70,17 @@ function buildDetailRows(order: OrderWithItems): string[] {
   const subtotal = Number(order.subtotal) > 0 ? Number(order.subtotal) : total - feesCovered - shipping
   const frequency = order.isRecurring ? (order.recurringFrequency === 'YEARLY' ? 'Annual' : 'Monthly') : null
 
+  const adoption = order.type === 'ADOPTION_AGREEMENT' ? order.adoptionAgreement : null
+
   // What they gave or bought
-  if (order.items.length > 0) {
+  if (adoption) {
+    rows.push(row('Adopting', escapeHtml(adoption.dogName)))
+    rows.push(row('Adoption fee', formatMoney(Number(adoption.adoptionFee))))
+    if (Number(adoption.healthCertificateFee ?? 0) > 0)
+      rows.push(row('Health certificate', formatMoney(Number(adoption.healthCertificateFee))))
+    if (Number(adoption.additionalDonation ?? 0) > 0)
+      rows.push(row('Additional donation', formatMoney(Number(adoption.additionalDonation))))
+  } else if (order.items.length > 0) {
     for (const item of order.items) {
       const label = escapeHtml(item.itemName ?? 'Item') + ((item.quantity ?? 1) > 1 ? ` &times; ${item.quantity}` : '')
       rows.push(row(label, formatMoney(Number(item.price) * (item.quantity ?? 1))))
@@ -120,6 +134,24 @@ function buildNotices(order: OrderWithItems): string[] {
         'Little Paws Dachshund Rescue is a 501(c)(3) nonprofit organization. Your donation is tax-deductible to the extent allowed by law.'
       )
     )
+  }
+
+  if (order.type === 'ADOPTION_AGREEMENT' && order.adoptionAgreement) {
+    notices.push(
+      noticeBlock(
+        'Your agreement',
+        `You can view or print your signed agreement any time from ${link(`${SITE}/adopt/agreement/${order.adoptionAgreement.id}`, 'this link')}.`
+      )
+    )
+
+    if (Number(order.adoptionAgreement.additionalDonation ?? 0) > 0) {
+      notices.push(
+        noticeBlock(
+          'Tax information',
+          'Little Paws Dachshund Rescue is a 501(c)(3) nonprofit organization. Your additional donation is tax-deductible to the extent allowed by law.'
+        )
+      )
+    }
   }
 
   return notices

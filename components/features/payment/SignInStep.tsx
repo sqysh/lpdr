@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
@@ -24,12 +26,12 @@ export function StepSignIn({ redirectTo }: { redirectTo: string }) {
           animate={{ opacity: 1, y: 0 }}
           className="px-4 py-4 border border-primary-light/20 dark:border-primary-dark/20 bg-surface-light dark:bg-surface-dark"
         >
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase mb-1 text-primary-light dark:text-primary-dark">
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase mb-1 text-primary-light dark:text-primary-dark">
             Check your inbox
           </p>
           <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
-            We sent a magic link to <span className="text-text-light dark:text-text-dark">{email}</span>. Click the link to sign
-            in and return here.
+            We sent a magic link to <span className="text-text-light dark:text-text-dark">{email}</span>. Click the link to sign in and
+            return here.
           </p>
         </motion.div>
       ) : (

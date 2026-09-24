@@ -90,6 +90,7 @@
   --font-nunito: var(--font-nunito);
   --font-quicksand: var(--font-quicksand);
   --font-bebas: var(--font-bebas);
+  --font-signature: var(--font-caveat), cursive;
 }
 
 body {
@@ -100,6 +101,16 @@ body {
     sans-serif;
 
   @apply bg-bg-light dark:bg-bg-dark;
+}
+
+.dark {
+  color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+  }
 }
 
 input[type="number"] {

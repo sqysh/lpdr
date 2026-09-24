@@ -116,12 +116,13 @@ enum UserStatus {
 }
 
 enum AdoptionAgreementStatus {
-  DRAFT // admin preparing
-  SENT // emailed to adopter
-  SIGNED // adopter signed, payment outstanding
-  PAID // signed and paid, awaiting countersignature
-  COMPLETE // countersigned by LPDR
-  VOID
+  DRAFT
+  SENT
+  SIGNED
+  PAID
+  COMPLETE
+  VOID // cancelled before payment
+  RETURNED // adopted, then the dog came back
 }
 
 enum AdoptionPaymentMethod {
@@ -262,6 +263,7 @@ model User {
   adoptionAgreements   AdoptionAgreement[]
   agreementsCreated    AdoptionAgreement[] @relation("AgreementCreatedBy")
   agreementsMarkedPaid AdoptionAgreement[] @relation("AgreementMarkedPaidBy")
+  agreementsClosed     AdoptionAgreement[] @relation("AgreementClosedBy")
 }
 
 // ─── Payment Method ────────────────────────────────────────────────────────────────────
@@ -357,6 +359,13 @@ model Order {
 
   // ── Donor message (e.g. in memory of someone) ───────────
   donorMessage String?
+
+  // Set for payments received outside Stripe and recorded by hand, like Zelle, Venmo or PayPal for an adoption
+  offlinePaymentMethod AdoptionPaymentMethod?
+
+  // Cumulative, as Stripe reports it. The order only moves to REFUNDED when the whole charge is returned
+  refundedAmount Decimal?  @db.Decimal(10, 2)
+  refundedAt     DateTime?
 
   @@index([type, createdAt])
   @@index([status])
@@ -767,12 +776,23 @@ model AdoptionAgreement {
 
   signatures AdoptionAgreementSignature[]
 
+  // Set when the agreement email fails to send, cleared when a send succeeds. The admin detail page
+  // shows these with a resend button
+  emailFailedAt      DateTime?
+  emailFailureReason String?
+
   // The admin who prepares the agreement is also the LPDR representative who countersigns it
   createdById String
   createdBy   User      @relation("AgreementCreatedBy", fields: [createdById], references: [id])
   sentAt      DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  // Who ended the agreement and why, for both VOID and RETURNED. The status says which
+  closedAt     DateTime?
+  closedReason String?
+  closedById   String?
+  closedBy     User?     @relation("AgreementClosedBy", fields: [closedById], references: [id])
 
   @@index([status, createdAt])
   @@index([userId])

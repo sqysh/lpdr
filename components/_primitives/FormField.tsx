@@ -21,11 +21,16 @@ type FormFieldProps = {
   hint?: string
   disabled?: boolean
   maxLength?: number
+  // Picks the phone keyboard (decimal, numeric, tel, email) without the quirks of type="number"
+  inputMode?: React.HTMLAttributes<HTMLInputElement>['inputMode']
   unstyled?: boolean
+  // Reshapes the value as it's typed, e.g. formatPhone. The formatted value is what the form stores
+  format?: (value: string) => string
+  inputClassName?: string
 }
 
-export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormField(
-  {
+export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormField(props, ref) {
+  const {
     id,
     label,
     name,
@@ -44,10 +49,12 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
     hint,
     disabled = false,
     maxLength,
-    unstyled = false
-  },
-  ref
-) {
+    inputMode,
+    unstyled = false,
+    format,
+    inputClassName = ''
+  } = props
+
   const fieldClass = unstyled
     ? className
     : `w-full px-3.5 py-3 text-sm font-mono border-2 border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark placeholder:text-muted-light/50 dark:placeholder:text-muted-dark/50 transition-colors duration-200 focus:outline-none focus-visible:border-primary-light dark:focus-visible:border-primary-dark ${readOnly || disabled ? 'cursor-not-allowed opacity-70' : ''}`
@@ -59,11 +66,16 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
   const labelClass = `block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2`
   const errorClass = `text-[11px] text-red-500 dark:text-red-400 font-mono mt-1.5`
 
+  const handleChange: React.ChangeEventHandler<FieldElement> = (e) => {
+    if (format) e.target.value = format(e.target.value)
+    onChange?.(e)
+  }
+
   const shared = {
     id,
     name,
     value,
-    onChange,
+    onChange: handleChange,
     onBlur,
     required,
     'aria-required': required,
@@ -114,12 +126,13 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
           {...shared}
           ref={ref as React.Ref<HTMLInputElement>}
           type={type}
+          inputMode={inputMode}
           placeholder={placeholder}
           autoComplete={autoComplete}
           readOnly={readOnly}
           disabled={disabled}
           maxLength={maxLength}
-          className={fieldClass}
+          className={`${fieldClass} ${inputClassName}`}
         />
       )}
 

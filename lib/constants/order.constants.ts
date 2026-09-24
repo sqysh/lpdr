@@ -22,6 +22,10 @@ export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string 
     label: 'Payment Confirmed',
     message:
       "Your auction payment has been received. Thank you for supporting Little Paws — we'll be in touch with details about your item shortly."
+  },
+  ADOPTION_AGREEMENT: {
+    label: 'Adoption',
+    message: 'Your payment is in and your adoption agreement is signed. Little Paws will countersign it shortly and email you a copy.'
   }
 }
 

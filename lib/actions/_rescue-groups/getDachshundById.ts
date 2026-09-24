@@ -5,7 +5,7 @@ import { Dog } from 'types/rescue-groups.types'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import type { ActionResult } from 'types/action.types'
 
-export async function getDachshundById(id: string): Promise<ActionResult<{ data: Dog }>> {
+export async function getDachshundById(id: string): Promise<ActionResult<{ data: Dog[] }>> {
   try {
     const response = await rescueGroupsFetch(`/animals/${id}`, { next: { revalidate: 3600 } })
 

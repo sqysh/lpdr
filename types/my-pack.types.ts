@@ -103,4 +103,4 @@ export interface AuctionPurchase {
   }[]
 }
 
-export type MyPackTab = 'account' | 'orders' | 'giving' | 'auctions' | 'settings'
+export type MyPackTab = 'account' | 'orders' | 'adoptions' | 'giving' | 'auctions' | 'settings'

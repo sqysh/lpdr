@@ -1,4 +1,4 @@
-import { Bebas_Neue, Nunito, Quicksand, Work_Sans } from 'next/font/google'
+import { Bebas_Neue, Caveat, Nunito, Quicksand, Work_Sans } from 'next/font/google'
 
 export const workSans = Work_Sans({
   subsets: ['latin'],
@@ -26,3 +26,5 @@ export const bebas = Bebas_Neue({
   preload: false,
   variable: '--font-bebas'
 })
+
+export const signatureFont = Caveat({ subsets: ['latin'], weight: ['500'], variable: '--font-caveat' })

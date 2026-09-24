@@ -1,5 +1,6 @@
 import { OrderType, RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
+import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-countersign'
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
 import { resend } from 'lib/email/resend'
 import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
@@ -390,9 +391,34 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       }
     }
 
+    if (orderType === 'ADOPTION_AGREEMENT') {
+      // SIGNED in the where, so a retried webhook or a second payment can't move it twice
+      const { count } = await prisma.adoptionAgreement.updateMany({
+        where: { id: metadata.agreementId, status: 'SIGNED' },
+        data: { status: 'PAID', paidAt: new Date(), orderId: order.id }
+      })
+
+      if (count === 0) {
+        await createLog('error', 'Adoption agreement payment received but agreement was not awaiting payment', {
+          agreementId: metadata.agreementId,
+          orderId: order.id,
+          paymentIntentId: id
+        })
+      } else {
+        // Not awaited: the webhook should answer Stripe quickly, and this can't fail the payment
+        void notifyAwaitingCountersign(metadata.agreementId)
+      }
+    }
+
     const orderWithItems = await prisma.order.findUniqueOrThrow({
       where: { id: order.id },
-      include: { items: true }
+      include: {
+        items: true,
+        // Adoption emails itemize from the agreement, since the order itself has no items
+        adoptionAgreement: {
+          select: { id: true, dogName: true, adoptionFee: true, healthCertificateFee: true, additionalDonation: true }
+        }
+      }
     })
 
     // Not awaited: a slow mail provider should not hold the webhook open long

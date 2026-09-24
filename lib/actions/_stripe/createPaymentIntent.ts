@@ -9,7 +9,7 @@ import { WelcomeWienerProduct } from 'types/welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage } from 'lib/utils/error.utils'
+import { getErrorMessage, UserFacingError } from 'lib/utils/error.utils'
 import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createPaymentIntentSchema } from 'lib/schemas/payment.schema'
@@ -19,6 +19,7 @@ import { OrderType } from '@prisma/client'
 import { ADOPTION_FEE_CENTS, MIN_DONATION_CENTS } from 'lib/constants/adoption-fees.constants'
 import { hasActiveAdoptionFee } from '../adoption-fee/hasActiveAdoptionFee'
 import { isDonation } from 'lib/constants/order.constants'
+import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -38,13 +39,12 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
 
-  console.log('INPUT: ', input)
-
   const parsed = parseInput(createPaymentIntentSchema, input)
-  console.log('PARSED: ', parsed)
+
   if (parsed.ok === false) return parsed.result
 
-  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId, donorMessage } = parsed.data
+  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId, donorMessage, agreementId } =
+    parsed.data
 
   const userId = gate.userId
 
@@ -78,6 +78,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
     let baseCents = 0
     let shippingCents = 0
     let purchaseDescription = `Order from ${displayName}`
+    let agreementUpdatedAt = ''
 
     if (items?.length) {
       const ids = items.map((i) => i.id).filter((id): id is string => !!id)
@@ -201,6 +202,40 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
 
       baseCents = ADOPTION_FEE_CENTS
+    } else if (orderType === 'ADOPTION_AGREEMENT') {
+      if (!agreementId) throw new Error('Missing adoption agreement')
+
+      const agreement = await prisma.adoptionAgreement.findUnique({
+        where: { id: agreementId },
+        select: {
+          userId: true,
+          status: true,
+          paymentMethod: true,
+          dogName: true,
+          adoptionFee: true,
+          healthCertificateFee: true,
+          additionalDonation: true,
+          updatedAt: true
+        }
+      })
+
+      // Same message for missing and someone else's, so an id never confirms another adopter's agreement
+      if (!agreement || agreement.userId !== userId) throw new Error('Adoption agreement not found')
+      if (agreement.status === 'PAID' || agreement.status === 'COMPLETE') throw new Error('This adoption has already been paid for')
+      if (agreement.status !== 'SIGNED') throw new Error('Please sign the agreement before paying')
+      if (agreement.paymentMethod !== 'CARD')
+        throw new Error('This adoption is set up to be paid another way. Please check your agreement email')
+
+      // Every amount comes from the signed agreement, never from the browser
+      baseCents = Math.round(
+        agreementTotal({
+          adoptionFee: Number(agreement.adoptionFee),
+          healthCertificateFee: agreement.healthCertificateFee == null ? null : Number(agreement.healthCertificateFee),
+          additionalDonation: agreement.additionalDonation == null ? null : Number(agreement.additionalDonation)
+        }) * 100
+      )
+      purchaseDescription = `Adoption of ${agreement.dogName} by ${displayName}`
+      agreementUpdatedAt = agreement.updatedAt.getTime().toString()
     } else {
       // Donor-chosen amount (one-time and recurring donations)
       baseCents = amount ?? 0
@@ -223,7 +258,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       ONE_TIME_DONATION: `One-time donation from ${displayName}`,
       RECURRING_DONATION: `Recurring donation from ${displayName}`,
       ADOPTION_FEE: `Adoption fee from ${displayName}`,
-      ADOPTION_AGREEMENT: `Adoption from ${displayName}`,
+      ADOPTION_AGREEMENT: purchaseDescription,
       AUCTION_PURCHASE: auctionItemId ? purchaseDescription : `Auction payment from ${displayName}`,
       PURCHASE: purchaseDescription,
       ECARD: `Ecard purchase from ${displayName}`
@@ -256,6 +291,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           )
         }),
         winningBidderId: winningBidderId ?? '',
+        agreementId: agreementId ?? '',
         auctionItemId: auctionItemId ?? '',
         ...(isDonation(orderType) && donorMessage && { donorMessage })
       }
@@ -303,7 +339,9 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       ? `winner-${winningBidderId}-${finalCents}`
       : orderType === 'ADOPTION_FEE'
         ? `adoption-${userId}-${finalCents}-${new Date().toISOString().slice(0, 10)}`
-        : undefined
+        : orderType === 'ADOPTION_AGREEMENT'
+          ? `agreement-${agreementId}-${finalCents}-${agreementUpdatedAt}`
+          : undefined
 
     if (!paymentIntent) {
       paymentIntent = await stripeClient.paymentIntents.create(paymentIntentParams, idempotencyKey ? { idempotencyKey } : undefined)
@@ -334,12 +372,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
     }
   } catch (error) {
-    await createLog('error', 'Failed to create payment intent', {
-      error: getErrorMessage(error),
-      orderType,
-      userId
-    })
-
+    const expected = error instanceof UserFacingError
+    await createLog(expected ? 'warn' : 'error', 'Failed to create payment intent', { error: getErrorMessage(error), orderType, userId })
     return fail(getErrorMessage(error))
   }
 }

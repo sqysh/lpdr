@@ -3,6 +3,7 @@ import { stripeClient } from 'lib/stripe/stripe-client'
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import {
+  handleChargeRefunded,
   handleInvoicePaymentFailed,
   handleInvoicePaymentSucceeded,
   handlePaymentIntentFailed,
@@ -67,8 +68,7 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.updated': {
         const updatedSub = event.data.object as Stripe.Subscription
         const statusesToHandle = ['active', 'past_due', 'canceled', 'unpaid', 'incomplete']
-        if (statusesToHandle.includes(updatedSub.status))
-          await handleSubscriptionUpdated(updatedSub)
+        if (statusesToHandle.includes(updatedSub.status)) await handleSubscriptionUpdated(updatedSub)
         break
       }
       case 'invoice.payment_succeeded':
@@ -76,6 +76,9 @@ export async function POST(req: NextRequest) {
         break
       case 'invoice.payment_failed':
         await handleInvoicePaymentFailed(event.data.object as Stripe.Invoice)
+        break
+      case 'charge.refunded':
+        await handleChargeRefunded(event.data.object as Stripe.Charge)
         break
       default:
         await createLog('info', 'Unhandled webhook event', {

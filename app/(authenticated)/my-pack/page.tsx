@@ -62,6 +62,7 @@ async function MyPackContent() {
       auctionPurchases={data?.auctionPurchases}
       hasPendingMigration={migration.success ? (migration.data?.pending ?? false) : false}
       featuredAuction={featuredAuction}
+      adoptionAgreements={data.adoptions.success ? data.adoptions.data : []}
     />
   )
 }

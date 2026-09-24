@@ -2,6 +2,7 @@ import prisma from 'prisma/client'
 import { createLog } from '../log/createLog'
 import { AuctionParticipation, AuctionPurchase, Donation, MultiItemOrder, ParticipationItem, Subscription } from 'types/my-pack.types'
 import { requireAuth } from 'lib/auth/guards'
+import { getMyAdoptionAgreements } from './getMyAdoptionAgreements'
 
 export const getPackMemberData = async () => {
   const gate = await requireAuth()
@@ -10,7 +11,7 @@ export const getPackMemberData = async () => {
   const userId = gate.userId
 
   try {
-    const [user, orders, auctionBids, paymentMethods, adoptionFees, instantBuyers] = await Promise.all([
+    const [user, orders, auctionBids, paymentMethods, adoptionFees, instantBuyers, adoptions] = await Promise.all([
       prisma.user.findUnique({
         where: { id: userId },
         select: {
@@ -101,7 +102,8 @@ export const getPackMemberData = async () => {
           }
         },
         orderBy: { createdAt: 'desc' }
-      })
+      }),
+      getMyAdoptionAgreements()
     ])
 
     if (!user) return { success: false, error: 'User not found', data: null }
@@ -280,7 +282,8 @@ export const getPackMemberData = async () => {
         auctionPurchases,
         auctionParticipation,
         paymentMethods,
-        adoptionFees: adoptionFeesData
+        adoptionFees: adoptionFeesData,
+        adoptions
       }
     }
   } catch (error) {

@@ -57,6 +57,18 @@ export const getOrderById = async (id: string) => {
             lastName: true,
             email: true
           }
+        },
+        adoptionAgreement: {
+          select: {
+            id: true,
+            status: true,
+            dogName: true,
+            dogPhoto: true,
+            dogRescueId: true,
+            adoptionFee: true,
+            healthCertificateFee: true,
+            additionalDonation: true
+          }
         }
       }
     })

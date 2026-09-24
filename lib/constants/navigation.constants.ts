@@ -2,8 +2,10 @@ import {
   BookOpen,
   Dog,
   DollarSign,
+  FileSignature,
   Gavel,
   Gift,
+  HandCoins,
   Handshake,
   Heart,
   History,
@@ -58,7 +60,8 @@ export const HIDDEN_PATHS = [
   '/privacy-policy',
   '/terms',
   '/donate',
-  '/adopt/application'
+  '/adopt/application',
+  '/adopt/agreement'
 ]
 
 export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
@@ -209,7 +212,8 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
       { label: 'Transactions', icon: Receipt, href: '/admin/transactions' },
       { label: 'Donations', icon: Heart, href: '/admin/donations' },
       { label: 'Subscriptions', icon: Repeat, href: '/admin/subscriptions' },
-      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees' }
+      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees' },
+      { label: 'Adoption Payments', icon: HandCoins, href: '/admin/adoption-payments' }
     ]
   },
   {
@@ -222,7 +226,10 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
   },
   {
     heading: 'Adoptions',
-    items: [{ label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds' }]
+    items: [
+      { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds' },
+      { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements' }
+    ]
   },
   {
     heading: 'People',

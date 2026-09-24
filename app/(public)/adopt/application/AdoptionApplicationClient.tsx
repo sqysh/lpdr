@@ -26,7 +26,7 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
   const [introOpen, setIntroOpen] = useState(true)
 
   const params = useSearchParams()
-  const myPackTab = params.get('ref')
+  const myPackTab = params.get('tab')
   const myPackHref = myPackTab ? `/my-pack?tab=${myPackTab}` : '/my-pack'
 
   // min-h keeps the form usable on short screens, where the calc leaves almost
@@ -46,9 +46,7 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-                    <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                      Adoption
-                    </p>
+                    <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Adoption</p>
                   </div>
                   <Link href={myPackHref} className={subtleLink}>
                     <LinkBody icon={<ChevronLeft className="w-3 h-3" aria-hidden="true" />} label="My Pack" />
@@ -65,9 +63,9 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
                 </div>
 
                 <p className="text-sm sm:text-base text-muted-light dark:text-muted-dark leading-relaxed mb-4 sm:mb-5">
-                  Thank you for taking the next step toward adopting a Little Paws dachshund. Please complete the application
-                  below in one sitting, then our team will review your submission and be in touch within 3–5 business days. Your
-                  access stays open for the full week, so you can return and start a fresh application from{' '}
+                  Thank you for taking the next step toward adopting a Little Paws dachshund. Please complete the application below in one
+                  sitting, then our team will review your submission and be in touch within 3–5 business days. Your access stays open for
+                  the full week, so you can return and start a fresh application from{' '}
                   <Link
                     href="/my-pack"
                     className="text-primary-light dark:text-primary-dark hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
@@ -122,7 +120,7 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
               <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
               <h2
                 id="application-heading"
-                className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
+                className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark"
               >
                 Application Form
               </h2>
@@ -137,13 +135,9 @@ export default function AdoptionApplicationClient({ expiresAt }: { expiresAt: Da
                   src={`https://toolkit.rescuegroups.org/of/f?c=${isDark ? FORM_CODE_DARK : FORM_CODE_LIGHT}`}
                 />
               ) : (
-                <div
-                  className={`${frameHeight} flex flex-col items-center justify-center gap-3`}
-                  role="status"
-                  aria-live="polite"
-                >
+                <div className={`${frameHeight} flex flex-col items-center justify-center gap-3`} role="status" aria-live="polite">
                   <Loader2 className="w-5 h-5 text-primary-light dark:text-primary-dark animate-spin" aria-hidden="true" />
-                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+                  <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                     Loading application
                   </p>
                 </div>

@@ -14,6 +14,53 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.12.0',
+    date: '2026-09-23',
+    title: 'Adoption agreements',
+    changes: [
+      {
+        type: 'feature',
+        text: 'Adoption agreements now happen on the website instead of Jotform. Choose the adopter and the dog, fill in the microchip and medical details, and send it. The adopter signs in, confirms their details, signs the agreement and pays, all in one place'
+      },
+      {
+        type: 'feature',
+        text: "The dog's name, age, photo and adoption fee are taken straight from RescueGroups, so they can't be typed in wrong. Dogs that already have an agreement in progress, or have been adopted through the site, are greyed out when choosing"
+      },
+      {
+        type: 'feature',
+        text: 'Adopters pay by card on the site, or by Zelle, Venmo or PayPal if they ask. For those, the adopter is emailed the payment details after signing, and payment is recorded from the agreement once it arrives'
+      },
+      {
+        type: 'feature',
+        text: "Once the adopter has paid, whoever prepared the agreement gets an email that it's ready to countersign. Countersigning completes the adoption and emails the adopter their copy"
+      },
+      {
+        type: 'feature',
+        text: 'An agreement can be cancelled before payment, or marked as returned if the dog comes back. Returns show whether they fall within the two-week trial, and refunds, including partial ones, can be sent from the agreement without opening Stripe'
+      },
+      {
+        type: 'feature',
+        text: 'A new Adoption Payments page under Money In lists every adoption payment, however it was paid, with the adoption fee, health certificate and any donation shown separately'
+      },
+      {
+        type: 'feature',
+        text: 'Adopters can find their agreements in a new Adoptions tab in My Pack, with a reminder at the top whenever one is waiting for them to sign or pay'
+      },
+      {
+        type: 'improvement',
+        text: 'The agreements list highlights anything waiting on Little Paws, like an agreement to countersign, a payment to record or an email that failed to send, and keeps those at the top'
+      },
+      {
+        type: 'improvement',
+        text: 'Refunds made directly in Stripe are now recorded on the order automatically, for every kind of payment, not just adoptions'
+      },
+      {
+        type: 'fix',
+        text: 'The receipt email for an adoption payment listed the whole amount as a donation. It now shows the adoption fee, health certificate and any additional donation separately'
+      }
+    ]
+  },
+  {
     version: '1.11.0',
     date: '2026-09-22',
     title: 'Donor messages and clearer monthly receipts',

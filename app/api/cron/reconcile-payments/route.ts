@@ -4,6 +4,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { stripeClient } from 'lib/stripe/stripe-client'
 import { resend } from 'lib/email/resend'
 import { paymentMismatchTemplate } from 'lib/email/templates/payment-mismatch.template'
+import type Stripe from 'stripe'
 
 /**
  * Every succeeded charge should have an order behind it. On Sep 16 five did not, for twelve
@@ -30,12 +31,12 @@ export async function GET(request: Request) {
     const since = Math.floor((Date.now() - LOOKBACK_HOURS * 60 * 60 * 1000) / 1000)
     const settledBefore = Date.now() - SETTLE_MINUTES * 60 * 1000
 
-    const intents = await stripeClient.paymentIntents.list({
-      created: { gte: since },
-      limit: 100
-    })
+    const succeeded: Stripe.PaymentIntent[] = []
 
-    const succeeded = intents.data.filter((pi) => pi.status === 'succeeded' && pi.created * 1000 < settledBefore)
+    // Auto-pagination: a single page of 100 can fill up on a busy night, and anything past it went unchecked
+    for await (const pi of stripeClient.paymentIntents.list({ created: { gte: since }, limit: 100 })) {
+      if (pi.status === 'succeeded' && pi.created * 1000 < settledBefore) succeeded.push(pi)
+    }
 
     if (succeeded.length === 0) {
       await createLog('info', '[CRON] reconcile-payments', {
@@ -81,13 +82,16 @@ export async function GET(request: Request) {
       payments: rows
     })
 
-    // The log alone is not enough: the whole point is that nobody was looking.
-    await resend.emails.send({
+    const { error: emailError } = await resend.emails.send({
       from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
       to: process.env.ALERT_EMAIL!,
       subject: `${missing.length} payment${missing.length === 1 ? '' : 's'} with no order`,
       html: paymentMismatchTemplate({ payments: rows })
     })
+
+    if (emailError) {
+      await createLog('error', 'Payment mismatch alert email failed to send', { error: emailError.message, missing: rows.length })
+    }
 
     return NextResponse.json({ success: true, checked: succeeded.length, missing: missing.length })
   } catch (error) {

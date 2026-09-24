@@ -35,6 +35,8 @@ import { LinkBody } from 'components/_common/LinkBody'
 import { AuctionStatus } from '@prisma/client'
 import { IAdoptionFee } from 'types/adoption-fee'
 import { IPaymentMethod } from 'types/payment-method.types'
+import type { MyAdoptionAgreement } from 'lib/actions/my-pack/getMyAdoptionAgreements'
+import { AdoptionActionBanner, AdoptionsTab } from './_components/AdoptionsTab'
 
 export default function MyPackClient({
   user,
@@ -46,7 +48,8 @@ export default function MyPackClient({
   multiItemOrders,
   auctionPurchases,
   hasPendingMigration,
-  featuredAuction
+  featuredAuction,
+  adoptionAgreements
 }: {
   user: PackMember
   donations: Donation[]
@@ -69,6 +72,7 @@ export default function MyPackClient({
     endDate: Date
     isPubliclyVisible: boolean
   }
+  adoptionAgreements: MyAdoptionAgreement[]
 }) {
   const router = useRouter()
   const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
@@ -97,7 +101,8 @@ export default function MyPackClient({
     ...(auctionParticipation ?? []).flatMap((a) => a.items.filter((i) => i.isWinner).map((i) => Number(i.myHighestBid) || 0)),
     ...(adoptionFees ?? []).map((a) => Number(a.feeAmount) || 0),
     ...(multiItemOrders ?? []).map((o) => Number(o.totalAmount) || 0),
-    ...(auctionPurchases ?? []).map((o) => Number(o.totalAmount) || 0)
+    ...(auctionPurchases ?? []).map((o) => Number(o.totalAmount) || 0),
+    ...(adoptionAgreements ?? []).filter((a) => a.order).map((a) => Number(a.order!.totalAmount) || 0)
   ].reduce((sum, n) => sum + n, 0)
 
   const handleSetDefaultPaymentMethod = async (id: string) => {
@@ -245,6 +250,11 @@ export default function MyPackClient({
             <StatusMessage status={status} />
           </div>
 
+          {/* On every tab while an adoption is waiting on them, not just the Adoptions tab */}
+          <div className="mt-6 [&>a]:mb-0">
+            <AdoptionActionBanner agreements={adoptionAgreements} />
+          </div>
+
           <div className="mt-6">
             <StatsStrip
               totalGiven={totalGiven}
@@ -313,12 +323,27 @@ export default function MyPackClient({
                 >
                   <MultiItemOrders multiItemOrders={multiItemOrders} />
                 </SectionShell>
+              </div>
+            )}
+
+            {activeTab === 'adoptions' && (
+              <div className="flex flex-col gap-12">
+                <SectionShell
+                  heading="Adoption Agreements"
+                  action={
+                    <Link href="/dachshunds" className={addCardStyles}>
+                      <LinkBody icon={<Dog className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Dachshunds" />
+                    </Link>
+                  }
+                >
+                  <AdoptionsTab agreements={adoptionAgreements} />
+                </SectionShell>
 
                 <SectionShell
-                  heading="Adoption Fees"
+                  heading="Application Fees"
                   action={
                     <Link href="/adopt" className={addCardStyles}>
-                      <LinkBody icon={<Dog className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Adopt" />
+                      <LinkBody icon={<Dog className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Apply" />
                     </Link>
                   }
                 >
