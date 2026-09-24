@@ -3,6 +3,7 @@ const NEUTRAL =
 const GOOD = 'bg-green-500/10 text-green-600 dark:text-green-400'
 const BAD = 'bg-red-500/10 text-red-500 dark:text-red-400'
 const WARN = 'bg-amber-500/10 text-amber-600 dark:text-amber-400'
+const REFUND = 'bg-sky-500/10 text-sky-600 dark:text-sky-400'
 
 /**
  * Keyed in lowercase and looked up that way, because this takes both Stripe's lowercase
@@ -19,10 +20,11 @@ const TONES: Record<string, string> = {
 
   // Order status
   confirmed: GOOD,
+  partially_refunded: REFUND,
+  refunded: REFUND,
   pending: WARN,
   processing: WARN,
   failed: BAD,
-  refunded: NEUTRAL,
   cancelled: NEUTRAL
 }
 

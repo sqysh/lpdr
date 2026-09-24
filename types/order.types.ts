@@ -5,11 +5,12 @@ import { DecimalToNumber } from './prisma.types'
 
 // ─── Query args ───────────────────────────────────────────────────────────
 
-/** Admin order detail — everything on the order plus its items and buyer. */
+/** Admin order detail: everything on the order plus its items, buyer, and adoption agreement if it has one. */
 export const orderDetailArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
   include: {
-    items: true,
-    user: { select: userContactSelect }
+    items: { orderBy: { createdAt: 'asc' } },
+    user: { select: { ...userContactSelect, anonymousBidding: true } },
+    adoptionAgreement: { select: { id: true } }
   }
 })
 
@@ -38,7 +39,9 @@ export const orderListArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
     createdAt: true,
     _count: { select: { items: true } },
     items: { select: { quantity: true } },
-    donorMessage: true
+    donorMessage: true,
+    refundedAmount: true,
+    refundedAt: true
   }
 })
 

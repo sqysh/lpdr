@@ -1,15 +1,18 @@
 import prisma from 'prisma/client'
 
 export async function getAuctionStats() {
-  const [activeAuctions, totalAuctionRevenue] = await Promise.all([
+  const [activeAuctions, revenue] = await Promise.all([
     prisma.auction.count({ where: { status: 'ACTIVE' } }),
-    prisma.auction.aggregate({
-      _sum: { totalAuctionRevenue: true }
+    prisma.order.aggregate({
+      where: { type: 'AUCTION_PURCHASE', status: 'CONFIRMED', source: 'SITE' },
+      // subtotal rather than totalAmount: the items themselves, without shipping or covered fees,
+      // which is what the per-auction counter measures too
+      _sum: { subtotal: true, refundedAmount: true }
     })
   ])
 
   return {
     activeAuctions,
-    auctionRevenue: Number(totalAuctionRevenue._sum?.totalAuctionRevenue ?? 0)
+    auctionRevenue: Number(revenue._sum.subtotal ?? 0) - Number(revenue._sum.refundedAmount ?? 0)
   }
 }

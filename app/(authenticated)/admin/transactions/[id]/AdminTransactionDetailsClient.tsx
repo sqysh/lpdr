@@ -10,8 +10,8 @@ import { TransactionFulfillmentSection } from './_components/TransactionFulfillm
 import { TransactionCustomerSection } from './_components/TransactionCustomerSection'
 import { TransactionPaymentSection } from './_components/TransactionPaymentSection'
 import { TransactionAnomalyBanner } from './_components/TransactionAnomalyBanner'
-import { TransactionRefundEmailPanel } from './_components/TransactionRefundEmailPanel'
 import { TransactionDonorMessage } from './_components/TransactionDonorMessage'
+import { TransactionRefundSection } from './_components/TransactionRefundSection'
 
 type Props = {
   order: IOrder
@@ -43,7 +43,7 @@ export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Pro
           {/* A refunded order is not going anywhere, so the fulfilment panel would be telling
               Nadine to post something that has been paid back. */}
           {hasPhysical && !isRefunded && <TransactionFulfillmentSection order={order} />}
-          <TransactionRefundEmailPanel order={order} />
+          <TransactionRefundSection order={order} />
           <TransactionCustomerSection order={order} />
           <TransactionPaymentSection order={order} />
         </div>

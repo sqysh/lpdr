@@ -15,6 +15,7 @@ import { SubscriptionGroupRow } from './_components/SubscriptionGroupRow'
 import { formatDate } from 'lib/utils/date.utils'
 import { rowClass } from '../_lib/rowClass'
 import { isAnonymous } from '../_lib/isAnonymous'
+import { orderDisplayStatus } from 'lib/utils/order.utils'
 
 const COL_COUNT = 9
 
@@ -22,26 +23,32 @@ export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
   const router = useRouter()
   const [filter, setFilter] = useState<Filter>('ALL')
 
-  // Stat-card values
   const stats = useMemo(() => {
     // Money the rescue actually kept. A refunded order was real revenue for a while, so it is
     // counted separately rather than silently dropped: Cathy reconciles against Stripe, where
     // the charge and the refund both appear.
     const confirmed = orders.filter((o) => o.status === 'CONFIRMED')
-    const refunded = orders.filter((o) => o.status === 'REFUNDED')
+
+    // Orders marked refunded by hand before refunds were recorded automatically have no amount
+    // stored, so a REFUNDED order without one counts as its full total
+    const refundOf = (o: IOrderRow) =>
+      o.refundedAmount != null ? Number(o.refundedAmount) : o.status === 'REFUNDED' ? Number(o.totalAmount) : 0
+    const refunds = orders.filter((o) => refundOf(o) > 0)
 
     const gross = confirmed.reduce((sum, o) => sum + Number(o.totalAmount), 0)
+    // Partial refunds come off confirmed orders; fully refunded ones are already outside gross
+    const partialRefunds = confirmed.reduce((sum, o) => sum + refundOf(o), 0)
     const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered) : 0), 0)
     const feesAbsorbed = confirmed.reduce((sum, o) => sum + (o.coverFees ? 0 : Number(o.feesCovered)), 0)
 
     return {
       gross,
-      net: gross - feesCovered - feesAbsorbed,
+      net: gross - partialRefunds - feesCovered - feesAbsorbed,
       feesCovered,
       feesAbsorbed,
       confirmedCount: confirmed.length,
-      refundedCount: refunded.length,
-      refundedTotal: refunded.reduce((sum, o) => sum + Number(o.totalAmount), 0),
+      refundedCount: refunds.length,
+      refundedTotal: refunds.reduce((sum, o) => sum + refundOf(o), 0),
       needsShipping: orders.filter((o) => o.status === 'CONFIRMED' && o.shippingStatus === 'PENDING_FULFILLMENT').length,
       failed: orders.filter((o) => o.status === 'FAILED').length
     }
@@ -196,11 +203,19 @@ export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
                     <td className="px-4 py-3 text-xs font-mono tabular-nums text-text-light dark:text-text-dark">
                       {row.order.items.reduce((sum, i) => sum + (i.quantity ?? 1), 0) || '—'}
                     </td>
-                    <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
-                      {formatMoney(row.order.totalAmount)}
+                    <td className="px-4 py-3 whitespace-nowrap">
+                      <p className="text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark">
+                        {formatMoney(row.order.totalAmount)}
+                      </p>
+                      {/* A full refund already shows in the status pill; a partial one only shows here */}
+                      {row.order.status === 'CONFIRMED' && Number(row.order.refundedAmount ?? 0) > 0 && (
+                        <p className="text-[10px] font-mono tabular-nums text-sky-600 dark:text-sky-400">
+                          −{formatMoney(Number(row.order.refundedAmount))} refunded
+                        </p>
+                      )}
                     </td>
                     <td className="px-4 py-3 whitespace-nowrap">
-                      <StatusPill status={row.order.status} />
+                      <StatusPill status={orderDisplayStatus(row.order)} />
                     </td>
                     <td className="px-4 py-3 text-[10px] font-mono whitespace-nowrap">
                       {row.order.shippingStatus === 'SHIPPED' ? (
