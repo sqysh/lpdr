@@ -16,6 +16,7 @@ import { formatDate } from 'lib/utils/date.utils'
 import { rowClass } from '../_lib/rowClass'
 import { isAnonymous } from '../_lib/isAnonymous'
 import { orderDisplayStatus } from 'lib/utils/order.utils'
+import { SyncRefundsButton } from './_components/SyncRefundsButton'
 
 const COL_COUNT = 9
 
@@ -126,14 +127,17 @@ export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
           )}
         </div>
 
-        <AdminFilterTabs
-          options={FILTERS}
-          value={filter}
-          onChange={setFilter}
-          counts={counts}
-          labels={FILTER_LABELS}
-          label="Filter orders by type"
-        />
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <AdminFilterTabs
+            options={FILTERS}
+            value={filter}
+            onChange={setFilter}
+            counts={counts}
+            labels={FILTER_LABELS}
+            label="Filter orders by type"
+          />
+          <SyncRefundsButton />
+        </div>
 
         <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark overflow-x-auto">
           <table className="w-full text-left">
