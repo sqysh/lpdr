@@ -2,13 +2,14 @@
 
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { FormError, FormField, SubmitButton } from 'components/_primitives'
 import { refundOrder } from 'lib/actions/admin/order/refundOrder'
 import { refundOrderSchema, type RefundOrderInput, type RefundOrderValues } from 'lib/schemas/order.schema'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { Loader2 } from 'lucide-react'
+import { MONEY_PATTERN } from 'lib/constants/regex.constants'
 
 type Preset = { label: string; amount: number }
 
@@ -24,6 +25,7 @@ export function RefundPanel({ orderId, remaining, presets = [] }: { orderId: str
   const polls = useRef(0)
 
   const {
+    control,
     register,
     handleSubmit,
     getValues,
@@ -33,6 +35,9 @@ export function RefundPanel({ orderId, remaining, presets = [] }: { orderId: str
     resolver: zodResolver(refundOrderSchema),
     defaultValues: { orderId, amount: remaining.toFixed(2), reason: 'requested_by_customer' }
   })
+
+  const amountInput = useWatch({ control, name: 'amount' })
+  const amount = MONEY_PATTERN.test(amountInput ?? '') ? Number(amountInput) : 0
 
   const onSubmit = async () => {
     setError(null)
@@ -102,7 +107,14 @@ export function RefundPanel({ orderId, remaining, presets = [] }: { orderId: str
       </FormField>
 
       <FormError error={error} />
-      <SubmitButton loading={isSubmitting || isRefreshing} isValid label="Refund through Stripe" />
+      <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+        Goes back to the card it was paid with. The customer is emailed automatically.
+      </p>
+      <SubmitButton
+        loading={isSubmitting || isRefreshing}
+        isValid={amount > 0}
+        label={amount > 0 ? `Refund ${formatMoney(amount)}` : 'Refund'}
+      />
     </form>
   )
 }
