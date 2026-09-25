@@ -24,12 +24,11 @@ type Props = {
   auctionStatus: AuctionStatus
   index: number
   customAuctionLink: string
-  onBidSuccess?: () => void
   myBid: MyBid
   isAuthed: boolean
 }
 
-export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink, onBidSuccess, myBid, isAuthed }: Props) {
+export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink, myBid, isAuthed }: Props) {
   const router = useRouter()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -93,7 +92,6 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
       }
 
       play('se2')
-      onBidSuccess?.()
       showConfetti()
       router.refresh()
     } finally {

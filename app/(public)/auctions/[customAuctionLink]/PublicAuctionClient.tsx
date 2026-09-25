@@ -14,7 +14,6 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
   const router = useRouter()
   const routerRef = useRef(router)
   const [filter, setFilter] = useState<AuctionFilter>('ALL')
-  const [slotTrigger, setSlotTrigger] = useState(0)
 
   const isAuthed = session.status === 'authenticated'
   const role = session.data?.user?.role
@@ -44,7 +43,6 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
     // Bids arrive in bursts near the end, and each refresh re-renders the whole auction on the server.
     // Waiting a moment folds a burst into one refresh per viewer instead of one per bid
     const onBidPlaced = () => {
-      setSlotTrigger((t) => t + 1)
       if (pending) return
       pending = setTimeout(() => {
         pending = null
@@ -72,15 +70,7 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
       <AuctionSignInModal />
 
       <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark">
-        <AuctionCountdown
-          auction={auction}
-          isActive={isActive}
-          isEnded={isEnded}
-          trigger={slotTrigger}
-          isAuthed={isAuthed}
-          isDraft={isDraft}
-          role={role}
-        />
+        <AuctionCountdown auction={auction} isActive={isActive} isEnded={isEnded} isAuthed={isAuthed} isDraft={isDraft} role={role} />
 
         <div className="max-w-7xl mx-auto px-4 xs:px-5 sm:px-6 py-10 sm:py-14">
           <AuctionItemGrid
@@ -90,7 +80,6 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
             isActive={isActive}
             setFilter={setFilter}
             filter={filter}
-            setSlotTrigger={setSlotTrigger}
             myBids={myBids}
             isAuthed={isAuthed}
             counts={counts}

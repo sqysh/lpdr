@@ -11,7 +11,6 @@ type Props = {
   auction: PublicAuction
   isActive: boolean
   isEnded: boolean
-  trigger: number
   isAuthed: boolean
   isDraft: boolean
   role?: Role | null
@@ -20,7 +19,7 @@ type Props = {
 // The hourly cron flips the status on the hour, and may take a moment to run
 const REFRESH_AFTER_ZERO_MS = [5_000, 30_000, 90_000, 180_000]
 
-export function AuctionCountdown({ auction, isActive, isEnded, trigger, isAuthed, isDraft, role }: Props) {
+export function AuctionCountdown({ auction, isActive, isEnded, isAuthed, isDraft, role }: Props) {
   const router = useRouter()
   const { days, hours, minutes, seconds, done } = useCountdown(new Date(isDraft ? auction.startDate : auction.endDate))
 
@@ -56,7 +55,6 @@ export function AuctionCountdown({ auction, isActive, isEnded, trigger, isAuthed
         isEnded={isEnded}
         minutes={minutes}
         seconds={seconds}
-        trigger={trigger}
         isDraft={isDraft}
         role={role}
       />

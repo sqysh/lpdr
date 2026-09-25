@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react'
 import { Zap } from 'lucide-react'
 import { SectionLabel } from 'components/_primitives'
 import { AuctionItemCard } from './auction-item-card/AuctionItemCard'
@@ -14,23 +13,11 @@ type Props = {
   setFilter: (filter: AuctionFilter) => void
   filter: AuctionFilter
   counts: Record<AuctionFilter, number>
-  setSlotTrigger: Dispatch<SetStateAction<number>>
   myBids: Record<string, MyBid>
   isAuthed: boolean
 }
 
-export function AuctionItemGrid({
-  isActive,
-  available,
-  auction,
-  customAuctionLink,
-  filter,
-  setFilter,
-  counts,
-  setSlotTrigger,
-  myBids,
-  isAuthed
-}: Props) {
+export function AuctionItemGrid({ isActive, available, auction, customAuctionLink, filter, setFilter, counts, myBids, isAuthed }: Props) {
   // Hidden: a filter with nothing in it, and Auction when every item is one, since it would match All.
   // The selected filter always stays, so it can't vanish from under someone when a bid moves them out of it
   const options = AUCTION_FILTERS.filter(
@@ -113,7 +100,6 @@ export function AuctionItemGrid({
                 auctionStatus={auction.status}
                 index={i}
                 customAuctionLink={customAuctionLink}
-                onBidSuccess={() => setSlotTrigger((t) => t + 1)}
                 myBid={myBids[item.id] ?? null}
                 isAuthed={isAuthed}
               />

@@ -1,14 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { useReducedMotion } from 'framer-motion'
 
 const CHARS = '0123456789$., '
 
 function SlotChar({ targetChar, spinning, delay }: { targetChar: string; spinning: boolean; delay: number }) {
   const charRef = useRef<HTMLSpanElement>(null)
-  const intervalRef = useRef<NodeJS.Timeout | null>(null)
-  const startRef = useRef<NodeJS.Timeout | null>(null)
-  const stopRef = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     if (!spinning) {
@@ -17,25 +15,24 @@ function SlotChar({ targetChar, spinning, delay }: { targetChar: string; spinnin
     }
 
     let i = Math.floor(Math.random() * CHARS.length)
+    let interval: ReturnType<typeof setInterval> | null = null
+    let stop: ReturnType<typeof setTimeout> | null = null
 
-    startRef.current = setTimeout(() => {
-      intervalRef.current = setInterval(() => {
-        if (charRef.current) {
-          charRef.current.textContent = CHARS[i % CHARS.length]
-          i++
-        }
+    const start = setTimeout(() => {
+      interval = setInterval(() => {
+        if (charRef.current) charRef.current.textContent = CHARS[i++ % CHARS.length]
       }, 55)
 
-      stopRef.current = setTimeout(() => {
-        if (intervalRef.current) clearInterval(intervalRef.current)
+      stop = setTimeout(() => {
+        if (interval) clearInterval(interval)
         if (charRef.current) charRef.current.textContent = targetChar
       }, 400 + delay)
     }, delay)
 
     return () => {
-      if (startRef.current) clearTimeout(startRef.current)
-      if (intervalRef.current) clearInterval(intervalRef.current)
-      if (stopRef.current) clearTimeout(stopRef.current)
+      clearTimeout(start)
+      if (interval) clearInterval(interval)
+      if (stop) clearTimeout(stop)
     }
   }, [spinning, targetChar, delay])
 
@@ -50,40 +47,38 @@ function SlotChar({ targetChar, spinning, delay }: { targetChar: string; spinnin
   )
 }
 
-export function AuctionSlotValue({ value, trigger }: { value: string; trigger: number }) {
-  const [displayValue, setDisplayValue] = useState(value)
+/**
+ * Spins when the value changes, so the animation always lands on the new total. Each change starts
+ * and stops its own spin, which means nothing can leave it stuck mid-spin.
+ */
+export function AuctionSlotValue({ value }: { value: string }) {
+  const reduceMotion = useReducedMotion()
   const [spinning, setSpinning] = useState(false)
-  const prevTrigger = useRef(trigger)
   const prevValue = useRef(value)
-
-  useEffect(() => {
-    if (trigger === prevTrigger.current) return
-    prevTrigger.current = trigger
-
-    const start = setTimeout(() => setSpinning(true), 0)
-    return () => clearTimeout(start)
-  }, [trigger])
 
   useEffect(() => {
     if (value === prevValue.current) return
     prevValue.current = value
+    if (reduceMotion) return
 
-    const stop = setTimeout(
-      () => {
-        setSpinning(false)
-        setDisplayValue(value)
-      },
-      spinning ? 300 : 0
-    )
+    // Long enough for the last character, which starts and stops latest, to settle
+    const start = setTimeout(() => setSpinning(true), 0)
+    const stop = setTimeout(() => setSpinning(false), 450 + value.length * 100)
 
-    return () => clearTimeout(stop)
-  }, [spinning, value])
+    return () => {
+      clearTimeout(start)
+      clearTimeout(stop)
+    }
+  }, [value, reduceMotion])
 
   return (
-    <div className="flex items-center leading-none text-text-light dark:text-text-dark">
-      {displayValue.split('').map((char, i) => (
-        <SlotChar key={i} targetChar={char} spinning={spinning} delay={i * 50} />
-      ))}
-    </div>
+    <span className="flex items-center leading-none text-text-light dark:text-text-dark">
+      <span className="sr-only">{value}</span>
+      <span className="flex items-center" aria-hidden="true">
+        {value.split('').map((char, i) => (
+          <SlotChar key={i} targetChar={char} spinning={spinning} delay={i * 50} />
+        ))}
+      </span>
+    </span>
   )
 }

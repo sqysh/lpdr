@@ -22,12 +22,11 @@ type Props = {
   minutes: number
   seconds: number
   done: boolean
-  trigger: number
   role?: Role | null
 }
 
 export function AuctionHeaderBand(props: Props) {
-  const { auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, trigger, role } = props
+  const { auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, role } = props
 
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
@@ -178,7 +177,7 @@ export function AuctionHeaderBand(props: Props) {
                   <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 xs:px-4 py-4">
                     <Icon size={11} className="text-muted-light dark:text-muted-dark mb-2" aria-hidden="true" />
                     {slot ? (
-                      <AuctionSlotValue value={value} trigger={trigger} />
+                      <AuctionSlotValue value={value} />
                     ) : (
                       <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">{value}</p>
                     )}
