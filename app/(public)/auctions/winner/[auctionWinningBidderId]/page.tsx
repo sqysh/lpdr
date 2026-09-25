@@ -26,10 +26,12 @@ export default async function AuctionWinnerPaymentPage({ params }: { params: Pro
 
   return (
     <AuctionWinnerPaymentClient
+      key={session?.user?.id ?? 'signed-out'}
       winningBidder={result.data}
       savedCards={paymentMethodsResult.data ?? []}
       userEmail={session.user.email ?? null}
       userId={session.user.id}
+      isAuthed={!!session?.user?.id}
     />
   )
 }

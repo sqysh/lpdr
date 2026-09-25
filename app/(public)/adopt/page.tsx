@@ -27,6 +27,7 @@ export default async function PreApplicationFlowPage() {
 
   return (
     <PreApplicationFlowClient
+      key={session?.user?.id ?? 'signed-out'}
       savedCards={paymentMethodsResult.data ?? []}
       userName={userNameResult.data ?? null}
       email={session?.user?.email}

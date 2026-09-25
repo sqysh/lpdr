@@ -12,6 +12,7 @@ import { IPaymentMethod } from 'types/payment-method.types'
 import { useConfettiStore } from 'stores/confetti.store'
 import { redeemBypassCodeSchema, RedeemBypassCodeInput, RedeemBypassCodeValues } from 'lib/schemas/adoption-fee.schema'
 import { redeemBypassCode } from 'lib/actions/adoption-fee/redeemBypassCode'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -34,6 +35,8 @@ export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email
 
   const [redeeming, setRedeeming] = useState(false)
   const [bypassError, setBypassError] = useState('')
+
+  useRefreshOnSignOut(isAuthed)
 
   const {
     register,
@@ -106,11 +109,7 @@ export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email
           )}
 
           {step === 'terms' && (
-            <PreApp2Terms
-              agreedToTerms={agreedToTerms}
-              handleContinueToInfo={handleContinueToInfo}
-              setAgreedToTerms={setAgreedToTerms}
-            />
+            <PreApp2Terms agreedToTerms={agreedToTerms} handleContinueToInfo={handleContinueToInfo} setAgreedToTerms={setAgreedToTerms} />
           )}
 
           {step === 'details' && (

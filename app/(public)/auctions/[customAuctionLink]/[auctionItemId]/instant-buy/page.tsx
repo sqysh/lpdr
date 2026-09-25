@@ -26,12 +26,14 @@ export default async function PublicAuctionInstantBuyPage({ params }: { params: 
 
   return (
     <PublicAuctionInstantBuyClient
+      key={session?.user?.id ?? 'signed-out'}
       auctionItem={auctionItem}
       savedCards={cardsResult.success ? (cardsResult.data ?? []) : []}
       userEmail={session?.user?.email ?? null}
       userName={userNameResult.data}
       userAddress={userAddressResult.data}
       userId={session?.user?.id ?? null}
+      isAuthed={!!session?.user?.id}
     />
   )
 }

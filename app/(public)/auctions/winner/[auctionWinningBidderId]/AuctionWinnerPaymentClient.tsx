@@ -11,6 +11,7 @@ import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
 import { PaymentHandlers, PaymentState } from './_types/auction-winner.types'
 import { IAuctionWinningBidder } from 'types/auction.types'
 import { AuctionWinnerPageHeader } from './_components/AuctionWinnerPageHeader'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 const EYEBROW = 'text-f10 uppercase tracking-[0.25em]'
 
@@ -19,9 +20,10 @@ interface Props {
   savedCards: IPaymentMethod[]
   userId: string
   userEmail: string | null
+  isAuthed: boolean
 }
 
-export default function AuctionWinnerPaymentClient({ winningBidder, savedCards, userId, userEmail }: Props) {
+export default function AuctionWinnerPaymentClient({ winningBidder, savedCards, userId, userEmail, isAuthed }: Props) {
   const { user, auction, auctionItems } = winningBidder
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ')
 
@@ -32,6 +34,8 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards, 
     billingName: fullName,
     billingEmail: userEmail ?? user.email ?? ''
   })
+
+  useRefreshOnSignOut(isAuthed)
 
   const alreadyPaid = winningBidder.winningBidPaymentStatus === 'PAID'
 

@@ -21,6 +21,7 @@ import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
 import { OrderType } from '@prisma/client'
 import { IAddress } from 'types/address.types'
 import { PaymentSection } from 'components/features/payment/PaymentSection'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 interface Props {
   auctionItem: IAuctionItemLive
@@ -29,10 +30,21 @@ interface Props {
   userName: { firstName: string; lastName: string } | null
   userAddress: Pick<IAddress, 'addressLine1' | 'addressLine2' | 'city' | 'state' | 'zipPostalCode'> | null
   userId: string
+  isAuthed: boolean
 }
 
-export default function PublicAuctionInstantBuyClient({ auctionItem, savedCards, userEmail, userName, userAddress, userId }: Props) {
+export default function PublicAuctionInstantBuyClient({
+  auctionItem,
+  savedCards,
+  userEmail,
+  userName,
+  userAddress,
+  userId,
+  isAuthed
+}: Props) {
   const router = useRouter()
+
+  useRefreshOnSignOut(isAuthed)
 
   const DEFAULT_VALUES = {
     firstName: userName?.firstName ?? '',

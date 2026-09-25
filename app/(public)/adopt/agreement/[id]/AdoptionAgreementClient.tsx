@@ -14,6 +14,7 @@ import { StatusPanel } from './_components/AgreementPrimitives'
 import { DevStepBar } from './_components/DevStepBar'
 import Link from 'next/link'
 import { LinkBody } from 'components/_common/LinkBody'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 export type AgreementData = NonNullable<Awaited<ReturnType<typeof getAdoptionAgreementForAdopter>>['data']>
 
@@ -27,6 +28,8 @@ export function AdoptionAgreementClient({ userId, savedCards, ...data }: Agreeme
   // What the page showed when it loaded. Signing is refused if the agreement has changed since
   const loadedAt = new Date(a.updatedAt).toISOString()
   const total = formatMoney(agreementTotal(a))
+
+  useRefreshOnSignOut(true)
 
   const step = (() => {
     if (a.status === 'PAID' || a.status === 'COMPLETE' || a.status === 'RETURNED') return 'done'

@@ -18,6 +18,7 @@ import { checkoutSchema, CheckoutFormInput, CheckoutFormValues } from 'lib/schem
 import { useCheckoutSteps } from '@hooks/useCheckoutSteps.hook'
 import { useCheckoutTotals } from '@hooks/useCheckoutTotals.hook'
 import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -30,6 +31,8 @@ type Props = {
 }
 
 export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuthed, email, userId }: Props) {
+  useRefreshOnSignOut(isAuthed)
+
   const items = useCartStore((s) => s.items)
 
   const {
@@ -95,9 +98,8 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
     : null
 
   const formattedShippingAddress = shippingAddress
-    ? [shippingAddress.addressLine1, shippingAddress.addressLine2, shippingAddress.city, shippingAddress.state]
-        .filter(Boolean)
-        .join(', ') + (shippingAddress.zipPostalCode ? ` ${shippingAddress.zipPostalCode}` : '')
+    ? [shippingAddress.addressLine1, shippingAddress.addressLine2, shippingAddress.city, shippingAddress.state].filter(Boolean).join(', ') +
+      (shippingAddress.zipPostalCode ? ` ${shippingAddress.zipPostalCode}` : '')
     : ''
 
   // ── Step navigation ───────────────────────────────────────────────────────
@@ -141,7 +143,7 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
           <Link
             href="/cart"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             <svg
               viewBox="0 0 24 24"
@@ -158,7 +160,7 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
           </Link>
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
               Little Paws Dachshund Rescue
             </p>
           </div>
@@ -188,14 +190,10 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
                       className="shrink-0 w-6 h-6 flex items-center justify-center bg-primary-light/10 dark:bg-primary-dark/10 border border-primary-light/30 dark:border-primary-dark/30 mt-0.5"
                       aria-hidden="true"
                     >
-                      <span className="text-[9px] font-mono font-bold text-primary-light dark:text-primary-dark uppercase">
-                        @
-                      </span>
+                      <span className="text-[9px] font-mono font-bold text-primary-light dark:text-primary-dark uppercase">@</span>
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-                        Ships to
-                      </p>
+                      <p className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark">Ships to</p>
                       <p className="text-xs font-mono text-text-light dark:text-text-dark">{formattedShippingAddress}</p>
                     </div>
                   </div>
@@ -206,9 +204,7 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
             <AnimatePresence mode="wait">
               {effectiveStep === 1 && <StepSignIn key="signin" redirectTo="/checkout" />}
 
-              {effectiveStep === 2 && (
-                <Step2Name key="name" register={register} errors={errors} control={control} onNext={handleNext} />
-              )}
+              {effectiveStep === 2 && <Step2Name key="name" register={register} errors={errors} control={control} onNext={handleNext} />}
 
               {effectiveStep === 3 && hasPhysical && (
                 <Step3Address

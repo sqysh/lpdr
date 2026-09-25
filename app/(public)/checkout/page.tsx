@@ -25,6 +25,7 @@ export default async function PublicCheckoutPage() {
 
   return (
     <PublicCheckoutClient
+      key={session?.user?.id ?? 'signed-out'}
       savedCards={savedPaymentMethods.data ?? []}
       userAddress={userAddress?.data}
       userName={userName?.data}

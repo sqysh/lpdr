@@ -18,6 +18,7 @@ import {
   AuctionItemTitleBlock
 } from './_components'
 import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 type Props = {
   item: PublicAuctionItem
@@ -29,6 +30,8 @@ type Props = {
 export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, currentUserId }: Props) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const searchParams = useSearchParams()
+
+  useRefreshOnSignOut(isAuthed)
 
   const router = useRouter()
   const routerRef = useRef(router)

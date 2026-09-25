@@ -9,6 +9,7 @@ import { getInitials } from 'lib/utils/user.utils'
 import { DonateForm } from './_components'
 import { LinkBody } from 'components/_common/LinkBody'
 import { MyPackAvatar } from '../../../components/_common/MyPackAvatar'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -20,6 +21,8 @@ type Props = {
 }
 
 export default function PublicDonateClient({ savedCards, userName, isAuthed, email, userImage, userId }: Props) {
+  useRefreshOnSignOut(isAuthed)
+
   return (
     <>
       {/* ── Thin sticky header ── */}
