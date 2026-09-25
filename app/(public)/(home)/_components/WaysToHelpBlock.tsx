@@ -45,7 +45,7 @@ const ROWS: HelpRow[] = [
     label: 'Monthly Sponsor',
     description: 'Set up a recurring monthly donation to support a dog in care',
     cost: '$10+ / mo',
-    href: '/donate',
+    href: '/subscriptions',
     cta: 'Sponsor'
   },
   {
@@ -69,7 +69,7 @@ const ROWS: HelpRow[] = [
     label: 'Adopt',
     description: 'Give a dachshund a forever home',
     cost: '$15 app fee',
-    href: '/dachshunds',
+    href: '/adopt',
     cta: 'Apply'
   },
   ...(new Date().getMonth() === 6
@@ -102,16 +102,13 @@ export const WaysToHelpBlock = () => {
       <div className="relative max-w-300 mx-auto">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-14 1200:mb-16 space-y-2">
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-            Ways to Help
-          </p>
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Ways to Help</p>
           <h2
             id="ways-to-help-heading"
             className="font-quicksand text-text-light dark:text-text-dark leading-tight"
             style={{ fontSize: 'clamp(1.5rem, 4vw, 3rem)' }}
           >
-            <span className="font-black">SUPPORT</span>{' '}
-            <span className="font-light">LITTLE PAWS RESCUE</span>
+            <span className="font-black">SUPPORT</span> <span className="font-light">LITTLE PAWS RESCUE</span>
           </h2>
         </div>
 
@@ -121,19 +118,13 @@ export const WaysToHelpBlock = () => {
           aria-hidden="true"
         >
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Initiative
-            </span>
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Initiative</span>
           </div>
           <div className="sm:w-36 shrink-0">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Cost
-            </span>
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Cost</span>
           </div>
           <div className="sm:w-40 shrink-0 flex sm:justify-end">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-              Action
-            </span>
+            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Action</span>
           </div>
         </div>
 
@@ -174,9 +165,7 @@ export const WaysToHelpBlock = () => {
                   <div className="sm:w-36 shrink-0">
                     <span
                       className={`text-[10px] font-mono tracking-[0.2em] uppercase tabular-nums ${
-                        row.free
-                          ? 'text-muted-light dark:text-muted-dark'
-                          : 'text-primary-light dark:text-primary-dark'
+                        row.free ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'
                       }`}
                     >
                       {row.cost}
