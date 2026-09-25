@@ -4,6 +4,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import { stampUserGeoFromRequest } from '../actions/_infra/stampUserGeoFromRequest'
+import { cookies } from 'next/headers'
 
 interface FacebookProfile extends Profile {
   first_name?: string | null
@@ -15,14 +16,35 @@ interface FacebookProfile extends Profile {
   }
 }
 
+/**
+ * Where the person was headed before Facebook, from the cookie NextAuth keeps for it. Only a path on
+ * this site is returned, so the value can't be used to send someone elsewhere.
+ */
+async function getIntendedPath() {
+  const store = await cookies()
+  const raw = store.get('__Secure-authjs.callback-url')?.value ?? store.get('authjs.callback-url')?.value
+  if (!raw) return null
+
+  try {
+    const url = new URL(raw, process.env.NEXT_PUBLIC_SITE_URL)
+    const path = url.pathname + url.search
+    return path.startsWith('/') && !path.startsWith('//') ? path : null
+  } catch {
+    return null
+  }
+}
+
 export async function handleFacebookCallback(user: User, account: Account, profile: FacebookProfile): Promise<boolean | string> {
   if (!user.email) {
+    const intended = await getIntendedPath()
+
     await createLog('warn', 'Facebook sign-in missing email', {
       location: ['facebook.callback.ts'],
-      facebookId: profile?.id
+      facebookId: profile?.id,
+      intended
     })
 
-    return '/auth/login?error=facebook-no-email'
+    return `/auth/login?error=facebook-no-email${intended ? `&callbackUrl=${encodeURIComponent(intended)}` : ''}`
   }
 
   try {

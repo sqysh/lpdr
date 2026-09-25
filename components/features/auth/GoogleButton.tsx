@@ -20,13 +20,10 @@ export function GoogleButton({ redirectTo }) {
       disabled={loading}
       whileHover={{ y: -1 }}
       whileTap={{ scale: 0.98 }}
-      className="w-full flex items-center justify-center gap-3 py-3 px-4 border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark hover:border-primary-light/50 dark:hover:border-primary-dark/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-60 disabled:cursor-not-allowed group"
+      className="w-full flex items-center justify-center min-h-11 gap-3 py-3 px-4 border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark hover:border-primary-light/50 dark:hover:border-primary-dark/50 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-60 disabled:cursor-not-allowed group"
     >
       {loading ? (
-        <Loader2
-          className="w-4 h-4 shrink-0 animate-spin text-muted-light dark:text-muted-dark"
-          aria-hidden="true"
-        />
+        <Loader2 className="w-4 h-4 shrink-0 animate-spin text-muted-light dark:text-muted-dark" aria-hidden="true" />
       ) : (
         <svg viewBox="0 0 24 24" className="w-4 h-4 shrink-0" aria-hidden="true">
           <path
@@ -47,7 +44,7 @@ export function GoogleButton({ redirectTo }) {
           />
         </svg>
       )}
-      <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-text-light dark:text-text-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors duration-200">
+      <span className="text-[10px] font-mono tracking-tag uppercase text-text-light dark:text-text-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors duration-200">
         {loading ? 'Redirecting...' : 'Continue with Google'}
       </span>
     </motion.button>

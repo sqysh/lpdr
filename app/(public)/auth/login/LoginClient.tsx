@@ -9,17 +9,25 @@ import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { ArrowLeft } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
 
-const ERROR_MESSAGES: Record<string, string> = {
-  'facebook-no-email': 'Facebook did not share an email address with us. Please use Google or a magic link instead.'
+const ERROR_MESSAGES: Record<string, { title: string; body: string }> = {
+  'facebook-no-email': {
+    title: "Facebook didn't share your email address",
+    body: 'We need it to send you bid updates and receipts. Continue with Google, or get a sign-in link by email below.'
+  }
 }
 
 export function LoginClient() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const searchParams = useSearchParams()
-  const errorMessage = ERROR_MESSAGES[searchParams.get('error') ?? '']
+  const errorKey = searchParams.get('error') ?? ''
+  const error = ERROR_MESSAGES[errorKey]
+  const facebookFailed = errorKey === 'facebook-no-email'
 
-  const redirectTo = searchParams.get('callbackUrl') || '/my-pack'
+  // Only a path on this site, so the value in the address bar can't send anyone elsewhere after signing in
+  const requested = searchParams.get('callbackUrl')
+  const redirectTo = requested?.startsWith('/') && !requested.startsWith('//') ? requested : '/my-pack'
+  const fromAuction = redirectTo.startsWith('/auctions')
 
   return (
     <main
@@ -48,7 +56,7 @@ export function LoginClient() {
             <Link
               href="/"
               className="inline-flex items-center gap-2 mb-4 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-              aria-label="Little Paws Dachshund Rescue — Home"
+              aria-label="Little Paws Dachshund Rescue, home"
             >
               <span className="block w-5.5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
               <span className="text-[10px] font-mono tracking-[0.25em] uppercase text-primary-light dark:text-primary-dark">
@@ -58,10 +66,10 @@ export function LoginClient() {
             </Link>
 
             <h1 className="font-quicksand font-black text-[30px] text-text-light dark:text-text-dark leading-none mb-1.5 tracking-tight">
-              Welcome back.
+              {fromAuction ? 'Sign in to bid.' : 'Welcome back.'}
             </h1>
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark tracking-eyebrow uppercase">
-              Sign in to your account to continue
+            <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark tracking-eyebrow uppercase">
+              {fromAuction ? "You'll go straight back to the auction" : 'Sign in to your account to continue'}
             </p>
           </div>
 
@@ -103,7 +111,7 @@ export function LoginClient() {
 
                   <div>
                     <p className="font-quicksand font-black text-xl text-text-light dark:text-text-dark mb-1">Check your email</p>
-                    <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">Magic link sent to</p>
+                    <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">Sign-in link sent to</p>
                     <p className="text-[12px] font-mono text-primary-light dark:text-primary-dark font-bold mt-0.5 truncate px-2">
                       {email}
                     </p>
@@ -111,7 +119,7 @@ export function LoginClient() {
 
                   <div className="w-full border border-border-light dark:border-border-dark bg-surface-light dark:bg-bg-dark px-4 py-3">
                     <p className="text-[11px] font-nunito text-text-light dark:text-text-dark leading-relaxed">
-                      Click the link in your email to sign in. It expires in <strong>15 minutes</strong>.
+                      Tap the link in your email to sign in. It expires in <strong>15 minutes</strong>.
                     </p>
                   </div>
 
@@ -138,15 +146,17 @@ export function LoginClient() {
                   exit={{ opacity: 0 }}
                   className="pt-6 px-6 pb-0 flex flex-col gap-3.5"
                 >
-                  {errorMessage && (
-                    <p role="alert" className="text-[11px] font-mono text-red-500 dark:text-red-400 leading-relaxed">
-                      {errorMessage}
-                    </p>
+                  {error && (
+                    <div role="alert" className="px-4 py-3 border border-amber-600/40 bg-amber-500/10 space-y-1">
+                      <p className="text-sm font-bold text-text-light dark:text-text-dark">{error.title}</p>
+                      <p className="text-[13px] text-muted-light dark:text-muted-dark leading-relaxed">{error.body}</p>
+                    </div>
                   )}
-                  {/* OAuth group */}
+
                   <div className="flex flex-col gap-2">
                     <GoogleButton redirectTo={redirectTo} />
-                    <FacebookButton redirectTo={redirectTo} />
+                    {/* Hidden after it failed, so the obvious next tap isn't the same dead end */}
+                    {!facebookFailed && <FacebookButton redirectTo={redirectTo} />}
                   </div>
 
                   {/* Divider */}

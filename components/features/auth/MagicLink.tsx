@@ -124,7 +124,7 @@ export function MagicLink({ email, setEmail, setSent, redirectTo }: Props) {
         ) : (
           <>
             <ArrowRight size={12} aria-hidden="true" />
-            Send Magic Link
+            Email me a sign-in link
           </>
         )}
       </motion.button>
