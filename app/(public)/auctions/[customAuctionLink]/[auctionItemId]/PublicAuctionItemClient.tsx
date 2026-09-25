@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { Gavel } from 'lucide-react'
-import { useSearchParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { Reveal } from 'components/_common/Reveal'
 import { AuctionSignInModal } from '../_components'
@@ -17,6 +17,7 @@ import {
   AuctionItemStickyBar,
   AuctionItemTitleBlock
 } from './_components'
+import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 type Props = {
   item: PublicAuctionItem
@@ -28,6 +29,9 @@ type Props = {
 export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, currentUserId }: Props) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const searchParams = useSearchParams()
+
+  const router = useRouter()
+  const routerRef = useRef(router)
 
   const isDraft = item?.auction?.status === 'DRAFT'
   const isActive = item?.auction?.status === 'ACTIVE'
@@ -48,6 +52,31 @@ export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, 
     if (searchParams.get('bidModal') !== 'true' || isAuthed) return
     openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`)
   }, [customAuctionLink, item.id, searchParams, isAuthed, openSignInModal])
+
+  useEffect(() => {
+    routerRef.current = router
+  }, [router])
+
+  // Bids come through useBidPanel on the item's own channel; the auction opening and closing are
+  // announced on the auction's channel, so an item page left open at 6am switches over by itself
+  const auctionId = item?.auction?.id
+
+  useEffect(() => {
+    if (!auctionId) return
+
+    const channelName = `auction-${auctionId}`
+    const channel = getPusherClient().subscribe(channelName)
+    const onStatusChanged = () => routerRef.current.refresh()
+
+    channel.bind('auction-started', onStatusChanged)
+    channel.bind('auction-ended', onStatusChanged)
+
+    return () => {
+      channel.unbind('auction-started', onStatusChanged)
+      channel.unbind('auction-ended', onStatusChanged)
+      releaseChannel(channelName)
+    }
+  }, [auctionId])
 
   return (
     <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark">
@@ -82,9 +111,9 @@ export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, 
               />
             </Reveal>
 
-            {isActive && (
+            {(isActive || isDraft) && (
               <Reveal index={3}>
-                <AuctionItemCountdown endDate={item.auction.endDate} />
+                <AuctionItemCountdown date={isDraft ? item.auction.startDate : item.auction.endDate} opens={isDraft} />
               </Reveal>
             )}
 

@@ -32,7 +32,6 @@ export function MigrationBanner({ initiallyPending }: { initiallyPending: boolea
 
     return () => {
       channel.unbind('migration-complete', onComplete)
-      pusher.unsubscribe(channelName)
       releaseChannel(channelName)
     }
   }, [userId, pending, router])

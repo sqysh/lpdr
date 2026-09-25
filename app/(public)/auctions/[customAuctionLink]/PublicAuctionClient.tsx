@@ -38,19 +38,31 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
     if (!auction.id) return
 
     const channelName = `auction-${auction.id}`
-    const pusher = getPusherClient()
-    const channel = pusher.subscribe(channelName)
+    const channel = getPusherClient().subscribe(channelName)
+    let pending: ReturnType<typeof setTimeout> | null = null
 
+    // Bids arrive in bursts near the end, and each refresh re-renders the whole auction on the server.
+    // Waiting a moment folds a burst into one refresh per viewer instead of one per bid
     const onBidPlaced = () => {
-      routerRef.current.refresh()
       setSlotTrigger((t) => t + 1)
+      if (pending) return
+      pending = setTimeout(() => {
+        pending = null
+        routerRef.current.refresh()
+      }, 1500)
     }
 
+    const onStatusChanged = () => routerRef.current.refresh()
+
     channel.bind('bid-placed', onBidPlaced)
+    channel.bind('auction-started', onStatusChanged)
+    channel.bind('auction-ended', onStatusChanged)
 
     return () => {
+      if (pending) clearTimeout(pending)
       channel.unbind('bid-placed', onBidPlaced)
-      pusher.unsubscribe(channelName)
+      channel.unbind('auction-started', onStatusChanged)
+      channel.unbind('auction-ended', onStatusChanged)
       releaseChannel(channelName)
     }
   }, [auction.id])

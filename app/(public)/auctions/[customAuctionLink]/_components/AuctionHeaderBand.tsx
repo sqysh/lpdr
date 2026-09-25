@@ -3,13 +3,14 @@ import { useRef } from 'react'
 import Link from 'next/link'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
-import { Clock, TrendingUp, Users, Package, ArrowLeft } from 'lucide-react'
+import { Clock, TrendingUp, Users, Package, ArrowLeft, Settings2 } from 'lucide-react'
 import { motion, useInView } from 'framer-motion'
 import { CountUnit } from 'components/_primitives'
 import { PublicAuction } from 'types/auction.types'
 import { getDisplayRevenue } from 'lib/utils/auction.utils'
 import { AuctionSlotValue } from './AuctionSlotValue'
 import { LinkBody } from 'components/_common/LinkBody'
+import { Role } from '@prisma/client'
 
 type Props = {
   auction: PublicAuction
@@ -22,15 +23,18 @@ type Props = {
   seconds: number
   done: boolean
   trigger: number
+  role?: Role | null
 }
 
 export function AuctionHeaderBand(props: Props) {
-  const { auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, trigger } = props
+  const { auction, isActive, isEnded, isDraft, days, hours, minutes, seconds, done, trigger, role } = props
 
   const headerRef = useRef(null)
   const headerInView = useInView(headerRef, { once: true })
   const displayRevenue = getDisplayRevenue(auction)
   const pct = getProgressPct(displayRevenue, auction.goal)
+
+  const canManage = role === 'ADMIN' || role === 'SUPER_USER'
 
   return (
     <section
@@ -44,15 +48,24 @@ export function AuctionHeaderBand(props: Props) {
           initial={{ opacity: 0, x: -12 }}
           animate={headerInView ? { opacity: 1, x: 0 } : {}}
           transition={{ duration: 0.35 }}
-          className="mb-6"
+          className="flex items-center justify-between gap-4 mb-6"
         >
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:underline"
-            aria-label="Back to all auctions"
+            className="inline-flex items-center gap-2 py-2 text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:underline"
           >
             <LinkBody icon={<ArrowLeft size={12} aria-hidden="true" />} label="Back to site" />
           </Link>
+
+          {/* Whatever the status, since an ended auction is when the crew most needs winners and fulfilment */}
+          {canManage && (
+            <Link
+              href={`/admin/auctions/${auction.id}`}
+              className="inline-flex items-center gap-2 py-2 px-3 border border-primary-light/30 dark:border-primary-dark/30 text-[10px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            >
+              <LinkBody icon={<Settings2 size={12} aria-hidden="true" />} label="Manage auction" />
+            </Link>
+          )}
         </motion.div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-20 items-start">
@@ -69,9 +82,11 @@ export function AuctionHeaderBand(props: Props) {
                 aria-hidden="true"
               />
               <div className="flex items-center gap-2">
-                {isActive && <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />}
+                {isActive && (
+                  <span className="w-1.5 h-1.5 bg-emerald-600 dark:bg-emerald-500 motion-safe:animate-pulse" aria-hidden="true" />
+                )}
                 <span
-                  className={`text-[10px] font-mono tracking-eyebrow uppercase ${isActive ? 'text-emerald-500' : 'text-primary-light dark:text-primary-dark'}`}
+                  className={`text-[10px] font-mono tracking-eyebrow uppercase ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-primary-light dark:text-primary-dark'}`}
                 >
                   {isActive ? 'Live Now' : isEnded ? 'Auction Ended' : 'Upcoming'}
                 </span>
@@ -94,7 +109,9 @@ export function AuctionHeaderBand(props: Props) {
               transition={{ duration: 0.4, delay: 0.16 }}
               className="text-[10px] font-mono text-muted-light dark:text-muted-dark"
             >
-              {isDraft ? `Opens ${formatDate(auction.startDate)}` : `${formatDate(auction.startDate)} — ${formatDate(auction.endDate)}`}
+              {isDraft
+                ? `Opens ${formatDate(auction.startDate, true)}`
+                : `${formatDate(auction.startDate)} to ${formatDate(auction.endDate)}`}
             </motion.p>
           </div>
 
@@ -110,15 +127,14 @@ export function AuctionHeaderBand(props: Props) {
               <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-5">
                 <div className="flex items-center gap-2 mb-4">
                   <Clock size={11} className="text-muted-light dark:text-muted-dark" aria-hidden="true" />
-                  <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
+                  <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                     {isDraft ? 'Opens In' : 'Closing In'}
                   </span>
                 </div>
                 <div
+                  role="timer"
                   className="flex items-end gap-4 xs:gap-6"
-                  aria-label={`${days} days ${hours} hours ${minutes} minutes ${seconds} seconds ${isDraft ? 'until bidding opens' : 'remaining'}`}
-                  aria-live="polite"
-                  aria-atomic="true"
+                  aria-label={`${days} days ${hours} hours ${minutes} minutes ${isDraft ? 'until bidding opens' : 'remaining'}`}
                 >
                   {days > 0 && <CountUnit value={days} label="days" size="sm" />}
                   <CountUnit value={hours} label="hrs" size="sm" />
@@ -138,7 +154,7 @@ export function AuctionHeaderBand(props: Props) {
                   <div key={label} className="bg-bg-light dark:bg-bg-dark px-3 xs:px-4 py-4">
                     <Icon size={11} className="text-muted-light dark:text-muted-dark mb-2" aria-hidden="true" />
                     <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">{value}</p>
-                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
+                    <p className="text-[10px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
                   </div>
                 ))}
               </div>
@@ -166,7 +182,7 @@ export function AuctionHeaderBand(props: Props) {
                     ) : (
                       <p className="font-mono font-black text-sm xs:text-base text-text-light dark:text-text-dark leading-none">{value}</p>
                     )}
-                    <p className="text-[9px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
+                    <p className="text-[10px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark mt-1">{label}</p>
                   </div>
                 ))}
               </div>
@@ -186,6 +202,7 @@ export function AuctionHeaderBand(props: Props) {
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-label={`${pct}% of goal reached`}
+                  aria-valuetext={`${formatMoney(displayRevenue)} raised of ${formatMoney(auction.goal)}`}
                 >
                   <motion.div
                     initial={{ width: 0 }}

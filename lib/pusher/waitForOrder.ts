@@ -64,7 +64,6 @@ export function waitForOrder(channelKey: string, router: AppRouterInstance): Pro
       channel.unbind('order-created', onCreated)
       channel.unbind('order-failed', onFailed)
       channel.unbind('pusher:subscription_error', onSubscriptionError)
-      pusher.unsubscribe(channelName)
       releaseChannel(channelName)
     }
 

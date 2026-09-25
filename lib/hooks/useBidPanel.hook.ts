@@ -34,6 +34,7 @@ export function useBidPanel(item: PublicAuctionItem) {
 
   const inputRef = useRef<HTMLInputElement>(null)
   const confirmTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inFlight = useRef(false)
 
   // Auction figures only ever climb, so the highest of the two sources is the current truth.
   // That makes a refresh and a Pusher event self-reconciling whichever order they arrive in.
@@ -67,7 +68,6 @@ export function useBidPanel(item: PublicAuctionItem) {
 
     return () => {
       channel.unbind('bid-placed', onBidPlaced)
-      pusher.unsubscribe(channelName)
       releaseChannel(channelName)
     }
   }, [item?.id])
@@ -79,28 +79,35 @@ export function useBidPanel(item: PublicAuctionItem) {
 
   /** One submit path for both buttons, so the two can't drift on error handling. */
   const submit = async (amount: number, kind: 'quick' | 'custom') => {
+    // A ref, not the submitting state: a fast double tap can land both taps before the re-render disables the button
+    if (inFlight.current) return
+    inFlight.current = true
+
     setError(null)
     setRaceCondition(null)
     setSubmitting(kind)
 
-    const result = await placeBid(item.id, amount)
+    try {
+      const result = await placeBid(item.id, amount)
 
-    setSubmitting(null)
-
-    if (!result.success) {
-      if (result.error === 'LOCK_NOT_ACQUIRED' && result.data?.newMinimumBid) {
-        setRaceCondition({ newMinimumBid: result.data.newMinimumBid, currentBid: result.data.currentBid })
+      if (!result.success) {
+        if (result.error === 'LOCK_NOT_ACQUIRED' && result.data?.newMinimumBid) {
+          setRaceCondition({ newMinimumBid: result.data.newMinimumBid, currentBid: result.data.currentBid })
+          return
+        }
+        setError(result.error ?? 'Unable to place bid. Please try again.')
         return
       }
-      setError(result.error ?? 'Unable to place bid. Please try again.')
-      return
-    }
 
-    play('se1')
-    showConfetti()
-    setPlacedBidAmount(amount)
-    setCustomAmount('')
-    router.refresh()
+      play('se1')
+      showConfetti()
+      setPlacedBidAmount(amount)
+      setCustomAmount('')
+      router.refresh()
+    } finally {
+      inFlight.current = false
+      setSubmitting(null)
+    }
   }
 
   /** First press arms, second places. Quick bid has no amount to review before it commits. */

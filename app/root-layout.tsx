@@ -14,6 +14,7 @@ import PublicContactModal from './(public)/(home)/_components/PublicContactModal
 import { HIDDEN_PATHS } from 'lib/constants/navigation.constants'
 import { stripePromise } from 'lib/stripe/stripe-promise'
 import { useSyncTheme } from 'stores/theme.store'
+import { MotionConfig } from 'framer-motion'
 
 interface Props {
   children: ReactNode
@@ -30,20 +31,22 @@ export function RootLayoutWrapper({ children, header, navDrawer }: Props) {
   useSyncTheme()
 
   return (
-    <Elements stripe={stripePromise}>
-      <Suspense fallback={null}>
-        <AuthRedirectWatcher />
-      </Suspense>
-      <CookieConsentBanner />
-      <FixedDonateTab />
-      <Confetti3D />
-      <CartBar />
-      <CartToast />
-      <PublicContactModal />
-      <Suspense fallback={null}>{navDrawer}</Suspense>
-      {!isHidden && header}
-      {children}
-      {!isHidden && <Footer />}
-    </Elements>
+    <MotionConfig reducedMotion="user">
+      <Elements stripe={stripePromise}>
+        <Suspense fallback={null}>
+          <AuthRedirectWatcher />
+        </Suspense>
+        <CookieConsentBanner />
+        <FixedDonateTab />
+        <Confetti3D />
+        <CartBar />
+        <CartToast />
+        <PublicContactModal />
+        <Suspense fallback={null}>{navDrawer}</Suspense>
+        {!isHidden && header}
+        {children}
+        {!isHidden && <Footer />}
+      </Elements>
+    </MotionConfig>
   )
 }

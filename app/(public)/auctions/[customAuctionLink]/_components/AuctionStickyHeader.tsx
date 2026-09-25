@@ -5,7 +5,9 @@ import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { PublicAuction } from 'types/auction.types'
 
 const ACTION =
-  'flex items-center gap-1.5 text-f10 font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'flex items-center gap-1.5 h-12 px-1 text-f10 font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+
+const Arrow = () => <span aria-hidden="true">→</span>
 
 type Props = {
   auction: PublicAuction
@@ -18,21 +20,15 @@ type Props = {
   isEnded: boolean
   isAuthed: boolean
   isDraft: boolean
-  role: Role
 }
 
 function Divider() {
   return <span className="w-px h-3.5 bg-border-light dark:bg-border-dark" aria-hidden="true" />
 }
 
-export function AuctionStickyHeader({ auction, isActive, done, days, hours, minutes, seconds, isEnded, isAuthed, isDraft, role }: Props) {
+export function AuctionStickyHeader({ auction, isActive, done, days, hours, minutes, seconds, isEnded, isAuthed, isDraft }: Props) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const isLive = isActive || isDraft
-
-  // Straight to this auction's admin page rather than the dashboard root: the crew reaches this
-  // page by clicking through from the public site, and the thing they want is the one they are
-  // looking at.
-  const canManage = role === 'ADMIN' || role === 'SUPER_USER'
 
   return (
     <div
@@ -45,9 +41,15 @@ export function AuctionStickyHeader({ auction, isActive, done, days, hours, minu
 
         <div className="flex items-center gap-4 shrink-0">
           {isLive && !done && (
-            <div className="flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 bg-emerald-500 animate-pulse" aria-hidden="true" />
-              <span className="text-f10 font-mono text-emerald-500 tabular-nums">
+            // A copy of the timer in the header band below, so screen readers only hear that one
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              <span
+                className={`w-1.5 h-1.5 motion-safe:animate-pulse ${isActive ? 'bg-emerald-600 dark:bg-emerald-500' : 'bg-primary-light dark:bg-primary-dark'}`}
+              />
+              <span
+                className={`text-f10 font-mono tabular-nums ${isActive ? 'text-emerald-700 dark:text-emerald-400' : 'text-primary-light dark:text-primary-dark'}`}
+              >
+                {isDraft && 'Opens in '}
                 {days > 0 ? `${days}d ` : ''}
                 {String(hours).padStart(2, '0')}:{String(minutes).padStart(2, '0')}:{String(seconds).padStart(2, '0')}
               </span>
@@ -56,27 +58,17 @@ export function AuctionStickyHeader({ auction, isActive, done, days, hours, minu
 
           {isEnded && <span className="text-f10 font-mono text-muted-light dark:text-muted-dark">Auction Ended</span>}
 
-          {/* Shown whatever the auction's status, since an ended auction is exactly when the crew
-              needs the admin page for winners and fulfilment. */}
-          {canManage && (
-            <>
-              <Divider />
-              <Link href={`/admin/auctions/${auction.id}`} className={ACTION}>
-                <LinkSpinner label="Manage →" />
-              </Link>
-            </>
-          )}
-
           {isLive && (
             <>
               <Divider />
               {isAuthed ? (
                 <Link href="/my-pack" className={ACTION}>
-                  <LinkSpinner label="My Pack →" />
+                  <LinkSpinner label="My Pack" />
+                  <Arrow />
                 </Link>
               ) : (
                 <button type="button" onClick={() => openSignInModal(`/auctions/${auction.customAuctionLink}`)} className={ACTION}>
-                  Sign in →
+                  Sign in <Arrow />
                 </button>
               )}
             </>

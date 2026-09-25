@@ -243,7 +243,6 @@ export function LiveActionsFeed() {
 
     return () => {
       channel.unbind_global(onEvent)
-      pusher.unsubscribe(SUPER_USER_CHANNEL)
       releaseChannel(SUPER_USER_CHANNEL)
     }
   }, [])
