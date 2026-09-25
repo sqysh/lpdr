@@ -47,10 +47,10 @@ export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
         if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setFocused(false)
       }}
     >
-      <HeroBackground />
+      <HeroBackground paused={stopped || !!reduceMotion} />
       <div className="max-w-180 1000:max-w-240 1200:max-w-300 mx-auto relative z-10 flex h-full min-h-[inherit] flex-col justify-between">
         <SlideContent slide={slide} index={current} total={SLIDES.length} />
-        <div className="relative z-10 w-full bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark">
+        <div className="relative z-10 w-full bg-navbar-light dark:bg-navbar-dark">
           <HeroMobileBar
             current={current}
             goNext={goNext}

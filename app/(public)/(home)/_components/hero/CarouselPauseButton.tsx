@@ -6,9 +6,9 @@ export function CarouselPauseButton({ stopped, onToggle }: { stopped: boolean; o
       type="button"
       onClick={onToggle}
       aria-label={stopped ? 'Play slideshow' : 'Pause slideshow'}
-      className="w-11 h-11 flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+      className="w-8 h-8 shrink-0 flex items-center justify-center border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
     >
-      {stopped ? <Play size={14} aria-hidden="true" /> : <Pause size={14} aria-hidden="true" />}
+      {stopped ? <Play size={12} aria-hidden="true" /> : <Pause size={12} aria-hidden="true" />}
     </button>
   )
 }

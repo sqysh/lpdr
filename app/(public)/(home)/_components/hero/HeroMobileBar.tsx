@@ -26,7 +26,7 @@ export function HeroMobileBar({
     <div className="968:hidden">
       {/* Thin horizontal countdown */}
       <div className="border-b border-border-light dark:border-border-dark">
-        {hasEvent ? <AuctionCountdown auction={auction} variant="horizontal" /> : <></>}
+        {hasEvent ? <AuctionCountdown auction={auction} variant="horizontal" /> : null}
       </div>
 
       {/* Dots / counter / arrows row */}
@@ -34,15 +34,16 @@ export function HeroMobileBar({
         <CarouselPauseButton stopped={stopped} onToggle={onToggleStopped} />
 
         {/* Dots */}
-        <div className="flex items-center gap-2 min-[400px]:gap-3 shrink" role="tablist" aria-label="Slide indicators">
+        <div className="flex items-center gap-1 shrink" aria-label="Slides">
           {SLIDES.map((s, i) => (
             <button
               key={s.id}
-              role="tab"
-              aria-selected={i === current}
-              aria-label={`Go to slide ${i + 1}`}
+              type="button"
+              aria-current={i === current ? 'true' : undefined}
+              aria-label={`Slide ${i + 1} of ${SLIDES.length}`}
               onClick={() => goTo(i)}
-              className="relative flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              // The visible dot is tiny, so the button around it is 24px to be tappable
+              className="w-6 h-6 flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               {i === current ? (
                 <span className="relative flex items-center justify-center w-4 h-4" aria-hidden="true">
@@ -50,10 +51,7 @@ export function HeroMobileBar({
                   <span className="w-1.5 h-1.5 bg-primary-light dark:bg-primary-dark" />
                 </span>
               ) : (
-                <span
-                  className="w-1.5 h-1.5 bg-muted-light/40 dark:bg-on-dark/40 hover:bg-primary-light dark:hover:bg-primary-dark transition-colors"
-                  aria-hidden="true"
-                />
+                <span className="w-1.5 h-1.5 bg-muted-light/40 dark:bg-on-dark/40 transition-colors" aria-hidden="true" />
               )}
             </button>
           ))}
@@ -62,8 +60,7 @@ export function HeroMobileBar({
         {/* Counter */}
         <span
           className="hidden min-[360px]:inline text-[10px] font-mono tracking-eyebrow tabular-nums text-muted-light dark:text-muted-dark shrink-0"
-          aria-live="polite"
-          aria-atomic="true"
+          aria-hidden="true"
         >
           {String(current + 1).padStart(2, '0')} / {String(SLIDES.length).padStart(2, '0')}
         </span>
@@ -72,6 +69,7 @@ export function HeroMobileBar({
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={goPrev}
+            type="button"
             aria-label="Previous slide"
             className="w-8 h-8 flex items-center justify-center border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
@@ -91,6 +89,7 @@ export function HeroMobileBar({
           </button>
           <button
             onClick={goNext}
+            type="button"
             aria-label="Next slide"
             className="w-8 h-8 flex items-center justify-center border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
