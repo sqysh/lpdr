@@ -8,11 +8,11 @@ import AdminHeaderButton from 'app/(authenticated)/admin/_components/AdminHeader
 import { Stat } from 'app/(authenticated)/admin/_components/Stat'
 import AdminEmptyState from 'app/(authenticated)/admin/_components/AdminEmptyState'
 import AdminFilterTabs from 'app/(authenticated)/admin/_components/AdminFilterTabs'
-import { AUCTION_FILTERS } from 'lib/constants/auction.constants'
 import { IAuction } from 'types/auction.types'
 import { AdminAuctionCard } from './_components/AdminAuctionCard'
 import { groupByYearAndQuarter } from './_lib/groupByYearAndQuarter'
 import { CreateAuctionModal } from './_components/CreateAuctionModal'
+import { AUCTION_STATUS_FILTERS } from 'lib/constants/auction.constants'
 
 export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[] }) {
   const [filter, setFilter] = useState('ALL')
@@ -54,7 +54,7 @@ export default function AdminAuctionsClient({ auctions }: { auctions: IAuction[]
 
           {/* Filter tabs */}
           <AdminFilterTabs
-            options={AUCTION_FILTERS}
+            options={AUCTION_STATUS_FILTERS}
             value={filter}
             onChange={setFilter}
             counts={counts}

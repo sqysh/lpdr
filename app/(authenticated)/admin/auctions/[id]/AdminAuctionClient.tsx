@@ -1,11 +1,11 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { IAuctionDetail, AuctionTab } from 'types/auction.types'
+import { IAuctionDetail } from 'types/auction.types'
 import { formatDate } from 'lib/utils/date.utils'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getAuctionStatusConfig } from 'lib/utils/auction.utils'
-import { TABS } from 'lib/constants/auction.constants'
+import { TABS, type AuctionTab } from '../_lib/admin-auction.constants'
 import { Check, Copy, ExternalLink } from 'lucide-react'
 import { useEffect, useRef, useState, useTransition } from 'react'
 import { OverviewTab } from './_components/OverviewTab'
@@ -15,7 +15,7 @@ import { BiddersTab } from './_components/BiddersTab'
 import { WinningBiddersTab } from './_components/WinningBiddersTab'
 import { TopBar } from './_components/TopBar'
 import { Tabs } from './_components/Tabs'
-import { Role } from '@prisma/client'
+import { AuctionStatus, Role } from '@prisma/client'
 import { useStatusMessage } from '@hooks/useStatusMessage.hook'
 import { toggleAuctionVisibility } from 'lib/actions/admin/auction/toggleAuctionVisibility'
 import { StatusMessage } from 'components/_primitives/StatusMessage'
@@ -82,7 +82,7 @@ export default function AdminAuctionClient({ auction, role, signups }: { auction
   }
 
   const statusConfig = getAuctionStatusConfig(auction.status)
-  const visibleTabs = TABS.filter((t) => t.statuses.includes(auction.status))
+  const visibleTabs = TABS.filter((t) => (t.statuses as readonly AuctionStatus[]).includes(auction.status))
 
   const tabSlug = (label: string) => label.toLowerCase().replace(/\s+/g, '-')
   const param = searchParams.get('tab')

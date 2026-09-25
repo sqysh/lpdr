@@ -1,5 +1,4 @@
 import { Prisma } from '@prisma/client'
-import { TABS } from 'lib/constants/auction.constants'
 import { bidSelect, userContactSelect, userPublicSelect } from './prisma-selects.types'
 import { DecimalToNumber } from './prisma.types'
 
@@ -143,8 +142,6 @@ export const auctionItemDetailArgs = Prisma.validator<Prisma.AuctionItemDefaultA
 })
 
 export type IAuctionItemDetail = DecimalToNumber<Prisma.AuctionItemGetPayload<typeof auctionItemDetailArgs>>
-
-export type AuctionTab = (typeof TABS)[number]['label']
 
 // ─── Winner payment page ──────────────────────────────────────────────────
 

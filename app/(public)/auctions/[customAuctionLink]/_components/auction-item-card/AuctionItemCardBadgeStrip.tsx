@@ -1,38 +1,29 @@
-import { Gavel, Tag } from 'lucide-react'
+import { Tag } from 'lucide-react'
 
-export function AuctionItemCardBadgeStrip({ isEnded, isSold, isUpcoming, item }) {
-  const ribbonLabel = isSold ? 'Sold' : isEnded ? 'Ended' : isUpcoming ? 'Upcoming' : null
+/**
+ * Only what's true of this item and not the whole auction: Buy Now, since nearly everything is an
+ * auction, and Sold. Status like upcoming or ended is already said by the page header.
+ */
+export function AuctionItemCardBadgeStrip({ isSold, item }) {
+  const isFixed = item.sellingFormat === 'FIXED'
+  if (!isFixed && !isSold) return null
+
   return (
-    <div className="absolute top-3 left-3 z-10 flex items-stretch bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark">
-      <div className="px-2 py-1 flex items-center gap-1.5">
-        {item.sellingFormat === 'FIXED' ? (
-          <Tag size={9} aria-hidden="true" className="text-muted-light dark:text-muted-dark" />
-        ) : (
-          <Gavel size={9} aria-hidden="true" className="text-primary-light dark:text-primary-dark" />
-        )}
+    <div className="absolute top-2.5 left-2.5 z-10 flex items-stretch bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm border border-border-light dark:border-border-dark">
+      {isFixed && (
+        <span className="px-2 py-1 flex items-center gap-1.5 text-[10px] font-mono tracking-tag uppercase font-black text-text-light dark:text-text-dark">
+          <Tag size={10} aria-hidden="true" />
+          Buy Now
+        </span>
+      )}
+      {isSold && (
         <span
-          className={`text-[9px] font-mono tracking-eyebrow uppercase font-black ${
-            item.sellingFormat === 'FIXED' ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'
+          className={`px-2 py-1 flex items-center text-[10px] font-mono tracking-tag uppercase font-black text-emerald-700 dark:text-emerald-400 ${
+            isFixed ? 'border-l border-border-light dark:border-border-dark' : ''
           }`}
         >
-          {item.sellingFormat === 'FIXED' ? 'Buy Now' : 'Auction'}
+          Sold
         </span>
-      </div>
-
-      {ribbonLabel && (
-        <div className="px-2 py-1 flex items-center border-l border-border-light dark:border-border-dark">
-          <span
-            className={`text-[9px] font-mono tracking-eyebrow uppercase font-black ${
-              isSold
-                ? 'text-emerald-500'
-                : isUpcoming
-                  ? 'text-primary-light dark:text-primary-dark'
-                  : 'text-muted-light dark:text-muted-dark'
-            }`}
-          >
-            {ribbonLabel}
-          </span>
-        </div>
       )}
     </div>
   )

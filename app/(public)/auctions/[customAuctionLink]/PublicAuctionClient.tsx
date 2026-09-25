@@ -7,12 +7,13 @@ import { PublicAuction } from 'types/auction.types'
 import { AuctionCountdown, AuctionEmptyState, AuctionHowItWorks, AuctionItemGrid, AuctionSignInModal, AuctionSoldGrid } from './_components'
 import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
 import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
+import { AUCTION_FILTERS, AuctionFilter, matchesFilter } from './_lib/auction-filters'
 
 export default function PublicAuctionClient({ auction, myBids }: { auction: PublicAuction; myBids: Record<string, MyBid> }) {
   const session = useSession()
   const router = useRouter()
   const routerRef = useRef(router)
-  const [filter, setFilter] = useState<'ALL' | 'AUCTION' | 'FIXED' | 'NO BIDS'>('ALL')
+  const [filter, setFilter] = useState<AuctionFilter>('ALL')
   const [slotTrigger, setSlotTrigger] = useState(0)
 
   const isAuthed = session.status === 'authenticated'
@@ -24,11 +25,10 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
   const available = auction.items.filter((i) => i.status !== 'SOLD')
   const sold = auction.items.filter((i) => i.status === 'SOLD')
 
-  const filtered = available.filter((item) => {
-    if (filter === 'ALL') return true
-    if (filter === 'NO BIDS') return item._count?.bids === 0 && item.sellingFormat !== 'FIXED'
-    return item.sellingFormat === filter
-  })
+  const filtered = available.filter((item) => matchesFilter(item, filter, myBids))
+  const counts = Object.fromEntries(
+    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
+  ) as Record<AuctionFilter, number>
 
   useEffect(() => {
     routerRef.current = router
@@ -93,6 +93,7 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
             setSlotTrigger={setSlotTrigger}
             myBids={myBids}
             isAuthed={isAuthed}
+            counts={counts}
           />
           <AuctionSoldGrid
             auction={auction}
@@ -102,7 +103,7 @@ export default function PublicAuctionClient({ auction, myBids }: { auction: Publ
             isAuthed={isAuthed}
           />
           <AuctionEmptyState auction={auction} />
-          <AuctionHowItWorks isActive={isActive} />
+          <AuctionHowItWorks isEnded={isEnded} />
         </div>
       </main>
     </>

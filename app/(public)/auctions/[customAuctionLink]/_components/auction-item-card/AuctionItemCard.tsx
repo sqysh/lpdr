@@ -1,16 +1,23 @@
+'use client'
+
+import { useEffect, useRef, useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion, useInView } from 'framer-motion'
+import { AuctionStatus } from '@prisma/client'
 import { useSounds } from 'lib/hooks/useSounds.hook'
 import { placeBid } from 'lib/actions/user/auction/placeBid'
-import { useInView, motion } from 'framer-motion'
-import { useRouter } from 'next/navigation'
-import { useRef, useState } from 'react'
+import { formatMoney } from 'lib/utils/currency.utils'
+import { QUICK_BID_INCREMENT } from 'lib/constants/auction.constants'
 import { PublicAuctionItem } from 'types/auction.types'
-import { AuctionStatus } from '@prisma/client'
 import { useConfettiStore } from 'stores/confetti.store'
-import { AuctionItemCardInfo } from './AuctionItemCardInfo'
+import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
+import { AuctionItemCardInfo } from './AuctionItemCardInfo'
 import { AuctionItemCardPhoto } from './AuctionItemCardPhoto'
 import { AuctionItemCardBadgeStrip } from './AuctionItemCardBadgeStrip'
-import { useAuctionUiStore } from 'stores/auction-ui.store'
+
+// Matches the item page's quick bid, so arming on either feels the same
+const CONFIRM_WINDOW_MS = 5000
 
 type Props = {
   item: PublicAuctionItem
@@ -26,18 +33,28 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
   const router = useRouter()
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
-  const [quickBidLoading, setQuickBidLoading] = useState(false)
-  const [quickBidError, setQuickBidError] = useState<string | null>(null)
-  const [confirming, setConfirming] = useState(false)
   const { play } = useSounds()
   const showConfetti = useConfettiStore((s) => s.show)
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
 
-  const quickBidAmount = Number(item.currentBid ?? item.startingPrice ?? 0) + 10
+  const [quickBidLoading, setQuickBidLoading] = useState(false)
+  const [quickBidError, setQuickBidError] = useState<string | null>(null)
+  const [confirming, setConfirming] = useState(false)
+
+  const confirmTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const inFlight = useRef(false)
+
+  const quickBidAmount = Number(item.currentBid ?? item.startingPrice ?? 0) + QUICK_BID_INCREMENT
 
   const isEnded = auctionStatus === 'ENDED'
   const isUpcoming = auctionStatus === 'DRAFT'
   const isSold = item.status === 'SOLD'
+
+  useEffect(() => {
+    return () => {
+      if (confirmTimeout.current) clearTimeout(confirmTimeout.current)
+    }
+  }, [])
 
   const handleQuickBid = async () => {
     if (!isAuthed) {
@@ -45,31 +62,43 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
       return
     }
 
+    // A ref, not the loading state: a fast double tap can land both taps before the re-render disables the button
+    if (inFlight.current) return
+
     if (!confirming) {
+      setQuickBidError(null)
       setConfirming(true)
-      setTimeout(() => setConfirming(false), 7000)
+      if (confirmTimeout.current) clearTimeout(confirmTimeout.current)
+      confirmTimeout.current = setTimeout(() => setConfirming(false), CONFIRM_WINDOW_MS)
       return
     }
 
+    if (confirmTimeout.current) clearTimeout(confirmTimeout.current)
     setConfirming(false)
+
+    inFlight.current = true
     setQuickBidLoading(true)
     setQuickBidError(null)
 
-    const result = await placeBid(item.id, quickBidAmount)
+    try {
+      const result = await placeBid(item.id, quickBidAmount)
 
-    setQuickBidLoading(false)
+      if (!result.success) {
+        setQuickBidError(
+          result.error === 'LOCK_NOT_ACQUIRED'
+            ? `Someone just bid. The next bid is now ${formatMoney(Number(result.data?.newMinimumBid ?? quickBidAmount))}. Try again.`
+            : (result.error ?? 'Something went wrong.')
+        )
+        return
+      }
 
-    if (result.success) {
       play('se2')
       onBidSuccess?.()
       showConfetti()
       router.refresh()
-    } else {
-      setQuickBidError(
-        result.error === 'LOCK_NOT_ACQUIRED'
-          ? `Bid updated to $${result.data?.newMinimumBid ?? quickBidAmount}. Try again.`
-          : (result.error ?? 'Something went wrong.')
-      )
+    } finally {
+      inFlight.current = false
+      setQuickBidLoading(false)
     }
   }
 
@@ -77,16 +106,13 @@ export function AuctionItemCard({ item, auctionStatus, index, customAuctionLink,
     <motion.article
       ref={ref}
       initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
+      animate={inView ? { opacity: 1, y: 0 } : undefined}
       transition={{ duration: 0.45, delay: (index % 3) * 0.07, ease: [0.25, 0.46, 0.45, 0.94] }}
       aria-label={item.name}
-      className="group relative bg-bg-light dark:bg-bg-dark border border-border-light dark:border-border-dark overflow-hidden flex flex-col h-full"
+      className="group relative bg-bg-light dark:bg-bg-dark overflow-hidden flex flex-col h-full"
     >
-      {/* Badge strip */}
-      <AuctionItemCardBadgeStrip isEnded={isEnded} isSold={isSold} isUpcoming={isUpcoming} item={item} />
-      {/* Photo */}
-      <AuctionItemCardPhoto isEnded={isEnded} isSold={isSold} item={item} />
-      {/* Info */}
+      <AuctionItemCardBadgeStrip isSold={isSold} item={item} />
+      <AuctionItemCardPhoto isEnded={isEnded} isSold={isSold} item={item} index={index} />
       <AuctionItemCardInfo
         auctionStatus={auctionStatus}
         confirming={confirming}
