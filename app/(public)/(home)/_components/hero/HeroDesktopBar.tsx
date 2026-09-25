@@ -2,17 +2,22 @@ import { SLIDES } from 'lib/constants/home.constants'
 import { AuctionCountdown } from './AuctionCountdown'
 import { VideoThumb } from './VideoThumb'
 import { HeroAuction } from './Hero'
+import { CarouselPauseButton } from './CarouselPauseButton'
 
 export function HeroDesktopBar({
   hasEvent,
   current,
   goTo,
-  auction
+  auction,
+  stopped,
+  onToggleStopped
 }: {
   hasEvent: boolean
   current: number
   goTo: (i: number) => void
   auction: HeroAuction
+  stopped: boolean
+  onToggleStopped: () => void
 }) {
   return (
     <div className="hidden 968:block">
@@ -27,6 +32,8 @@ export function HeroDesktopBar({
           )}
         </div>
       </div>
+
+      <CarouselPauseButton stopped={stopped} onToggle={onToggleStopped} />
 
       {/* Dot indicators */}
       <div

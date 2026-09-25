@@ -1,6 +1,7 @@
 import { SLIDES } from 'lib/constants/home.constants'
 import { AuctionCountdown } from './AuctionCountdown'
 import { HeroAuction } from './Hero'
+import { CarouselPauseButton } from './CarouselPauseButton'
 
 export function HeroMobileBar({
   hasEvent,
@@ -8,7 +9,9 @@ export function HeroMobileBar({
   goTo,
   goPrev,
   goNext,
-  auction
+  auction,
+  stopped,
+  onToggleStopped
 }: {
   hasEvent: boolean
   current: number
@@ -16,6 +19,8 @@ export function HeroMobileBar({
   goPrev: () => void
   goNext: () => void
   auction: HeroAuction
+  stopped: boolean
+  onToggleStopped: () => void
 }) {
   return (
     <div className="968:hidden">
@@ -26,6 +31,8 @@ export function HeroMobileBar({
 
       {/* Dots / counter / arrows row */}
       <div className="flex items-center justify-between gap-2 px-3 min-[400px]:px-4 py-3">
+        <CarouselPauseButton stopped={stopped} onToggle={onToggleStopped} />
+
         {/* Dots */}
         <div className="flex items-center gap-2 min-[400px]:gap-3 shrink" role="tablist" aria-label="Slide indicators">
           {SLIDES.map((s, i) => (
