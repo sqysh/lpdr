@@ -14,7 +14,7 @@ import { StatusPanel } from './_components/AgreementPrimitives'
 import { DevStepBar } from './_components/DevStepBar'
 import Link from 'next/link'
 import { LinkBody } from 'components/_common/LinkBody'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 export type AgreementData = NonNullable<Awaited<ReturnType<typeof getAdoptionAgreementForAdopter>>['data']>
 

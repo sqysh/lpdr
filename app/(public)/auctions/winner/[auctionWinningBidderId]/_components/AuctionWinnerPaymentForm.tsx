@@ -52,10 +52,6 @@ export function AuctionWinnerPaymentForm({ winningBidder, savedCards, isAuthed, 
             exit={{ opacity: 0, height: 0 }}
             className="overflow-hidden"
           >
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-3 h-px bg-cyan-600 dark:bg-violet-400" aria-hidden="true" />
-              <span className="text-[10px] uppercase tracking-[0.25em] text-zinc-500 dark:text-muted-dark">Card Details</span>
-            </div>
             <CardElementField onChange={onCardChange} />
             <div className="flex items-center gap-2 mt-2">
               <ShieldCheck className="w-3 h-3 text-zinc-400 dark:text-muted-dark/50 shrink-0" aria-hidden="true" />
@@ -92,7 +88,7 @@ export function AuctionWinnerPaymentForm({ winningBidder, savedCards, isAuthed, 
       <FormError error={error} />
 
       {/* ── Submit ── */}
-      <SubmitButton loading={loading} isValid={isValid} label="Complete Payment" price={`$${finalAmount.toFixed(2)}`} onClick={onSubmit} />
+      <SubmitButton loading={loading} isValid={isValid} label="Complete Payment" price={finalAmount} onClick={onSubmit} />
     </div>
   )
 }

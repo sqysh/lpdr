@@ -12,7 +12,7 @@ import { IPaymentMethod } from 'types/payment-method.types'
 import { useConfettiStore } from 'stores/confetti.store'
 import { redeemBypassCodeSchema, RedeemBypassCodeInput, RedeemBypassCodeValues } from 'lib/schemas/adoption-fee.schema'
 import { redeemBypassCode } from 'lib/actions/adoption-fee/redeemBypassCode'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]

@@ -11,7 +11,7 @@ import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
 import { PaymentHandlers, PaymentState } from './_types/auction-winner.types'
 import { IAuctionWinningBidder } from 'types/auction.types'
 import { AuctionWinnerPageHeader } from './_components/AuctionWinnerPageHeader'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 const EYEBROW = 'text-f10 uppercase tracking-[0.25em]'
 

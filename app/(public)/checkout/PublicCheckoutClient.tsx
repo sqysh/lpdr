@@ -18,7 +18,7 @@ import { checkoutSchema, CheckoutFormInput, CheckoutFormValues } from 'lib/schem
 import { useCheckoutSteps } from '@hooks/useCheckoutSteps.hook'
 import { useCheckoutTotals } from '@hooks/useCheckoutTotals.hook'
 import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]

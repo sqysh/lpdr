@@ -10,16 +10,21 @@ import { formatRole } from 'lib/utils/user.utils'
 import { BypassCode } from './_components/BypassCode'
 import { NavRowBody } from 'app/(authenticated)/admin/_components/NavRowBody'
 import { useState } from 'react'
+import { LinkBody } from 'components/_common/LinkBody'
 
-type Props = {
+export default function AdminSidebar({
+  onClose,
+  email,
+  role,
+  bypassCode,
+  bypassCodeRotatesAt
+}: {
   onClose?: () => void
   email: string
   role: Role
   bypassCode: string
   bypassCodeRotatesAt: string
-}
-
-export default function AdminSidebar({ onClose, email, role, bypassCode, bypassCodeRotatesAt }: Props) {
+}) {
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
 
@@ -43,8 +48,12 @@ export default function AdminSidebar({ onClose, email, role, bypassCode, bypassC
       className="flex w-52 shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col py-4 h-screen sticky top-0"
     >
       {/* Brand */}
-      <Link href="/" aria-label="Little Paws admin home" className="flex items-center gap-2.5 px-4 mb-6">
-        <span className="font-mono text-[11px] tracking-eyebrow uppercase text-text-light dark:text-text-dark">Little Paws</span>
+      <Link
+        href="/"
+        className="flex items-center gap-2.5 px-4 mb-6 font-mono text-[11px] tracking-eyebrow uppercase text-text-light dark:text-text-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+      >
+        <LinkBody icon={null} label="Little Paws" />
+        <span className="sr-only">, back to the site</span>
       </Link>
 
       {/* Groups */}

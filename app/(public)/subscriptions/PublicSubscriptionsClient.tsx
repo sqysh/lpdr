@@ -11,7 +11,7 @@ import { StickyHeader } from './_components/StickyHeader'
 import { SubscriptionSelector } from './_components/SubscriptionSelector'
 import { SubscriptionPaymentView } from './_components/SubscriptionPaymentView'
 import { StickyBar } from './_components/StickyBar'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 type View = 'select' | 'payment'
 

@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { LogIn, Menu, User } from 'lucide-react'
+import { LayoutDashboard, LogIn, Menu, User } from 'lucide-react'
 import GoogleTranslate from './GoogleTranslate'
 import { NavDropdown } from './NavDropdown'
 import { mainNavigationLinks } from 'lib/constants/navigation.constants'
@@ -13,11 +13,7 @@ import { useModalsStore } from 'stores/modals.store'
 import { LinkBody } from 'components/_common/LinkBody'
 import { LinkSpinner } from 'components/_common/LinkSpinner'
 import { CartLinkContent } from './CartLinkContent'
-
-type HeaderClientProps = {
-  hasActiveFee: boolean
-  isAuthed: boolean
-}
+import { Role } from '@prisma/client'
 
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
@@ -33,7 +29,7 @@ const cartLink = `relative inline-flex items-center ${focusRing} rounded p-1`
 const donateButton =
   'inline-flex items-center justify-center bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white font-mono uppercase transition-colors duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
-export function HeaderClient({ hasActiveFee, isAuthed }: HeaderClientProps) {
+export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFee: boolean; isAuthed: boolean; userRole?: Role | null }) {
   const { hidden } = useScrollDirection()
   const mobileNavOpen = useNavigationStore((s) => s.mobileNavOpen)
   const openMobileNav = useNavigationStore((s) => s.openMobileNav)
@@ -43,6 +39,15 @@ export function HeaderClient({ hasActiveFee, isAuthed }: HeaderClientProps) {
   const totalItems = items.reduce((sum, item) => sum + item.quantity, 0)
 
   const cartLabel = `View shopping cart${totalItems > 0 ? ` — ${totalItems} item${totalItems !== 1 ? 's' : ''}` : ''}`
+
+  const isStaff = userRole === 'ADMIN' || userRole === 'SUPER_USER'
+
+  // Only named staff roles get the dashboard; anyone else signed in, including a role added later, gets My Pack
+  const account = !isAuthed
+    ? { href: '/auth/login', label: 'Sign in', icon: LogIn }
+    : isStaff
+      ? { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard }
+      : { href: '/my-pack', label: 'My Pack', icon: User }
 
   return (
     <>
@@ -91,14 +96,10 @@ export function HeaderClient({ hasActiveFee, isAuthed }: HeaderClientProps) {
                 </li>
                 <li>
                   <Link
-                    href={isAuthed ? '/my-pack' : '/auth/login'}
-                    aria-label={isAuthed ? 'Go to My Pack' : 'Sign in to your account'}
+                    href={account.href}
                     className={`inline-flex items-center gap-1.5 ${topBarLink} tracking-eyebrow whitespace-nowrap ${focusRing} rounded`}
                   >
-                    <LinkBody
-                      icon={isAuthed ? <User className="w-3 h-3" aria-hidden="true" /> : <LogIn className="w-3 h-3" aria-hidden="true" />}
-                      label={isAuthed ? 'My Pack' : 'Sign In'}
-                    />
+                    <LinkBody icon={<account.icon className="w-3 h-3" aria-hidden="true" />} label={account.label} />
                   </Link>
                 </li>
               </ul>

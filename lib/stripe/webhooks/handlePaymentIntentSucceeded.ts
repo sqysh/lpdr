@@ -18,9 +18,10 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
     if (!metadata?.orderType) return
 
     const existingOrder = await prisma.order.findFirst({
-      where: { paymentIntentId: id }
+      where: { paymentIntentId: id },
+      select: { id: true, status: true }
     })
-    if (existingOrder) return
+    if (existingOrder && existingOrder.status !== 'FAILED') return
 
     const orderType = (metadata?.orderType as OrderType) || 'ONE_TIME_DONATION'
     const userId = metadata?.userId || null
@@ -85,42 +86,56 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       zipPostalCode?: string
     } | null
 
-    const order = await prisma.order.create({
-      data: {
-        type: orderType,
-        status: 'CONFIRMED',
-        totalAmount: amount / 100,
-        paymentIntentId: id,
-        customerEmail: metadata?.email || '',
-        customerName: metadata?.name?.trim() || '',
-        userId,
-        paidAt: new Date(),
-        addressLine1: address?.addressLine1 ?? null,
-        addressLine2: address?.addressLine2 ?? null,
-        city: address?.city ?? null,
-        state: address?.state ?? null,
-        zipPostalCode: address?.zipPostalCode ?? null,
-        country: 'US',
-        subtotal: parseFloat(metadata.subtotal ?? '0'),
-        shipping: parseFloat(metadata.shipping ?? '0'),
-        coverFees: metadata.coverFees === 'true',
-        feesCovered: parseFloat(metadata.feesCovered ?? '0'),
-        isRecurring,
-        recurringFrequency: isRecurring ? ((metadata?.recurringFrequency as RecurringFrequency) ?? null) : null,
-        stripeSubscriptionId: isRecurring ? (metadata?.stripeSubscriptionId ?? null) : null,
-        nextBillingDate: nbd && !isNaN(+nbd) ? nbd : null,
-        paymentMethodId: (paymentIntent.payment_method as string) || null,
-        isPhysical: hasPhysical,
-        shippingStatus: hasPhysical ? 'PENDING_FULFILLMENT' : null,
-        geoLatitude: geoUser?.lastGeoLatitude ?? null,
-        geoLongitude: geoUser?.lastGeoLongitude ?? null,
-        geoCity: geoUser?.lastGeoCity ?? null,
-        geoRegion: geoUser?.lastGeoRegion ?? null,
-        geoCountry: geoUser?.lastGeoCountry ?? null,
-        geoSource: geoUser?.lastGeoLatitude != null ? 'ip' : null,
-        donorMessage: metadata.donorMessage ?? null
-      }
-    })
+    const orderData = {
+      type: orderType,
+      status: 'CONFIRMED' as const,
+      totalAmount: amount / 100,
+      paymentIntentId: id,
+      customerEmail: metadata?.email || '',
+      customerName: metadata?.name?.trim() || '',
+      userId,
+      paidAt: new Date(),
+      addressLine1: address?.addressLine1 ?? null,
+      addressLine2: address?.addressLine2 ?? null,
+      city: address?.city ?? null,
+      state: address?.state ?? null,
+      zipPostalCode: address?.zipPostalCode ?? null,
+      country: 'US',
+      subtotal: parseFloat(metadata.subtotal ?? '0'),
+      shipping: parseFloat(metadata.shipping ?? '0'),
+      coverFees: metadata.coverFees === 'true',
+      feesCovered: parseFloat(metadata.feesCovered ?? '0'),
+      isRecurring,
+      recurringFrequency: isRecurring ? ((metadata?.recurringFrequency as RecurringFrequency) ?? null) : null,
+      stripeSubscriptionId: isRecurring ? (metadata?.stripeSubscriptionId ?? null) : null,
+      nextBillingDate: nbd && !isNaN(+nbd) ? nbd : null,
+      paymentMethodId: (paymentIntent.payment_method as string) || null,
+      isPhysical: hasPhysical,
+      shippingStatus: hasPhysical ? ('PENDING_FULFILLMENT' as const) : null,
+      geoLatitude: geoUser?.lastGeoLatitude ?? null,
+      geoLongitude: geoUser?.lastGeoLongitude ?? null,
+      geoCity: geoUser?.lastGeoCity ?? null,
+      geoRegion: geoUser?.lastGeoRegion ?? null,
+      geoCountry: geoUser?.lastGeoCountry ?? null,
+      geoSource: geoUser?.lastGeoLatitude != null ? 'ip' : null,
+      donorMessage: metadata.donorMessage ?? null
+    }
+
+    let order
+    if (existingOrder) {
+      // Claimed with FAILED in the where, so if Stripe delivers this event twice at once, only one
+      // delivery upgrades the row and carries on; the other finds nothing to claim and stops
+      const { count } = await prisma.order.updateMany({
+        where: { id: existingOrder.id, status: 'FAILED' },
+        data: { ...orderData, failureCode: null, failureReason: null }
+      })
+      if (count === 0) return
+
+      order = await prisma.order.findUniqueOrThrow({ where: { id: existingOrder.id } })
+      await createLog('info', 'Failed attempt upgraded after the payment succeeded', { orderId: order.id, paymentIntentId: id })
+    } else {
+      order = await prisma.order.create({ data: orderData })
+    }
 
     // ── Now create order items using the already-fetched products/wieners ──
     if (orderType === 'PURCHASE' && compact.length > 0) {

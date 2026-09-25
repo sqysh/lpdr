@@ -82,7 +82,7 @@ export function AuctionItemCardInfo(props) {
           </div>
         )}
 
-        {!isUpcoming && displayPrice != null && (
+        {displayPrice != null && (
           <div className="flex items-center justify-between gap-2">
             <dt className="text-[10px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
               {isFixed ? 'Price' : !item.currentBid ? 'Starting' : 'Current'}
@@ -167,16 +167,17 @@ export function AuctionItemCardInfo(props) {
               />
             </Link>
           )}
-
-          <Link
-            href={itemHref}
-            aria-label={`View item: ${item.name}`}
-            className="min-h-11 flex items-center justify-between px-3 py-2 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
-          >
-            <CardLinkBody label="View item" icon={<Eye size={12} aria-hidden="true" />} />
-          </Link>
         </div>
       )}
+
+      {/* On every card, whatever the status: before opening it's how people preview, after closing how they see what sold */}
+      <Link
+        href={itemHref}
+        aria-label={`${isUpcoming ? 'Preview item' : 'View item'}: ${item.name}`}
+        className={`${auctionStatus === 'ACTIVE' && !isSold ? 'mt-1.5' : 'mt-3'} min-h-11 flex items-center justify-between px-3 py-2 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`}
+      >
+        <CardLinkBody label={isUpcoming ? 'Preview item' : 'View item'} icon={<Eye size={12} aria-hidden="true" />} />
+      </Link>
     </div>
   )
 }

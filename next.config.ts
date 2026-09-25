@@ -4,7 +4,7 @@ const isDev = process.env.NODE_ENV === 'development'
 const devScriptHosts = isDev ? ' https://va.vercel-scripts.com' : ''
 
 const nextConfig: NextConfig = {
-  allowedDevOrigins: ['10.0.0.89'],
+  allowedDevOrigins: ['10.0.0.204'],
   images: {
     remotePatterns: [
       {

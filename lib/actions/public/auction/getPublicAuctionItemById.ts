@@ -5,7 +5,7 @@ import { bidderDisplay } from 'lib/utils/auction.utils'
 
 export const getPublicAuctionItemById = async (id: string) => {
   const item = await prisma.auctionItem.findFirst({
-    where: { id, auction: { status: { in: ['ACTIVE', 'ENDED'] } } },
+    where: { id, auction: { status: { in: ['DRAFT', 'ACTIVE', 'ENDED'] } } },
     ...auctionItemLiveArgs
   })
 

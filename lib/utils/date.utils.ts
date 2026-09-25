@@ -1,14 +1,21 @@
-const TZ = 'America/New_York'
+export const TZ = 'America/New_York'
 
 /** Formats a date as "Jan 1, 2026", optionally with time as "Jan 1, 2026, 12:00 PM" */
 export function formatDate(date: Date | string, includeTime = false) {
-  return new Date(date).toLocaleString('en-US', {
-    timeZone: TZ,
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    ...(includeTime && { hour: 'numeric', minute: '2-digit', hour12: true })
-  })
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: TZ,
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      ...(includeTime && { hour: 'numeric', minute: '2-digit', hour12: true })
+    })
+      .formatToParts(new Date(date))
+      .map((p) => [p.type, p.value])
+  )
+
+  const day = `${parts.month} ${parts.day}, ${parts.year}`
+  return includeTime ? `${day}, ${parts.hour}:${parts.minute} ${parts.dayPeriod} ET` : day
 }
 
 /** Formats a date as "Jan 1, 2026, 12:00 PM" — shorthand for formatDate(date, true) */

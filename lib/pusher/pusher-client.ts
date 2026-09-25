@@ -1,44 +1,42 @@
 import 'client-only'
 import Pusher from 'pusher-js'
 
-// Cached on globalThis for the same reason as prisma: HMR re-evaluates this module, and each run would leave a socket behind
-const globalForPusher = globalThis as unknown as { pusherClient?: Pusher | null }
+type PusherGlobal = typeof globalThis & { __pusherClient?: Pusher }
+const g = globalThis as PusherGlobal
 
-// Created on first use in the browser. A module-level instance also ran during server rendering of client
-// components, where pusher-js opens a real socket that never subscribes and stays open for the life of the function
+/**
+ * One client for the whole tab, created on first use and cached on globalThis so hot reload doesn't
+ * leave extra sockets open. Browser only: client components also render on the server, where a
+ * module-level client would open an idle socket on every warm function instance.
+ */
 export function getPusherClient() {
-  if (typeof window === 'undefined') {
-    throw new Error('getPusherClient is browser only; call it inside an effect or event handler')
-  }
+  if (typeof window === 'undefined') throw new Error('getPusherClient is browser only; call it inside an effect or event handler')
 
-  if (!globalForPusher.pusherClient) {
-    globalForPusher.pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
+  if (!g.__pusherClient) {
+    g.__pusherClient = new Pusher(process.env.NEXT_PUBLIC_PUSHER_KEY!, {
       cluster: process.env.NEXT_PUBLIC_PUSHER_CLUSTER!
     })
+  } else if (['disconnected', 'failed'].includes(g.__pusherClient.connection.state)) {
+    // Closed because the last channel was released. Reconnecting resubscribes every channel still held,
+    // so a page that subscribes just after another page let go still gets its events
+    g.__pusherClient.connect()
   }
 
-  return globalForPusher.pusherClient
+  return g.__pusherClient
 }
 
 /**
- * Leaves a channel and closes the socket once nothing else is using it. Every subscriber should
- * clean up through this rather than calling unsubscribe itself.
+ * Lets go of a channel, and closes the socket once nothing is subscribed, so a visitor on a page
+ * with no live updates isn't holding a connection open.
  */
 export function releaseChannel(channelName: string) {
-  const client = globalForPusher.pusherClient
+  const client = g.__pusherClient
   if (!client) return
 
-  if (client.connection.state === 'connected') {
-    client.unsubscribe(channelName)
-  } else {
-    // The unsubscribe message would be written to a socket that is closing or gone, which the browser
-    // logs as an error. Dropping it locally is enough, and stops pusher-js resubscribing it on reconnect
-    client.channels.remove(channelName)
-  }
+  // Unsubscribing sends a message, which throws on a socket that's already closing, so in that case
+  // the channel is only dropped locally
+  if (client.connection.state === 'connected') client.unsubscribe(channelName)
+  else client.channels.remove(channelName)
 
-  // Only drop the socket once nothing is subscribed, so two components on one page don't cut each other off
-  if (client.allChannels().length === 0) {
-    client.disconnect()
-    globalForPusher.pusherClient = null
-  }
+  if (client.allChannels().length === 0) client.disconnect()
 }

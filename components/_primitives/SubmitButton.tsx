@@ -12,7 +12,7 @@ export function SubmitButton({
   loading: boolean
   isValid: boolean
   label: string
-  price?: string
+  price?: number
   onClick?: (e: { preventDefault: () => void }) => void
 }) {
   const ready = isValid && !loading
@@ -42,13 +42,13 @@ export function SubmitButton({
           />
           Processing...
         </span>
-      ) : price ? (
+      ) : price != null ? (
         <>
           <span className="flex flex-1 items-center justify-center gap-2 py-4">
             {label}
             <ArrowRight className="w-3.5 h-3.5" aria-hidden="true" />
           </span>
-          <span className="flex items-center justify-center px-5 py-4 bg-black/10 tabular-nums">{formatMoney(Number(price))}</span>
+          <span className="flex items-center justify-center px-5 py-4 bg-black/10 tabular-nums">{formatMoney(price)}</span>
         </>
       ) : (
         <span className="flex flex-1 items-center justify-center gap-2 py-4">

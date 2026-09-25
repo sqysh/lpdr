@@ -1,13 +1,14 @@
 'use client'
 
 import { useBidPanel } from '@hooks/useBidPanel.hook'
-import { Gavel, Loader2, Package, Zap } from 'lucide-react'
+import { Clock, Gavel, Loader2, Package, Zap } from 'lucide-react'
 import Link, { useLinkStatus } from 'next/link'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { PublicAuctionItem, PublicBid } from 'types/auction.types'
 import { BidError, BidPlaced, CurrentPrice, EYEBROW, QuickBidButton, RaceConditionNotice, StandingBanner } from './AuctionItemBidPanelParts'
 import { AuctionItemBidPanelBidAmountForm } from './AuctionItemBidPanelBidAmountForm'
+import { formatDate } from 'lib/utils/date.utils'
 
 const PANEL = 'border border-border-light dark:border-border-dark'
 const CTA =
@@ -41,6 +42,7 @@ export function AuctionItemBidPanel({ item, isAuthed, isTopBidder, customAuction
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const panel = useBidPanel(item)
 
+  const isUpcoming = item?.auction?.status === 'DRAFT'
   const isFixed = item?.sellingFormat === 'FIXED'
   const isActive = item?.auction?.status === 'ACTIVE'
   const isSold = item?.status === 'SOLD'
@@ -62,17 +64,26 @@ export function AuctionItemBidPanel({ item, isAuthed, isTopBidder, customAuction
   )
 
   // ── Closed: sold, or the auction is over. Price only, no way in. ──
+  // ── Not open: upcoming, sold, or over. Price only, no way in, and a message that says which ──
   if (isSold || !isActive) {
+    const message = isSold
+      ? 'This item has been sold.'
+      : isUpcoming
+        ? `Bidding opens ${item.auction.startDate ? formatDate(item.auction.startDate, true) : 'soon'}.`
+        : 'This auction has ended.'
+
     return (
       <div id="bid-panel" className={PANEL}>
         <div className="h-0.5 bg-border-light dark:bg-border-dark" aria-hidden="true" />
         <div className="p-5 space-y-4">
           {price}
           <div className="flex items-center gap-2 px-4 py-3 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark">
-            <Package size={13} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
-            <p className="text-f10 font-mono text-muted-light dark:text-muted-dark">
-              {isSold ? 'This item has been sold.' : 'This auction has ended.'}
-            </p>
+            {isUpcoming ? (
+              <Clock size={13} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+            ) : (
+              <Package size={13} className="text-muted-light dark:text-muted-dark shrink-0" aria-hidden="true" />
+            )}
+            <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark">{message}</p>
           </div>
         </div>
       </div>

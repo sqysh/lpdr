@@ -17,14 +17,21 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
     const failureReason = last_payment_error?.message || 'Payment failed'
     const failureCode = last_payment_error?.code || null
 
+    // Stripe doesn't guarantee event order, so an earlier attempt's failure can arrive after the payment
+    // succeeded on a retry. A confirmed or refunded order is final: it's never turned back into a failure,
+    // and the customer isn't told a payment failed that actually went through
+    const existing = await prisma.order.findUnique({ where: { paymentIntentId: id }, select: { status: true } })
+    if (existing && existing.status !== 'FAILED') {
+      await createLog('info', 'Late payment failure ignored; the payment has since succeeded', {
+        paymentIntentId: id,
+        status: existing.status
+      })
+      return
+    }
+
     const order = await prisma.order.upsert({
       where: { paymentIntentId: id },
-      update: {
-        status: 'FAILED',
-        failureReason,
-        failureCode,
-        failureEmailSentAt: customerEmail ? new Date() : null
-      },
+      update: { status: 'FAILED', failureReason, failureCode },
       create: {
         type: orderType,
         status: 'FAILED',
@@ -34,13 +41,12 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
         customerName: customerName ?? '',
         userId,
         failureReason,
-        failureCode,
-        failureEmailSentAt: customerEmail ? new Date() : null
+        failureCode
       }
     })
 
     if (customerEmail) {
-      await resend.emails.send({
+      const { error } = await resend.emails.send({
         from: 'Little Paws <payments@littlepawsdr.org>',
         to: customerEmail,
         subject: "Your payment didn't go through",
@@ -51,16 +57,21 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
           myPackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/my-pack`
         })
       })
+
+      // Only recorded once Resend accepts it, so the column reflects emails that actually went out
+      if (error) {
+        await createLog('error', 'Payment failed email not sent', { orderId: order.id, error: error.message })
+      } else {
+        await prisma.order.update({ where: { id: order.id }, data: { failureEmailSentAt: new Date() } })
+      }
     }
 
-    await pusherTrigger(`payment-${userId}`, 'order-failed', {
-      orderId: order.id,
-      error: failureReason,
-      type: orderType
-    })
+    if (userId) {
+      await pusherTrigger(`payment-${userId}`, 'order-failed', { orderId: order.id, error: failureReason, type: orderType })
+    }
 
     await pusherSuperuser('order-failed', {
-      userId: userId ?? null,
+      userId,
       email: order.customerEmail,
       name: order.customerName,
       amount: order.totalAmount,

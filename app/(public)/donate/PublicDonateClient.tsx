@@ -9,7 +9,7 @@ import { getInitials } from 'lib/utils/user.utils'
 import { DonateForm } from './_components'
 import { LinkBody } from 'components/_common/LinkBody'
 import { MyPackAvatar } from '../../../components/_common/MyPackAvatar'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 type Props = {
   savedCards: IPaymentMethod[]

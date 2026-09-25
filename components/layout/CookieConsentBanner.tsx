@@ -53,23 +53,22 @@ export function CookieConsentBanner() {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 40 }}
           transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="fixed bottom-0 left-0 right-0 z-150 border-t border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark"
+          // Above any fixed bottom bar that publishes its height. With no bar, it keeps clear of the iPhone
+          // home indicator itself; with one, the bar has already handled that
+          style={{
+            bottom: 'var(--bottom-bar-height, 0px)',
+            paddingBottom: 'max(0px, calc(env(safe-area-inset-bottom) - var(--bottom-bar-height, 0px)))'
+          }}
+          className="fixed left-0 right-0 z-150 border-t border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark shadow-[0_-4px_12px_rgba(0,0,0,0.06)]"
           role="region"
           aria-label="Cookie notice"
         >
           <div className="max-w-4xl mx-auto px-4 sm:px-6 py-4 flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6">
             <div className="flex items-start gap-3 flex-1 min-w-0">
-              <Cookie
-                className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5"
-                aria-hidden="true"
-              />
+              <Cookie className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-xs font-mono text-muted-light dark:text-muted-dark leading-relaxed">
-                We use cookies to keep you signed in, remember your cart, and understand how
-                visitors use the site.{' '}
-                <Link
-                  href="/privacy-policy"
-                  className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2"
-                >
+                We use cookies to keep you signed in, remember your cart, and understand how visitors use the site.{' '}
+                <Link href="/privacy-policy" className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2">
                   Learn more
                 </Link>
               </p>
@@ -79,7 +78,7 @@ export function CookieConsentBanner() {
               <button
                 type="button"
                 onClick={handleAccept}
-                className="flex-1 sm:flex-none px-4 py-2 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="flex-1 sm:flex-none min-h-10 px-4 py-2 text-[11px] font-mono tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 Accept
               </button>
@@ -87,7 +86,7 @@ export function CookieConsentBanner() {
                 type="button"
                 onClick={handleDismiss}
                 aria-label="Dismiss cookie notice"
-                className="p-2 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="w-10 h-10 flex items-center justify-center text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 <X className="w-4 h-4" aria-hidden="true" />
               </button>

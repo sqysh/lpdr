@@ -15,7 +15,7 @@ type Props = {
   processingFee: number
   isValid: boolean
   submitLabel: string
-  submitPrice?: string
+  submitPrice?: number
   /** Subscriptions save the card by necessity, so they hide the toggle. */
   showSaveCard?: boolean
   saveCardLabel?: string

@@ -1,4 +1,4 @@
-import { ordinal } from './date.utils'
+import { ordinal, TZ } from './date.utils'
 
 /**
  * RescueGroups stores the fee as display text ("$450", "$1,200.00"). Some listings carry text instead
@@ -19,6 +19,14 @@ export function agreementTotal(a: { adoptionFee: number; healthCertificateFee: n
   return Number(a.adoptionFee) + Number(a.healthCertificateFee ?? 0) + Number(a.additionalDonation ?? 0)
 }
 
-// Contracts fill the date as "this 23rd day of September, 2026" rather than a plain date
-export const agreementDate = (d: Date) =>
-  `${ordinal(d.getDate())} day of ${d.toLocaleDateString('en-US', { month: 'long' })}, ${d.getFullYear()}`
+// Contracts fill the date as "this 23rd day of September, 2026" rather than a plain date. Read in Eastern
+// time so an agreement opened in the evening doesn't show tomorrow's date from a server running in UTC
+export const agreementDate = (d: Date) => {
+  const parts = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', { timeZone: TZ, day: 'numeric', month: 'long', year: 'numeric' })
+      .formatToParts(d)
+      .map((p) => [p.type, p.value])
+  )
+
+  return `${ordinal(Number(parts.day))} day of ${parts.month}, ${parts.year}`
+}

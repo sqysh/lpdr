@@ -21,7 +21,7 @@ import { useStripeCheckout } from '@hooks/useStripeCheckout.hook'
 import { OrderType } from '@prisma/client'
 import { IAddress } from 'types/address.types'
 import { PaymentSection } from 'components/features/payment/PaymentSection'
-import { useRefreshOnSignOut } from '@hooks/useRefreshOnSIgnOut.hook'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 interface Props {
   auctionItem: IAuctionItemLive
@@ -243,7 +243,7 @@ export default function PublicAuctionInstantBuyClient({
                 processingFee={processingFee}
                 isValid={isValid}
                 submitLabel="Buy Now"
-                submitPrice={`$${finalAmount.toFixed(2)}`}
+                submitPrice={finalAmount}
               />
             </form>
           </section>

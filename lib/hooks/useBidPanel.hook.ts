@@ -12,6 +12,9 @@ import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
 
 const CONFIRM_WINDOW_MS = 5000
 
+// Short enough that the page feels live, long enough to fold a quick run of bids into one reload
+const REFRESH_AFTER_BID_MS = 800
+
 type RaceCondition = { newMinimumBid: number; currentBid: number | null }
 
 type BidPlacedPayload = { currentBid?: number; minimumBid?: number; totalBids?: number }
@@ -35,6 +38,11 @@ export function useBidPanel(item: PublicAuctionItem) {
   const inputRef = useRef<HTMLInputElement>(null)
   const confirmTimeout = useRef<ReturnType<typeof setTimeout> | null>(null)
   const inFlight = useRef(false)
+  const routerRef = useRef(router)
+
+  useEffect(() => {
+    routerRef.current = router
+  }, [router])
 
   // Auction figures only ever climb, so the highest of the two sources is the current truth.
   // That makes a refresh and a Pusher event self-reconciling whichever order they arrive in.
@@ -54,19 +62,28 @@ export function useBidPanel(item: PublicAuctionItem) {
     if (!item?.id) return
 
     const channelName = `auction-item-${item.id}`
-    const pusher = getPusherClient()
-    const channel = pusher.subscribe(channelName)
+    const channel = getPusherClient().subscribe(channelName)
+    let pendingRefresh: ReturnType<typeof setTimeout> | null = null
 
+    // The panel's numbers update at once from the event. The rest of the page (bid history, top
+    // bidder, standing, footer price) only changes with a reload, which follows shortly after
     const onBidPlaced = (data: { auctionItem?: BidPlacedPayload; item?: BidPlacedPayload }) => {
       const payload = data?.auctionItem ?? data?.item
       if (!payload) return
 
       setLive(payload)
+
+      if (pendingRefresh) return
+      pendingRefresh = setTimeout(() => {
+        pendingRefresh = null
+        routerRef.current.refresh()
+      }, REFRESH_AFTER_BID_MS)
     }
 
     channel.bind('bid-placed', onBidPlaced)
 
     return () => {
+      if (pendingRefresh) clearTimeout(pendingRefresh)
       channel.unbind('bid-placed', onBidPlaced)
       releaseChannel(channelName)
     }
@@ -116,6 +133,8 @@ export function useBidPanel(item: PublicAuctionItem) {
       setError(null)
       setRaceCondition(null)
       setConfirming(true)
+      // Cleared first, so an earlier arming's timer can't cancel this one partway through
+      if (confirmTimeout.current) clearTimeout(confirmTimeout.current)
       confirmTimeout.current = setTimeout(() => setConfirming(false), CONFIRM_WINDOW_MS)
       return
     }
