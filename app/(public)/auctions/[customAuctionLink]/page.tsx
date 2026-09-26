@@ -16,7 +16,12 @@ export default async function PublicAuctionPage({ params }: { params: Promise<{ 
   const autoPayStatus = session?.user?.id
     ? await prisma.user.findUnique({
         where: { id: session.user.id },
-        select: { autoPay: true, address: { select: { addressLine1: true } }, _count: { select: { paymentMethods: true } } }
+        select: {
+          autoPay: true,
+          autoPayCoverFees: true,
+          address: { select: { addressLine1: true } },
+          _count: { select: { paymentMethods: true } }
+        }
       })
     : null
 
@@ -37,6 +42,7 @@ export default async function PublicAuctionPage({ params }: { params: Promise<{ 
         autoPayStatus
           ? {
               enabled: autoPayStatus.autoPay,
+              coversFees: autoPayStatus.autoPayCoverFees,
               hasCard: autoPayStatus._count.paymentMethods > 0,
               hasAddress: !!autoPayStatus.address?.addressLine1
             }
