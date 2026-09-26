@@ -44,7 +44,7 @@ export function AuctionItemCardInfo(props) {
   const bidCount = item._count?.bids ?? 0
 
   const itemHref = `/auctions/${customAuctionLink}/${item.id}`
-  const primaryHref = isFixed ? `${itemHref}/instant-buy` : `${itemHref}?bidModal=true`
+  const primaryHref = isFixed ? `${itemHref}/instant-buy` : `${itemHref}?bid=1`
 
   // Only meaningful on an auction item: a fixed item has no bids to be top of
   const isTopBid = !isFixed && myBid?.status === 'TOP_BID'

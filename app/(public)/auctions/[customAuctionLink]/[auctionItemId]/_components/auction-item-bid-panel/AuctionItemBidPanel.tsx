@@ -48,9 +48,7 @@ export function AuctionItemBidPanel({ item, isAuthed, isTopBidder, customAuction
   const isSold = item?.status === 'SOLD'
   const myBidCount = currentUserId ? item.bids.filter((b) => b.userId === currentUserId).length : 0
 
-  const signInHref = isFixed
-    ? `/auctions/${customAuctionLink}/${item.id}/instant-buy`
-    : `/auctions/${customAuctionLink}/${item.id}?bidModal=true`
+  const signInHref = isFixed ? `/auctions/${customAuctionLink}/${item.id}/instant-buy` : `/auctions/${customAuctionLink}/${item.id}?bid=1`
 
   const price = isFixed ? (
     <CurrentPrice label="Price" amount={Number(item.buyNowPrice ?? 0)} />

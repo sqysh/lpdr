@@ -46,12 +46,22 @@ export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, 
     : null
   const isTopBidder = !!myTopBid && topBid?.id === myTopBid.id
 
-  // The bid panel is inline, so an authed arrival needs nothing doing. Only the signed-out case
-  // still has somewhere to send them
+  // "bidModal" is the old name, still honored for links already out there, like sign-in links sent before the rename
+  const arrivingToBid = searchParams.get('bid') === '1' || searchParams.get('bidModal') === 'true'
+
+  // Arriving to bid, from a card, the footer or an outbid email: signed-out visitors are asked to sign in,
+  // signed-in ones land on the bid panel with the amount field ready
   useEffect(() => {
-    if (searchParams.get('bidModal') !== 'true' || isAuthed) return
-    openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`)
-  }, [customAuctionLink, item.id, searchParams, isAuthed, openSignInModal])
+    if (!arrivingToBid) return
+
+    if (!isAuthed) {
+      openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bid=1`, isFixed ? 'buy' : 'bid')
+      return
+    }
+
+    document.getElementById('bid-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    document.getElementById('bid-amount')?.focus({ preventScroll: true })
+  }, [arrivingToBid, customAuctionLink, item.id, isAuthed, isFixed, openSignInModal])
 
   return (
     <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark">

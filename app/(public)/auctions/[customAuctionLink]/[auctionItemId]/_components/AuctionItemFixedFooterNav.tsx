@@ -209,7 +209,7 @@ export function AuctionItemFixedFooterNav({ auctionItems, item, customAuctionLin
               {!isFixed ? (
                 <button
                   type="button"
-                  onClick={() => (isAuthed ? goToBidPanel() : openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bidModal=true`))}
+                  onClick={() => (isAuthed ? goToBidPanel() : openSignInModal(`/auctions/${customAuctionLink}/${item.id}?bid=1`))}
                   className={BAR_CTA_BID}
                 >
                   <Gavel size={14} aria-hidden="true" />

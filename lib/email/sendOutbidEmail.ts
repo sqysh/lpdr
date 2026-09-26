@@ -8,9 +8,11 @@ type SendOutbidEmailParams = {
   email: string
   firstName: string
   itemName: string
+  itemImage: string
   yourBid: number
   newBid: number
   minimumBid: number
+  endsAt: Date
   url: string
 }
 
@@ -18,9 +20,11 @@ export const sendOutbidEmail = async ({
   email,
   firstName,
   itemName,
+  itemImage,
   yourBid,
   newBid,
   minimumBid,
+  endsAt,
   url
 }: SendOutbidEmailParams) => {
   try {
@@ -28,7 +32,7 @@ export const sendOutbidEmail = async ({
       from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
       to: email,
       subject: `You've been outbid on ${itemName}`,
-      html: auctionOutBidTemplate({ firstName, itemName, yourBid, newBid, minimumBid, url })
+      html: auctionOutBidTemplate({ firstName, itemName, itemImage, yourBid, newBid, minimumBid, endsAt, url })
     })
 
     await Promise.all([

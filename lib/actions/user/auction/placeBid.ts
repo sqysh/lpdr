@@ -8,6 +8,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { sendOutbidEmail } from 'lib/email/sendOutbidEmail'
 import { PreviousTopBid } from 'types/auction-bid'
 import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
+import { formatMoney } from 'lib/utils/currency.utils'
 
 /** Thrown deliberately, so the message is safe to show the bidder. Anything else is not. */
 class BidError extends Error {}
@@ -46,7 +47,7 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
         const currentMinimum = Number(auctionItem.minimumBid ?? auctionItem.startingPrice ?? 0)
 
         if (bidAmount < currentMinimum) {
-          throw new BidError(`Minimum bid is now $${currentMinimum.toLocaleString()}. Please increase your bid.`)
+          throw new BidError(`Minimum bid is now ${formatMoney(currentMinimum)}. Please increase your bid.`)
         }
 
         previousTopBid = await tx.auctionBid.findFirst({
@@ -114,7 +115,9 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           totalBids: true,
           topBidder: true,
           name: true,
-          auction: { select: { customAuctionLink: true } }
+          auction: { select: { customAuctionLink: true, endDate: true } },
+          // Only the photo the outbid email shows: the primary one, or the first if none is marked
+          photos: { orderBy: [{ isPrimary: 'desc' }, { sortOrder: 'asc' }], take: 1, select: { url: true } }
         }
       }),
       prisma.user.findUnique({
@@ -180,13 +183,16 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           email: previousTopBid.user.email,
           firstName: previousTopBid.user.firstName ?? 'Friend',
           itemName: updatedItem.name,
+          itemImage: updatedItem.photos[0]?.url ?? null,
           yourBid: Number(previousTopBid.bidAmount),
           newBid: bidAmount,
           minimumBid: bidAmount + 1,
-          url: `${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}`
+          endsAt: updatedItem.auction.endDate,
+          // Straight to the bid panel: signed-in readers land ready to bid, signed-out ones are asked to sign in first
+          url: `${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${updatedItem.auction.customAuctionLink}/${updatedItem.id}?bid=1`
         })
       } catch (error) {
-        // A failed email must not surface as a failed bid: the bid is already committed.
+        // A failed email must not surface as a failed bid: the bid is already committed
         await createLog('warn', 'Outbid email failed', { auctionItemId, error: getErrorMessage(error) })
       }
     }
