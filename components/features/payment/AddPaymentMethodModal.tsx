@@ -10,7 +10,7 @@ import { useRemoveScroll } from 'lib/hooks/useRemoveScroll.hook'
 import { extractErrorMessage } from 'lib/utils/log.client.utils'
 import { getSetupIntentClientSecret } from 'lib/actions/_stripe/getSetupIntentClientSecret'
 import { createPaymentMethod } from 'lib/actions/_stripe/createPaymentMethod'
-import { useThemeStore } from 'stores/theme.store'
+import { CardElementField } from './CardElementField'
 
 const accentText = 'text-cyan-600 dark:text-violet-400'
 const accentBg = 'bg-cyan-600 dark:bg-violet-400'
@@ -24,7 +24,6 @@ const fieldShell =
 export default function AddPaymentMethodModal() {
   const isOpen = usePaymentMethodModal((s) => s.isOpen)
   const closeModal = usePaymentMethodModal((s) => s.close)
-  const isDark = useThemeStore((s) => s.isDark)
 
   const router = useRouter()
   const stripe = useStripe()
@@ -199,36 +198,12 @@ export default function AddPaymentMethodModal() {
               </div>
 
               {/* Card element */}
-              <div>
-                <label id="card-details-label" className={fieldLabel}>
-                  Card Details
-                </label>
-                <div
-                  role="group"
-                  aria-labelledby="card-details-label"
-                  className={`px-3.5 py-3.5 ${fieldShell} transition-colors duration-200 focus-within:border-cyan-600 dark:focus-within:border-violet-400`}
-                >
-                  <CardElement
-                    onChange={(e) => {
-                      setCardComplete(e.complete)
-                      setError(e.error?.message ?? null)
-                    }}
-                    options={{
-                      style: {
-                        base: {
-                          color: isDark ? '#f1f0ff' : '#09090b',
-                          backgroundColor: isDark ? '#13131f' : '#f9fafb',
-                          fontSize: '14px',
-                          fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
-                          '::placeholder': { color: isDark ? '#4a4a6a' : '#a1a1aa' },
-                          iconColor: isDark ? '#7c3aed' : '#0891b2'
-                        },
-                        invalid: { color: '#ef4444' }
-                      }
-                    }}
-                  />
-                </div>
-              </div>
+              <CardElementField
+                onChange={({ complete, error }) => {
+                  setCardComplete(complete)
+                  setError(error ?? null)
+                }}
+              />
 
               {/* Security note */}
               <div className="flex items-center gap-2">
