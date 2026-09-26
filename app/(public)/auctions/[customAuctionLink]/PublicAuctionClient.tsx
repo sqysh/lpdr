@@ -81,7 +81,7 @@ export default function PublicAuctionClient({
             watchedIds={watchedIds}
           />
           <AuctionEmptyState auction={auction} />
-          <AuctionHowItWorks isEnded={isEnded} />
+          <AuctionHowItWorks isEnded={isEnded} isAuthed={isAuthed} />
         </div>
       </main>
     </>

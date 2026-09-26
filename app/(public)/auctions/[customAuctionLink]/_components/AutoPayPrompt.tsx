@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, CreditCard, HeartHandshake, Loader2, MapPin, X, Zap } from 'lucide-react'
+import { CheckCircle, CreditCard, HeartHandshake, Link, Loader2, MapPin, X, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
 import AddPaymentMethodModal from 'components/features/payment/AddPaymentMethodModal'
@@ -57,8 +57,22 @@ export function AutoPayPrompt({ autoPay, isEnded }: Props) {
   const [dismissed, setDismissed] = useState(false)
 
   if (!autoPay || isEnded || dismissed) return null
-  // Already set up before this visit: nothing to ask
-  if (autoPay.enabled && phase === 'setup') return null
+  // Already set up before this visit: a quiet summary instead of the prompt, so the settings stay discoverable
+  if (autoPay.enabled && phase === 'setup') {
+    return (
+      <p className="mb-8 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] font-mono text-muted-light dark:text-muted-dark">
+        <span className="inline-flex items-center gap-1.5">
+          <Zap size={12} className="text-emerald-700 dark:text-emerald-400" aria-hidden="true" />
+          Auto-pay is on
+        </span>
+        <span aria-hidden="true">·</span>
+        <span>{autoPay.coversFees ? 'Covering the card fee' : 'Not covering the card fee'}</span>
+        <Link href="/my-pack?tab=settings" className="text-primary-light dark:text-primary-dark hover:underline underline-offset-4">
+          Change
+        </Link>
+      </p>
+    )
+  }
 
   const onSetupAction = async () => {
     setError(null)

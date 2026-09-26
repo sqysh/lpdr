@@ -1,5 +1,6 @@
 import { SectionLabel } from 'components/_primitives'
 import { Eye, Gavel, ShoppingCart } from 'lucide-react'
+import Link from 'next/link'
 
 const STEPS = [
   {
@@ -15,12 +16,13 @@ const STEPS = [
   {
     icon: ShoppingCart,
     title: 'Win and pay',
-    description: "If you win, we'll email you to pay, or charge your saved card automatically if you've turned on auto-pay."
+    description:
+      "If you win, we'll email you to pay. Or turn on auto-pay in My Pack and your card is charged automatically, with the option to cover the card fee so the rescue gets your full bid."
   }
 ]
 
 // Shown before and during the auction, when people are deciding whether and how to bid
-export function AuctionHowItWorks({ isEnded }: { isEnded: boolean }) {
+export function AuctionHowItWorks({ isEnded, isAuthed }: { isEnded: boolean; isAuthed: boolean }) {
   if (isEnded) return null
 
   return (
@@ -46,6 +48,16 @@ export function AuctionHowItWorks({ isEnded }: { isEnded: boolean }) {
           </li>
         ))}
       </ol>
+      {isAuthed && (
+        <div className="px-5 py-3 border-t border-border-light dark:border-border-dark">
+          <Link
+            href="/my-pack?tab=settings"
+            className="text-[11px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark hover:underline underline-offset-4"
+          >
+            Your payment settings →
+          </Link>
+        </div>
+      )}
     </section>
   )
 }
