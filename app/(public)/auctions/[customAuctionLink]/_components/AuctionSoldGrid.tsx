@@ -8,10 +8,14 @@ type Props = {
   auction: PublicAuction
   customAuctionLink: string
   myBids: Record<string, MyBid>
+  isAuthed: boolean
+  watchedIds: string[]
 }
 
-export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids }: Props) {
+export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids, isAuthed, watchedIds }: Props) {
   if (sold.length === 0) return null
+
+  const watched = new Set(watchedIds)
 
   return (
     <section aria-labelledby="sold-heading" className="mt-14 sm:mt-20">
@@ -33,6 +37,8 @@ export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids }: Pr
               index={i}
               customAuctionLink={customAuctionLink}
               myBid={myBids[item.id] ?? null}
+              isAuthed={isAuthed}
+              isWatched={watched.has(item.id)}
             />
           </li>
         ))}

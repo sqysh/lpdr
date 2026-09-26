@@ -15,13 +15,15 @@ export default function PublicAuctionClient({
   myBids,
   autoPay,
   isAuthed,
-  role
+  role,
+  watchedIds
 }: {
   auction: PublicAuction
   myBids: Record<string, MyBid>
   autoPay: AutoPayStatus | null
   isAuthed: boolean
   role: Role | null
+  watchedIds: string[]
 }) {
   const router = useRouter()
 
@@ -67,8 +69,17 @@ export default function PublicAuctionClient({
             customAuctionLink={auction.customAuctionLink}
             isActive={isActive}
             myBids={myBids}
+            isAuthed={isAuthed}
+            watchedIds={watchedIds}
           />
-          <AuctionSoldGrid auction={auction} customAuctionLink={auction.customAuctionLink} sold={sold} myBids={myBids} />
+          <AuctionSoldGrid
+            auction={auction}
+            customAuctionLink={auction.customAuctionLink}
+            sold={sold}
+            myBids={myBids}
+            isAuthed={isAuthed}
+            watchedIds={watchedIds}
+          />
           <AuctionEmptyState auction={auction} />
           <AuctionHowItWorks isEnded={isEnded} />
         </div>

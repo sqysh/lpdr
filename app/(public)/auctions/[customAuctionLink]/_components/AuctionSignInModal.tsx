@@ -6,10 +6,20 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { MagicLink } from 'components/features/auth/MagicLink'
-import { useAuctionUiStore } from 'stores/auction-ui.store'
+import { useAuctionUiStore, type SignInReason } from 'stores/auction-ui.store'
 
 const FOCUSABLE =
   'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+
+// What they were trying to do when they were asked to sign in, so the sheet says why
+const REASONS: Record<SignInReason, { title: string; body: string }> = {
+  bid: { title: 'Sign in to bid', body: "You'll come straight back to the item after signing in." },
+  buy: { title: 'Sign in to buy', body: "You'll come straight back to the item after signing in." },
+  watch: {
+    title: 'Sign in to save items',
+    body: 'Your watchlist is kept with your account, so you can come back to it anytime and see when items are ending.'
+  }
+}
 
 export function AuctionSignInModal() {
   const [email, setEmail] = useState('')
@@ -17,7 +27,9 @@ export function AuctionSignInModal() {
   const closeSignInModal = useAuctionUiStore((s) => s.closeSignInModal)
   const signInRedirectTo = useAuctionUiStore((s) => s.signInRedirectTo)
   const dialogRef = useRef<HTMLDivElement>(null)
+  const signInReason = useAuctionUiStore((s) => s.signInReason)
 
+  const copy = REASONS[signInReason]
   const isOpen = signInRedirectTo !== null
 
   const onClose = () => {
@@ -110,7 +122,7 @@ export function AuctionSignInModal() {
 
             <div className="flex items-center justify-between gap-4 pl-5 sm:pl-6 pr-2 py-2 border-b border-border-light dark:border-border-dark">
               <h2 id="auction-signin-title" className="font-quicksand font-black text-lg text-text-light dark:text-text-dark">
-                Sign in to bid
+                {copy.title}
               </h2>
               <button
                 type="button"
@@ -148,9 +160,7 @@ export function AuctionSignInModal() {
               </div>
             ) : (
               <div className="px-5 sm:px-6 py-6 space-y-4">
-                <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
-                  You&apos;ll come straight back to the item after signing in.
-                </p>
+                <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">{copy.body}</p>
 
                 <div className="flex flex-col gap-2">
                   <GoogleButton redirectTo={signInRedirectTo ?? '/'} />

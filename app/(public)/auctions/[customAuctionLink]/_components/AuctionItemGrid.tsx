@@ -17,23 +17,29 @@ import {
 import { useState } from 'react'
 
 export function AuctionItemGrid({
-  isActive,
-  available,
   auction,
+  available,
   customAuctionLink,
-  myBids
+  isActive,
+  myBids,
+  isAuthed,
+  watchedIds
 }: {
   isActive: boolean
   available: PublicAuctionListItem[]
   auction: PublicAuction
   customAuctionLink: string
   myBids: Record<string, MyBid>
+  isAuthed: boolean
+  watchedIds: string[]
 }) {
   const [filter, setFilter] = useState<AuctionFilter>('ALL')
   const [sort, setSort] = useState<AuctionSort>('DEFAULT')
 
+  const watched = new Set(watchedIds)
+
   const counts = Object.fromEntries(
-    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
+    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, { myBids, watched })).length])
   ) as Record<AuctionFilter, number>
 
   // Hidden: a filter with nothing in it, and Auction when every item is one, since it would match All.
@@ -44,7 +50,7 @@ export function AuctionItemGrid({
   const showFilters = options.length > 1
 
   const filtered = sortItems(
-    available.filter((item) => matchesFilter(item, filter, myBids)),
+    available.filter((item) => matchesFilter(item, filter, { myBids, watched })),
     sort
   )
 
@@ -157,6 +163,8 @@ export function AuctionItemGrid({
                 index={i}
                 customAuctionLink={customAuctionLink}
                 myBid={myBids[item.id] ?? null}
+                isAuthed={isAuthed}
+                isWatched={watched.has(item.id)}
               />
             </li>
           ))}

@@ -1,11 +1,12 @@
 import type { PublicAuctionListItem } from 'types/auction.types'
 import type { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
 
-export const AUCTION_FILTERS = ['ALL', 'MY BIDS', 'WINNING', 'OUTBID', 'NO BIDS', 'AUCTION', 'FIXED'] as const
+export const AUCTION_FILTERS = ['ALL', 'WATCHING', 'MY BIDS', 'WINNING', 'OUTBID', 'NO BIDS', 'AUCTION', 'FIXED'] as const
 export type AuctionFilter = (typeof AUCTION_FILTERS)[number]
 
 export const AUCTION_FILTER_LABELS: Record<AuctionFilter, string> = {
   ALL: 'All',
+  WATCHING: 'Watching',
   'MY BIDS': 'My bids',
   WINNING: 'Winning',
   OUTBID: 'Outbid',
@@ -21,13 +22,17 @@ export const EMPTY_MESSAGE: Partial<Record<AuctionFilter, string>> = {
   'NO BIDS': 'Every item has at least one bid.'
 }
 
+export type FilterContext = { myBids: Record<string, MyBid>; watched: Set<string> }
+
 /** One definition of each filter, so the list and the counts on the buttons can't disagree. */
-export function matchesFilter(item: PublicAuctionListItem, filter: AuctionFilter, myBids: Record<string, MyBid>) {
+export function matchesFilter(item: PublicAuctionListItem, filter: AuctionFilter, { myBids, watched }: FilterContext) {
   const mine = myBids[item.id]
 
   switch (filter) {
     case 'ALL':
       return true
+    case 'WATCHING':
+      return watched.has(item.id)
     case 'MY BIDS':
       return !!mine
     case 'WINNING':

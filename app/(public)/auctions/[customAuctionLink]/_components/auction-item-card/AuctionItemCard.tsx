@@ -8,19 +8,24 @@ import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
 import { AuctionItemCardInfo } from './AuctionItemCardInfo'
 import { AuctionItemCardPhoto } from './AuctionItemCardPhoto'
 import { AuctionItemCardBadgeStrip } from './AuctionItemCardBadgeStrip'
+import { WatchButton } from './WatchButton'
 
 export function AuctionItemCard({
   item,
   auctionStatus,
   index,
   customAuctionLink,
-  myBid
+  myBid,
+  isAuthed,
+  isWatched
 }: {
   item: PublicAuctionItem
   auctionStatus: AuctionStatus
   index: number
   customAuctionLink: string
   myBid: MyBid
+  isAuthed: boolean
+  isWatched: boolean
 }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-40px' })
@@ -39,6 +44,13 @@ export function AuctionItemCard({
       className="group relative bg-bg-light dark:bg-bg-dark overflow-hidden flex flex-col h-full"
     >
       <AuctionItemCardBadgeStrip isSold={isSold} item={item} />
+      <WatchButton
+        itemId={item.id}
+        itemName={item.name}
+        initiallyWatching={isWatched}
+        isAuthed={isAuthed}
+        signInHref={`/auctions/${customAuctionLink}`}
+      />
       <AuctionItemCardPhoto isEnded={isEnded} isSold={isSold} item={item} index={index} />
       <AuctionItemCardInfo
         auctionStatus={auctionStatus}

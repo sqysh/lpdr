@@ -20,6 +20,15 @@ export default async function PublicAuctionPage({ params }: { params: Promise<{ 
       })
     : null
 
+  const watchedIds = session?.user?.id
+    ? (
+        await prisma.auctionItemWatch.findMany({
+          where: { userId: session.user.id, auctionItem: { auctionId: result.data.id } },
+          select: { auctionItemId: true }
+        })
+      ).map((w) => w.auctionItemId)
+    : []
+
   return (
     <PublicAuctionClient
       auction={result.data}
@@ -35,6 +44,7 @@ export default async function PublicAuctionPage({ params }: { params: Promise<{ 
       }
       isAuthed={!!session?.user}
       role={session?.user?.role ?? null}
+      watchedIds={watchedIds}
     />
   )
 }

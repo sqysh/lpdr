@@ -253,10 +253,11 @@ model User {
   orders         Order[]
 
   // Auctions
-  bidder      AuctionBidder[]
-  bids        AuctionBid[]
-  winningBids AuctionWinningBidder[]
-  instantBuys AuctionItemInstantBuyer[]
+  bidder              AuctionBidder[]
+  bids                AuctionBid[]
+  winningBids         AuctionWinningBidder[]
+  instantBuys         AuctionItemInstantBuyer[]
+  watchedAuctionItems AuctionItemWatch[]
 
   // Adoptions
   adoptionFees         AdoptionFee[]
@@ -478,6 +479,8 @@ model AuctionItem {
   auctionWinningBidderId String?
   winningBidder          AuctionWinningBidder? @relation(fields: [auctionWinningBidderId], references: [id])
 
+  watchers AuctionItemWatch[]
+
   @@index([auctionId])
 }
 
@@ -594,6 +597,19 @@ model AuctionItemPhoto {
   updatedAt DateTime    @updatedAt
 
   @@index([itemId])
+}
+
+model AuctionItemWatch {
+  id            String      @id @default(cuid())
+  userId        String
+  auctionItemId String
+  createdAt     DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  auctionItem   AuctionItem @relation(fields: [auctionItemId], references: [id], onDelete: Cascade)
+
+  // One watch per person per item, which also makes toggling safe to repeat
+  @@unique([userId, auctionItemId])
+  @@index([auctionItemId])
 }
 
 // ─── Adoption Application Bypass Code ───────────────────────────────────────────────────

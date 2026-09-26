@@ -2,6 +2,8 @@
 
 import { create } from 'zustand'
 
+export type SignInReason = 'bid' | 'buy' | 'watch'
+
 type AuctionUiState = {
   drawerOpen: boolean
   bidModalOpen: boolean
@@ -9,7 +11,8 @@ type AuctionUiState = {
   winningBidderData: unknown | null
   openDrawer: () => void
   closeDrawer: () => void
-  openSignInModal: (redirectTo: string) => void
+  signInReason: SignInReason
+  openSignInModal: (redirectTo: string, reason?: SignInReason) => void
   closeSignInModal: () => void
   openWinningBidderDrawer: (data: unknown) => void
   closeWinningBidderDrawer: () => void
@@ -22,7 +25,8 @@ export const useAuctionUiStore = create<AuctionUiState>((set) => ({
   winningBidderData: null,
   openDrawer: () => set({ drawerOpen: true }),
   closeDrawer: () => set({ drawerOpen: false }),
-  openSignInModal: (signInRedirectTo) => set({ signInRedirectTo }),
+  signInReason: 'bid',
+  openSignInModal: (redirectTo, reason = 'bid') => set({ signInRedirectTo: redirectTo, signInReason: reason }),
   closeSignInModal: () => set({ signInRedirectTo: null }),
   openWinningBidderDrawer: (winningBidderData) => set({ winningBidderData }),
   closeWinningBidderDrawer: () => set({ winningBidderData: null })
