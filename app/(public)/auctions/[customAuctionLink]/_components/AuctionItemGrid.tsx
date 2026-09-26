@@ -32,6 +32,10 @@ export function AuctionItemGrid({
   const [filter, setFilter] = useState<AuctionFilter>('ALL')
   const [sort, setSort] = useState<AuctionSort>('DEFAULT')
 
+  const counts = Object.fromEntries(
+    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
+  ) as Record<AuctionFilter, number>
+
   // Hidden: a filter with nothing in it, and Auction when every item is one, since it would match All.
   // The selected filter always stays, so it can't vanish from under someone when a bid moves them out of it
   const options = AUCTION_FILTERS.filter(
@@ -43,10 +47,6 @@ export function AuctionItemGrid({
     available.filter((item) => matchesFilter(item, filter, myBids)),
     sort
   )
-
-  const counts = Object.fromEntries(
-    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
-  ) as Record<AuctionFilter, number>
 
   return (
     <section aria-labelledby="available-heading">
