@@ -1,13 +1,14 @@
 'use client'
 
 import { useState } from 'react'
-import { CheckCircle, CreditCard, HeartHandshake, Link, Loader2, MapPin, X, Zap } from 'lucide-react'
+import { CheckCircle, CreditCard, HeartHandshake, Loader2, MapPin, X, Zap } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
 import AddPaymentMethodModal from 'components/features/payment/AddPaymentMethodModal'
 import { UpdateAddressModal } from 'components/_common/UpdateAddressModal'
 import { toggleAutoPay } from 'lib/actions/user/auction/toggleAutoPay'
 import { toggleAutoPayCoverFees } from 'lib/actions/user/auction/toggleAutoPayCoverFees'
+import Link from 'next/link'
 
 export type AutoPayStatus = { enabled: boolean; coversFees: boolean; hasCard: boolean; hasAddress: boolean }
 
@@ -57,6 +58,7 @@ export function AutoPayPrompt({ autoPay, isEnded }: Props) {
   const [dismissed, setDismissed] = useState(false)
 
   if (!autoPay || isEnded || dismissed) return null
+
   // Already set up before this visit: a quiet summary instead of the prompt, so the settings stay discoverable
   if (autoPay.enabled && phase === 'setup') {
     return (
