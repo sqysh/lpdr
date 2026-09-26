@@ -1,45 +1,38 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
 import { PublicAuction } from 'types/auction.types'
 import { AuctionCountdown, AuctionEmptyState, AuctionHowItWorks, AuctionItemGrid, AuctionSignInModal, AuctionSoldGrid } from './_components'
 import { MyBid } from 'lib/actions/public/auction/getMyBidsForAuction'
-import { AUCTION_FILTERS, AuctionFilter, AuctionSort, matchesFilter, sortItems } from './_lib/auction-filters'
 import { useAuctionChannelEvent } from './_components/AuctionChannel'
-import { AutoPayPrompt, AutoPayStatus } from './[auctionItemId]/_components/AutoPayPrompt'
+import { AutoPayPrompt, AutoPayStatus } from './_components/AutoPayPrompt'
+import { Role } from '@prisma/client'
+import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 
 export default function PublicAuctionClient({
   auction,
   myBids,
-  autoPay
+  autoPay,
+  isAuthed,
+  role
 }: {
   auction: PublicAuction
   myBids: Record<string, MyBid>
   autoPay: AutoPayStatus | null
+  isAuthed: boolean
+  role: Role | null
 }) {
-  const session = useSession()
   const router = useRouter()
-  const [filter, setFilter] = useState<AuctionFilter>('ALL')
-  const [sort, setSort] = useState<AuctionSort>('DEFAULT')
 
-  const isAuthed = session.status === 'authenticated'
-  const role = session.data?.user?.role
+  useRefreshOnSignOut(isAuthed)
+
   const isDraft = auction.status === 'DRAFT'
   const isActive = auction.status === 'ACTIVE'
   const isEnded = auction.status === 'ENDED'
 
   const available = auction.items.filter((i) => i.status !== 'SOLD')
   const sold = auction.items.filter((i) => i.status === 'SOLD')
-
-  const filtered = sortItems(
-    available.filter((item) => matchesFilter(item, filter, myBids)),
-    sort
-  )
-  const counts = Object.fromEntries(
-    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
-  ) as Record<AuctionFilter, number>
 
   const pendingRefresh = useRef<ReturnType<typeof setTimeout> | null>(null)
 
@@ -70,24 +63,12 @@ export default function PublicAuctionClient({
           <AutoPayPrompt autoPay={autoPay} isEnded={isEnded} />
           <AuctionItemGrid
             auction={auction}
-            available={filtered}
+            available={available}
             customAuctionLink={auction.customAuctionLink}
             isActive={isActive}
-            setFilter={setFilter}
-            filter={filter}
             myBids={myBids}
-            isAuthed={isAuthed}
-            counts={counts}
-            sort={sort}
-            setSort={setSort}
           />
-          <AuctionSoldGrid
-            auction={auction}
-            customAuctionLink={auction.customAuctionLink}
-            sold={sold}
-            myBids={myBids}
-            isAuthed={isAuthed}
-          />
+          <AuctionSoldGrid auction={auction} customAuctionLink={auction.customAuctionLink} sold={sold} myBids={myBids} />
           <AuctionEmptyState auction={auction} />
           <AuctionHowItWorks isEnded={isEnded} />
         </div>

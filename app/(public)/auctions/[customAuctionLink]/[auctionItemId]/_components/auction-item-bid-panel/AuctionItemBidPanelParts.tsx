@@ -133,7 +133,7 @@ export function QuickBidButton({
           )}
           <span className="text-left">
             <span className="block text-f10 font-mono tracking-eyebrow uppercase font-black leading-none mb-0.5">
-              {submitting ? 'Placing bid' : confirming ? 'Tap again to bid' : 'Instant Bid'}
+              {submitting ? 'Placing bid' : confirming ? 'Tap again to bid' : 'Lightning Bid'}
             </span>
             <span className="block text-f9 font-mono opacity-70">
               {confirming ? 'This bid is binding' : `${formatMoney(QUICK_BID_INCREMENT)} above the current bid`}

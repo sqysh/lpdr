@@ -1,5 +1,5 @@
 import { formatMoney } from 'lib/utils/currency.utils'
-import { Check, ChevronRight, Eye, Loader2, TrendingUp, Trophy, Zap } from 'lucide-react'
+import { ChevronRight, Eye, Loader2, TrendingUp, Trophy } from 'lucide-react'
 import Link, { useLinkStatus } from 'next/link'
 
 function CardLinkBody({ label, icon }: { label: string; icon: React.ReactNode }) {
@@ -37,19 +37,7 @@ function YourBidBadge({ myBid }: { myBid: { status: string; bidAmount: number } 
 }
 
 export function AuctionItemCardInfo(props) {
-  const {
-    isSold,
-    isUpcoming,
-    auctionStatus,
-    item,
-    handleQuickBid,
-    quickBidLoading,
-    confirming,
-    quickBidAmount,
-    quickBidError,
-    customAuctionLink,
-    myBid
-  } = props
+  const { auctionStatus, customAuctionLink, isSold, isUpcoming, item, myBid } = props
 
   const isFixed = item.sellingFormat === 'FIXED'
   const displayPrice = isFixed ? item.buyNowPrice : (item.currentBid ?? item.startingPrice)
@@ -60,7 +48,6 @@ export function AuctionItemCardInfo(props) {
 
   // Only meaningful on an auction item: a fixed item has no bids to be top of
   const isTopBid = !isFixed && myBid?.status === 'TOP_BID'
-  const termsId = `quick-bid-terms-${item.id}`
 
   return (
     <div className="flex flex-col flex-1 p-3 sm:p-4">
@@ -101,51 +88,6 @@ export function AuctionItemCardInfo(props) {
       {auctionStatus === 'ACTIVE' && !isSold && (
         <div className="mt-3 space-y-1.5">
           {!isFixed && <YourBidBadge myBid={myBid} />}
-
-          {!isFixed && !isTopBid && (
-            <>
-              <button
-                type="button"
-                onClick={handleQuickBid}
-                disabled={quickBidLoading}
-                aria-describedby={termsId}
-                className={`w-full min-h-11 flex items-center justify-between gap-2 px-3 py-2 transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-600 text-[10px] font-mono tracking-tag uppercase font-black disabled:opacity-60 disabled:cursor-not-allowed ${
-                  confirming ? 'bg-amber-700 text-white' : 'bg-amber-400 hover:bg-amber-300 text-amber-950'
-                }`}
-              >
-                <span className="truncate">
-                  {quickBidLoading
-                    ? 'Bidding'
-                    : confirming
-                      ? `Confirm ${formatMoney(quickBidAmount)}`
-                      : `Bid ${formatMoney(quickBidAmount)}`}
-                </span>
-                {quickBidLoading ? (
-                  <Loader2 size={12} className="shrink-0 animate-spin" aria-hidden="true" />
-                ) : confirming ? (
-                  <Check size={12} className="shrink-0" aria-hidden="true" />
-                ) : (
-                  <Zap size={12} className="shrink-0" aria-hidden="true" />
-                )}
-              </button>
-
-              {/* Always in the page, so the terms are announced when they appear at the confirm step,
-                  the moment a bid is one tap from being placed and binding */}
-              <div id={termsId} aria-live="polite">
-                {confirming && !quickBidLoading && (
-                  <p className="px-3 py-2 border border-amber-600/40 bg-amber-500/10 text-[11px] font-mono leading-relaxed text-amber-800 dark:text-amber-300">
-                    Tap again to confirm. Bids are binding: if you win, payment is due and all sales are final.
-                  </p>
-                )}
-              </div>
-
-              {quickBidError && (
-                <p role="alert" className="text-[11px] font-mono leading-relaxed text-red-600 dark:text-red-400">
-                  {quickBidError}
-                </p>
-              )}
-            </>
-          )}
 
           {isTopBid && (
             <p className="px-3 py-2.5 border border-border-light dark:border-border-dark text-[11px] font-mono leading-relaxed text-muted-light dark:text-muted-dark text-center">

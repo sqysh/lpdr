@@ -33,6 +33,8 @@ export default async function PublicAuctionPage({ params }: { params: Promise<{ 
             }
           : null
       }
+      isAuthed={!!session?.user}
+      role={session?.user?.role ?? null}
     />
   )
 }

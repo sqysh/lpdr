@@ -5,12 +5,12 @@ const STEPS = [
   {
     icon: Eye,
     title: 'Browse items',
-    description: 'Look through everything up for auction and find something you love.'
+    description: 'Look through everything up for auction, and open any item to see its photos and details.'
   },
   {
     icon: Gavel,
     title: 'Place your bid',
-    description: 'Tap Bid on any item, then tap again to confirm. Or open the item to choose your own amount.'
+    description: 'Open any item and enter your bid, or tap Lightning bid to go $10 above the current bid in one tap.'
   },
   {
     icon: ShoppingCart,

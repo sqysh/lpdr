@@ -89,12 +89,13 @@ function Lightbox({
       }}
       className="fixed inset-0 m-0 p-0 w-full h-full max-w-none max-h-none bg-black/95 text-white backdrop:bg-black/80 flex items-center justify-center"
     >
-      <div className="relative w-full h-full flex items-center justify-center px-2 sm:px-16 py-16" {...handlers}>
+      <div className="absolute inset-0 px-2 sm:px-16 py-16" {...handlers}>
+        {/* Fills the area and keeps its shape, rather than sizing to whatever width the image reports */}
         <Picture
           key={current.url}
           src={current.url}
           alt={`${name}, photo ${idx + 1} of ${photos.length}`}
-          className="max-w-full max-h-full object-contain select-none"
+          className="w-full h-full object-contain select-none"
         />
       </div>
 

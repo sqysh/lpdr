@@ -10,40 +10,43 @@ import {
   AUCTION_SORTS,
   AuctionFilter,
   AuctionSort,
-  EMPTY_MESSAGE
+  EMPTY_MESSAGE,
+  matchesFilter,
+  sortItems
 } from '../_lib/auction-filters'
+import { useState } from 'react'
 
 export function AuctionItemGrid({
   isActive,
   available,
   auction,
   customAuctionLink,
-  filter,
-  setFilter,
-  counts,
-  myBids,
-  isAuthed,
-  sort,
-  setSort
+  myBids
 }: {
   isActive: boolean
   available: PublicAuctionListItem[]
   auction: PublicAuction
   customAuctionLink: string
-  setFilter: (filter: AuctionFilter) => void
-  filter: AuctionFilter
-  counts: Record<AuctionFilter, number>
   myBids: Record<string, MyBid>
-  isAuthed: boolean
-  sort: AuctionSort
-  setSort: (sort: AuctionSort) => void
 }) {
+  const [filter, setFilter] = useState<AuctionFilter>('ALL')
+  const [sort, setSort] = useState<AuctionSort>('DEFAULT')
+
   // Hidden: a filter with nothing in it, and Auction when every item is one, since it would match All.
   // The selected filter always stays, so it can't vanish from under someone when a bid moves them out of it
   const options = AUCTION_FILTERS.filter(
     (f) => f === 'ALL' || f === filter || (counts[f] > 0 && !(f === 'AUCTION' && counts.AUCTION === counts.ALL))
   )
   const showFilters = options.length > 1
+
+  const filtered = sortItems(
+    available.filter((item) => matchesFilter(item, filter, myBids)),
+    sort
+  )
+
+  const counts = Object.fromEntries(
+    AUCTION_FILTERS.map((f) => [f, available.filter((item) => matchesFilter(item, f, myBids)).length])
+  ) as Record<AuctionFilter, number>
 
   return (
     <section aria-labelledby="available-heading">
@@ -120,10 +123,10 @@ export function AuctionItemGrid({
 
       {/* Tells screen readers what a filter change did, since the list swaps silently otherwise */}
       <p className="sr-only" role="status">
-        Showing {available.length} of {counts.ALL} items
+        Showing {filtered.length} of {counts.ALL} items
       </p>
 
-      {available.length === 0 ? (
+      {filtered.length === 0 ? (
         <div className="border border-border-light dark:border-border-dark py-14 px-6 text-center space-y-3">
           <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark">Nothing here right now</p>
           <p className="text-sm text-muted-light dark:text-muted-dark">{EMPTY_MESSAGE[filter] ?? 'No items match this filter.'}</p>
@@ -142,7 +145,7 @@ export function AuctionItemGrid({
           // cells blank instead of filled with the line color
           className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 items-stretch border-t border-l border-border-light dark:border-border-dark"
         >
-          {available.map((item, i) => (
+          {filtered.map((item, i) => (
             <li
               key={item.id}
               id={`item-${item.id}`}
@@ -154,7 +157,6 @@ export function AuctionItemGrid({
                 index={i}
                 customAuctionLink={customAuctionLink}
                 myBid={myBids[item.id] ?? null}
-                isAuthed={isAuthed}
               />
             </li>
           ))}

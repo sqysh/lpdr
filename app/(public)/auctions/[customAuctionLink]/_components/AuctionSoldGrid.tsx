@@ -8,10 +8,9 @@ type Props = {
   auction: PublicAuction
   customAuctionLink: string
   myBids: Record<string, MyBid>
-  isAuthed: boolean
 }
 
-export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids, isAuthed }: Props) {
+export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids }: Props) {
   if (sold.length === 0) return null
 
   return (
@@ -34,7 +33,6 @@ export function AuctionSoldGrid({ sold, auction, customAuctionLink, myBids, isAu
               index={i}
               customAuctionLink={customAuctionLink}
               myBid={myBids[item.id] ?? null}
-              isAuthed={isAuthed}
             />
           </li>
         ))}
