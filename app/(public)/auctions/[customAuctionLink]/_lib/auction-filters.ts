@@ -40,3 +40,29 @@ export function matchesFilter(item: PublicAuctionListItem, filter: AuctionFilter
       return item.sellingFormat === filter
   }
 }
+
+export const AUCTION_SORTS = ['DEFAULT', 'PRICE_LOW', 'PRICE_HIGH', 'MOST_BIDS'] as const
+export type AuctionSort = (typeof AUCTION_SORTS)[number]
+
+export const AUCTION_SORT_LABELS: Record<AuctionSort, string> = {
+  DEFAULT: 'Featured',
+  PRICE_LOW: 'Price: low to high',
+  PRICE_HIGH: 'Price: high to low',
+  MOST_BIDS: 'Most bids'
+}
+
+// What someone would pay now: the current bid, or the starting price before any bids, or the Buy Now price
+const priceOf = (item: PublicAuctionListItem) =>
+  Number(item.sellingFormat === 'FIXED' ? (item.buyNowPrice ?? 0) : (item.currentBid ?? item.startingPrice ?? 0))
+
+/** Returns a sorted copy. Featured keeps the order the crew set the items up in. */
+export function sortItems(items: PublicAuctionListItem[], sort: AuctionSort) {
+  if (sort === 'DEFAULT') return items
+
+  return [...items].sort((a, b) => {
+    if (sort === 'PRICE_LOW') return priceOf(a) - priceOf(b)
+    if (sort === 'PRICE_HIGH') return priceOf(b) - priceOf(a)
+    // Ties fall back to the higher price, so the busiest, most valuable items lead
+    return (b._count?.bids ?? 0) - (a._count?.bids ?? 0) || priceOf(b) - priceOf(a)
+  })
+}

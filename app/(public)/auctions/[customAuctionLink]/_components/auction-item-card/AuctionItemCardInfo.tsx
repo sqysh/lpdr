@@ -85,7 +85,7 @@ export function AuctionItemCardInfo(props) {
         {displayPrice != null && (
           <div className="flex items-center justify-between gap-2">
             <dt className="text-[10px] font-mono tracking-widest uppercase text-muted-light dark:text-muted-dark">
-              {isFixed ? 'Price' : !item.currentBid ? 'Starting' : 'Current'}
+              {isFixed ? 'Price' : bidCount === 0 ? 'Starting' : 'Current'}
             </dt>
             <dd className="font-mono font-black text-sm tabular-nums text-text-light dark:text-text-dark">{formatMoney(displayPrice)}</dd>
           </div>

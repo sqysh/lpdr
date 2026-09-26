@@ -100,9 +100,7 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
   if (loadError) {
     return (
       <div className="flex items-center justify-center h-dvh">
-        <p className="text-xs font-mono text-red-500 dark:text-red-400">
-          Could not load the map. Check the API key configuration.
-        </p>
+        <p className="text-xs font-mono text-red-500 dark:text-red-400">Could not load the map. Check the API key configuration.</p>
       </div>
     )
   }
@@ -111,6 +109,8 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
     <div className="relative h-[calc(100dvh-48px)] lg:h-dvh w-full">
       {isLoaded && isResolved && (
         <GoogleMap
+          // backgroundColor is only read when the map is created, so switching theme recreates the map
+          key={isDark ? 'dark' : 'light'}
           mapContainerClassName="absolute inset-0"
           center={US_CENTER}
           zoom={US_ZOOM}
@@ -120,7 +120,10 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
           options={{
             disableDefaultUI: true,
             zoomControl: true,
-            styles: isDark ? MAP_STYLE_DARK : MAP_STYLE_LIGHT
+            styles: isDark ? MAP_STYLE_DARK : MAP_STYLE_LIGHT,
+            // What shows through the hairline gaps between tiles; Google's default is a light gray that
+            // blends into the light map but draws a grid over the dark one
+            backgroundColor: isDark ? '#0d0d14' : '#f5f5f5'
           }}
         >
           {clusters.map((cluster) => (
