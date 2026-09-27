@@ -14,7 +14,8 @@ import {
   Bell,
   FileText,
   Send,
-  User
+  User,
+  PenLine
 } from 'lucide-react'
 
 export const ICON_MAP = {
@@ -33,7 +34,8 @@ export const ICON_MAP = {
   Bell,
   FileText,
   Send,
-  User
+  User,
+  PenLine
 } as const
 
 export type IconKey = keyof typeof ICON_MAP

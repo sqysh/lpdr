@@ -14,7 +14,7 @@ import { useRouter } from 'next/navigation'
 import { formatDate } from 'lib/utils/date.utils'
 import { isAnonymous } from '../_lib/isAnonymous'
 
-const COL_COUNT = 8
+const COL_COUNT = 9
 
 // A subscription is only ended once its newest charge failed or was refunded; a confirmed
 // latest charge means it is still billing, whatever happened earlier in its history
@@ -92,8 +92,6 @@ export function AdminSubscriptionsClient({ orders }: { orders: IOrderRow[] }) {
     () => (filter === 'ALL' ? subscriptions : subscriptions.filter((s) => (filter === 'ACTIVE' ? s.isActive : !s.isActive))),
     [subscriptions, filter]
   )
-
-  const renewals = orders.length - 1
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
@@ -185,9 +183,6 @@ export function AdminSubscriptionsClient({ orders }: { orders: IOrderRow[] }) {
                       <Repeat className="w-3 h-3 shrink-0" aria-hidden="true" />
                       {s.latest.recurringFrequency ?? 'Monthly'}
                     </span>
-                    <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                      {renewals === 0 ? 'First payment' : `${renewals} renewal${renewals === 1 ? '' : 's'}`}
-                    </p>
                   </td>
                   <td className="px-4 py-3 text-xs font-mono tabular-nums text-muted-light dark:text-muted-dark">{s.charges}</td>
                   <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">

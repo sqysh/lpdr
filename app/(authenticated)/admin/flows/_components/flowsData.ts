@@ -88,8 +88,7 @@ export const FLOWS: FlowData[] = [
       },
       {
         question: 'Can a user update their own shipping address or payment method?',
-        answer:
-          'Yes, from the Account tab. They can add or remove saved cards and update their shipping address at any time.'
+        answer: 'Yes, from the Account tab. They can add or remove saved cards and update their shipping address at any time.'
       },
       {
         question: 'Where does a user turn on auto-pay for auctions?',
@@ -163,6 +162,80 @@ export const FLOWS: FlowData[] = [
         question: 'Does someone need an account just to look at the dogs available for adoption?',
         answer:
           'No. Browsing the dachshunds available for adoption is open to everyone. An account is only required when they are ready to pay the $15 application fee and submit an application.'
+      }
+    ]
+  },
+  {
+    id: 'adoption-agreement',
+    icon: 'FileText',
+    title: 'Adoption agreements',
+    summary: 'From sending the agreement to welcoming a dog home',
+    steps: [
+      {
+        icon: 'FileText',
+        title: 'Agreement created and sent',
+        caption: 'An admin picks the adopter and the dog, then sends it. The adopter gets an email with a link.'
+      },
+      {
+        icon: 'MousePointerClick',
+        title: 'Adopter fills in their details',
+        caption: 'They sign in, confirm their name, phone and address, and read the terms.'
+      },
+      {
+        icon: 'PenLine',
+        title: 'Adopter signs',
+        caption: 'They sign the agreement, including the financial terms and the adoption fee.'
+      },
+      {
+        icon: 'CreditCard',
+        title: 'Adoption fee paid',
+        caption: 'By card on the agreement page, or by Zelle, Venmo or PayPal, which an admin marks as paid.'
+      },
+      {
+        icon: 'CheckCircle',
+        title: 'LPDR countersigns',
+        caption: 'Our representative reviews and countersigns, which completes the adoption.'
+      },
+      {
+        icon: 'Heart',
+        title: 'Welcome home',
+        caption: 'The adopter gets a welcome email, and the agreement stays in their My Pack.'
+      }
+    ],
+    faq: [
+      {
+        question: 'Where do I see what needs doing on each agreement?',
+        answer:
+          'On the Adoption Agreements page. Agreements waiting on LPDR, like a payment to mark or a countersignature, are highlighted and sorted to the top, so the next action is always the first thing you see.'
+      },
+      {
+        question: 'How does the adopter pay the adoption fee?',
+        answer:
+          'By card, right on the agreement page, which records the payment and sends a receipt automatically. They can also pay by Zelle, Venmo or PayPal. In that case, once the money arrives, open the agreement and mark it as paid with the method used. That records the payment, sends their receipt and notifies our representative.'
+      },
+      {
+        question: 'Can an agreement be cancelled?',
+        answer:
+          'Yes. Before the fee is paid, void it: the agreement is closed and the dog becomes available to choose for another agreement. After the fee is paid, mark it as returned instead, which is used when an adoption does not work out.'
+      },
+      {
+        question: 'How do refunds work when a dog is returned?',
+        answer:
+          'Once an agreement is marked as returned, a refund panel appears on it, showing how many days the dog was with the adopter. Card payments can be refunded from there, and the refund goes back to their card through Stripe. Refunds made in the Stripe dashboard are recorded here automatically too. Payments made by Zelle, Venmo or PayPal are refunded outside the site the same way they came in.'
+      },
+      {
+        question: 'Who countersigns, and when?',
+        answer:
+          'Our adoption representative countersigns once the adopter has signed and the fee is paid. Countersigning completes the adoption and sends the adopter their welcome email.'
+      },
+      {
+        question: 'Where can the adopter find their agreement later?',
+        answer:
+          'In My Pack, on the Adoptions tab. If there is anything left for them to do, like signing or paying, a banner there tells them and links straight to it.'
+      },
+      {
+        question: 'Where do I see all adoption fee payments?',
+        answer: 'On the Adoption Payments page, which lists every payment with how it was paid and any refund.'
       }
     ]
   },
