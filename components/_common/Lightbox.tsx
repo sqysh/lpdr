@@ -3,7 +3,6 @@
 import { useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import Picture from 'components/_common/Picture'
-import { IAuctionItemPhoto } from 'types/auction-item-photo'
 import { useSwipe } from '@hooks/useSwipe.hook'
 
 export function Lightbox({
@@ -14,7 +13,7 @@ export function Lightbox({
   onNext,
   onClose
 }: {
-  photos: IAuctionItemPhoto[]
+  photos: { url: string }[]
   idx: number
   name: string
   onPrev: () => void
