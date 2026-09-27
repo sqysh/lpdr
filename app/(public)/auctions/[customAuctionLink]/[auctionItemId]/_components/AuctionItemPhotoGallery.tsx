@@ -182,7 +182,15 @@ export function AuctionItemPhotoGallery({ photos, name }: { photos: IAuctionItem
           className="absolute inset-0 w-full h-full cursor-zoom-in focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           {...handlers}
         >
-          <Picture priority key={current.url} src={current.url} alt="" className="w-full h-full object-cover" />
+          <Picture
+            priority
+            unoptimized={false}
+            sizes="(min-width: 1024px) 50vw, 100vw"
+            key={current.url}
+            src={current.url}
+            alt=""
+            className="w-full h-full object-cover"
+          />
         </button>
 
         <span
@@ -225,7 +233,7 @@ export function AuctionItemPhotoGallery({ photos, name }: { photos: IAuctionItem
                 i === idx ? 'border-primary-light dark:border-primary-dark' : 'border-transparent opacity-60 hover:opacity-90'
               }`}
             >
-              <Picture src={photo.url} alt="" className="w-full h-full object-cover" />
+              <Picture unoptimized={false} sizes="56px" src={photo.url} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>

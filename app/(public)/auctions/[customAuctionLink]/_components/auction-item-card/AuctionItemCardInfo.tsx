@@ -98,6 +98,7 @@ export function AuctionItemCardInfo(props) {
           {isFixed && (
             <Link
               href={primaryHref}
+              prefetch={false}
               aria-label={`Buy Now: ${item.name}, ${formatMoney(item.buyNowPrice)}`}
               className="btn-shimmer relative overflow-hidden group/btn min-h-11 flex items-center justify-between px-3 py-2 text-white bg-emerald-700 hover:bg-emerald-800 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-emerald-700"
             >
@@ -115,6 +116,7 @@ export function AuctionItemCardInfo(props) {
       {/* On every card, whatever the status: before opening it's how people preview, after closing how they see what sold */}
       <Link
         href={itemHref}
+        prefetch={false}
         aria-label={`${isUpcoming ? 'Preview item' : 'View item'}: ${item.name}`}
         className={`${auctionStatus === 'ACTIVE' && !isSold ? 'mt-1.5' : 'mt-3'} min-h-11 flex items-center justify-between px-3 py-2 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`}
       >
