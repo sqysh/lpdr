@@ -2,24 +2,7 @@
 
 import { useState } from 'react'
 import Picture from 'components/_common/Picture'
-
-function PhotoFallback() {
-  return (
-    <div className="w-full h-full flex items-center justify-center relative overflow-hidden">
-      <div
-        className="absolute inset-0 opacity-10"
-        style={{
-          backgroundImage: 'radial-gradient(circle, currentColor 1px, transparent 1px)',
-          backgroundSize: '16px 16px'
-        }}
-        aria-hidden="true"
-      />
-      <span className="font-quicksand font-black text-2xl text-primary-light/20 dark:text-primary-dark/20 select-none" aria-hidden="true">
-        LP
-      </span>
-    </div>
-  )
-}
+import { PhotoFallback } from 'components/_common/PhotoFallback'
 
 export function AuctionItemCardPhoto({ isEnded, isSold, item, index }) {
   const photo = item.photos.find((p) => p.isPrimary) ?? item.photos[0]
