@@ -31,7 +31,7 @@ export function LeftGallery({ a }) {
       <div className="relative overflow-hidden bg-surface-light dark:bg-surface-dark aspect-square sm:aspect-4/3">
         {showMain ? (
           <Picture
-            priority={true}
+            priority
             src={current}
             alt={`${name}, photo ${activePhoto + 1} of ${count}`}
             onError={() => setFailed((f) => ({ ...f, [current]: true }))}

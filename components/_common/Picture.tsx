@@ -32,7 +32,7 @@ const Picture: FC<PictureProps> = ({
   style,
   unoptimized = true
 }) => {
-  const resolvedAlt = decorative ? '' : alt || 'Little Paws Dachshund Rescue'
+  const resolvedAlt = decorative ? '' : (alt ?? 'Little Paws Dachshund Rescue')
   const ariaHidden = decorative ? true : undefined
 
   return (
