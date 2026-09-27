@@ -7,6 +7,7 @@ declare module '@auth/core/adapters' {
     role: Role
     firstName: string | null
     lastName: string | null
+    nameConfirmedAt: Date | null
   }
 }
 
@@ -16,7 +17,8 @@ declare module 'next-auth' {
       id: string
       email: string
       role: Role
-      hasSeenWelcome: boolean
+      // Set for accounts whose name was guessed from their email address, which the name prompt asks about
+      needsName: boolean
     } & DefaultSession['user']
   }
 

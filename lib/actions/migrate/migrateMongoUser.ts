@@ -39,7 +39,8 @@ async function migrateUserFields(tx: any, mongoUser: any, userId: string) {
   await tx.user.update({
     where: { id: userId },
     data: {
-      firstName: d.firstName ?? undefined,
+      // Names from the old site were typed by the person, so they count as confirmed
+      ...(d.firstName && { nameConfirmedAt: new Date() }),
       lastName: d.lastName ?? undefined,
       phone: d.phone ?? undefined,
       anonymousBidding: d.anonymousBidding ?? true
@@ -148,12 +149,7 @@ async function migrateOrders(tx: any, normalizedEmail: string, userId: string) {
     })
 
     for (const item of itemDocs) {
-      const itemType =
-        item.itemType === 'welcomeWiener'
-          ? 'WELCOME_WIENER'
-          : item.itemType === 'ecard'
-            ? 'ECARD'
-            : 'PRODUCT'
+      const itemType = item.itemType === 'welcomeWiener' ? 'WELCOME_WIENER' : item.itemType === 'ecard' ? 'ECARD' : 'PRODUCT'
 
       await tx.orderItem.create({
         data: {
@@ -251,9 +247,7 @@ async function migrateAuctions(tx: any, normalizedEmail: string, userId: string)
   }
 
   async function attachPhotos(itemId: string, mongoItemData: any) {
-    const photoIds = (mongoItemData.photos ?? [])
-      .map((ref: any) => ref.$oid ?? ref.toString())
-      .filter(Boolean) as string[]
+    const photoIds = (mongoItemData.photos ?? []).map((ref: any) => ref.$oid ?? ref.toString()).filter(Boolean) as string[]
     if (!photoIds.length) return
 
     const photos = await tx.mongoAuctionItemPhoto.findMany({
@@ -294,9 +288,7 @@ async function migrateAuctions(tx: any, normalizedEmail: string, userId: string)
       continue
     }
 
-    const auctionItemIds = (d.auctionItems ?? [])
-      .map((ref: any) => mongoId(ref))
-      .filter(Boolean) as string[]
+    const auctionItemIds = (d.auctionItems ?? []).map((ref: any) => mongoId(ref)).filter(Boolean) as string[]
     const mongoAuctionItems = await tx.mongoAuctionItem.findMany({
       where: { mongoId: { in: auctionItemIds } }
     })
@@ -309,8 +301,7 @@ async function migrateAuctions(tx: any, normalizedEmail: string, userId: string)
         totalPrice: d.totalPrice ?? 0,
         itemSoldPrice: d.subtotal ?? d.totalPrice ?? 0,
         shipping: d.shipping ?? 0,
-        shippingStatus:
-          (mapShippingStatus(d.shippingStatus) as any) ?? 'PENDING_PAYMENT_CONFIRMATION',
+        shippingStatus: (mapShippingStatus(d.shippingStatus) as any) ?? 'PENDING_PAYMENT_CONFIRMATION',
         paidOn: d.paidOn ? parseDate(d.paidOn) : parseDate(d.createdAt),
         createdAt: parseDate(d.createdAt)
       }
@@ -353,9 +344,7 @@ async function migrateAuctions(tx: any, normalizedEmail: string, userId: string)
     const auction = await getAuction(mongoAuctionId)
 
     const mongoItemId = mongoId(d.auctionItem)
-    const mongoItem = mongoItemId
-      ? await tx.mongoAuctionItem.findUnique({ where: { mongoId: mongoItemId } })
-      : null
+    const mongoItem = mongoItemId ? await tx.mongoAuctionItem.findUnique({ where: { mongoId: mongoItemId } }) : null
     const item = mongoItem?.data as any
     const isPhysical = !d.isDigital
     const shippingStatus = isPhysical ? 'PENDING_FULFILLMENT' : 'DIGITAL'
@@ -412,9 +401,7 @@ async function migrateAuctions(tx: any, normalizedEmail: string, userId: string)
     }
 
     const mongoItemId = d.auctionItem?.$oid ?? d.auctionItem?.toString()
-    const mongoItem = mongoItemId
-      ? await tx.mongoAuctionItem.findUnique({ where: { mongoId: mongoItemId } })
-      : null
+    const mongoItem = mongoItemId ? await tx.mongoAuctionItem.findUnique({ where: { mongoId: mongoItemId } }) : null
     const item = mongoItem?.data as any
 
     const bidder = await getOrCreateBidder(auction.id)
@@ -614,12 +601,7 @@ async function migrateWelcomeWienerOrders(tx: any, normalizedEmail: string, user
   }
 }
 
-async function runMigrationTransaction(
-  tx: any,
-  normalizedEmail: string,
-  userId: string,
-  mongoUser?: any
-) {
+async function runMigrationTransaction(tx: any, normalizedEmail: string, userId: string, mongoUser?: any) {
   if (mongoUser) {
     await migrateUserFields(tx, mongoUser, userId)
   }
@@ -662,20 +644,14 @@ async function runMigrationTransaction(
  * Deletes each staging record after successful migration.
  * Once all users have migrated, staging tables will be empty and can be dropped.
  */
-export async function migrateMongoUser(
-  email: string,
-  userId: string
-): Promise<{ success: boolean; error?: string }> {
+export async function migrateMongoUser(email: string, userId: string): Promise<{ success: boolean; error?: string }> {
   const normalizedEmail = email.toLowerCase().trim()
 
   try {
     const mongoUser = await prisma.mongoUser.findUnique({ where: { email: normalizedEmail } })
 
     if (!mongoUser) {
-      await prisma.$transaction(
-        async (tx) => runMigrationTransaction(tx, normalizedEmail, userId),
-        { timeout: 60000 }
-      )
+      await prisma.$transaction(async (tx) => runMigrationTransaction(tx, normalizedEmail, userId), { timeout: 60000 })
       await createLog('info', 'No mongo user record — migrated orphaned records only', {
         email: normalizedEmail,
         userId
@@ -685,10 +661,7 @@ export async function migrateMongoUser(
 
     await createLog('info', 'Starting migration', { email: normalizedEmail, userId })
 
-    await prisma.$transaction(
-      async (tx) => runMigrationTransaction(tx, normalizedEmail, userId, mongoUser),
-      { timeout: 60000 }
-    )
+    await prisma.$transaction(async (tx) => runMigrationTransaction(tx, normalizedEmail, userId, mongoUser), { timeout: 60000 })
 
     await pusherTrigger(`user-${userId}`, 'migration-complete', {})
     await createLog('info', 'Mongo user migration complete', { email: normalizedEmail, userId })

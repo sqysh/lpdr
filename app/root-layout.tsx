@@ -15,6 +15,7 @@ import { HIDDEN_PATHS } from 'lib/constants/navigation.constants'
 import { stripePromise } from 'lib/stripe/stripe-promise'
 import { useSyncTheme } from 'stores/theme.store'
 import { MotionConfig } from 'framer-motion'
+import { NamePrompt } from 'components/features/auth/NamePrompt'
 
 interface Props {
   children: ReactNode
@@ -37,6 +38,7 @@ export function RootLayoutWrapper({ children, header, navDrawer }: Props) {
           <AuthRedirectWatcher />
         </Suspense>
         <CookieConsentBanner />
+        <NamePrompt />
         <FixedDonateTab />
         <Confetti3D />
         <CartBar />

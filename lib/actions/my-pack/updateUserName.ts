@@ -17,7 +17,7 @@ export const updateUserName = async ({ firstName, lastName }: { firstName: strin
   try {
     const user = await prisma.user.update({
       where: { id: gate.userId },
-      data: { firstName: firstName.trim(), lastName: lastName.trim() },
+      data: { firstName: firstName.trim(), lastName: lastName.trim() || null, nameConfirmedAt: new Date() },
       select: { id: true, firstName: true, lastName: true, email: true }
     })
 

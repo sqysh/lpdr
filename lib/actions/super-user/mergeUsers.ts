@@ -28,8 +28,7 @@ export async function mergeUsers({
 
     if (!primary) return { success: false, error: 'Primary user not found.' }
     if (!duplicate) return { success: false, error: 'No account found with that email address.' }
-    if (primary.id === duplicate.id)
-      return { success: false, error: 'That email belongs to this account.' }
+    if (primary.id === duplicate.id) return { success: false, error: 'That email belongs to this account.' }
 
     await prisma.$transaction(async (tx) => {
       await tx.order.updateMany({
@@ -82,6 +81,7 @@ export async function mergeUsers({
         where: { id: primaryUserId },
         data: {
           firstName: primary.firstName ?? duplicate.firstName,
+          nameConfirmedAt: primary.nameConfirmedAt ?? duplicate.nameConfirmedAt,
           lastName: primary.lastName ?? duplicate.lastName,
           phone: primary.phone ?? duplicate.phone,
           stripeCustomerId: primary.stripeCustomerId ?? duplicate.stripeCustomerId

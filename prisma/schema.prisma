@@ -213,12 +213,14 @@ model User {
   image     String?
 
   // Account
-  role           Role       @default(PACK_MEMBER)
-  status         UserStatus @default(ACTIVE)
-  emailVerified  DateTime?
-  lastLoginAt    DateTime?
-  hasSeenWelcome Boolean    @default(false)
-  metadata       Json?
+  role            Role       @default(PACK_MEMBER)
+  status          UserStatus @default(ACTIVE)
+  emailVerified   DateTime?
+  lastLoginAt     DateTime?
+  hasSeenWelcome  Boolean    @default(false)
+  metadata        Json?
+  // When the name was given by the person or their Google/Facebook account. Null means it was guessed from their email
+  nameConfirmedAt DateTime?
 
   // Auction preferences
   anonymousBidding Boolean @default(false)

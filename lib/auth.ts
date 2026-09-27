@@ -1,8 +1,6 @@
 import NextAuth from 'next-auth'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import prisma from 'prisma/client'
-import type { AdapterUser } from '@auth/core/adapters'
-import { Role } from '@prisma/client'
 import { authConfig } from './auth/auth.config'
 import { handleMagicLinkCallback } from './callbacks/magic-link.callback'
 import { handleGoogleCallback } from './callbacks/google.callback'
@@ -55,16 +53,13 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async session({ session, user }) {
-      const dbUser = user as AdapterUser & {
-        firstName: string | null
-        lastName: string | null
-      }
+      session.user.id = user.id
+      session.user.role = user.role
+      // True for accounts whose name was guessed from their email address, which the name prompt asks about
+      session.user.needsName = !user.nameConfirmedAt
 
-      session.user.id = dbUser.id
-      session.user.role = dbUser.role as Role
-
-      if (dbUser.firstName && dbUser.lastName) {
-        session.user.name = `${dbUser.firstName} ${dbUser.lastName}`.trim()
+      if (user.firstName && user.lastName) {
+        session.user.name = `${user.firstName} ${user.lastName}`.trim()
       }
 
       return session
@@ -156,7 +151,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
           where: { id: user.id },
           data: {
             firstName: firstName || emailName.charAt(0).toUpperCase() + emailName.slice(1),
-            lastName: rest.length ? rest.join(' ') : null
+            lastName: rest.length ? rest.join(' ') : null,
+            // A name from Google or Facebook is real; one made from the email address still needs confirming
+            nameConfirmedAt: user.name ? new Date() : null
           }
         })
         .catch((err) =>

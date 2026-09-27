@@ -13,6 +13,25 @@ const ERROR_MESSAGES: Record<string, { title: string; body: string }> = {
   'facebook-no-email': {
     title: "Facebook didn't share your email address",
     body: 'We need it to send you bid updates and receipts. Continue with Google, or get a sign-in link by email below.'
+  },
+  // Backing out of Google's or Facebook's own screen, which is by far the most common reason
+  OAuthCallbackError: {
+    title: "Sign-in wasn't finished",
+    body: 'It looks like that was cancelled before it completed. Try again, or choose another way to sign in below.'
+  },
+  // An email link that expired or was already used
+  Verification: {
+    title: 'That sign-in link has already been used or has expired',
+    body: 'Each link works once. If you opened it from your email app, you may already be signed in there. Otherwise, enter your email below for a fresh link.'
+  },
+  AccessDenied: {
+    title: "We couldn't sign you in",
+    body: 'If you think this is a mistake, reply to any email from us or contact lpdr@littlepawsdr.org.'
+  },
+  // Anything else NextAuth reports, so no error ever lands on a page with no explanation
+  Default: {
+    title: "Sign-in didn't go through",
+    body: 'Please try again, or choose another way to sign in below.'
   }
 }
 
@@ -20,8 +39,8 @@ export function LoginClient() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const searchParams = useSearchParams()
-  const errorKey = searchParams.get('error') ?? ''
-  const error = ERROR_MESSAGES[errorKey]
+  const errorKey = searchParams.get('error')
+  const error = errorKey ? (ERROR_MESSAGES[errorKey] ?? ERROR_MESSAGES.Default) : null
   const facebookFailed = errorKey === 'facebook-no-email'
 
   // Only a path on this site, so the value in the address bar can't send anyone elsewhere after signing in

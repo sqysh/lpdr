@@ -41,7 +41,10 @@ export async function saveAdopterDetails(agreementId: string, input: unknown): P
         data: { firstName: d.firstName, lastName: d.lastName, phone: d.phone, ...address },
         select: { updatedAt: true }
       }),
-      prisma.user.update({ where: { id: gate.userId }, data: { firstName: d.firstName, lastName: d.lastName, phone: d.phone } }),
+      prisma.user.update({
+        where: { id: gate.userId },
+        data: { firstName: d.firstName, lastName: d.lastName, phone: d.phone, nameConfirmedAt: new Date() }
+      }),
       prisma.address.upsert({
         where: { userId: gate.userId },
         create: { userId: gate.userId, name: `${d.firstName} ${d.lastName}`, ...address },
