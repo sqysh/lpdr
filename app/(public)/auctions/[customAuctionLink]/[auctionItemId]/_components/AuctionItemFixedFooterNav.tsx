@@ -8,6 +8,7 @@ import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { useQuickBid } from 'lib/hooks/useQuickBid.hook'
 import { QUICK_BID_INCREMENT } from 'lib/constants/auction.constants'
 import { useEffect, useRef } from 'react'
+import { PublicAuctionItem } from 'types/auction.types'
 
 const BAR_CTA_BASE =
   'btn-shimmer group w-full min-h-12 flex items-center justify-center gap-2 px-5 py-3 text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-inset'
@@ -68,7 +69,23 @@ function BuyNowBarBody({ price }: { price: string }) {
   )
 }
 
-export function AuctionItemFixedFooterNav({ auctionItems, item, customAuctionLink, isFixed, isAuthed, isTopBidder }) {
+export function AuctionItemFixedFooterNav({
+  auctionItems,
+  item,
+  customAuctionLink,
+  isFixed,
+  isAuthed,
+  isTopBidder,
+  needsName
+}: {
+  auctionItems: PublicAuctionItem['auction']['items']
+  item: PublicAuctionItem
+  customAuctionLink: string
+  isFixed: boolean
+  isAuthed: boolean
+  isTopBidder: boolean
+  needsName: boolean
+}) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const quickBid = useQuickBid(item)
 
@@ -89,12 +106,14 @@ export function AuctionItemFixedFooterNav({ auctionItems, item, customAuctionLin
       : 'Auction ended'
 
   // Hidden while the viewer is already winning: a fixed increment with no amount to choose can only
-  // raise their own price. The bid panel stays available for a deliberate self-raise
-  const showQuickBid = isOpen && !isFixed && isAuthed && !isTopBidder
+  // raise their own price. Also hidden until a guessed name is replaced, which happens in the bid panel
+  const showQuickBid = isOpen && !isFixed && isAuthed && !isTopBidder && !needsName
 
   const goToBidPanel = () => {
     document.getElementById('bid-panel')?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-    document.getElementById('bid-amount')?.focus({ preventScroll: true })
+    // The amount field, or the first name field while the panel is asking for a name
+    const field = document.getElementById('bid-amount') ?? document.getElementById('nb-first')
+    field?.focus({ preventScroll: true })
   }
 
   const navRef = useRef<HTMLElement>(null)
@@ -226,7 +245,7 @@ export function AuctionItemFixedFooterNav({ auctionItems, item, customAuctionLin
                 ) : (
                   <button
                     type="button"
-                    onClick={() => openSignInModal(`/auctions/${customAuctionLink}/${item.id}/instant-buy`)}
+                    onClick={() => openSignInModal(`/auctions/${customAuctionLink}/${item.id}/instant-buy`, 'buy')}
                     className={BAR_CTA_BUY}
                   >
                     <Zap size={14} aria-hidden="true" />

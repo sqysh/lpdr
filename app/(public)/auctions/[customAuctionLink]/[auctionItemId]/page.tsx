@@ -15,6 +15,7 @@ export default async function PublicAuctionItemPage({ params }: { params: Promis
       auctionItems={auctionItemResult.data.auction.items}
       isAuthed={!!session?.user?.id}
       currentUserId={session?.user?.id ?? null}
+      needsName={session?.user?.needsName ?? false}
     />
   )
 }

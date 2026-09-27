@@ -4,7 +4,13 @@ import { AlertCircle, Check, CheckCircle, Loader2, RefreshCw, TrendingUp, Trophy
 import { formatMoney } from 'lib/utils/currency.utils'
 import { QUICK_BID_INCREMENT } from 'lib/constants/auction.constants'
 
-const EYEBROW = 'text-f9 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { useSession } from 'next-auth/react'
+import { FormField, FormError } from 'components/_primitives'
+import { updateUserName } from 'lib/actions/my-pack/updateUserName'
+
+export const EYEBROW = 'text-f9 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
 const PANEL = 'flex items-start gap-2.5 px-4 py-3 border'
 
 export function CurrentPrice({
@@ -193,4 +199,67 @@ export function BidError({ message }: { message: string }) {
   )
 }
 
-export { EYEBROW }
+/** Shown in place of the bid controls until a guessed name is replaced, since it's the name on the winner email and receipt */
+export function NameBeforeBid() {
+  const router = useRouter()
+  const { update } = useSession()
+  const [firstName, setFirstName] = useState('')
+  const [lastName, setLastName] = useState('')
+  const [saving, setSaving] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const onSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!firstName.trim()) return setError('Please enter your first name.')
+
+    setSaving(true)
+    setError(null)
+    const result = await updateUserName({ firstName: firstName.trim(), lastName: lastName.trim() })
+
+    if (!result.success) {
+      setSaving(false)
+      return setError(result.error ?? "That didn't save. Please try again.")
+    }
+
+    // The page reloads with the name confirmed, which swaps in the bid controls; the session update closes the corner prompt too
+    await update()
+    router.refresh()
+  }
+
+  return (
+    <form onSubmit={onSubmit} className="space-y-3">
+      <p className={EYEBROW}>Before your first bid</p>
+      <p className="text-xs font-nunito text-muted-light dark:text-muted-dark leading-relaxed">
+        What name should we use? It goes on your receipt if you win. Other bidders only see your first name and last initial, or nothing at
+        all if you turn on anonymous bidding in My Pack.
+      </p>
+      <div className="grid grid-cols-2 gap-3">
+        <FormField
+          id="nb-first"
+          name="firstName"
+          label="First name"
+          autoComplete="given-name"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+        />
+        <FormField
+          id="nb-last"
+          name="lastName"
+          label="Last name"
+          autoComplete="family-name"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+        />
+      </div>
+      <FormError error={error} />
+      <button
+        type="submit"
+        disabled={saving || !firstName.trim()}
+        className="w-full min-h-12 flex items-center justify-center gap-2 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-f10 font-mono tracking-eyebrow uppercase font-black disabled:opacity-50 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+      >
+        {saving && <Loader2 size={14} className="animate-spin" aria-hidden="true" />}
+        {saving ? 'Saving' : 'Continue to bid'}
+      </button>
+    </form>
+  )
+}

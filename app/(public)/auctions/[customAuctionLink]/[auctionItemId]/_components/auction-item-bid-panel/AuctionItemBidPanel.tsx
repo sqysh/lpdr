@@ -6,23 +6,22 @@ import Link, { useLinkStatus } from 'next/link'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { useAuctionUiStore } from 'stores/auction-ui.store'
 import { PublicAuctionItem, PublicBid } from 'types/auction.types'
-import { BidError, BidPlaced, CurrentPrice, EYEBROW, QuickBidButton, RaceConditionNotice, StandingBanner } from './AuctionItemBidPanelParts'
+import {
+  BidError,
+  BidPlaced,
+  CurrentPrice,
+  EYEBROW,
+  NameBeforeBid,
+  QuickBidButton,
+  RaceConditionNotice,
+  StandingBanner
+} from './AuctionItemBidPanelParts'
 import { AuctionItemBidPanelBidAmountForm } from './AuctionItemBidPanelBidAmountForm'
 import { formatDate } from 'lib/utils/date.utils'
 
 const PANEL = 'border border-border-light dark:border-border-dark'
 const CTA =
   'btn-shimmer relative overflow-hidden w-full flex items-center justify-between gap-2 px-5 py-4 text-white transition-colors focus:outline-none focus-visible:ring-2'
-
-type Props = {
-  item: PublicAuctionItem
-  isAuthed: boolean
-  isTopBidder: boolean
-  customAuctionLink: string
-  topBid: PublicBid | undefined
-  myTopBid: PublicBid | null
-  currentUserId: string | null
-}
 
 function BuyNowBody({ price }: { price: string }) {
   const { pending } = useLinkStatus()
@@ -38,7 +37,25 @@ function BuyNowBody({ price }: { price: string }) {
   )
 }
 
-export function AuctionItemBidPanel({ item, isAuthed, isTopBidder, customAuctionLink, topBid, myTopBid, currentUserId }: Props) {
+export function AuctionItemBidPanel({
+  item,
+  isAuthed,
+  isTopBidder,
+  customAuctionLink,
+  topBid,
+  myTopBid,
+  currentUserId,
+  needsName
+}: {
+  item: PublicAuctionItem
+  isAuthed: boolean
+  isTopBidder: boolean
+  customAuctionLink: string
+  topBid: PublicBid | undefined
+  myTopBid: PublicBid | null
+  currentUserId: string | null
+  needsName: boolean
+}) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const panel = useBidPanel(item)
 
@@ -146,42 +163,48 @@ export function AuctionItemBidPanel({ item, isAuthed, isTopBidder, customAuction
       <div className="p-5 space-y-4">
         {price}
 
-        {myTopBid && (
-          <StandingBanner
-            isTopBidder={isTopBidder}
-            myBidAmount={Number(myTopBid.bidAmount)}
-            justRaised={panel.placedBidAmount !== null && myBidCount > 1}
-          />
+        {needsName ? (
+          <NameBeforeBid />
+        ) : (
+          <>
+            {myTopBid && (
+              <StandingBanner
+                isTopBidder={isTopBidder}
+                myBidAmount={Number(myTopBid.bidAmount)}
+                justRaised={panel.placedBidAmount !== null && myBidCount > 1}
+              />
+            )}
+
+            {panel.placedBidAmount != null && !myTopBid && <BidPlaced amount={panel.placedBidAmount} />}
+
+            {!isTopBidder && (
+              <QuickBidButton
+                amount={panel.quickBidAmount}
+                confirming={panel.confirming}
+                submitting={panel.submitting === 'quick'}
+                onPress={panel.pressQuickBid}
+                onCancel={panel.cancelConfirm}
+              />
+            )}
+
+            <AuctionItemBidPanelBidAmountForm
+              label={isTopBidder ? 'Raise your bid' : 'Or enter your own amount'}
+              value={panel.customAmount}
+              onChange={panel.setCustomAmount}
+              onSubmit={panel.pressCustomBid}
+              submitting={panel.submitting === 'custom'}
+              disabled={panel.submitting !== null}
+              minimumBid={panel.minimumBid}
+              currentBid={panel.currentBid}
+              submitLabel={panel.placedBidAmount != null ? 'Bid again' : 'Place bid'}
+              inputRef={panel.inputRef}
+            />
+
+            {panel.raceCondition && <RaceConditionNotice newMinimumBid={panel.raceCondition.newMinimumBid} onUse={panel.useRaceAmount} />}
+
+            {panel.error && <BidError message={panel.error} />}
+          </>
         )}
-
-        {panel.placedBidAmount != null && !myTopBid && <BidPlaced amount={panel.placedBidAmount} />}
-
-        {!isTopBidder && (
-          <QuickBidButton
-            amount={panel.quickBidAmount}
-            confirming={panel.confirming}
-            submitting={panel.submitting === 'quick'}
-            onPress={panel.pressQuickBid}
-            onCancel={panel.cancelConfirm}
-          />
-        )}
-
-        <AuctionItemBidPanelBidAmountForm
-          label={isTopBidder ? 'Raise your bid' : 'Or enter your own amount'}
-          value={panel.customAmount}
-          onChange={panel.setCustomAmount}
-          onSubmit={panel.pressCustomBid}
-          submitting={panel.submitting === 'custom'}
-          disabled={panel.submitting !== null}
-          minimumBid={panel.minimumBid}
-          currentBid={panel.currentBid}
-          submitLabel={panel.placedBidAmount != null ? 'Bid again' : 'Place bid'}
-          inputRef={panel.inputRef}
-        />
-
-        {panel.raceCondition && <RaceConditionNotice newMinimumBid={panel.raceCondition.newMinimumBid} onUse={panel.useRaceAmount} />}
-
-        {panel.error && <BidError message={panel.error} />}
       </div>
     </div>
   )

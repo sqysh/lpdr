@@ -20,14 +20,19 @@ import {
 import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
 import { AuctionSignedInAs } from './_components/AuctionSignedInAs'
 
-type Props = {
+export default function PublicAuctionItemClient({
+  item,
+  auctionItems,
+  isAuthed,
+  currentUserId,
+  needsName
+}: {
   item: PublicAuctionItem
   auctionItems: PublicAuctionItem['auction']['items']
   isAuthed: boolean
   currentUserId: string | null
-}
-
-export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, currentUserId }: Props) {
+  needsName: boolean
+}) {
   const openSignInModal = useAuctionUiStore((s) => s.openSignInModal)
   const searchParams = useSearchParams()
 
@@ -92,6 +97,7 @@ export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, 
                   topBid={topBid}
                   myTopBid={myTopBid}
                   currentUserId={currentUserId}
+                  needsName={needsName}
                 />
               </div>
             </Reveal>
@@ -147,6 +153,7 @@ export default function PublicAuctionItemClient({ item, auctionItems, isAuthed, 
         isFixed={isFixed}
         item={item}
         isTopBidder={isTopBidder}
+        needsName={needsName}
       />
     </main>
   )
