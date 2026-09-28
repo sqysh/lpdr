@@ -9,6 +9,7 @@ import { useAuctionChannelEvent } from './_components/AuctionChannel'
 import { AutoPayPrompt, AutoPayStatus } from './_components/AutoPayPrompt'
 import { Role } from '@prisma/client'
 import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
+import { AuctionFooter } from './_components/AuctionFooter'
 
 export default function PublicAuctionClient({
   auction,
@@ -83,6 +84,7 @@ export default function PublicAuctionClient({
           <AuctionEmptyState auction={auction} />
           <AuctionHowItWorks isEnded={isEnded} isAuthed={isAuthed} />
         </div>
+        <AuctionFooter auctionLink={`${process.env.NEXT_PUBLIC_SITE_URL}/auctions/${auction.customAuctionLink}`} />
       </main>
     </>
   )
