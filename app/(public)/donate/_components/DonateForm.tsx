@@ -24,6 +24,8 @@ import { LinkBody } from 'components/_common/LinkBody'
 import { ArrowRight } from 'lucide-react'
 import { StripeSecurityNote } from 'components/features/payment/StripeSecurityNote'
 import { CustomAmount } from './CustomAmount'
+import { useWalletCheckout } from '@hooks/useWalletCheckout.hook'
+import { ExpressPay } from 'components/features/payment/ExpressPay'
 
 export type AmountState = {
   useCustom: boolean
@@ -76,6 +78,8 @@ export function DonateForm({ savedCards, userName, isAuthed, email, userId }: Pr
     billingName: `${values.firstName} ${values.lastName}`,
     billingEmail: email ?? ''
   })
+
+  const { createWalletIntent, waitForOrder, cancel: cancelWallet } = useWalletCheckout(userId, (message) => patch({ error: message }))
 
   // ── Derived values ────────────────────────────────────────────────────────
   const donationAmount = amount.useCustom ? parseFloat(amount.customAmount) || 0 : (amount.selectedAmount ?? 0)
@@ -191,6 +195,27 @@ export function DonateForm({ savedCards, userName, isAuthed, email, userId }: Pr
             hint="Optional. For example, a donation in memory of someone special."
             error={errors.donorMessage?.message}
           />
+
+          {donationAmount >= 5 && (
+            <ExpressPay
+              amount={finalAmount}
+              createIntent={(walletName) =>
+                createWalletIntent({
+                  amount: Math.round(donationAmount * 100),
+                  coverFees: payment.coverFees,
+                  orderType: 'ONE_TIME_DONATION' as OrderType,
+                  donorMessage: values.donorMessage?.trim() || undefined,
+                  // The typed name wins, and the wallet's name fills in when the fields are empty
+                  name: `${values.firstName ?? ''} ${values.lastName ?? ''}`.trim() || walletName || undefined
+                })
+              }
+              onPaid={waitForOrder}
+              onError={(message) => {
+                cancelWallet()
+                patch({ error: message })
+              }}
+            />
+          )}
 
           {/* Saved cards */}
           {isAuthed && (
