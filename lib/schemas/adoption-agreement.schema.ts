@@ -63,8 +63,7 @@ export const prepareAdoptionAgreementSchema = z.object({
   fleaTickPreventionDate: optionalDate,
   knownIssues: optionalText(2000),
 
-  healthCertificateFee: optionalMoney,
-  paymentMethod: z.enum(AdoptionPaymentMethod)
+  healthCertificateFee: optionalMoney
 })
 
 export type PrepareAdoptionAgreementInput = z.input<typeof prepareAdoptionAgreementSchema>
@@ -107,6 +106,7 @@ export type SignTermsValues = z.output<typeof signTermsSchema>
 
 export const signFinancialSchema = z.object({
   agreementId: z.string().min(1),
+  paymentMethod: z.enum(AdoptionPaymentMethod, { error: 'Choose how you would like to pay' }),
   loadedAt,
   firstAdopterName: signature('First adopter signature'),
   secondAdopterName: z

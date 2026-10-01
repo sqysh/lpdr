@@ -782,13 +782,13 @@ model AdoptionAgreement {
   additionalDonation   Decimal? @db.Decimal(10, 2)
 
   // Chosen by admin. Anything but CARD skips the payment step and emails instructions instead
-  paymentMethod  AdoptionPaymentMethod @default(CARD)
-  orderId        String?               @unique
-  order          Order?                @relation(fields: [orderId], references: [id])
+  paymentMethod  AdoptionPaymentMethod?
+  orderId        String?                @unique
+  order          Order?                 @relation(fields: [orderId], references: [id])
   paidAt         DateTime?
   // Set when someone records a Zelle, Venmo or PayPal payment by hand
   markedPaidById String?
-  markedPaidBy   User?                 @relation("AgreementMarkedPaidBy", fields: [markedPaidById], references: [id])
+  markedPaidBy   User?                  @relation("AgreementMarkedPaidBy", fields: [markedPaidById], references: [id])
 
   // Which terms were agreed to: the clauses will be revised, and a signed agreement must keep its own
   termsVersion String

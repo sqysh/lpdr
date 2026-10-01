@@ -29,7 +29,7 @@ export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ 
   try {
     const agreement = await prisma.adoptionAgreement.findUnique({
       where: { id },
-      select: { status: true, dogRescueGroupsId: true, dogName: true, adoptionFee: true, email: true, firstName: true, paymentMethod: true }
+      select: { status: true, dogRescueGroupsId: true, dogName: true, adoptionFee: true, email: true, firstName: true }
     })
 
     if (!agreement) return { success: false, data: null, error: 'Agreement not found' }
@@ -94,8 +94,7 @@ export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ 
         html: adoptionAgreementReadyTemplate({
           firstName: agreement.firstName,
           dogName: agreement.dogName,
-          link: `${SITE}/adopt/agreement/${id}`,
-          paysByCard: agreement.paymentMethod === 'CARD'
+          link: `${SITE}/adopt/agreement/${id}`
         })
       })
 

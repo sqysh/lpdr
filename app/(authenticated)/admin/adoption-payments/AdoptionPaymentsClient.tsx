@@ -16,9 +16,11 @@ import { formatDate } from 'lib/utils/date.utils'
 const COL_COUNT = 7
 
 const methodLabel = (method?: string | null) =>
-  !method || method === 'CARD'
-    ? 'Card'
-    : (OFFLINE_PAYMENT_INSTRUCTIONS[method as keyof typeof OFFLINE_PAYMENT_INSTRUCTIONS]?.label ?? method)
+  !method
+    ? '—'
+    : method === 'CARD'
+      ? 'Card'
+      : (OFFLINE_PAYMENT_INSTRUCTIONS[method as keyof typeof OFFLINE_PAYMENT_INSTRUCTIONS]?.label ?? method)
 
 export function AdoptionPaymentsClient({ payments }: { payments: IAdoptionPaymentRow[] }) {
   const router = useRouter()

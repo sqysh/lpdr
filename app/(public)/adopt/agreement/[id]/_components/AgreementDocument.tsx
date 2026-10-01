@@ -2,6 +2,7 @@ import { formatDate } from 'lib/utils/date.utils'
 import { AgreementData } from '../AdoptionAgreementClient'
 import { Fact } from './AgreementPrimitives'
 import { agreementDate } from 'lib/utils/adoption-agreement.utils'
+import { DEFAULT_MICROCHIP_DIRECTIONS } from 'lib/constants/adoption-agreement.constants'
 
 const withDuration = (date: string | Date | null, duration: string | null) =>
   date ? `${formatDate(date)}${duration ? ` · ${duration}` : ''}` : null
@@ -18,8 +19,9 @@ export function AgreementDocument({ data }: { data: AgreementData }) {
     <article className="space-y-8">
       <div className="space-y-4 text-sm leading-relaxed text-text-light dark:text-text-dark">
         <p>
-          This adoption agreement is entered into this {agreementDate(date)} by and between Little Paws Dachshund Rescue, a Connecticut
-          non-profit corporation, and <strong>{adopter}</strong>, resident of the state of <strong>{a.state}</strong> (Adopter(s)).
+          This Adoption Agreement is entered into this {agreementDate(date)}, by and between Little Paws Dachshund Rescue, a South Carolina
+          non-profit corporation and <strong>{adopter}</strong>, residents of the State of <strong>{a.state}</strong>{' '}
+          (&ldquo;Adopter(s)&rdquo;).
         </p>
         {terms && <p>{terms.intro}</p>}
       </div>
@@ -43,9 +45,14 @@ export function AgreementDocument({ data }: { data: AgreementData }) {
           <Fact label="Microchip" value={a.microchipNumber} />
           <Fact label="Microchip company" value={a.microchipManufacturer} />
         </dl>
-        {a.microchipRegistration && (
-          <p className="text-sm text-muted-light dark:text-muted-dark whitespace-pre-wrap">{a.microchipRegistration}</p>
-        )}
+        <div className="p-4 border-l-2 border-primary-light dark:border-primary-dark bg-surface-light dark:bg-surface-dark">
+          <p className="text-f10 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-1">
+            Registering your dog&rsquo;s microchip
+          </p>
+          <p className="text-sm text-text-light dark:text-text-dark whitespace-pre-wrap">
+            {a.microchipRegistration || DEFAULT_MICROCHIP_DIRECTIONS}
+          </p>
+        </div>
       </section>
 
       <section className="space-y-3">

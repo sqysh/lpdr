@@ -98,7 +98,6 @@ export async function createAdoptionAgreement(input: unknown): Promise<ActionRes
       dogName: dog.name,
       adopterEmail: adopter.email,
       adoptionFee,
-      paymentMethod: details.paymentMethod,
       createdBy: gate.userId
     }
 

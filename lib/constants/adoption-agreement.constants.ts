@@ -14,12 +14,12 @@ type AdoptionTerms = {
  * what an earlier adopter agreed to. To revise: add a new dated entry, point the current version at it,
  * and leave every earlier entry exactly as it was.
  */
-export const ADOPTION_TERMS_VERSION = '2026-09-22'
+export const ADOPTION_TERMS_VERSION = '2026-10-01'
 
 export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
-  '2026-09-22': {
+  '2026-10-01': {
     intro:
-      'Little Paws Dachshund Rescue, LPDR, is a Connecticut nonprofit corporation whose sole purpose is to ensure that each dachshund in its care is placed in a home that will lovingly care for and make the dachshund a permanent member of the family. LPDR is run exclusively by volunteers and does not profit financially from adoption fees or donations. LPDR wishes to give the dachshund described below to the Adopter(s), and Adopter(s) wishes to adopt the dachshund and provide it a permanent and loving home.',
+      'Little Paws Dachshund Rescue, LPDR, is a South Carolina nonprofit corporation whose sole purpose is to ensure that each dachshund in its care is placed in a home that will lovingly care for and make the dachshund a permanent member of the family. LPDR is run exclusively by volunteers and does not profit financially from adoption fees or donations. LPDR wishes to give the dachshund described below to Adopter(s), and Adopter(s) wishes to adopt the dachshund and provide it a permanent and loving home.',
 
     clauses: [
       // 1
@@ -37,11 +37,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       // 4
       [
         "I/We will keep the microchip tag on the dog at all times. I/We understand that all dogs adopted through Little Paws Dachshund Rescue are microchipped under the rescue's name at the time of adoption. I/We agree to have the microchip registration transferred to our name and contact information within thirty (30) days of adoption.",
-        'This transfer may be completed in one of two ways:',
-        [
-          'I/We may contact AKC Reunite at 800-252-7894 to complete the ownership transfer directly, which may involve a fee and require rescue authorization.',
-          "I/We may request that the rescue's microchip coordinator complete the transfer at no cost by emailing chips@littlepawsdr.org within thirty (30) days of the dog going home. After thirty (30) days, the adopter must complete the transfer independently through the microchip company."
-        ],
+        "See directions for registering your dog's microchip on page one of this agreement.",
         "Any changes to the adopter's contact information (including address or phone number) must also be reported to the rescue within thirty (30) days. The dog has also been outfitted with an LPDR ID tag, which must remain on the dog for their lifetime. In the event the dog is lost, stolen, or escapes, any expenses incurred are the sole responsibility of the adopter."
       ],
       // 5
@@ -64,7 +60,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ['I/We will never transport the Dachshund in an open vehicle or in any other way that will endanger the Dachshund during transport.'],
       // 10
       [
-        'I/We agree to a two-week trial period. LPDR will allow return of the Dachshund within two weeks of receiving the dog if the adopter is unsatisfied with the Dachshund. We agree to contact LPDR, via email, to applications@littlepawsdr.org immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, all adoption fees paid will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the Dachshund to LPDR without penalty at any time before the expiration of the Trial Period.'
+        'I/We agree to a two-week trial period. The fourteen (14) day trial period begins on the day the Dachshund goes to his or her new home. LPDR will allow return of the Dachshund within that period if the adopter is unsatisfied with the Dachshund. We agree to contact LPDR, via email, to applications@littlepawsdr.org immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, the adoption fee will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the Dachshund to LPDR without penalty at any time before the expiration of the Trial Period.'
       ],
       // 11
       [
@@ -110,6 +106,10 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       "LPDR's adoption fees are based on the dog's age. A schedule of adoption fees is found on our website (www.LittlePawsDR.org). Other charges such as Health Certificate Fee, which is mandated by various states when crossing state lines, and the New England fee which covers state-mandated quarantine requirements, are additional fees charged by LPDR to recoup some of the costs incurred to transport the adopted dog to the adopter's locale. The adoption fees we collect do not cover the vetting and medical costs of the animals we take in. We engage in various fundraising events throughout the year to cover medical costs and sustain our organization's mission. If you are interested in making a donation to LPDR's fund, over and above the adoption fee, it's greatly appreciated. Donations help support the dogs in LPDR's care, allows us to save more dogs that are abandoned, neglected or homeless and contributes to a solution to the problem of the overpopulation of pets. LPDR is a 100% volunteer run, 501(c)(3) non-profit organization and all donations are tax deductible."
   }
 }
+
+// Shown on page one when an agreement has no directions of its own, since term 4 points there
+export const DEFAULT_MICROCHIP_DIRECTIONS =
+  "Contact AKC Reunite at 800-252-7894 to complete the ownership transfer directly, which may involve a fee and require rescue authorization. Or email chips@littlepawsdr.org within thirty (30) days of your dog going home and the rescue's microchip coordinator will complete the transfer at no cost. After thirty (30) days, the transfer must be completed independently through the microchip company."
 
 export const getAdoptionTerms = (version: string) => ADOPTION_TERMS[version] ?? null
 

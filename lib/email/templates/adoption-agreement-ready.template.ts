@@ -5,15 +5,11 @@ type Props = {
   firstName: string | null
   dogName: string
   link: string
-  paysByCard: boolean
 }
 
-export function adoptionAgreementReadyTemplate({ firstName, dogName, link, paysByCard }: Props): string {
+export function adoptionAgreementReadyTemplate({ firstName, dogName, link }: Props): string {
   const name = escapeHtml(dogName)
   const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : 'Hi,'
-  const paymentNote = paysByCard
-    ? 'You can sign and pay the adoption fee in one visit.'
-    : "Once you've signed, we'll send you instructions for paying the adoption fee."
 
   return `
     <!DOCTYPE html>
@@ -36,7 +32,7 @@ export function adoptionAgreementReadyTemplate({ firstName, dogName, link, paysB
 
                   <p style="margin: 0 0 16px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">${greeting}</p>
                   <p style="margin: 0 0 16px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">
-                    We're so glad ${name} is going home with you. Please review the agreement, including ${name}'s medical details, and sign it when you're ready. ${paymentNote}
+                    We're so glad ${name} is going home with you. Please review the entire adoption agreement, sign where indicated, and return as soon as possible. You'll choose how to pay the adoption fee (card, Zelle, Venmo or PayPal) when you sign.
                   </p>
                   <p style="margin: 0 0 32px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">
                     You'll be asked to sign in with this email address.

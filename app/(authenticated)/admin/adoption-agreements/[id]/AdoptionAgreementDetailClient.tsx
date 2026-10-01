@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { AlertTriangle, Check, Loader2, Pencil, Send } from 'lucide-react'
+import { AlertTriangle, Check, ExternalLink, FileText, Loader2, Pencil, Send } from 'lucide-react'
 import type { IAdoptionAgreement } from 'types/adoption-agreement.types'
 import { AGREEMENT_FILTER_LABELS, AGREEMENT_STATUS_HINT, OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
@@ -18,6 +18,7 @@ import { CountersignPanel } from './_components/CountersignPanel'
 import { MarkPaidPanel } from './_components/MarkPaidPanel'
 import { ClosePanel } from './_components/ClosePanel'
 import { RefundPanel } from 'components/features/payment/RefundPanel'
+import { DeleteAgreementButton } from './_components/DeleteAgreementButton'
 
 type Agreement = IAdoptionAgreement
 
@@ -61,7 +62,11 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
 
   const adopter = [a.firstName, a.lastName].filter(Boolean).join(' ')
   const rep = [a.createdBy.firstName, a.createdBy.lastName].filter(Boolean).join(' ') || a.createdBy.email
-  const paymentMethod = a.paymentMethod === 'CARD' ? 'Card' : OFFLINE_PAYMENT_INSTRUCTIONS[a.paymentMethod].label
+  const paymentMethod = !a.paymentMethod
+    ? 'Chosen by the adopter when they sign'
+    : a.paymentMethod === 'CARD'
+      ? 'Card'
+      : OFFLINE_PAYMENT_INSTRUCTIONS[a.paymentMethod].label
   const canSend = a.status === 'DRAFT' || a.status === 'SENT'
   const emailFailed = a.status === 'SENT' && !!a.emailFailedAt
 
@@ -82,7 +87,7 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
-      <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between">
+      <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-3">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
           <Link
             href="/admin/adoption-agreements"
@@ -98,9 +103,24 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
             {a.dogName}
           </p>
         </nav>
-        <span className="shrink-0 text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
-          {AGREEMENT_FILTER_LABELS[a.status]} · {AGREEMENT_STATUS_HINT[a.status]}
-        </span>
+
+        <div className="flex items-center gap-3 shrink-0">
+          <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
+            {AGREEMENT_FILTER_LABELS[a.status]}
+            <span className="hidden sm:inline"> · {AGREEMENT_STATUS_HINT[a.status]}</span>
+          </span>
+          <Link
+            href={`/adopt/agreement/${a.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 h-6 px-2 border border-border-light dark:border-border-dark text-[9px] font-mono tracking-eyebrow uppercase text-text-light dark:text-text-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          >
+            <FileText className="w-3 h-3" aria-hidden="true" />
+            <span className="hidden sm:inline">View agreement</span>
+            <span className="sm:hidden">View</span>
+            <ExternalLink className="w-2.5 h-2.5" aria-hidden="true" />
+          </Link>
+        </div>
       </header>
 
       {emailFailed && (
@@ -337,14 +357,27 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
 
               return (
                 <dl className="divide-y divide-border-light dark:divide-border-dark">
+                  <Row label="Adoption fee" value={formatMoney(a.adoptionFee)} />
+                  {a.healthCertificateFee != null && Number(a.healthCertificateFee) > 0 && (
+                    <Row label="Health certificate" value={formatMoney(a.healthCertificateFee)} />
+                  )}
+                  {a.additionalDonation != null && Number(a.additionalDonation) > 0 && (
+                    <Row label="Additional donation" value={formatMoney(a.additionalDonation)} />
+                  )}
+                  <Row
+                    label={a.order ? 'Agreement total' : 'Total due'}
+                    value={<span className="font-bold">{formatMoney(subtotal)}</span>}
+                  />
+                  {feesCovered > 0 && <Row label="Processing fees covered" value={`+${formatMoney(feesCovered)}`} />}
+                  {a.order && <Row label="Charged" value={formatMoney(charged)} />}
                   {application && (
                     <Row
                       label="Application fee"
                       value={
-                        <>
+                        <span className="text-muted-light dark:text-muted-dark">
                           {formatMoney(applicationFee)}
-                          <span className="block text-[10px] text-muted-light dark:text-muted-dark">
-                            Paid separately {formatDate(application.createdAt)}
+                          <span className="block text-[10px]">
+                            Already paid {formatDate(application.createdAt)}
                             {application.orderId && (
                               <>
                                 {' · '}
@@ -357,22 +390,9 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
                               </>
                             )}
                           </span>
-                        </>
+                        </span>
                       }
                     />
-                  )}
-                  <Row label="Adoption fee" value={formatMoney(a.adoptionFee)} />
-                  {a.healthCertificateFee != null && Number(a.healthCertificateFee) > 0 && (
-                    <Row label="Health certificate" value={formatMoney(a.healthCertificateFee)} />
-                  )}
-                  {a.additionalDonation != null && Number(a.additionalDonation) > 0 && (
-                    <Row label="Additional donation" value={formatMoney(a.additionalDonation)} />
-                  )}
-                  <Row label={a.order ? 'Agreement total' : 'Total due'} value={formatMoney(subtotal)} />
-                  {feesCovered > 0 && <Row label="Processing fees covered" value={`+${formatMoney(feesCovered)}`} />}
-                  {a.order && <Row label="Charged" value={formatMoney(charged)} />}
-                  {application && (
-                    <Row label="Total from adopter" value={<span className="font-bold">{formatMoney(applicationFee + charged)}</span>} />
                   )}
                 </dl>
               )
@@ -406,6 +426,14 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
 
           {['DRAFT', 'SENT', 'SIGNED'].includes(a.status) && <ClosePanel agreementId={a.id} mode="void" />}
           {['PAID', 'COMPLETE'].includes(a.status) && <ClosePanel agreementId={a.id} mode="return" />}
+
+          <Panel title="Delete">
+            <p className="mb-3 text-[11px] font-nunito text-muted-light dark:text-muted-dark">
+              For test runs and agreements started by mistake. Removes the agreement, its signatures and its order. To end a real adoption,
+              void or return it instead.
+            </p>
+            <DeleteAgreementButton agreementId={a.id} />
+          </Panel>
         </div>
       </div>
     </main>

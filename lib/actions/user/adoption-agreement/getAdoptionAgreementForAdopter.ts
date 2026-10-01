@@ -1,6 +1,6 @@
 'use server'
 
-import { requireAuth } from 'lib/auth/guards'
+import { requireAdmin, requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import prisma from 'prisma/client'
 import { ADOPTION_TERMS_VERSION, getAdoptionTerms, OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
@@ -14,7 +14,11 @@ export async function getAdoptionAgreementForAdopter(id: string) {
 
   try {
     const owned = await findOwnedAgreement(id, gate.userId)
-    if (!owned) return { success: false as const, data: null, error: 'Agreement not found' }
+
+    // Admins can read any agreement, drafts included, to see exactly what the adopter sees. Read only:
+    // the sign actions still go through findOwnedAgreement, so an admin can never sign on someone's behalf
+    const readOnly = !owned && (await requireAdmin()).ok
+    if (!owned && !readOnly) return { success: false as const, data: null, error: 'Agreement not found' }
 
     const agreement = await prisma.adoptionAgreement.findUniqueOrThrow({
       where: { id },
@@ -35,6 +39,7 @@ export async function getAdoptionAgreementForAdopter(id: string) {
       data: serialize({
         agreement,
         terms,
+        readOnly,
         steps: {
           detailsComplete: !!(
             agreement.firstName &&
@@ -49,7 +54,8 @@ export async function getAdoptionAgreementForAdopter(id: string) {
           financialSigned: hasSigned(agreement.signatures, 'FINANCIAL_FIRST_ADOPTER')
         },
         // Shown once signed, for anyone paying outside the site
-        paymentInstructions: agreement.paymentMethod === 'CARD' ? null : OFFLINE_PAYMENT_INSTRUCTIONS[agreement.paymentMethod]
+        paymentInstructions:
+          agreement.paymentMethod && agreement.paymentMethod !== 'CARD' ? OFFLINE_PAYMENT_INSTRUCTIONS[agreement.paymentMethod] : null
       })
     }
   } catch (error) {

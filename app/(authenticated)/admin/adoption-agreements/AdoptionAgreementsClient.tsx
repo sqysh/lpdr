@@ -35,7 +35,7 @@ const STATUS_STYLE: Record<IAdoptionAgreementRow['status'], string> = {
 }
 
 const paymentLabel = (method: IAdoptionAgreementRow['paymentMethod']) =>
-  method === 'CARD' ? 'Card' : OFFLINE_PAYMENT_INSTRUCTIONS[method].label
+  !method ? 'Not chosen yet' : method === 'CARD' ? 'Card' : OFFLINE_PAYMENT_INSTRUCTIONS[method].label
 
 // The date that matters depends on where it is: when it was paid, when it went out, or when it was started
 const relevantDate = (a: IAdoptionAgreementRow) => a.paidAt ?? a.sentAt ?? a.createdAt

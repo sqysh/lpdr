@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm, UseFormRegister } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -36,8 +36,7 @@ const EMPTY: PrepareAdoptionAgreementInput = {
   heartwormPreventionDate: '',
   fleaTickPreventionDate: '',
   knownIssues: '',
-  healthCertificateFee: '',
-  paymentMethod: 'CARD'
+  healthCertificateFee: ''
 }
 
 export function NewAdoptionAgreementClient({
@@ -49,6 +48,7 @@ export function NewAdoptionAgreementClient({
   holdDogs: DogOption[]
   unavailableDogs: Record<string, string>
 }) {
+  const [isNavigating, startNavigation] = useTransition()
   const router = useRouter()
   const [adopter, setAdopter] = useState<AdopterResult | null>(null)
   const [dog, setDog] = useState<DogOption | null>(null)
@@ -89,7 +89,7 @@ export function NewAdoptionAgreementClient({
       return
     }
 
-    router.push(`/admin/adoption-agreements/${result.data.id}`)
+    startNavigation(() => router.push(`/admin/adoption-agreements/${result.data.id}`))
   }
 
   const fill = (values: Partial<PrepareAdoptionAgreementInput>) => {
@@ -136,7 +136,7 @@ export function NewAdoptionAgreementClient({
             />
 
             <FormError error={submitError} />
-            <SubmitButton loading={isSubmitting} isValid={!!adopter && !!dog} label="Save draft" />
+            <SubmitButton loading={isSubmitting || isNavigating} isValid={!!adopter && !!dog} label="Save draft" />
           </>
         )}
       </form>

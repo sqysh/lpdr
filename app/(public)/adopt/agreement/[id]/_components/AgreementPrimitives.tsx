@@ -1,3 +1,7 @@
+import { AgreementData } from '../AdoptionAgreementClient'
+
+export type StepProps = { data: AgreementData; loadedAt: string }
+
 export function Heading({ eyebrow, title, children }: { eyebrow: string; title: string; children?: React.ReactNode }) {
   return (
     <div className="space-y-2">

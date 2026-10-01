@@ -24,7 +24,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
   const parsed = parseInput(signFinancialSchema, input)
   if (parsed.ok === false) return parsed.result
 
-  const { agreementId, loadedAt, firstAdopterName, secondAdopterName, additionalDonation } = parsed.data
+  const { agreementId, loadedAt, paymentMethod, firstAdopterName, secondAdopterName, additionalDonation } = parsed.data
 
   try {
     const agreement = await findOwnedAgreement(agreementId, gate.userId)
@@ -45,7 +45,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
     await prisma.$transaction(async (tx) => {
       await tx.adoptionAgreement.update({
         where: { id: agreementId, status: 'SENT' },
-        data: { status: 'SIGNED', additionalDonation },
+        data: { status: 'SIGNED', additionalDonation, paymentMethod },
         select: { id: true }
       })
 
@@ -60,14 +60,12 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
       }
     })
 
-    const paysByCard = agreement.paymentMethod === 'CARD'
+    const paysByCard = paymentMethod === 'CARD'
 
     // Card payers go straight to the payment step. Everyone else needs the details somewhere they
     // can find again, not just on a page they might close
     if (agreement.paymentMethod !== 'CARD') {
-      if (!SITE) {
-        await createLog('error', 'NEXT_PUBLIC_SITE_URL is not set; payment instructions not emailed', { agreementId })
-      } else {
+      if (!paysByCard && SITE) {
         const { label, instruction } = OFFLINE_PAYMENT_INSTRUCTIONS[agreement.paymentMethod]
         const total = agreementTotal({
           adoptionFee: Number(agreement.adoptionFee),
@@ -101,7 +99,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
       agreementId,
       dogName: agreement.dogName,
       adopterEmail: agreement.email,
-      paymentMethod: agreement.paymentMethod,
+      paymentMethod,
       additionalDonation
     }
 

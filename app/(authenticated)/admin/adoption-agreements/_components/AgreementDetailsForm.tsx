@@ -2,7 +2,6 @@
 
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import { FormField } from 'components/_primitives'
-import { OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
 import type { UpdateAdoptionAgreementInput } from 'lib/schemas/adoption-agreement.schema'
 import { Section } from './Secion'
 
@@ -34,8 +33,7 @@ export const DEV_FILL = {
     knownIssues: 'Mild separation anxiety. Car sickness, managed with medication for longer trips.'
   },
   fees: {
-    healthCertificateFee: '45.00',
-    paymentMethod: 'CARD'
+    healthCertificateFee: '45.00'
   }
 } satisfies Record<string, Partial<Fields>>
 
@@ -88,7 +86,7 @@ export function AgreementDetailsForm({ register, errors, fill, colorHint, firstS
           type="textarea"
           rows={3}
           {...register('microchipRegistration')}
-          hint="Directions for the adopter"
+          hint="Shown on page one of the agreement. Leave blank to use the standard AKC Reunite and chips@ directions"
           error={errors.microchipRegistration?.message}
         />
       </Section>
@@ -182,9 +180,10 @@ export function AgreementDetailsForm({ register, errors, fill, colorHint, firstS
         />
       </Section>
 
-      <Section step={firstStep + 2} title="Fees & payment" onFill={() => fill(DEV_FILL.fees)}>
+      <Section step={firstStep + 2} title="Fees" onFill={() => fill(DEV_FILL.fees)}>
         <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
-          The adoption fee is taken from the dog&apos;s RescueGroups listing when the agreement is sent.
+          The adoption fee is taken from the dog&apos;s RescueGroups listing when the agreement is sent. The adopter chooses how to pay when
+          they sign.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <FormField
@@ -196,21 +195,6 @@ export function AgreementDetailsForm({ register, errors, fill, colorHint, firstS
             hint="If applicable. What the vet charged for the certificate"
             error={errors.healthCertificateFee?.message}
           />
-          <FormField
-            id="paymentMethod"
-            label="Payment method"
-            type="select"
-            {...register('paymentMethod')}
-            hint="Card unless the adopter has asked to pay another way"
-            error={errors.paymentMethod?.message}
-          >
-            <option value="CARD">Card</option>
-            {Object.entries(OFFLINE_PAYMENT_INSTRUCTIONS).map(([value, { label }]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </FormField>
         </div>
       </Section>
     </>

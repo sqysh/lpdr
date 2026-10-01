@@ -40,8 +40,7 @@ function toFormValues(a: IAdoptionAgreement): UpdateAdoptionAgreementInput {
     heartwormPreventionDate: toDateInput(a.heartwormPreventionDate),
     fleaTickPreventionDate: toDateInput(a.fleaTickPreventionDate),
     knownIssues: a.knownIssues ?? '',
-    healthCertificateFee: a.healthCertificateFee != null ? Number(a.healthCertificateFee).toFixed(2) : '',
-    paymentMethod: a.paymentMethod
+    healthCertificateFee: a.healthCertificateFee != null ? Number(a.healthCertificateFee).toFixed(2) : ''
   }
 }
 
