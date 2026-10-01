@@ -14,9 +14,14 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
   // Refunds recorded by hand before they were tracked have no amount, so a REFUNDED order counts as its full total
   const refunded = order.refundedAmount != null ? Number(order.refundedAmount) : order.status === 'REFUNDED' ? total : 0
 
-  // What the rescue keeps: everything charged, less anything refunded, less the processing fee. Stripe keeps
+  // Stripe's actual fee once charge.updated has recorded it. Until then (or for orders from before it was
+  // tracked) the donor's covered amount is the closest estimate, and offline payments have no fee at all
+  const hasActualFee = order.stripeFee != null
+  const stripeFee = hasActualFee ? Number(order.stripeFee) : order.paymentIntentId ? feesCovered : 0
+
+  // What the rescue keeps: everything charged, less anything refunded, less Stripe's fee. Stripe keeps
   // its fee even on a refund, so a fully refunded order nets slightly below zero, which is the true cost of it
-  const netToRescue = total - refunded - feesCovered
+  const netToRescue = total - refunded - stripeFee
 
   return (
     <section
@@ -105,21 +110,15 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
           </div>
         )}
 
-        <div className="flex justify-between text-xs font-mono">
-          <dt className="text-muted-light dark:text-muted-dark">
-            Processing fee
-            <span
-              className={`ml-1.5 text-[9px] tracking-tag uppercase ${
-                order.coverFees ? 'text-emerald-500' : 'text-amber-600 dark:text-amber-400'
-              }`}
-            >
-              {order.coverFees ? 'covered' : 'absorbed'}
-            </span>
-          </dt>
-          <dd className="tabular-nums text-text-light dark:text-text-dark">
-            {order.coverFees ? `+${formatMoney(feesCovered)}` : formatMoney(feesCovered)}
-          </dd>
-        </div>
+        {order.coverFees && feesCovered > 0 && (
+          <div className="flex justify-between text-xs font-mono">
+            <dt className="text-muted-light dark:text-muted-dark">
+              Fees covered
+              <span className="ml-1.5 text-[9px] tracking-tag uppercase text-emerald-500">by donor</span>
+            </dt>
+            <dd className="tabular-nums text-text-light dark:text-text-dark">+{formatMoney(feesCovered)}</dd>
+          </div>
+        )}
 
         <div className="flex justify-between pt-2 mt-1 border-t border-border-light dark:border-border-dark">
           <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Charged</dt>
@@ -127,13 +126,23 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
         </div>
 
         {refunded > 0 && (
-          <div className="flex justify-between">
-            <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-sky-600 dark:text-sky-400">Refunded</dt>
-            <dd className="text-sm font-mono font-black tabular-nums text-sky-600 dark:text-sky-400">−{formatMoney(refunded)}</dd>
+          <div className="flex justify-between text-xs font-mono">
+            <dt className="text-sky-600 dark:text-sky-400">Refunded</dt>
+            <dd className="tabular-nums text-sky-600 dark:text-sky-400">−{formatMoney(refunded)}</dd>
           </div>
         )}
 
-        <div className="flex justify-between">
+        {stripeFee > 0 && (
+          <div className="flex justify-between text-xs font-mono">
+            <dt className="text-muted-light dark:text-muted-dark">
+              Stripe fee
+              {!hasActualFee && <span className="ml-1.5 text-[9px] tracking-tag uppercase text-amber-600 dark:text-amber-400">est.</span>}
+            </dt>
+            <dd className="tabular-nums text-text-light dark:text-text-dark">−{formatMoney(stripeFee)}</dd>
+          </div>
+        )}
+
+        <div className="flex justify-between pt-2 mt-1 border-t border-border-light dark:border-border-dark">
           <dt className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Net to rescue</dt>
           <dd
             className={`text-sm font-mono font-black tabular-nums ${netToRescue < 0 ? 'text-red-500 dark:text-red-400' : 'text-primary-light dark:text-primary-dark'}`}

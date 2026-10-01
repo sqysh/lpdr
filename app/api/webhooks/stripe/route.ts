@@ -15,6 +15,7 @@ import {
   handleSubscriptionDeleted,
   handleSubscriptionUpdated
 } from 'lib/stripe/webhooks'
+import { handleChargeUpdated } from 'lib/stripe/webhooks/handleChargeUpdated'
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!
 
@@ -79,6 +80,9 @@ export async function POST(req: NextRequest) {
         break
       case 'charge.refunded':
         await handleChargeRefunded(event.data.object as Stripe.Charge)
+        break
+      case 'charge.updated':
+        await handleChargeUpdated(event.data.object as Stripe.Charge)
         break
       default:
         await createLog('info', 'Unhandled webhook event', {

@@ -318,6 +318,7 @@ model Order {
   failureEmailSentAt DateTime?
   refundEmailSentAt  DateTime?
   stripeInvoiceId    String?   @unique
+  stripeFee          Decimal?  @db.Decimal(10, 2)
 
   // ── Customer (denormalized snapshot) ────────────────────
   customerEmail String

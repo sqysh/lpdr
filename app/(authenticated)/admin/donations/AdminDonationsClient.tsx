@@ -39,16 +39,20 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
     const refunded = orders.filter((o) => o.status === 'REFUNDED')
 
     const gross = confirmed.reduce((sum, o) => sum + Number(o.totalAmount), 0)
-    const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered) : 0), 0)
-    const feesAbsorbed = confirmed.reduce((sum, o) => sum + (o.coverFees ? 0 : Number(o.feesCovered)), 0)
+    // Stripe's real fee once recorded; the donor's covered amount is the estimate until then, and offline gifts have none
+    const feeOf = (o: (typeof confirmed)[number]) =>
+      o.stripeFee != null ? Number(o.stripeFee) : o.paymentIntentId ? Number(o.feesCovered ?? 0) : 0
+    const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered ?? 0) : 0), 0)
+    const stripeFees = confirmed.reduce((sum, o) => sum + feeOf(o), 0)
 
     // Recurring is counted by distinct subscription, not by charge, so the number means donors
     const recurring = new Set(confirmed.filter((o) => o.isRecurring && o.stripeSubscriptionId).map((o) => o.stripeSubscriptionId))
 
     return {
       gross,
-      net: gross - feesCovered - feesAbsorbed,
+      net: gross - stripeFees,
       feesCovered,
+      stripeFees,
       oneTimeCount: confirmed.filter((o) => !o.isRecurring).length,
       recurringCount: recurring.size,
       refundedCount: refunded.length,
@@ -111,7 +115,7 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
           <Stat icon={DollarSign} label="Gross" value={formatMoney(stats.gross)} />
           <Stat icon={DollarSign} label="Net to Rescue" value={formatMoney(stats.net)} accent />
-          <Stat icon={Percent} label="Fees Covered" value={formatMoney(stats.feesCovered)} />
+          <Stat icon={Percent} label="Stripe Fees" value={formatMoney(stats.stripeFees)} />
           <Stat icon={Heart} label="One-time" value={String(stats.oneTimeCount)} />
           {stats.refundedCount > 0 ? (
             <Stat icon={Undo2} label="Refunded" value={formatMoney(stats.refundedTotal)} />

@@ -36,17 +36,22 @@ export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
       o.refundedAmount != null ? Number(o.refundedAmount) : o.status === 'REFUNDED' ? Number(o.totalAmount) : 0
     const refunds = orders.filter((o) => refundOf(o) > 0)
 
+    // Stripe's real fee once charge.updated has recorded it; the donor's covered amount is the estimate
+    // until then, and offline payments have none
+    const feeOf = (o: IOrderRow) => (o.stripeFee != null ? Number(o.stripeFee) : o.paymentIntentId ? Number(o.feesCovered ?? 0) : 0)
+
     const gross = confirmed.reduce((sum, o) => sum + Number(o.totalAmount), 0)
     // Partial refunds come off confirmed orders; fully refunded ones are already outside gross
     const partialRefunds = confirmed.reduce((sum, o) => sum + refundOf(o), 0)
-    const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered) : 0), 0)
-    const feesAbsorbed = confirmed.reduce((sum, o) => sum + (o.coverFees ? 0 : Number(o.feesCovered)), 0)
+    // Stripe keeps its fee on a refund, so fully refunded orders still cost the rescue theirs
+    const stripeFees = [...confirmed, ...orders.filter((o) => o.status === 'REFUNDED')].reduce((sum, o) => sum + feeOf(o), 0)
+    const feesCovered = confirmed.reduce((sum, o) => sum + (o.coverFees ? Number(o.feesCovered ?? 0) : 0), 0)
 
     return {
       gross,
-      net: gross - partialRefunds - feesCovered - feesAbsorbed,
+      net: gross - partialRefunds - stripeFees,
+      stripeFees,
       feesCovered,
-      feesAbsorbed,
       confirmedCount: confirmed.length,
       refundedCount: refunds.length,
       refundedTotal: refunds.reduce((sum, o) => sum + refundOf(o), 0),
@@ -117,7 +122,7 @@ export function AdminTransactionsClient({ orders }: { orders: IOrderRow[] }) {
         <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-3">
           <Stat icon={DollarSign} label="Gross" value={formatMoney(stats.gross)} />
           <Stat icon={DollarSign} label="Net to Rescue" value={formatMoney(stats.net)} accent />
-          <Stat icon={Percent} label="Fees Covered" value={formatMoney(stats.feesCovered)} />
+          <Stat icon={Percent} label="Stripe Fees" value={formatMoney(stats.stripeFees)} />
           <Stat icon={Package} label="Confirmed" value={String(stats.confirmedCount)} />
           <Stat icon={Truck} label="Needs Shipping" value={String(stats.needsShipping)} />
           {stats.refundedCount > 0 ? (

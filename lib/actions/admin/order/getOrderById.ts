@@ -21,6 +21,8 @@ export const getOrderById = async (id: string) => {
         subtotal: true,
         shipping: true,
         feesCovered: true,
+        stripeFee: true,
+        paymentIntentId: true,
         coverFees: true,
         isRecurring: true,
         recurringFrequency: true,

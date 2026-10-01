@@ -1,4 +1,4 @@
-import { OrderType, RecurringFrequency } from '@prisma/client'
+import { Order, OrderType, RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-countersign'
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
@@ -121,7 +121,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       donorMessage: metadata.donorMessage ?? null
     }
 
-    let order
+    let order: Order
     if (existingOrder) {
       // Claimed with FAILED in the where, so if Stripe delivers this event twice at once, only one
       // delivery upgrades the row and carries on; the other finds nothing to claim and stops

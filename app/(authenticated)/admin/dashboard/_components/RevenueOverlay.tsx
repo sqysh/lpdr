@@ -10,18 +10,15 @@ const COLORS = [
   'bg-amber-500 dark:bg-amber-400'
 ]
 
-const fmtType = (type: string) =>
-  sourceMeta[type]?.label ?? type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')
+const fmtType = (type: string) => sourceMeta[type]?.label ?? type.charAt(0).toUpperCase() + type.slice(1).replace(/_/g, ' ')
 
-export function RevenueOverlay({
-  liveRevenue,
-  monthlyChange,
-  sources
-}: {
+type RevenueProps = {
   liveRevenue: number
   monthlyChange: number
   sources: { type: string; total: number }[]
-}) {
+}
+
+export function RevenueBreakdown({ liveRevenue, monthlyChange, sources }: RevenueProps) {
   const up = monthlyChange >= 0
   const sourceTotal = sources.reduce((sum, s) => sum + s.total, 0)
 
@@ -34,13 +31,7 @@ export function RevenueOverlay({
     .sort((a, b) => b.total - a.total)
 
   return (
-    <div className="absolute top-4 left-4 w-72 border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
-      <div className="px-4 py-3 border-b border-border-light dark:border-border-dark">
-        <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-          Total revenue · all time
-        </p>
-      </div>
-
+    <>
       <div className="px-4 py-3">
         <p className="font-quicksand text-3xl font-black text-primary-light dark:text-primary-dark leading-none">
           {formatMoney(liveRevenue)}
@@ -48,20 +39,12 @@ export function RevenueOverlay({
 
         <div className="flex items-center gap-1.5 mt-2.5">
           {up ? (
-            <TrendingUp
-              className="w-3.5 h-3.5 shrink-0 text-green-600 dark:text-green-400"
-              aria-hidden="true"
-            />
+            <TrendingUp className="w-3.5 h-3.5 shrink-0 text-green-600 dark:text-green-400" aria-hidden="true" />
           ) : (
-            <TrendingDown
-              className="w-3.5 h-3.5 shrink-0 text-red-600 dark:text-red-400"
-              aria-hidden="true"
-            />
+            <TrendingDown className="w-3.5 h-3.5 shrink-0 text-red-600 dark:text-red-400" aria-hidden="true" />
           )}
           <span
-            className={`font-mono text-[10px] tracking-[0.15em] uppercase ${
-              up ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'
-            }`}
+            className={`font-mono text-[10px] tracking-tag uppercase ${up ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'}`}
           >
             {up ? 'Up' : 'Down'} {Math.abs(monthlyChange).toFixed(1)}% vs last month
           </span>
@@ -73,9 +56,7 @@ export function RevenueOverlay({
           <div
             className="flex h-1.5 w-full overflow-hidden"
             role="img"
-            aria-label={`Revenue by source: ${segments
-              .map((s) => `${fmtType(s.type)} ${Math.round(s.pct)}%`)
-              .join(', ')}`}
+            aria-label={`Revenue by source: ${segments.map((s) => `${fmtType(s.type)} ${Math.round(s.pct)}%`).join(', ')}`}
           >
             {segments.map((s) => (
               <span key={s.type} className={s.color} style={{ width: `${s.pct}%` }} />
@@ -102,13 +83,22 @@ export function RevenueOverlay({
       )}
 
       <div className="px-4 py-2.5 border-t border-border-light dark:border-border-dark flex items-center justify-between">
-        <span className="font-mono text-[9px] tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-          + historical
-        </span>
+        <span className="font-mono text-[9px] tracking-tag uppercase text-muted-light dark:text-muted-dark">+ historical</span>
         <span className="font-mono text-xs font-bold text-muted-light dark:text-muted-dark tabular-nums">
           {formatMoney(HISTORICAL_TOTAL)}
         </span>
       </div>
+    </>
+  )
+}
+
+export function RevenueOverlay(props: RevenueProps) {
+  return (
+    <div className="hidden sm:block absolute top-4 left-4 w-72 border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
+      <div className="px-4 py-3 border-b border-border-light dark:border-border-dark">
+        <p className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Total revenue · all time</p>
+      </div>
+      <RevenueBreakdown {...props} />
     </div>
   )
 }

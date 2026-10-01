@@ -41,7 +41,9 @@ export const orderListArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
     items: { select: { quantity: true } },
     donorMessage: true,
     refundedAmount: true,
-    refundedAt: true
+    refundedAt: true,
+    stripeFee: true,
+    paymentIntentId: true
   }
 })
 

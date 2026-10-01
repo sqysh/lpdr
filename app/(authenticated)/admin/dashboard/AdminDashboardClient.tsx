@@ -6,23 +6,30 @@ import { useThemeStore } from 'stores/theme.store'
 import { MAP_STYLE_LIGHT, MAP_STYLE_DARK, US_CENTER, US_ZOOM } from './_constants/map.constants'
 import { clusterByGrid } from './_lib/clusterByGrid'
 import { ClusterMarker } from './_components/ClusterMarker'
-import { MapStatsPanel } from './_components/MapStatsPanel'
-import { TopSupporters } from './_components/TopSupporters'
-import { PendingShipments } from './_components/PendingShipments'
-import { RevenueOverlay } from './_components/RevenueOverlay'
+import { MapStatsPanel, RegionList } from './_components/MapStatsPanel'
+import { SupporterList, TopSupporters } from './_components/TopSupporters'
+import { PendingShipments, ShipmentList } from './_components/PendingShipments'
+import { RevenueBreakdown, RevenueOverlay } from './_components/RevenueOverlay'
 import { RegionCount } from './_types/map.types'
-import { Loader2 } from 'lucide-react'
+import { DollarSign, Heart, Loader2, MapPin, Truck } from 'lucide-react'
+import { DockTab, MobileDock } from './_components/MobileDock'
+import Link from 'next/link'
 
-type Point = {
-  id: string
-  lat: number
-  lng: number
-  city: string | null
-  region: string | null
-}
-
-type Props = {
-  points: Point[]
+export function AdminDashboardClient({
+  points,
+  regionCounts,
+  shipments,
+  supporters,
+  totalRevenue,
+  orderMetrics
+}: {
+  points: {
+    id: string
+    lat: number
+    lng: number
+    city: string | null
+    region: string | null
+  }[]
   regionCounts: { region: string; count: number }[]
   shipments: {
     id: string
@@ -49,13 +56,12 @@ type Props = {
       total: number
     }[]
   }
-}
-
-export function AdminDashboardClient({ points, regionCounts, shipments, supporters, totalRevenue, orderMetrics }: Props) {
+}) {
   const isDark = useThemeStore((s) => s.isDark)
   const isResolved = useThemeStore((s) => s.isResolved)
   const mapRef = useRef<google.maps.Map | null>(null)
   const [zoom, setZoom] = useState(US_ZOOM)
+  const [sheet, setSheet] = useState<string | null>(null)
 
   const { isLoaded, loadError } = useLoadScript({
     googleMapsApiKey: process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY!
@@ -97,6 +103,70 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
     map.fitBounds({ south, west, north, east }, 64)
   }, [])
 
+  const wholeDollars = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 })
+
+  const tabs: DockTab[] = [
+    {
+      id: 'revenue',
+      label: 'Revenue',
+      value: wholeDollars.format(totalRevenue),
+      title: 'Total revenue · all time',
+      icon: DollarSign,
+      content: <RevenueBreakdown liveRevenue={totalRevenue} monthlyChange={orderMetrics.monthlyChange} sources={sources} />
+    },
+    ...(shipments.length > 0
+      ? [
+          {
+            id: 'shipping',
+            label: 'To ship',
+            value: String(shipments.length),
+            title: `Needs shipping · ${shipments.length} ${shipments.length === 1 ? 'order' : 'orders'}`,
+            icon: Truck,
+            tone: 'amber' as const,
+            content: (
+              <>
+                <ShipmentList shipments={shipments} />
+                <Link
+                  href="/admin/transactions"
+                  className="block px-4 py-3 border-t border-border-light dark:border-border-dark font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
+                >
+                  View all transactions →
+                </Link>
+              </>
+            )
+          }
+        ]
+      : []),
+    ...(supporters.length > 0
+      ? [
+          {
+            id: 'supporters',
+            label: 'Givers',
+            value: String(supporters.length),
+            title: 'Top supporters',
+            icon: Heart,
+            content: <SupporterList supporters={supporters} />
+          }
+        ]
+      : []),
+    {
+      id: 'located',
+      label: 'Located',
+      value: points.length.toLocaleString(),
+      title: `${points.length.toLocaleString()} located · ${regionCounts.length} regions`,
+      icon: MapPin,
+      content: (
+        <RegionList
+          regionCounts={regionCounts}
+          onRegionClick={(r) => {
+            setSheet(null)
+            focusRegion(r)
+          }}
+        />
+      )
+    }
+  ]
+
   if (loadError) {
     return (
       <div className="flex items-center justify-center h-dvh">
@@ -120,6 +190,7 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
           options={{
             disableDefaultUI: true,
             zoomControl: true,
+            zoomControlOptions: { position: google.maps.ControlPosition.RIGHT_CENTER },
             styles: isDark ? MAP_STYLE_DARK : MAP_STYLE_LIGHT,
             // What shows through the hairline gaps between tiles; Google's default is a light gray that
             // blends into the light map but draws a grid over the dark one
@@ -154,7 +225,6 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
         </div>
       )}
 
-      {/* Stats overlay */}
       <MapStatsPanel total={points.length} regionCounts={regionCounts} onRegionClick={focusRegion} />
 
       <TopSupporters supporters={supporters} />
@@ -162,6 +232,8 @@ export function AdminDashboardClient({ points, regionCounts, shipments, supporte
       <PendingShipments shipments={shipments} />
 
       <RevenueOverlay liveRevenue={totalRevenue} monthlyChange={orderMetrics.monthlyChange} sources={sources} />
+
+      <MobileDock tabs={tabs} openId={sheet} onOpenChange={setSheet} />
     </div>
   )
 }
