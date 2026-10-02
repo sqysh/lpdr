@@ -24,6 +24,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
   const parsed = parseInput(signFinancialSchema, input)
   if (parsed.ok === false) return parsed.result
 
+  // paymentMethod is the adopter's choice from this form. The agreement's own is empty until this signing saves it
   const { agreementId, loadedAt, paymentMethod, firstAdopterName, secondAdopterName, additionalDonation } = parsed.data
 
   try {
@@ -64,34 +65,32 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
 
     // Card payers go straight to the payment step. Everyone else needs the details somewhere they
     // can find again, not just on a page they might close
-    if (agreement.paymentMethod !== 'CARD') {
-      if (!paysByCard && SITE) {
-        const { label, instruction } = OFFLINE_PAYMENT_INSTRUCTIONS[agreement.paymentMethod]
-        const total = agreementTotal({
-          adoptionFee: Number(agreement.adoptionFee),
-          healthCertificateFee: agreement.healthCertificateFee == null ? null : Number(agreement.healthCertificateFee),
-          additionalDonation
-        })
+    if (!paysByCard && SITE) {
+      const { label, instruction } = OFFLINE_PAYMENT_INSTRUCTIONS[paymentMethod]
+      const total = agreementTotal({
+        adoptionFee: Number(agreement.adoptionFee),
+        healthCertificateFee: agreement.healthCertificateFee == null ? null : Number(agreement.healthCertificateFee),
+        additionalDonation
+      })
 
-        try {
-          const { error } = await resend.emails.send({
-            from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
-            to: agreement.email,
-            replyTo: 'applications@littlepawsdr.org',
-            subject: `How to pay for ${agreement.dogName}'s adoption`,
-            html: adoptionAgreementPaymentTemplate({
-              firstName: agreement.firstName,
-              dogName: agreement.dogName,
-              total,
-              methodLabel: label,
-              instruction,
-              link: `${SITE}/adopt/agreement/${agreementId}`
-            })
+      try {
+        const { error } = await resend.emails.send({
+          from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
+          to: agreement.email,
+          replyTo: 'applications@littlepawsdr.org',
+          subject: `How to pay for ${agreement.dogName}'s adoption`,
+          html: adoptionAgreementPaymentTemplate({
+            firstName: agreement.firstName,
+            dogName: agreement.dogName,
+            total,
+            methodLabel: label,
+            instruction,
+            link: `${SITE}/adopt/agreement/${agreementId}`
           })
-          if (error) throw new Error(error.message)
-        } catch (error) {
-          await createLog('error', 'Adoption payment instructions email failed to send', { agreementId, error: getErrorMessage(error) })
-        }
+        })
+        if (error) throw new Error(error.message)
+      } catch (error) {
+        await createLog('error', 'Adoption payment instructions email failed to send', { agreementId, error: getErrorMessage(error) })
       }
     }
 
