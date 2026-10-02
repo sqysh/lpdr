@@ -63,7 +63,7 @@ async function markWinnerPaid(winningBidderId: string): Promise<void> {
     }),
     prisma.auction.update({
       where: { id: winner.auctionId },
-      data: { totalAuctionRevenue: { increment: winner.totalPrice } }
+      data: { totalAuctionRevenue: { increment: winner.totalPrice ?? 0 } }
     })
   ])
 }
@@ -142,9 +142,10 @@ async function createAuctionOrder({
 }
 
 /**
- * Charges a winner's saved card when they have auto-pay on. Every path that
- * cannot charge falls back to emailing them a payment link, so nobody is left
- * without a way to pay.
+ * Charges a winner's saved card when they have auto-pay on. Every path that cannot charge falls back
+ * to emailing them a payment link, so nobody is left without a way to pay. Once the card is charged,
+ * nothing falls back to that email: a problem recording the win is logged for follow-up instead,
+ * because asking a charged winner to pay again could charge them twice.
  */
 export async function processAutoPay(winner: Winner, auction: { id: string; title: string }, sendPaymentRequestEmail: () => Promise<void>) {
   const user = await getWinnerUser(winner.userId)
@@ -175,8 +176,10 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
   const finalAmount = Math.round((winner.totalPrice + processingFee) * 100) / 100
   const customerName = `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim()
 
+  let paymentIntent: Awaited<ReturnType<typeof stripeClient.paymentIntents.create>>
+
   try {
-    const paymentIntent = await stripeClient.paymentIntents.create(
+    paymentIntent = await stripeClient.paymentIntents.create(
       {
         amount: Math.round(finalAmount * 100),
         currency: 'usd',
@@ -201,14 +204,37 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       // A retry of the cron must not charge the same win twice
       { idempotencyKey: `autopay-${winner.winningBidderId}` }
     )
+  } catch (error) {
+    // Declined, expired, needs authentication: nothing was charged, so the payment link is the right fallback
+    await createLog('error', '[AUTO-PAY] charge failed', {
+      userId: winner.userId,
+      winningBidderId: winner.winningBidderId,
+      error: getErrorMessage(error)
+    })
+    return sendPaymentRequestEmail()
+  }
 
-    if (paymentIntent.status !== 'succeeded') {
-      await createLog('warn', '[AUTO-PAY] intent did not succeed', {
-        userId: winner.userId,
+  if (paymentIntent.status !== 'succeeded') {
+    await createLog('warn', '[AUTO-PAY] intent did not succeed', {
+      userId: winner.userId,
+      winningBidderId: winner.winningBidderId,
+      status: paymentIntent.status
+    })
+    return sendPaymentRequestEmail()
+  }
+
+  // The card has been charged. From here nothing may ask the winner to pay again: a failure is logged
+  // for follow-up, and the webhook for this payment records the win if this code didn't get to it
+  try {
+    // The webhook for this payment can occasionally get here first and record the win itself
+    const recorded = await prisma.order.findFirst({ where: { paymentIntentId: paymentIntent.id }, select: { id: true } })
+    if (recorded) {
+      await createLog('info', '[AUTO-PAY] success, recorded by the webhook', {
         winningBidderId: winner.winningBidderId,
-        status: paymentIntent.status
+        orderId: recorded.id,
+        paymentIntentId: paymentIntent.id
       })
-      return sendPaymentRequestEmail()
+      return
     }
 
     await markWinnerPaid(winner.winningBidderId)
@@ -230,7 +256,13 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       feesCovered: processingFee
     })
 
-    await sendConfirmationEmail(order)
+    await sendConfirmationEmail(order).catch((error) =>
+      createLog('error', '[AUTO-PAY] charged, but the receipt email failed', {
+        winningBidderId: winner.winningBidderId,
+        orderId: order.id,
+        error: getErrorMessage(error)
+      })
+    )
 
     await createLog('info', '[AUTO-PAY] success', {
       userId: winner.userId,
@@ -239,12 +271,12 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       paymentIntentId: paymentIntent.id
     })
   } catch (error) {
-    await createLog('error', '[AUTO-PAY] failed', {
+    await createLog('error', '[AUTO-PAY] charged, but recording the win failed. Check this winner by hand', {
       userId: winner.userId,
       winningBidderId: winner.winningBidderId,
+      amount: finalAmount,
+      paymentIntentId: paymentIntent.id,
       error: getErrorMessage(error)
     })
-
-    return sendPaymentRequestEmail()
   }
 }

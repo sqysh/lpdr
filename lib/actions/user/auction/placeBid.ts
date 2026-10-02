@@ -154,10 +154,10 @@ export async function placeBid(auctionItemId: string, bidAmount: number) {
           bidAmount: Number(result.bidAmount),
           bidderId: userId,
           bidderName,
-          ip: details.ip,
-          device: details.device,
-          city: details.geoCity,
-          country: details.geoCountry
+          ip: details?.ip ?? null,
+          device: details?.device ?? null,
+          city: details?.geoCity ?? null,
+          country: details?.geoCountry ?? null
         }),
         pusherSuperuser('bid-placed', {
           auctionItemId,
