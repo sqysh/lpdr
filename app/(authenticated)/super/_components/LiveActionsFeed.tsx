@@ -12,12 +12,14 @@ import {
   Activity,
   FileText,
   Mail,
-  MapPin
+  MapPin,
+  AlertTriangle
 } from 'lucide-react'
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
 import { SUPER_USER_CHANNEL } from 'lib/pusher/pusher.constants'
 import { getPusherClient, releaseChannel } from 'lib/pusher/pusher-client'
+import { formatMoney } from 'lib/utils/currency.utils'
 
 interface EventConfig {
   icon: React.ElementType
@@ -32,6 +34,12 @@ interface LiveEvent {
   data: Record<string, unknown>
   ts: string
 }
+
+// Pusher payloads arrive untyped, so amounts are coerced before formatting
+const money = (value: unknown) => formatMoney(Number(value ?? 0))
+
+// Events that mean someone has to step in. Pinned above the feed until dismissed, whatever the filter
+const ALERT_EVENTS = ['auto-pay-needs-attention', 'payment-request-failed', 'auction-close-failed']
 
 const EVENT_CONFIG: Record<string, EventConfig> = {
   'user-signed-in': {
@@ -50,19 +58,19 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: ShoppingCart,
     label: 'Order Created',
     color: 'text-green-500',
-    format: (d) => `${d.email} — $${d.amount}`
+    format: (d) => `${d.email} — ${money(d.amount)}`
   },
   'order-failed': {
     icon: XCircle,
     label: 'Payment Failed',
     color: 'text-red-500',
-    format: (d) => `${d.email} — $${d.amount} — ${d.failureReason ?? 'unknown'}`
+    format: (d) => `${d.email} — ${money(d.amount)} — ${d.failureReason ?? 'unknown'}`
   },
   'recurring-donation': {
     icon: Activity,
     label: 'Recurring Donation',
     color: 'text-green-500',
-    format: (d) => `${d.email} — $${d.amount} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
+    format: (d) => `${d.email} — ${money(d.amount)} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
   },
   'subscription-created': {
     icon: CreditCard,
@@ -116,13 +124,51 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: Gavel,
     label: 'Auction Ended',
     color: 'text-amber-500',
-    format: (d) => `${d.auctionTitle} — $${d.totalRaised} raised`
+    format: (d) => `${d.auctionTitle} — ${money(d.totalRaised)} raised`
   },
   'auction-updated': {
     icon: Gavel,
     label: 'Auction Ping',
     color: 'text-muted-light dark:text-muted-dark',
     format: (d) => `${d.auctionId}`
+  },
+  'auction-closed': {
+    icon: Gavel,
+    label: 'Auction Closed',
+    color: 'text-green-500',
+    format: (d) =>
+      `${d.auctionTitle} — ${money(d.totalRaised)} — ${d.winners} winners${Number(d.failedPaymentSteps) ? ` — ${d.failedPaymentSteps} failed` : ''} — ${Math.round(Number(d.durationMs) / 1000)}s`
+  },
+  'auction-close-failed': {
+    icon: AlertTriangle,
+    label: 'Auction Close Failed',
+    color: 'text-red-500',
+    format: (d) => `${d.auctionTitle} — ${d.error}`
+  },
+  'auto-pay-charged': {
+    icon: CreditCard,
+    label: 'Auto-Pay Charged',
+    color: 'text-green-500',
+    format: (d) =>
+      `${d.name} — ${money(d.amount)}${d.coverFees ? ' (covered fees)' : ''}${d.via === 'webhook' ? ' · recorded by webhook' : ''}`
+  },
+  'auto-pay-payment-link': {
+    icon: Mail,
+    label: 'Payment Link Sent',
+    color: 'text-sky-500',
+    format: (d) => `${d.name} — ${money(d.total)} — ${d.reason}`
+  },
+  'auto-pay-needs-attention': {
+    icon: AlertTriangle,
+    label: 'Charged, Not Recorded',
+    color: 'text-red-500',
+    format: (d) => `${d.name} — ${money(d.amount)} — ${d.paymentIntentId} — ${d.error}`
+  },
+  'payment-request-failed': {
+    icon: AlertTriangle,
+    label: 'Winner Email Failed',
+    color: 'text-red-500',
+    format: (d) => `${d.name} (${d.email}) — ${money(d.total)} — ${d.error}`
   },
   'order-shipped': {
     icon: Package,
@@ -170,13 +216,13 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     icon: Gavel,
     label: 'Bid Placed',
     color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `$${d.bidAmount ?? d.currentBid} by ${d.bidderName ?? d.topBidder}`
+    format: (d) => `${money(d.bidAmount ?? d.currentBid)} by ${d.bidderName ?? d.topBidder}`
   },
   'outbid-email-sent': {
     icon: Mail,
     label: 'Outbid Email',
     color: 'text-amber-500',
-    format: (d) => `${d.name} outbid on ${d.itemName} — their $${d.yourBid} → new bid $${d.newBid}`
+    format: (d) => `${d.name} outbid on ${d.itemName} — their ${money(d.yourBid)} → new bid ${money(d.newBid)}`
   },
   'test-ping': {
     icon: Activity,
@@ -199,43 +245,63 @@ const DEFAULT_CONFIG: EventConfig = {
   format: (d) => JSON.stringify(d).slice(0, 80)
 }
 
+const FILTERS = ['all', 'orders', 'users', 'auctions', 'payments', 'system']
+
+const FILTER_MATCH: Record<string, string[]> = {
+  orders: ['order-created', 'order-failed', 'order-shipped', 'recurring-donation'],
+  users: ['user-signed-in', 'user-registered', 'user-signed-out', 'user-suspended', 'user-terminated', 'user-reinstated'],
+  auctions: [
+    'auction-created',
+    'auction-started',
+    'auction-ended',
+    'auction-updated',
+    'auction-closed',
+    'auction-close-failed',
+    'auction-item-created',
+    'bid-placed',
+    'outbid-email-sent',
+    'auto-pay-charged',
+    'auto-pay-payment-link',
+    'auto-pay-needs-attention',
+    'payment-request-failed'
+  ],
+  payments: [
+    'subscription-created',
+    'subscription-updated',
+    'subscription-cancelled',
+    'payment-method-attached',
+    'payment-method-detached',
+    'payment-method-updated'
+  ],
+  system: ['user-suspended', 'user-terminated', 'user-reinstated']
+}
+
 export function LiveActionsFeed() {
   const [events, setEvents] = useState<LiveEvent[]>([])
+  const [alerts, setAlerts] = useState<LiveEvent[]>([])
   const [filter, setFilter] = useState<string>('all')
   const feedRef = useRef<HTMLDivElement>(null)
 
-  const FILTERS = ['all', 'orders', 'users', 'auctions', 'payments', 'system']
-  const FILTER_MATCH: Record<string, string[]> = {
-    orders: ['order-created', 'order-failed', 'order-shipped', 'recurring-donation'],
-    users: ['user-signed-in', 'user-registered', 'user-signed-out', 'user-suspended', 'user-terminated', 'user-reinstated'],
-    auctions: ['auction-created', 'auction-started', 'auction-ended', 'auction-updated', 'bid-placed'],
-    payments: [
-      'subscription-created',
-      'subscription-updated',
-      'subscription-cancelled',
-      'payment-method-attached',
-      'payment-method-detached',
-      'payment-method-updated'
-    ],
-    system: ['user-suspended', 'user-terminated', 'user-reinstated']
-  }
-
   useEffect(() => {
-    const channelName = SUPER_USER_CHANNEL
     const pusher = getPusherClient()
-    const channel = pusher.subscribe(channelName)
+    const channel = pusher.subscribe(SUPER_USER_CHANNEL)
 
     const onEvent = (event: string, data: Record<string, unknown>) => {
       if (event.startsWith('pusher:')) return
 
+      // auto-pay arrives as one event with an outcome; each outcome gets its own row style
+      const key = event === 'auto-pay' && typeof data.outcome === 'string' ? `auto-pay-${data.outcome}` : event
+
       const newEvent: LiveEvent = {
-        id: `${event}-${Date.now()}-${Math.random()}`,
-        event,
+        id: `${key}-${Date.now()}-${Math.random()}`,
+        event: key,
         data,
         ts: (data._ts as string) ?? new Date().toISOString()
       }
 
       setEvents((prev) => [newEvent, ...prev].slice(0, 200))
+      // Kept outside the 200 cap so a burst of bids can't push an alert out of view
+      if (ALERT_EVENTS.includes(key)) setAlerts((prev) => [newEvent, ...prev])
       feedRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
     }
 
@@ -263,6 +329,38 @@ export function LiveActionsFeed() {
           </div>
         }
       />
+
+      {/* Needs attention: pinned until dismissed */}
+      {alerts.length > 0 && (
+        <ul role="list" aria-label="Needs attention" className="shrink-0 border-b border-red-500/40 bg-red-500/5 max-h-48 overflow-y-auto">
+          {alerts.map((alert) => {
+            const config = EVENT_CONFIG[alert.event] ?? DEFAULT_CONFIG
+            const time = new Date(alert.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
+
+            return (
+              <li key={alert.id} role="alert" className="flex items-start gap-3 px-4 py-2.5 border-b border-red-500/20 last:border-b-0">
+                <AlertTriangle size={12} className="mt-0.5 shrink-0 text-red-500" aria-hidden="true" />
+                <div className="flex-1 min-w-0">
+                  <p className="font-mono text-[9px] tracking-[0.12em] uppercase font-bold text-red-500">
+                    {config.label} · {time}
+                  </p>
+                  {/* Wrapped, not truncated: the payment id and error here are what gets copied */}
+                  <p className="font-mono text-[10px] text-text-light dark:text-text-dark leading-snug wrap-break-word">
+                    {config.format(alert.data)}
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setAlerts((prev) => prev.filter((a) => a.id !== alert.id))}
+                  className="shrink-0 font-mono text-[9px] tracking-widest uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+                >
+                  Dismiss
+                </button>
+              </li>
+            )
+          })}
+        </ul>
+      )}
 
       {/* Filter chips */}
       <div className="flex items-center gap-0 border-b border-border-light dark:border-border-dark shrink-0">
