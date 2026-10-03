@@ -1,5 +1,5 @@
 import { createLog } from 'lib/actions/log/createLog'
-import { pusherTrigger } from 'lib/pusher/pusher.utils'
+import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import { resolveAuctionWinners } from 'lib/utils/end-auction/resolveAuctionWinners.util'
 import { processAutoPay } from 'lib/utils/end-auction/processAutoPay.util'
 import { sendWinnerEmail } from 'lib/utils/end-auction/sendWinnerEmail.util'
@@ -92,17 +92,32 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
     // leaves that winner's row AWAITING_PAYMENT, which the reminder cron picks up.
     const results = await Promise.allSettled(
       winners.map((winner) => {
-        const sendPaymentRequestEmail = () =>
-          sendWinnerEmail({
-            email: winner.user.email,
-            firstName: winner.user.firstName ?? 'Friend',
-            auctionId: auction.id,
-            winningBidderId: winner.winningBidderId,
-            items: winner.items,
-            itemsTotal: winner.itemsTotal,
-            shipping: winner.shipping,
-            totalPrice: winner.totalPrice
-          })
+        const sendPaymentRequestEmail = async () => {
+          try {
+            await sendWinnerEmail({
+              email: winner.user.email,
+              firstName: winner.user.firstName ?? 'Friend',
+              auctionId: auction.id,
+              winningBidderId: winner.winningBidderId,
+              items: winner.items,
+              itemsTotal: winner.itemsTotal,
+              shipping: winner.shipping,
+              totalPrice: winner.totalPrice
+            })
+          } catch (error) {
+            // This winner hasn't been told they won or how to pay, so it needs a manual resend
+            await pusherSuperuser('payment-request-failed', {
+              auctionId: auction.id,
+              winningBidderId: winner.winningBidderId,
+              name: [winner.user.firstName, winner.user.lastName].filter(Boolean).join(' ') || winner.user.email,
+              email: winner.user.email,
+              total: winner.totalPrice,
+              error: error instanceof Error ? error.message : 'Unknown error'
+            }).catch(() => {})
+            // Rethrown so it still counts as a failed payment step in the cron summary
+            throw error
+          }
+        }
 
         return processAutoPay(winner, auction, sendPaymentRequestEmail)
       })
@@ -119,6 +134,17 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
       detail: `Ended auction ${auction.id}, ${winners.length} winner(s), ${failedPayments.length} payment step(s) failed`,
       ...(failedPayments.length ? { errors: failedPayments.map((f) => String(f.reason)) } : {})
     })
+
+    await pusherSuperuser('auction-closed', {
+      auctionId: auction.id,
+      auctionTitle: auction.title,
+      totalRaised,
+      winners: winners.length,
+      items: auction._count.items,
+      bidders: auction._count.bidders,
+      failedPaymentSteps: failedPayments.length,
+      durationMs: Date.now() - start
+    }).catch(() => {})
 
     return { success: true }
   } catch (error) {
@@ -138,6 +164,12 @@ export async function endAuctionCore(overrideAuctionId?: string): Promise<{ succ
         type: 'WINNER_RESOLUTION_FAILED',
         message: error instanceof Error ? error.message : 'Unknown error'
       })
+
+      await pusherSuperuser('auction-close-failed', {
+        auctionId: endingAuction.id,
+        auctionTitle: endingAuction.title,
+        error: error instanceof Error ? error.message : 'Unknown error'
+      }).catch(() => {})
     }
 
     return { error: 'Failed to end auctions', success: false }

@@ -5,6 +5,7 @@ import { resolveAuctionWinners } from './resolveAuctionWinners.util'
 import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { calculateStripeFees } from '../fees.utils'
+import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 type Winner = Awaited<ReturnType<typeof resolveAuctionWinners>>[number]
 
@@ -15,6 +16,18 @@ type WinnerAddress = {
   state: string
   zipPostalCode: string
 }
+
+type AutoPayOutcome = 'charged' | 'payment-link' | 'needs-attention'
+
+// One event per winner at close, so the super feed shows every result as it happens
+const notifyFeed = (winner: Winner, outcome: AutoPayOutcome, details: Record<string, unknown> = {}) =>
+  pusherSuperuser('auto-pay', {
+    outcome,
+    winningBidderId: winner.winningBidderId,
+    name: [winner.user.firstName, winner.user.lastName].filter(Boolean).join(' ') || winner.user.email,
+    total: winner.totalPrice,
+    ...details
+  }).catch(() => {})
 
 async function getWinnerUser(userId: string) {
   return prisma.user.findUnique({
@@ -149,7 +162,10 @@ async function createAuctionOrder({
  */
 export async function processAutoPay(winner: Winner, auction: { id: string; title: string }, sendPaymentRequestEmail: () => Promise<void>) {
   const user = await getWinnerUser(winner.userId)
-  if (!user?.autoPay) return sendPaymentRequestEmail()
+  if (!user?.autoPay) {
+    await notifyFeed(winner, 'payment-link', { reason: 'Auto-pay off' })
+    return sendPaymentRequestEmail()
+  }
 
   const [paymentMethod, address] = await Promise.all([
     getDefaultPaymentMethod(winner.userId),
@@ -161,6 +177,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       userId: winner.userId,
       winningBidderId: winner.winningBidderId
     })
+    await notifyFeed(winner, 'payment-link', { reason: 'No saved card' })
     return sendPaymentRequestEmail()
   }
 
@@ -169,6 +186,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       userId: winner.userId,
       winningBidderId: winner.winningBidderId
     })
+    await notifyFeed(winner, 'payment-link', { reason: 'Missing address' })
     return sendPaymentRequestEmail()
   }
 
@@ -211,6 +229,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       winningBidderId: winner.winningBidderId,
       error: getErrorMessage(error)
     })
+    await notifyFeed(winner, 'payment-link', { reason: `Declined: ${getErrorMessage(error)}` })
     return sendPaymentRequestEmail()
   }
 
@@ -220,6 +239,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       winningBidderId: winner.winningBidderId,
       status: paymentIntent.status
     })
+    await notifyFeed(winner, 'payment-link', { reason: `Payment ${paymentIntent.status}` })
     return sendPaymentRequestEmail()
   }
 
@@ -234,6 +254,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
         orderId: recorded.id,
         paymentIntentId: paymentIntent.id
       })
+      await notifyFeed(winner, 'charged', { amount: finalAmount, via: 'webhook' })
       return
     }
 
@@ -270,10 +291,16 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
       amount: finalAmount,
       paymentIntentId: paymentIntent.id
     })
+    await notifyFeed(winner, 'charged', { amount: finalAmount, coverFees: user.autoPayCoverFees })
   } catch (error) {
     await createLog('error', '[AUTO-PAY] charged, but recording the win failed. Check this winner by hand', {
       userId: winner.userId,
       winningBidderId: winner.winningBidderId,
+      amount: finalAmount,
+      paymentIntentId: paymentIntent.id,
+      error: getErrorMessage(error)
+    })
+    await notifyFeed(winner, 'needs-attention', {
       amount: finalAmount,
       paymentIntentId: paymentIntent.id,
       error: getErrorMessage(error)

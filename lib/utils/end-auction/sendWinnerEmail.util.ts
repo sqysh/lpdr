@@ -35,12 +35,15 @@ export async function sendWinnerEmail({
   const url = `${BASE}/auctions/winner/${winningBidderId}`
 
   try {
-    const result = await resend.emails.send({
+    const { data, error } = await resend.emails.send({
       from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
       to: email,
       subject: subjectFor(reminderNumber),
       html: auctionWinningBidderTemplate({ url, firstName, items, itemsTotal, shipping, totalPrice, reminderNumber })
     })
+
+    // Resend reports rejections in the result rather than throwing, so a rejected email has to be turned into an error here
+    if (error) throw new Error(error.message)
 
     await createLog('info', 'Winner email sent successfully', {
       location: ['sendWinnerEmail.ts'],
@@ -48,7 +51,7 @@ export async function sendWinnerEmail({
       auctionId,
       winningBidderId,
       reminderNumber,
-      messageId: result.data?.id
+      messageId: data?.id
     })
   } catch (error) {
     await createLog('error', 'Failed to send winner email', {
