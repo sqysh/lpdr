@@ -1,6 +1,7 @@
 import { createLog } from 'lib/actions/log/createLog'
 import { resend } from 'lib/email/resend'
 import { auctionWinningBidderTemplate } from 'lib/email/templates/winning-bidder.template'
+import { throttled } from 'lib/email/throttled'
 
 /** The first notice announces the win. Later ones are chasing payment, and should say so. */
 const subjectFor = (reminderNumber: number) => {
@@ -35,12 +36,14 @@ export async function sendWinnerEmail({
   const url = `${BASE}/auctions/winner/${winningBidderId}`
 
   try {
-    const { data, error } = await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
-      to: email,
-      subject: subjectFor(reminderNumber),
-      html: auctionWinningBidderTemplate({ url, firstName, items, itemsTotal, shipping, totalPrice, reminderNumber })
-    })
+    const { data, error } = await throttled(() =>
+      resend.emails.send({
+        from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
+        to: email,
+        subject: subjectFor(reminderNumber),
+        html: auctionWinningBidderTemplate({ url, firstName, items, itemsTotal, shipping, totalPrice, reminderNumber })
+      })
+    )
 
     // Resend reports rejections in the result rather than throwing, so a rejected email has to be turned into an error here
     if (error) throw new Error(error.message)

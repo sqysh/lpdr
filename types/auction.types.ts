@@ -128,7 +128,25 @@ export const auctionDetailArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
     },
     bids: { orderBy: { createdAt: 'desc' }, select: bidSelect },
     winningBidders: {
-      include: { auctionItems: true, user: { select: userContactSelect } }
+      include: {
+        auctionItems: true,
+        user: {
+          select: {
+            ...userContactSelect,
+            autoPay: true,
+            autoPayCoverFees: true,
+            address: { select: { id: true } },
+            _count: { select: { paymentMethods: true } },
+            // Recent auction payment attempts, matched to this auction by date in the tab
+            orders: {
+              where: { type: 'AUCTION_PURCHASE' },
+              orderBy: { createdAt: 'desc' },
+              take: 5,
+              select: { status: true, autoPaid: true, failureReason: true, totalAmount: true, createdAt: true }
+            }
+          }
+        }
+      }
     },
     instantBuyers: true
   }

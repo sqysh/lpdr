@@ -64,15 +64,18 @@ export default function PublicAuctionClient({
 
         <div className="max-w-7xl mx-auto px-4 xs:px-5 sm:px-6 py-10 sm:py-14">
           <AutoPayPrompt autoPay={autoPay} isEnded={isEnded} />
-          <AuctionItemGrid
-            auction={auction}
-            available={available}
-            customAuctionLink={auction.customAuctionLink}
-            isActive={isActive}
-            myBids={myBids}
-            isAuthed={isAuthed}
-            watchedIds={watchedIds}
-          />
+          {/* Once ended with everything sold, the live grid is just an empty box above the Sold section */}
+          {(!isEnded || available.length > 0) && (
+            <AuctionItemGrid
+              auction={auction}
+              available={available}
+              customAuctionLink={auction.customAuctionLink}
+              isActive={isActive}
+              myBids={myBids}
+              isAuthed={isAuthed}
+              watchedIds={watchedIds}
+            />
+          )}
           <AuctionSoldGrid
             auction={auction}
             customAuctionLink={auction.customAuctionLink}

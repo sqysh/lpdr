@@ -13,7 +13,10 @@ import {
   FileText,
   Mail,
   MapPin,
-  AlertTriangle
+  AlertTriangle,
+  Undo2,
+  Repeat,
+  PenLine
 } from 'lucide-react'
 import { PanelHeader } from './PanelHeader'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -35,251 +38,371 @@ interface LiveEvent {
   ts: string
 }
 
-// Pusher payloads arrive untyped, so amounts are coerced before formatting
+type Data = Record<string, unknown>
+
+// Pusher payloads arrive untyped, so values are coerced before display
 const money = (value: unknown) => formatMoney(Number(value ?? 0))
+const str = (value: unknown) => (value == null ? '' : String(value))
+const who = (d: Data) => str(d.name).trim() || str(d.customerName).trim() || str(d.email) || str(d.adopterEmail) || 'Someone'
+
+const ORDER_TYPE_LABEL: Record<string, string> = {
+  ONE_TIME_DONATION: 'a donation',
+  RECURRING_DONATION: 'a recurring donation',
+  ADOPTION_FEE: 'an adoption application',
+  ADOPTION_AGREEMENT: 'an adoption',
+  AUCTION_PURCHASE: 'auction winnings',
+  PURCHASE: 'a merch order'
+}
+const orderType = (value: unknown) => ORDER_TYPE_LABEL[str(value)] ?? (str(value).replace(/_/g, ' ').toLowerCase() || 'an order')
+
+const STATE_GREEN = 'text-green-500'
+const STATE_RED = 'text-red-500'
+const STATE_AMBER = 'text-amber-500'
+const STATE_PRIMARY = 'text-primary-light dark:text-primary-dark'
+const STATE_MUTED = 'text-muted-light dark:text-muted-dark'
 
 // Events that mean someone has to step in. Pinned above the feed until dismissed, whatever the filter
-const ALERT_EVENTS = ['auto-pay-needs-attention', 'payment-request-failed', 'auction-close-failed']
+const ALERT_EVENTS = ['auto-pay-needs-attention', 'payment-request-failed', 'auction-close-failed', 'auction-anomaly']
+
+// Errors that already have their own, clearer event in the feed, so the error row would only repeat it
+const COVERED_ERRORS = ['Failed to send winner email', '[AUTO-PAY] charge failed', '[CRON] end-auction']
 
 const EVENT_CONFIG: Record<string, EventConfig> = {
+  // ── People ──
+  'user-registered': {
+    icon: Star,
+    label: 'New Account',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.email)} created an account with ${str(d.method)}`
+  },
   'user-signed-in': {
     icon: User,
     label: 'Signed In',
-    color: 'text-green-500',
-    format: (d) => `${d.email} via ${d.method}`
-  },
-  'user-registered': {
-    icon: Star,
-    label: 'Registered',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${d.email} via ${d.method}`
-  },
-  'order-created': {
-    icon: ShoppingCart,
-    label: 'Order Created',
-    color: 'text-green-500',
-    format: (d) => `${d.email} — ${money(d.amount)}`
-  },
-  'order-failed': {
-    icon: XCircle,
-    label: 'Payment Failed',
-    color: 'text-red-500',
-    format: (d) => `${d.email} — ${money(d.amount)} — ${d.failureReason ?? 'unknown'}`
-  },
-  'recurring-donation': {
-    icon: Activity,
-    label: 'Recurring Donation',
-    color: 'text-green-500',
-    format: (d) => `${d.email} — ${money(d.amount)} ${d.frequency}${d.isFirstPayment ? ' (first)' : ' (renewal)'}`
-  },
-  'subscription-created': {
-    icon: CreditCard,
-    label: 'Subscription Created',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${d.email} — ${d.frequency}`
-  },
-  'subscription-updated': {
-    icon: CreditCard,
-    label: 'Subscription Updated',
-    color: 'text-amber-500',
-    format: (d) => `${d.email} — ${d.status}`
-  },
-  'subscription-cancelled': {
-    icon: CreditCard,
-    label: 'Subscription Cancelled',
-    color: 'text-red-500',
-    format: (d) => `${d.email}`
-  },
-  'payment-method-attached': {
-    icon: CreditCard,
-    label: 'Card Added',
-    color: 'text-green-500',
-    format: (d) => `${d.email} — ${d.brand} ••${d.last4}`
-  },
-  'payment-method-detached': {
-    icon: CreditCard,
-    label: 'Card Removed',
-    color: 'text-amber-500',
-    format: (d) => `${d.email} — ${d.brand} ••${d.last4}`
-  },
-  'payment-method-updated': {
-    icon: CreditCard,
-    label: 'Card Updated',
-    color: 'text-amber-500',
-    format: (d) => `${d.email} — ${d.brand} ••${d.last4}`
-  },
-  'auction-created': {
-    icon: Gavel,
-    label: 'Auction Created',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${d.title} by ${d.createdBy}`
-  },
-  'auction-started': {
-    icon: Gavel,
-    label: 'Auction Started',
-    color: 'text-green-500',
-    format: (d) => `${d.auctionTitle}`
-  },
-  'auction-ended': {
-    icon: Gavel,
-    label: 'Auction Ended',
-    color: 'text-amber-500',
-    format: (d) => `${d.auctionTitle} — ${money(d.totalRaised)} raised`
-  },
-  'auction-updated': {
-    icon: Gavel,
-    label: 'Auction Ping',
-    color: 'text-muted-light dark:text-muted-dark',
-    format: (d) => `${d.auctionId}`
-  },
-  'auction-closed': {
-    icon: Gavel,
-    label: 'Auction Closed',
-    color: 'text-green-500',
-    format: (d) =>
-      `${d.auctionTitle} — ${money(d.totalRaised)} — ${d.winners} winners${Number(d.failedPaymentSteps) ? ` — ${d.failedPaymentSteps} failed` : ''} — ${Math.round(Number(d.durationMs) / 1000)}s`
-  },
-  'auction-close-failed': {
-    icon: AlertTriangle,
-    label: 'Auction Close Failed',
-    color: 'text-red-500',
-    format: (d) => `${d.auctionTitle} — ${d.error}`
-  },
-  'auto-pay-charged': {
-    icon: CreditCard,
-    label: 'Auto-Pay Charged',
-    color: 'text-green-500',
-    format: (d) =>
-      `${d.name} — ${money(d.amount)}${d.coverFees ? ' (covered fees)' : ''}${d.via === 'webhook' ? ' · recorded by webhook' : ''}`
-  },
-  'auto-pay-payment-link': {
-    icon: Mail,
-    label: 'Payment Link Sent',
-    color: 'text-sky-500',
-    format: (d) => `${d.name} — ${money(d.total)} — ${d.reason}`
-  },
-  'auto-pay-needs-attention': {
-    icon: AlertTriangle,
-    label: 'Charged, Not Recorded',
-    color: 'text-red-500',
-    format: (d) => `${d.name} — ${money(d.amount)} — ${d.paymentIntentId} — ${d.error}`
-  },
-  'payment-request-failed': {
-    icon: AlertTriangle,
-    label: 'Winner Email Failed',
-    color: 'text-red-500',
-    format: (d) => `${d.name} (${d.email}) — ${money(d.total)} — ${d.error}`
-  },
-  'order-shipped': {
-    icon: Package,
-    label: 'Order Shipped',
-    color: 'text-green-500',
-    format: (d) => `${d.email ?? d.userId}`
+    color: STATE_GREEN,
+    format: (d) => `${who(d)} signed in with ${str(d.method)}${d.name ? ` (${str(d.email)})` : ''}`
   },
   'user-signed-out': {
     icon: UserX,
     label: 'Signed Out',
-    color: 'text-muted-light dark:text-muted-dark',
-    format: (d) => `${d.email}`
+    color: STATE_MUTED,
+    format: (d) => `${who(d)} signed out`
   },
-  'user-suspended': {
-    icon: UserX,
-    label: 'User Suspended',
-    color: 'text-amber-500',
-    format: (d) => `${d.targetEmail} by ${d.actor}`
-  },
-  'user-terminated': {
-    icon: UserX,
-    label: 'User Terminated',
-    color: 'text-red-500',
-    format: (d) => `${d.targetEmail} by ${d.actor}`
-  },
-  'user-reinstated': {
-    icon: UserCheck,
-    label: 'User Reinstated',
-    color: 'text-green-500',
-    format: (d) => `${d.targetEmail} by ${d.actor}`
-  },
-  'adoption-fee-created': {
-    icon: FileText,
-    label: 'Adoption Fee',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${d.email} — ${d.name} — ${d.state}`
-  },
-  'auction-item-created': {
-    icon: Gavel,
-    label: 'Item Added',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${d.name} (${d.sellingFormat}) by ${d.createdBy}`
-  },
-  'bid-placed': {
-    icon: Gavel,
-    label: 'Bid Placed',
-    color: 'text-primary-light dark:text-primary-dark',
-    format: (d) => `${money(d.bidAmount ?? d.currentBid)} by ${d.bidderName ?? d.topBidder}`
-  },
-  'outbid-email-sent': {
-    icon: Mail,
-    label: 'Outbid Email',
-    color: 'text-amber-500',
-    format: (d) => `${d.name} outbid on ${d.itemName} — their ${money(d.yourBid)} → new bid ${money(d.newBid)}`
-  },
-  'test-ping': {
-    icon: Activity,
-    label: 'Test Ping',
-    color: 'text-green-500',
-    format: (d) => `${d.message} — ${d._ts}`
+  'user-name-updated': {
+    icon: PenLine,
+    label: 'Name Added',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.email)} is now ${str(d.name)}`
   },
   'address-updated': {
     icon: MapPin,
     label: 'Address',
     color: 'text-cyan-500',
-    format: (d) => `${d.email} ${d.isFirstAddress ? 'added' : 'updated'} an address in ${d.city}, ${d.state}`
+    format: (d) => `${str(d.email)} ${d.isFirstAddress ? 'added' : 'updated'} an address in ${str(d.city)}, ${str(d.state)}`
+  },
+  'user-suspended': {
+    icon: UserX,
+    label: 'User Suspended',
+    color: STATE_AMBER,
+    format: (d) => `${str(d.targetEmail)} suspended by ${str(d.actor)}`
+  },
+  'user-terminated': {
+    icon: UserX,
+    label: 'User Terminated',
+    color: STATE_RED,
+    format: (d) => `${str(d.targetEmail)} terminated by ${str(d.actor)}`
+  },
+  'user-reinstated': {
+    icon: UserCheck,
+    label: 'User Reinstated',
+    color: STATE_GREEN,
+    format: (d) => `${str(d.targetEmail)} reinstated by ${str(d.actor)}`
+  },
+
+  // ── Orders and payments ──
+  'order-created': {
+    icon: ShoppingCart,
+    label: 'Payment',
+    color: STATE_GREEN,
+    format: (d) => `${who(d)} paid ${money(d.amount)} for ${orderType(d.type)}`
+  },
+  'order-failed': {
+    icon: XCircle,
+    label: 'Payment Failed',
+    color: STATE_RED,
+    format: (d) => `${who(d)}'s ${money(d.amount)} payment for ${orderType(d.type)} failed: ${str(d.failureReason) || 'unknown reason'}`
+  },
+  'order-refunded': {
+    icon: Undo2,
+    label: 'Refund',
+    color: STATE_AMBER,
+    format: (d) => `${who(d)} was refunded ${money(d.amount ?? d.refundedAmount)}${d.type ? ` for ${orderType(d.type)}` : ''}`
+  },
+  'order-shipped': {
+    icon: Package,
+    label: 'Shipping',
+    color: STATE_GREEN,
+    format: (d) => `${who(d)}'s order marked ${str(d.shippingStatus).replace(/_/g, ' ').toLowerCase()}`
+  },
+  'recurring-donation': {
+    icon: Repeat,
+    label: 'Recurring Donation',
+    color: STATE_GREEN,
+    format: (d) =>
+      `${who(d)} gave ${money(d.amount)} ${str(d.frequency).toLowerCase()} ${d.isFirstPayment ? '(first payment)' : '(renewal)'}`
+  },
+  'recurring-payment-failed': {
+    icon: XCircle,
+    label: 'Recurring Payment Failed',
+    color: STATE_RED,
+    format: (d) => `${who(d)}'s recurring ${money(d.amount)} payment failed`
+  },
+  'subscription-created': {
+    icon: CreditCard,
+    label: 'Subscription Started',
+    color: STATE_PRIMARY,
+    // Stripe sends this amount in cents
+    format: (d) => `${str(d.email)} started ${money(Number(d.amount ?? 0) / 100)} ${str(d.frequency).toLowerCase()}`
+  },
+  'subscription-updated': {
+    icon: CreditCard,
+    label: 'Subscription Updated',
+    color: STATE_AMBER,
+    format: (d) => `${who(d)}'s subscription is now ${str(d.status).toLowerCase()}`
+  },
+  'subscription-cancelled': {
+    icon: CreditCard,
+    label: 'Subscription Cancelled',
+    color: STATE_RED,
+    format: (d) => `${who(d)} cancelled their recurring donation`
+  },
+  'payment-method-attached': {
+    icon: CreditCard,
+    label: 'Card Saved',
+    color: STATE_GREEN,
+    format: (d) => `${who(d)} saved a ${str(d.brand)} ending ${str(d.last4)}`
+  },
+  'payment-method-detached': {
+    icon: CreditCard,
+    label: 'Card Removed',
+    color: STATE_AMBER,
+    format: (d) => `${who(d)} removed a ${str(d.brand)} ending ${str(d.last4)}`
+  },
+  'payment-method-updated': {
+    icon: CreditCard,
+    label: 'Card Updated',
+    color: STATE_AMBER,
+    format: (d) => `${who(d)} updated a ${str(d.brand)} ending ${str(d.last4)}`
+  },
+
+  // ── Auctions ──
+  'auction-created': {
+    icon: Gavel,
+    label: 'Auction Created',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.title)} created by ${str(d.createdBy)}`
+  },
+  'auction-started': {
+    icon: Gavel,
+    label: 'Auction Started',
+    color: STATE_GREEN,
+    format: (d) => `${str(d.auctionTitle)} is now live`
+  },
+  'auction-ended': {
+    icon: Gavel,
+    label: 'Auction Ended',
+    color: STATE_AMBER,
+    format: (d) => `${str(d.auctionTitle)} closed with ${money(d.totalRaised)} in winning bids`
+  },
+  'auction-updated': {
+    icon: Gavel,
+    label: 'Auction Edited',
+    color: STATE_MUTED,
+    format: (d) => `${str(d.title) || str(d.auctionId)} edited${d.datesChanged ? ', dates changed' : ''}`
+  },
+  'auction-item-created': {
+    icon: Gavel,
+    label: 'Item Added',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.name)} (${str(d.sellingFormat).toLowerCase()}) added by ${str(d.createdBy)}`
+  },
+  'auction-item-updated': {
+    icon: Gavel,
+    label: 'Item Edited',
+    color: STATE_MUTED,
+    format: (d) =>
+      `${str(d.name)} edited${d.duringLiveAuction ? ' during the live auction' : ''}${Number(d.photosAdded) ? `, ${d.photosAdded} photo(s) added` : ''}`
+  },
+  'auction-item-deleted': {
+    icon: Gavel,
+    label: 'Item Deleted',
+    color: STATE_AMBER,
+    format: (d) => `${str(d.name) || str(d.auctionItemId)} was deleted`
+  },
+  'bid-placed': {
+    icon: Gavel,
+    label: 'Bid',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.bidderName) || 'Someone'} bid ${money(d.bidAmount)} on ${str(d.itemName)}`
+  },
+  'outbid-email-sent': {
+    icon: Mail,
+    label: 'Outbid',
+    color: STATE_AMBER,
+    format: (d) => `${str(d.name)} was outbid on ${str(d.itemName)}: their ${money(d.yourBid)} beaten by ${money(d.newBid)}`
+  },
+  'auction-closed': {
+    icon: Gavel,
+    label: 'Auction Closed',
+    color: STATE_GREEN,
+    format: (d) =>
+      `${str(d.auctionTitle)}: ${money(d.totalRaised)} from ${str(d.winners)} winners${Number(d.failedPaymentSteps) ? `, ${d.failedPaymentSteps} payment steps failed` : ''}, in ${Math.round(Number(d.durationMs) / 1000)}s`
+  },
+  'auction-close-failed': {
+    icon: AlertTriangle,
+    label: 'Auction Close Failed',
+    color: STATE_RED,
+    format: (d) => `${str(d.auctionTitle)} could not close: ${str(d.error)}`
+  },
+  'auction-anomaly': {
+    icon: AlertTriangle,
+    label: 'Auction Problem',
+    color: STATE_RED,
+    format: (d) => `${str(d.auctionTitle)}: ${str(d.message)}${d.itemName ? ` (${str(d.itemName)})` : ''}`
+  },
+  'auto-pay-charged': {
+    icon: CreditCard,
+    label: 'Auto-Pay Charged',
+    color: STATE_GREEN,
+    format: (d) =>
+      `${str(d.name)} was charged ${money(d.amount)} automatically${d.coverFees ? ', covering fees' : ''}${d.via === 'webhook' ? ' (recorded by webhook)' : ''}`
+  },
+  'auto-pay-payment-link': {
+    icon: Mail,
+    label: 'Payment Link Sent',
+    color: 'text-sky-500',
+    format: (d) => `${str(d.name)} owes ${money(d.total)} and was sent a payment link: ${str(d.reason)}`
+  },
+  'auto-pay-needs-attention': {
+    icon: AlertTriangle,
+    label: 'Charged, Not Recorded',
+    color: STATE_RED,
+    format: (d) => `${str(d.name)} was charged ${money(d.amount)} but the win wasn't recorded. ${str(d.paymentIntentId)}: ${str(d.error)}`
+  },
+  'payment-request-failed': {
+    icon: AlertTriangle,
+    label: 'Winner Email Failed',
+    color: STATE_RED,
+    format: (d) => `${str(d.name)} (${str(d.email)}) owes ${money(d.total)} but their winner email failed: ${str(d.error)}`
   },
   'winner-marked-paid': {
     icon: CreditCard,
     label: 'Winner Marked Paid',
-    color: 'text-green-500',
-    format: (d) => `${d.name} — ${money(d.amount)} by ${String(d.method).toLowerCase()}`
+    color: STATE_GREEN,
+    format: (d) => `${str(d.name)} paid ${money(d.amount)} by ${str(d.method).toLowerCase()} for ${str(d.auctionTitle)}`
+  },
+
+  // ── Adoptions ──
+  'adoption-agreement-drafted': {
+    icon: FileText,
+    label: 'Agreement Drafted',
+    color: STATE_MUTED,
+    format: (d) => `Agreement for ${str(d.dogName)} drafted for ${str(d.adopterEmail)}, fee ${money(d.adoptionFee)}`
+  },
+  'adoption-agreement-sent': {
+    icon: FileText,
+    label: 'Agreement Sent',
+    color: STATE_PRIMARY,
+    format: (d) => `${str(d.dogName)}'s agreement ${d.resent ? 'sent again' : 'sent'} to ${str(d.adopterEmail)}`
+  },
+  'adoption-agreement-updated': {
+    icon: FileText,
+    label: 'Agreement Edited',
+    color: STATE_MUTED,
+    format: (d) => `${str(d.dogName) || 'An agreement'} was edited`
+  },
+  'adoption-agreement-terms-signed': {
+    icon: PenLine,
+    label: 'Terms Signed',
+    color: STATE_PRIMARY,
+    format: (d) => `${who(d)} signed the terms for ${str(d.dogName)}`
+  },
+  'adoption-agreement-signed': {
+    icon: PenLine,
+    label: 'Agreement Signed',
+    color: STATE_GREEN,
+    format: (d) =>
+      `${who(d)} signed for ${str(d.dogName)}, paying by ${str(d.paymentMethod).toLowerCase()}${Number(d.additionalDonation) ? ` with a ${money(d.additionalDonation)} donation` : ''}`
+  },
+  'adoption-agreement-paid': {
+    icon: CreditCard,
+    label: 'Adoption Paid',
+    color: STATE_GREEN,
+    format: (d) => `${str(d.dogName)}'s adoption paid, ${money(d.amount)} by ${str(d.method).toLowerCase()}`
+  },
+  'adoption-agreement-completed': {
+    icon: FileText,
+    label: 'Adoption Complete',
+    color: STATE_GREEN,
+    format: (d) => `${str(d.dogName)}'s adoption is complete`
+  },
+  'adoption-fee-created': {
+    icon: FileText,
+    label: 'Application Fee',
+    color: STATE_PRIMARY,
+    format: (d) => `${who(d)} paid the application fee${d.state ? ` (${str(d.state)})` : ''}`
+  },
+
+  // ── System ──
+  'system-error': {
+    icon: AlertTriangle,
+    label: 'Error',
+    color: STATE_AMBER,
+    format: (d) => {
+      const meta = (d.metadata ?? {}) as Data
+      const detail = [meta.email, meta.error ?? meta.detail].filter(Boolean).map(str).join(' · ')
+      return `${str(d.message)}${detail ? `: ${detail}` : ''}`
+    }
+  },
+  'test-ping': {
+    icon: Activity,
+    label: 'Test Ping',
+    color: STATE_GREEN,
+    format: (d) => `${str(d.message)}`
   }
+}
+
+// Agreement close events (void, returned) are named at runtime, so anything adoption-shaped without its own entry still reads well
+const ADOPTION_FALLBACK: EventConfig = {
+  icon: FileText,
+  label: 'Adoption',
+  color: STATE_MUTED,
+  format: (d) => [str(d.dogName), str(d.adopterEmail), str(d.reason)].filter(Boolean).join(' · ')
 }
 
 const DEFAULT_CONFIG: EventConfig = {
   icon: Activity,
   label: 'Event',
-  color: 'text-muted-light dark:text-muted-dark',
-  format: (d) => JSON.stringify(d).slice(0, 80)
+  color: STATE_MUTED,
+  format: (d) => JSON.stringify(d).slice(0, 120)
 }
 
-const FILTERS = ['all', 'orders', 'users', 'auctions', 'payments', 'system']
+const configFor = (event: string) =>
+  EVENT_CONFIG[event] ??
+  (event.startsWith('adoption-agreement-')
+    ? { ...ADOPTION_FALLBACK, label: event.replace('adoption-agreement-', 'Agreement ') }
+    : DEFAULT_CONFIG)
 
-const FILTER_MATCH: Record<string, string[]> = {
-  orders: ['order-created', 'order-failed', 'order-shipped', 'recurring-donation'],
-  users: ['user-signed-in', 'user-registered', 'user-signed-out', 'user-suspended', 'user-terminated', 'user-reinstated'],
-  auctions: [
-    'auction-created',
-    'auction-started',
-    'auction-ended',
-    'auction-updated',
-    'auction-closed',
-    'auction-close-failed',
-    'auction-item-created',
-    'bid-placed',
-    'outbid-email-sent',
-    'auto-pay-charged',
-    'auto-pay-payment-link',
-    'auto-pay-needs-attention',
-    'payment-request-failed'
-  ],
-  payments: [
-    'subscription-created',
-    'subscription-updated',
-    'subscription-cancelled',
-    'payment-method-attached',
-    'payment-method-detached',
-    'payment-method-updated'
-  ],
-  system: ['user-suspended', 'user-terminated', 'user-reinstated']
+const FILTERS = ['all', 'auctions', 'payments', 'adoptions', 'users', 'errors']
+
+const FILTER_MATCH: Record<string, (event: string) => boolean> = {
+  auctions: (e) =>
+    e.startsWith('auction') ||
+    e.startsWith('auto-pay') ||
+    ['bid-placed', 'outbid-email-sent', 'payment-request-failed', 'winner-marked-paid'].includes(e),
+  payments: (e) => e.startsWith('order-') || e.startsWith('subscription-') || e.startsWith('payment-method-') || e.startsWith('recurring-'),
+  adoptions: (e) => e.startsWith('adoption-'),
+  users: (e) => e.startsWith('user-') || e === 'address-updated',
+  errors: (e) => e === 'system-error' || ALERT_EVENTS.includes(e) || e.endsWith('-failed')
 }
 
 export function LiveActionsFeed() {
@@ -292,8 +415,11 @@ export function LiveActionsFeed() {
     const pusher = getPusherClient()
     const channel = pusher.subscribe(SUPER_USER_CHANNEL)
 
-    const onEvent = (event: string, data: Record<string, unknown>) => {
+    const onEvent = (event: string, data: Data) => {
       if (event.startsWith('pusher:')) return
+
+      // An error that already has its own event in the feed would only repeat it
+      if (event === 'system-error' && COVERED_ERRORS.includes(str(data.message))) return
 
       // auto-pay arrives as one event with an outcome; each outcome gets its own row style
       const key = event === 'auto-pay' && typeof data.outcome === 'string' ? `auto-pay-${data.outcome}` : event
@@ -319,7 +445,7 @@ export function LiveActionsFeed() {
     }
   }, [])
 
-  const filtered = filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.includes(e.event))
+  const filtered = filter === 'all' ? events : events.filter((e) => FILTER_MATCH[filter]?.(e.event))
 
   return (
     <div className="flex flex-col flex-1 min-w-0">
@@ -327,7 +453,6 @@ export function LiveActionsFeed() {
         label={`Live Actions (${events.length})`}
         action={
           <div className="flex items-center gap-2">
-            {/* Live indicator */}
             <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
               <span className="animate-ping absolute inline-flex h-full w-full bg-green-500 opacity-75" />
               <span className="relative inline-flex h-1.5 w-1.5 bg-green-500" />
@@ -336,11 +461,10 @@ export function LiveActionsFeed() {
         }
       />
 
-      {/* Needs attention: pinned until dismissed */}
       {alerts.length > 0 && (
         <ul role="list" aria-label="Needs attention" className="shrink-0 border-b border-red-500/40 bg-red-500/5 max-h-48 overflow-y-auto">
           {alerts.map((alert) => {
-            const config = EVENT_CONFIG[alert.event] ?? DEFAULT_CONFIG
+            const config = configFor(alert.event)
             const time = new Date(alert.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })
 
             return (
@@ -368,11 +492,11 @@ export function LiveActionsFeed() {
         </ul>
       )}
 
-      {/* Filter chips */}
-      <div className="flex items-center gap-0 border-b border-border-light dark:border-border-dark shrink-0">
+      <div className="flex items-center gap-0 border-b border-border-light dark:border-border-dark shrink-0 overflow-x-auto">
         {FILTERS.map((f) => (
           <button
             key={f}
+            type="button"
             onClick={() => setFilter(f)}
             className={`px-3 py-1.5 font-mono text-[9px] tracking-widest uppercase border-r border-border-light dark:border-border-dark transition-colors focus:outline-none ${
               filter === f
@@ -383,10 +507,11 @@ export function LiveActionsFeed() {
             {f}
           </button>
         ))}
-        <span className="ml-auto px-3 font-mono text-[9px] text-muted-light dark:text-muted-dark">{filtered.length} events</span>
+        <span className="ml-auto px-3 font-mono text-[9px] text-muted-light dark:text-muted-dark whitespace-nowrap">
+          {filtered.length} events
+        </span>
       </div>
 
-      {/* Feed */}
       <div ref={feedRef} className="flex-1 overflow-y-auto" aria-label="Live platform activity feed" aria-live="polite" aria-atomic="false">
         {filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-2 py-12">
@@ -397,14 +522,9 @@ export function LiveActionsFeed() {
           <ul role="list">
             <AnimatePresence mode="popLayout">
               {filtered.map((evt) => {
-                const config = EVENT_CONFIG[evt.event] ?? DEFAULT_CONFIG
+                const config = configFor(evt.event)
                 const Icon = config.icon
-                const time = new Date(evt.ts).toLocaleTimeString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  second: '2-digit'
-                })
-                const originChannel = evt.data._channel as string | undefined
+                const time = new Date(evt.ts).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 
                 return (
                   <motion.li
@@ -414,25 +534,19 @@ export function LiveActionsFeed() {
                     transition={{ duration: 0.35 }}
                     className="flex items-start gap-3 px-4 py-2.5 border-b border-border-light dark:border-border-dark hover:bg-surface-light dark:hover:bg-surface-dark transition-colors"
                   >
-                    {/* Icon */}
                     <div className={`mt-0.5 shrink-0 ${config.color}`} aria-hidden="true">
                       <Icon size={12} />
                     </div>
-
-                    {/* Content */}
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap mb-0.5">
-                        <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>{config.label}</span>
-                        {originChannel && (
-                          <span className="font-mono text-[8px] text-muted-light dark:text-muted-dark opacity-60">via {originChannel}</span>
-                        )}
-                      </div>
-                      <p className="font-mono text-[10px] text-text-light dark:text-text-dark leading-snug truncate">
+                      <span className={`font-mono text-[9px] tracking-[0.12em] uppercase font-bold ${config.color}`}>{config.label}</span>
+                      {/* Full sentence on hover when the row is truncated */}
+                      <p
+                        title={config.format(evt.data)}
+                        className="mt-0.5 font-mono text-[10px] text-text-light dark:text-text-dark leading-snug truncate"
+                      >
                         {config.format(evt.data)}
                       </p>
                     </div>
-
-                    {/* Time */}
                     <span className="font-mono text-[9px] text-muted-light dark:text-muted-dark tabular-nums shrink-0 mt-0.5">{time}</span>
                   </motion.li>
                 )
