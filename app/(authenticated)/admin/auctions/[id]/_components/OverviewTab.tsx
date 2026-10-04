@@ -1,7 +1,7 @@
 import { formatDateTime, getDaysRemaining } from 'lib/utils/date.utils'
 import { IAuctionDetail } from 'types/auction.types'
 import { formatMoney } from 'lib/utils/currency.utils'
-import { Clock, DollarSign, Gavel, Package, UserPlus, Users } from 'lucide-react'
+import { Clock, DollarSign, Gavel, Package, UserPlus, Users, Wallet } from 'lucide-react'
 import { motion } from 'framer-motion'
 import Picture from 'components/_common/Picture'
 import { getDisplayRevenue } from 'lib/utils/auction.utils'
@@ -14,6 +14,15 @@ const META = 'text-f10 font-mono text-muted-light dark:text-muted-dark'
 export function OverviewTab({ auction, signups }: { auction: IAuctionDetail; signups: AuctionSignups }) {
   const isEnded = auction.status === 'ENDED'
   const displayRevenue = getDisplayRevenue(auction)
+  // Instant buys are paid at checkout, so anything still owed is an unpaid winner's items.
+  // Shipping is left out: it covers postage, not money raised
+  const outstanding = isEnded
+    ? auction.winningBidders
+        .filter((w) => w.winningBidPaymentStatus !== 'PAID')
+        .reduce((sum, w) => sum + Number(w.totalPrice ?? 0) - Number(w.shipping ?? 0), 0)
+    : 0
+  const collected = Math.max(0, displayRevenue - outstanding)
+  const collectedPct = auction.goal > 0 ? Math.min(100, Math.round((collected / auction.goal) * 100)) : 0
   const pct = auction.goal > 0 ? Math.min(100, Math.round((displayRevenue / auction.goal) * 100)) : 0
   const daysLeft = getDaysRemaining(auction.endDate)
 
@@ -27,14 +36,24 @@ export function OverviewTab({ auction, signups }: { auction: IAuctionDetail; sig
   return (
     <div className="space-y-4">
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-px bg-border-light dark:bg-border-dark border border-border-light dark:border-border-dark">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-px bg-border-light dark:bg-border-dark border border-border-light dark:border-border-dark">
         <StatCard
-          label={isEnded ? 'Revenue' : 'Secured'}
+          label={isEnded ? 'Won' : 'Secured'}
           value={formatMoney(displayRevenue)}
           icon={DollarSign}
           iconColor="text-primary-light dark:text-primary-dark"
           delay={0}
         />
+        {isEnded && (
+          <StatCard
+            label="Collected"
+            value={formatMoney(collected)}
+            sub={outstanding > 0 ? `${formatMoney(outstanding)} outstanding` : 'All paid'}
+            icon={Wallet}
+            iconColor="text-emerald-500"
+            delay={0.03}
+          />
+        )}
         <StatCard label="Items" value={String(auction.items.length)} icon={Package} iconColor="text-violet-500" delay={0.06} />
         <StatCard label="Bidders" value={String(auction.bidders.length)} icon={Users} iconColor="text-pink-500" delay={0.12} />
         {/* The headline is the attributable number. Every account created during the auction
@@ -65,29 +84,41 @@ export function OverviewTab({ auction, signups }: { auction: IAuctionDetail; sig
             <div className="flex items-end justify-between">
               <div>
                 <p className="text-2xl font-black font-quicksand tabular-nums text-text-light dark:text-text-dark">
-                  {formatMoney(displayRevenue)}
+                  {formatMoney(isEnded ? collected : displayRevenue)}
                 </p>
                 <p className={`${META} mt-0.5`}>
-                  {isEnded ? 'total revenue · ' : 'secured · '}
+                  {isEnded ? `collected of ${formatMoney(displayRevenue)} won · ` : 'secured · '}
                   goal {formatMoney(auction.goal)}
                 </p>
               </div>
-              <p className="text-xl font-black font-mono tabular-nums text-primary-light dark:text-primary-dark">{pct}%</p>
+              <p className="text-xl font-black font-mono tabular-nums text-primary-light dark:text-primary-dark">
+                {isEnded ? collectedPct : pct}%
+              </p>
             </div>
 
             <div
               role="progressbar"
-              aria-valuenow={pct}
+              aria-valuenow={isEnded ? collectedPct : pct}
               aria-valuemin={0}
               aria-valuemax={100}
-              aria-label="Auction goal progress"
-              className="h-1.5 bg-bg-light dark:bg-bg-dark overflow-hidden"
+              aria-label={isEnded ? 'Collected toward goal' : 'Auction goal progress'}
+              className="relative h-1.5 bg-bg-light dark:bg-bg-dark overflow-hidden"
             >
+              {isEnded && (
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${pct}%` }}
+                  transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
+                  className="absolute inset-y-0 left-0 bg-primary-light/25 dark:bg-primary-dark/25"
+                />
+              )}
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${pct}%` }}
+                animate={{ width: `${isEnded ? collectedPct : pct}%` }}
                 transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className={`h-full ${pct >= 100 ? 'bg-emerald-500' : 'bg-primary-light dark:bg-primary-dark'}`}
+                className={`absolute inset-y-0 left-0 ${
+                  (isEnded ? collectedPct : pct) >= 100 ? 'bg-emerald-500' : 'bg-primary-light dark:bg-primary-dark'
+                }`}
               />
             </div>
 
