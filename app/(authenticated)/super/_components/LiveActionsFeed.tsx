@@ -235,6 +235,12 @@ const EVENT_CONFIG: Record<string, EventConfig> = {
     label: 'Address',
     color: 'text-cyan-500',
     format: (d) => `${d.email} ${d.isFirstAddress ? 'added' : 'updated'} an address in ${d.city}, ${d.state}`
+  },
+  'winner-marked-paid': {
+    icon: CreditCard,
+    label: 'Winner Marked Paid',
+    color: 'text-green-500',
+    format: (d) => `${d.name} — ${money(d.amount)} by ${String(d.method).toLowerCase()}`
   }
 }
 

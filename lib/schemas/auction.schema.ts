@@ -228,3 +228,20 @@ export const auctionPaymentSchema = z.object({
 
 export type AuctionPaymentInput = z.input<typeof auctionPaymentSchema>
 export type AuctionPaymentValues = z.output<typeof auctionPaymentSchema>
+
+export const markAuctionWinnerPaidSchema = z.object({
+  winningBidderId: z.string().min(1),
+  method: z.enum(['ZELLE', 'VENMO', 'PAYPAL']),
+  // Money often arrives a day or two before someone records it, so the actual date can be set
+  receivedOn: z
+    .string()
+    .trim()
+    .optional()
+    .transform((v) => (v ? new Date(`${v}T12:00:00`) : null)),
+  reference: z
+    .string()
+    .trim()
+    .max(200)
+    .optional()
+    .transform((v) => v || null)
+})

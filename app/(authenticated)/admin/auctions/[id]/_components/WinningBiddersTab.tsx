@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Check, Copy } from 'lucide-react'
 import { IAuctionDetail } from 'types/auction.types'
 import { formatMoney } from 'lib/utils/currency.utils'
+import { MarkWinnerPaidButton } from './MarkWinnerPaidButton'
 
 const COLUMNS = ['Bidder', 'Items Won', 'Total', 'Payment Status', 'Emails Sent']
 
@@ -113,7 +114,12 @@ export function WinningBiddersTab({ auction }: { auction: IAuctionDetail }) {
                       >
                         {bidder.winningBidPaymentStatus?.replace(/_/g, ' ')}
                       </span>
-                      {!paid && <CopyPaymentLink bidderId={bidder.id} name={name} />}
+                      {!paid && (
+                        <>
+                          <CopyPaymentLink bidderId={bidder.id} name={name} />
+                          <MarkWinnerPaidButton winningBidderId={bidder.id} name={name} total={Number(bidder.totalPrice ?? 0)} />
+                        </>
+                      )}
                     </td>
 
                     <td className="px-5 py-3.5">

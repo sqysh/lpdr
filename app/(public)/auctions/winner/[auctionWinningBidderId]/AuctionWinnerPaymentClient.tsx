@@ -12,6 +12,7 @@ import { PaymentHandlers, PaymentState } from './_types/auction-winner.types'
 import { IAuctionWinningBidder } from 'types/auction.types'
 import { AuctionWinnerPageHeader } from './_components/AuctionWinnerPageHeader'
 import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
+import { OtherWaysToPay } from './_components/OtherWaysToPay'
 
 const EYEBROW = 'text-f10 uppercase tracking-[0.25em]'
 
@@ -105,7 +106,12 @@ export default function AuctionWinnerPaymentClient({ winningBidder, savedCards, 
 
         {/* ── Two column layout ── */}
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_380px] gap-8 items-start">
-          <AuctionWinnerPaymentForm winningBidder={winningBidder} savedCards={savedCards} state={state} handlers={handlers} isAuthed />
+          <div className="space-y-6 min-w-0">
+            <AuctionWinnerPaymentForm winningBidder={winningBidder} savedCards={savedCards} state={state} handlers={handlers} isAuthed />
+
+            {/* No processing fee here: it only exists to cover what Stripe charges on a card */}
+            <OtherWaysToPay total={subtotal} name={fullName || user.email || ''} auctionTitle={auction.title} />
+          </div>
 
           <WinnerOrderSummary
             winningBidder={winningBidder}
