@@ -9,9 +9,27 @@ const META = 'text-f10 font-mono text-muted-light dark:text-muted-dark'
 const EYEBROW = 'text-f10 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
 const PILL = 'text-f9 font-black tracking-widest uppercase px-2 py-0.5'
 
-const COLUMNS = ['', 'Bidder', 'Bids', 'Highest', 'Leading', 'Anonymous', 'Status']
+const COLUMNS = ['', 'Bidder', 'Bids', 'Highest', 'Leading', 'Anonymous', 'Auto-Pay', 'Status']
 
 type Bid = IAuctionDetail['bids'][number]
+
+// What happens to this bidder's winnings at close: charged automatically, or emailed a payment link and why
+function AutoPayCell({ user }: { user: IAuctionDetail['bidders'][number]['user'] }) {
+  if (!user.autoPay) return <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">Off</span>
+
+  const missing = user._count.paymentMethods === 0 ? 'no card' : !user.address ? 'no address' : null
+
+  if (missing) {
+    return <span className="text-[10px] font-mono text-amber-600 dark:text-amber-400">On, {missing}</span>
+  }
+
+  return (
+    <span className="text-[10px] font-mono text-emerald-600 dark:text-emerald-400">
+      On
+      {user.autoPayCoverFees && <span className="block text-muted-light dark:text-muted-dark">Covers fees</span>}
+    </span>
+  )
+}
 
 /** Every bid this person placed, newest first, with the item it was on. */
 function BidderBidList({ bids, itemName }: { bids: Bid[]; itemName: (id: string) => string }) {
@@ -59,6 +77,8 @@ export function BiddersTab({ auction }: { auction: IAuctionDetail }) {
 
   const itemName = (id: string) => auction.items.find((i) => i.id === id)?.name ?? 'Removed item'
 
+  const autoPayReady = auction.bidders.filter((b) => b.user.autoPay && b.user._count.paymentMethods > 0 && b.user.address).length
+
   return (
     <div className="border border-border-light dark:border-border-dark">
       <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
@@ -68,6 +88,9 @@ export function BiddersTab({ auction }: { auction: IAuctionDetail }) {
             Bidders <span className="ml-1">{auction.bidders.length}</span>
           </h2>
         </div>
+        <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
+          {autoPayReady} of {auction.bidders.length} will be charged automatically if they win
+        </span>
       </div>
 
       <div className="overflow-x-auto">
@@ -168,6 +191,10 @@ export function BiddersTab({ auction }: { auction: IAuctionDetail }) {
                       >
                         {bidder.user?.anonymousBidding ? 'Yes' : 'No'}
                       </span>
+                    </td>
+
+                    <td className="px-5 py-3 whitespace-nowrap">
+                      <AutoPayCell user={bidder.user} />
                     </td>
 
                     <td className="px-5 py-3.5">

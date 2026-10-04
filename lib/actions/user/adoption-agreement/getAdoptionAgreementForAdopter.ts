@@ -20,13 +20,16 @@ export async function getAdoptionAgreementForAdopter(id: string) {
     const readOnly = !owned && (await requireAdmin()).ok
     if (!owned && !readOnly) return { success: false as const, data: null, error: 'Agreement not found' }
 
-    const agreement = await prisma.adoptionAgreement.findUniqueOrThrow({
+    const agreement = await prisma.adoptionAgreement.findUnique({
       where: { id },
       include: {
         signatures: { select: { role: true, typedName: true, signedAt: true } },
         createdBy: { select: { firstName: true, lastName: true, email: true } }
       }
     })
+
+    // Deleted, or an admin following a link to one that no longer exists
+    if (!agreement) return { success: false as const, data: null, error: 'Agreement not found' }
 
     const termsSigned = hasSigned(agreement.signatures, 'TERMS_ADOPTER')
 

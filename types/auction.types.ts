@@ -113,7 +113,19 @@ export const auctionDetailArgs = Prisma.validator<Prisma.AuctionDefaultArgs>()({
       orderBy: { createdAt: 'asc' },
       include: { photos: true, instantBuyers: true, _count: { select: { bids: true } } }
     },
-    bidders: { include: { user: { select: userContactSelect } } },
+    bidders: {
+      include: {
+        user: {
+          select: {
+            ...userContactSelect,
+            autoPay: true,
+            autoPayCoverFees: true,
+            address: { select: { id: true } },
+            _count: { select: { paymentMethods: true } }
+          }
+        }
+      }
+    },
     bids: { orderBy: { createdAt: 'desc' }, select: bidSelect },
     winningBidders: {
       include: { auctionItems: true, user: { select: userContactSelect } }
