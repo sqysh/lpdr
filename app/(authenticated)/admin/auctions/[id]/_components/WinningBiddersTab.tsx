@@ -14,20 +14,23 @@ type Winner = IAuctionDetail['winningBidders'][number]
 const muted = 'text-muted-light dark:text-muted-dark'
 
 // Only orders from this auction's close onward, so an earlier auction's attempts don't show
-function autoPayNote(winner: Winner, endedAt: Date): { text: string; tone: string; title?: string } | null {
+function paymentNote(winner: Winner, endedAt: Date): { text: string; tone: string; title?: string } | null {
   const user = winner.user
   const attempts = (user?.orders ?? []).filter((o) => new Date(o.createdAt) >= endedAt)
   const charged = attempts.find((o) => o.autoPaid && o.status === 'CONFIRMED')
   const declined = attempts.find((o) => o.status === 'FAILED')
 
   if (charged) return { text: 'Auto-pay charged', tone: 'text-emerald-700 dark:text-emerald-400' }
-  if (declined) {
+
+  // Covers both a declined auto-pay at close and a winner whose card failed on the winner page
+  if (declined && winner.winningBidPaymentStatus !== 'PAID') {
     return {
-      text: 'Auto-pay declined',
+      text: 'Payment declined',
       tone: 'text-red-600 dark:text-red-400',
-      title: `${declined.failureReason ?? 'No reason given'}. Sent a payment link instead.`
+      title: declined.failureReason ?? 'No reason given'
     }
   }
+
   if (!user?.autoPay) return null
 
   const missing = user._count.paymentMethods === 0 ? 'no saved card' : !user.address ? 'no address' : null
@@ -103,7 +106,7 @@ export function WinningBiddersTab({ auction }: { auction: IAuctionDetail }) {
                 const paid = bidder.winningBidPaymentStatus === 'PAID'
                 const items = bidder.auctionItems ?? []
                 const shipping = Number(bidder.shipping ?? 0)
-                const note = autoPayNote(bidder, endedAt)
+                const note = paymentNote(bidder, endedAt)
                 const reminders = bidder.emailNotificationCount ?? 0
                 const itemsTitle = items.map((i) => `${i.name} (${formatMoney(Number(i.soldPrice ?? 0))})`).join('\n')
 

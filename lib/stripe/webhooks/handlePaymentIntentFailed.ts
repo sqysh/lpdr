@@ -2,6 +2,7 @@ import { OrderType } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { resend } from 'lib/email/resend'
 import { paymentFailedTemplate } from 'lib/email/templates/payment-failed.template'
+import { throttled } from 'lib/email/throttled'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
@@ -20,8 +21,11 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
     // Stripe doesn't guarantee event order, so an earlier attempt's failure can arrive after the payment
     // succeeded on a retry. A confirmed or refunded order is final: it's never turned back into a failure,
     // and the customer isn't told a payment failed that actually went through
-    const existing = await prisma.order.findUnique({ where: { paymentIntentId: id }, select: { status: true } })
-    if (existing && existing.status !== 'FAILED') {
+    const existing = await prisma.order.findUnique({
+      where: { paymentIntentId: id },
+      select: { status: true, failureEmailSentAt: true }
+    })
+    if (existing && (existing.status === 'CONFIRMED' || existing.status === 'REFUNDED')) {
       await createLog('info', 'Late payment failure ignored; the payment has since succeeded', {
         paymentIntentId: id,
         status: existing.status
@@ -45,18 +49,25 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
       }
     })
 
-    if (customerEmail) {
-      const { error } = await resend.emails.send({
-        from: 'Little Paws <payments@littlepawsdr.org>',
-        to: customerEmail,
-        subject: "Your payment didn't go through",
-        html: paymentFailedTemplate({
-          name: customerName,
-          amount: paymentIntent.amount / 100,
-          failureReason,
-          myPackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/my-pack`
+    // Auction winners already see the error on the winner page, or got the winner email with their link if
+    // auto-pay was declined, and the reminder cron keeps chasing. Everyone else hears about a failure once,
+    // not once per retry
+    const shouldEmail = customerEmail && orderType !== 'AUCTION_PURCHASE' && !existing?.failureEmailSentAt
+
+    if (shouldEmail) {
+      const { error } = await throttled(() =>
+        resend.emails.send({
+          from: 'Little Paws <treasurer@littlepawsdr.org>',
+          to: customerEmail,
+          subject: "Your payment didn't go through",
+          html: paymentFailedTemplate({
+            name: customerName,
+            amount: paymentIntent.amount / 100,
+            failureReason,
+            myPackUrl: `${process.env.NEXT_PUBLIC_SITE_URL}/my-pack`
+          })
         })
-      })
+      )
 
       // Only recorded once Resend accepts it, so the column reflects emails that actually went out
       if (error) {
