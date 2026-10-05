@@ -10,6 +10,7 @@ import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
 import type { ActionResult } from 'types/action.types'
 import { markAuctionWinnerPaidSchema } from 'lib/schemas/auction.schema'
+import { sendAdminShippingNotice } from 'lib/email/sendAdminShippingNotice'
 
 class AlreadyPaid extends Error {}
 
@@ -104,10 +105,12 @@ export async function markAuctionWinnerPaid(input: unknown): Promise<ActionResul
       return order.id
     })
 
-    // The same receipt a card payer gets. The payment is recorded either way, so a failed email is logged, not undone
+    // The same emails a card payment sends: the winner's receipt, and the rescue's notice that
+    // something needs posting. The payment is recorded either way, so a failed email is logged, not undone
     try {
       const order = await prisma.order.findUniqueOrThrow({ where: { id: orderId }, include: { items: true } })
       await sendConfirmationEmail(order)
+      if (hasPhysical && order.addressLine1) await sendAdminShippingNotice(order)
     } catch (error) {
       await createLog('error', 'Auction winner receipt failed to send', { winningBidderId, orderId, error: getErrorMessage(error) })
     }

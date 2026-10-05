@@ -2,9 +2,8 @@ import { Order, OrderType, RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-countersign'
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
-import { resend } from 'lib/email/resend'
+import { sendAdminShippingNotice } from 'lib/email/sendAdminShippingNotice'
 import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
-import { adminOrderNotificationTemplate } from 'lib/email/templates/admin-order-notification.template'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
@@ -446,29 +445,8 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
     )
 
     if (hasPhysical && orderWithItems.addressLine1) {
-      void resend.emails
-        .send({
-          from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
-          to: 'lpdr@littlepawsdr.org',
-          subject: `New order to ship — #${orderWithItems.id.slice(-8).toUpperCase()}`,
-          html: adminOrderNotificationTemplate({
-            orderId: orderWithItems.id,
-            customerName: orderWithItems.customerName,
-            customerEmail: orderWithItems.customerEmail,
-            items: orderWithItems.items.map((i) => ({ name: i.itemName, quantity: i.quantity })),
-            addressLine1: orderWithItems.addressLine1,
-            addressLine2: orderWithItems.addressLine2,
-            city: orderWithItems.city,
-            state: orderWithItems.state,
-            zipPostalCode: orderWithItems.zipPostalCode
-          })
-        })
-        .catch((error) =>
-          createLog('error', 'Failed to send admin shipping notification', {
-            orderId: order.id,
-            error: error instanceof Error ? error.message : 'Unknown error'
-          })
-        )
+      // Not awaited, same as the receipt: the webhook should answer Stripe quickly
+      void sendAdminShippingNotice(orderWithItems)
     }
 
     // Notifications are best effort. The order exists and the money has moved; a Pusher outage
