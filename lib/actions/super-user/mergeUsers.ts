@@ -91,7 +91,7 @@ export async function mergeUsers({
       await tx.user.delete({ where: { id: duplicate.id } })
     })
 
-    const firstName = primary.firstName ?? primary.email.split('@')[0]
+    const firstName = primary.firstName ?? duplicate.firstName ?? null
     const { error: emailError } = await resend.emails.send({
       from: 'Little Paws Dachshund Rescue <support@littlepawsdr.org>',
       to: primary.email,

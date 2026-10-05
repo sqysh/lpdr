@@ -10,8 +10,8 @@ export const updateUserName = async ({ firstName, lastName }: { firstName: strin
   const gate = await requireAuth()
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
-  if (!firstName.trim() || !lastName.trim()) {
-    return { success: false, error: 'First and last name are required', data: null }
+  if (firstName.trim().length > 50 || lastName.trim().length > 50) {
+    return { success: false, error: 'Names must be 50 characters or fewer', data: null }
   }
 
   try {

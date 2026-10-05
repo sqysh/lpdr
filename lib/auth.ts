@@ -55,8 +55,9 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     async session({ session, user }) {
       session.user.id = user.id
       session.user.role = user.role
-      // True for accounts whose name was guessed from their email address, which the name prompt asks about
-      session.user.needsName = !user.nameConfirmedAt
+      // Asked until they've confirmed it and both parts are there. A provider can hand over a
+      // one-word name, and older accounts were given one made from their email address
+      session.user.needsName = !user.nameConfirmedAt || !user.firstName?.trim() || !user.lastName?.trim()
 
       if (user.firstName && user.lastName) {
         session.user.name = `${user.firstName} ${user.lastName}`.trim()
@@ -142,18 +143,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
     },
 
     async createUser({ user }) {
-      // Google gives user.name ("First Last"); magic link gives nothing, so derive from email
-      const emailName = user.email!.split('@')[0]
+      // Google and Facebook give user.name ("First Last"). Magic link gives nothing, so the name
+      // prompt asks for it rather than guessing one from the email address
       const [firstName, ...rest] = (user.name ?? '').trim().split(' ').filter(Boolean)
 
       await prisma.user
         .update({
           where: { id: user.id },
           data: {
-            firstName: firstName || emailName.charAt(0).toUpperCase() + emailName.slice(1),
+            firstName: firstName || null,
             lastName: rest.length ? rest.join(' ') : null,
-            // A name from Google or Facebook is real; one made from the email address still needs confirming
-            nameConfirmedAt: user.name ? new Date() : null
+            nameConfirmedAt: firstName && rest.length ? new Date() : null
           }
         })
         .catch((err) =>
