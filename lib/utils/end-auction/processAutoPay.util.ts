@@ -205,7 +205,7 @@ export async function processAutoPay(winner: Winner, auction: { id: string; titl
         payment_method: paymentMethod.stripePaymentId,
         confirm: true,
         off_session: true,
-        description: `Auto-pay: ${auction.title}`,
+        description: `Auction payment from ${customerName} (auto-pay)`,
         receipt_email: user.email ?? '',
         metadata: {
           orderType: 'AUCTION_PURCHASE',
