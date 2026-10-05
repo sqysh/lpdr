@@ -18,10 +18,9 @@ export async function toggleAuctionVisibility(auctionId: string) {
     })
 
     if (!auction) return { success: false, error: 'Auction not found', data: null }
-
-    if (auction.status !== 'DRAFT') {
+    if (auction.status === 'ENDED') return { success: false, data: null, error: 'This auction has ended and can no longer be changed.' }
+    if (auction.status !== 'DRAFT')
       return { success: false, error: 'Visibility can only be changed while an auction is a draft', data: null }
-    }
 
     await prisma.auction.update({
       where: { id: auctionId },

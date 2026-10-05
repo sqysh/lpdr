@@ -5,7 +5,7 @@ export const AUCTION_STATUS_FILTERS: (AuctionStatus | 'ALL')[] = ['ALL', 'DRAFT'
 export const TABS = [
   { label: 'Overview', statuses: ['DRAFT', 'ACTIVE', 'ENDED'] },
   { label: 'Items', statuses: ['DRAFT', 'ACTIVE', 'ENDED'] },
-  { label: 'Settings', statuses: ['DRAFT', 'ACTIVE', 'ENDED'] },
+  { label: 'Settings', statuses: ['DRAFT', 'ACTIVE'] },
   { label: 'Bidders', statuses: ['ACTIVE', 'ENDED'] },
   { label: 'Winning Bidders', statuses: ['ENDED'] }
 ] as const satisfies readonly { label: string; statuses: readonly AuctionStatus[] }[]

@@ -37,6 +37,7 @@ export default function AdminAuctionClient({ auction, role, signups }: { auction
   // Visibility is server state. The action writes it, router.refresh() re-runs the page, and the
   // new value arrives as a prop. Mirroring it locally only creates a second copy that can lie.
   const isVisible = auction.isPubliclyVisible
+  const canToggleVisibility = auction.status === 'DRAFT'
 
   const [copied, setCopied] = useState(false)
   const [saving, setSaving] = useState(false)
@@ -173,28 +174,30 @@ export default function AdminAuctionClient({ auction, role, signups }: { auction
             {/* Published state is a fact about the auction, not a third thing you can do to the
                 link, so it reads as a sentence with the action beside it rather than a fourth
                 button in the row above. */}
-            <div className="flex items-center gap-2">
-              <span
-                className={`w-1.5 h-1.5 shrink-0 ${isVisible ? 'bg-emerald-500' : 'bg-muted-light dark:bg-muted-dark'}`}
-                aria-hidden="true"
-              />
-              <span className="text-f10 font-mono text-muted-light dark:text-muted-dark">
-                {isVisible ? 'Visible to supporters' : 'Hidden from supporters'}
-              </span>
-              <button
-                type="button"
-                onClick={handleToggleVisibility}
-                disabled={busy}
-                title={isVisible ? 'Hide this auction so supporters cannot see it' : 'Show this auction to supporters'}
-                className={`text-f9 font-mono tracking-tag uppercase underline underline-offset-4 decoration-dotted transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline ${
-                  confirmingVisibility
-                    ? 'text-amber-600 dark:text-amber-400'
-                    : 'text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark'
-                }`}
-              >
-                {busy ? 'Saving' : confirmingVisibility ? (isVisible ? 'Yes, hide it' : 'Yes, show it') : isVisible ? 'Hide' : 'Show'}
-              </button>
-            </div>
+            {canToggleVisibility && (
+              <div className="flex items-center gap-2">
+                <span
+                  className={`w-1.5 h-1.5 shrink-0 ${isVisible ? 'bg-emerald-500' : 'bg-muted-light dark:bg-muted-dark'}`}
+                  aria-hidden="true"
+                />
+                <span className="text-f10 font-mono text-muted-light dark:text-muted-dark">
+                  {isVisible ? 'Visible to supporters' : 'Hidden from supporters'}
+                </span>
+                <button
+                  type="button"
+                  onClick={handleToggleVisibility}
+                  disabled={busy}
+                  title={isVisible ? 'Hide this auction so supporters cannot see it' : 'Show this auction to supporters'}
+                  className={`text-f9 font-mono tracking-tag uppercase underline underline-offset-4 decoration-dotted transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50 disabled:cursor-not-allowed disabled:no-underline ${
+                    confirmingVisibility
+                      ? 'text-amber-600 dark:text-amber-400'
+                      : 'text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark'
+                  }`}
+                >
+                  {busy ? 'Saving' : confirmingVisibility ? (isVisible ? 'Yes, hide it' : 'Yes, show it') : isVisible ? 'Hide' : 'Show'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
