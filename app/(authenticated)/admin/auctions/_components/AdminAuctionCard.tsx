@@ -118,9 +118,9 @@ export function AdminAuctionCard({ auction, index }: { auction: IAuction; index:
               </div>
             </div>
 
-            {/* ── Revenue ── */}
+            {/* ── Collected ── */}
             <div className="px-5 py-4 border-b border-border-light dark:border-border-dark">
-              <p className={`${EYEBROW} mb-1`}>Revenue</p>
+              <p className={`${EYEBROW} mb-1`}>Collected</p>
               <p className="font-quicksand font-black text-2xl text-text-light dark:text-text-dark tabular-nums leading-none mb-3">
                 {formatMoney(Number(auction.totalAuctionRevenue))}
               </p>

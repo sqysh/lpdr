@@ -342,7 +342,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
             data: {
               supporterEmails: updatedEmails,
               supporters: updatedEmails.length,
-              ...(alreadyPaid ? {} : { totalAuctionRevenue: { increment: winningBidderRecord.totalPrice ?? 0 } })
+              ...(alreadyPaid ? {} : { totalAuctionRevenue: { increment: winningBidderRecord.itemsTotal ?? 0 } })
             }
           })
 

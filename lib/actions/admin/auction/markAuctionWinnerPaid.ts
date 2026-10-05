@@ -99,7 +99,7 @@ export async function markAuctionWinnerPaid(input: unknown): Promise<ActionResul
 
       await tx.auction.update({
         where: { id: winner.auctionId },
-        data: { totalAuctionRevenue: { increment: winner.totalPrice ?? 0 } }
+        data: { totalAuctionRevenue: { increment: winner.itemsTotal ?? 0 } }
       })
 
       return order.id
