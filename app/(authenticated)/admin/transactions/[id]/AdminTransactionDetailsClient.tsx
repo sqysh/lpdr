@@ -12,6 +12,7 @@ import { TransactionPaymentSection } from './_components/TransactionPaymentSecti
 import { TransactionAnomalyBanner } from './_components/TransactionAnomalyBanner'
 import { TransactionDonorMessage } from './_components/TransactionDonorMessage'
 import { TransactionRefundSection } from './_components/TransactionRefundSection'
+import { TransactionShipToSection } from './_components/TransactionShipToSection'
 
 type Props = {
   order: IOrder
@@ -22,6 +23,8 @@ export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Pro
   const isRefunded = order.status === 'REFUNDED'
   const hasPhysical = order.items.some((i) => i.isPhysical)
   const hasSubscriptionHistory = subscriptionOrders?.length > 1
+  // Only orders with something to post, and only once there's an address to send it to
+  const showShipTo = hasPhysical && !isRefunded && Boolean(order.addressLine1)
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
@@ -40,6 +43,7 @@ export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Pro
 
         {/* Right */}
         <div className="space-y-6">
+          {showShipTo && <TransactionShipToSection order={order} />}
           {/* A refunded order is not going anywhere, so the fulfilment panel would be telling
               Nadine to post something that has been paid back. */}
           {hasPhysical && !isRefunded && <TransactionFulfillmentSection order={order} />}
