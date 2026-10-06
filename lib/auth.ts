@@ -59,6 +59,8 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       // one-word name, and older accounts were given one made from their email address
       session.user.needsName = !user.nameConfirmedAt || !user.firstName?.trim() || !user.lastName?.trim()
 
+      session.user.adminAreas = user.adminAreas ?? []
+
       if (user.firstName && user.lastName) {
         session.user.name = `${user.firstName} ${user.lastName}`.trim()
       }

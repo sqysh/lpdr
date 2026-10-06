@@ -4,6 +4,7 @@ import prisma from 'prisma/client'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { requireAdmin } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
+import { serialize } from 'lib/utils/serializers.utils'
 
 export async function getUserById(id: string) {
   const gate = await requireAdmin()
@@ -50,7 +51,8 @@ export async function getUserById(id: string) {
             }
           }
         },
-        paymentMethods: true
+        paymentMethods: true,
+        adminAreas: true
       }
     })
 
@@ -58,26 +60,7 @@ export async function getUserById(id: string) {
       return { success: false, error: 'User not found', data: null }
     }
 
-    return {
-      success: true,
-      error: null,
-      data: {
-        ...user,
-        emailVerified: user.emailVerified?.toISOString() ?? null,
-        lastLoginAt: user.lastLoginAt?.toISOString() ?? null,
-        createdAt: user.createdAt.toISOString(),
-        orders: user.orders.map((o) => ({
-          ...o,
-          totalAmount: Number(o.totalAmount),
-          createdAt: o.createdAt.toISOString(),
-          items: o.items.map((i) => ({
-            ...i,
-            price: Number(i.price),
-            subtotal: Number(i.subtotal)
-          }))
-        }))
-      }
-    }
+    return { success: true, error: null, data: serialize(user) }
   } catch (error) {
     await createLog('error', 'Failed to get user by id', {
       userId: id,

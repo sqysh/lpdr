@@ -141,6 +141,16 @@ enum AgreementSignatureRole {
   REPRESENTATIVE
 }
 
+enum AdminArea {
+  MONEY // dashboard revenue, transactions, donations, subscriptions, adoption fees and payments
+  AUCTIONS
+  STORE // products, welcome wieners
+  DOGS // dachshunds
+  AGREEMENTS
+  APPLICATIONS
+  PEOPLE // users, newsletter
+}
+
 // ─── Next Auth ────────────────────────────────────────────────────────────────────
 model Account {
   id                String  @id @default(cuid())
@@ -267,6 +277,9 @@ model User {
   agreementsCreated    AdoptionAgreement[] @relation("AgreementCreatedBy")
   agreementsMarkedPaid AdoptionAgreement[] @relation("AgreementMarkedPaidBy")
   agreementsClosed     AdoptionAgreement[] @relation("AgreementClosedBy")
+
+  // Only read for ADMIN. SUPER_USER always has every area, PACK_MEMBER never has any
+  adminAreas AdminArea[] @default([])
 }
 
 // ─── Payment Method ────────────────────────────────────────────────────────────────────

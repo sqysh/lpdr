@@ -1,5 +1,7 @@
+import { AdminArea } from '@prisma/client'
 import {
   BookOpen,
+  ClipboardList,
   Dog,
   DollarSign,
   FileSignature,
@@ -41,6 +43,7 @@ type NavItem = {
   label: string
   icon: typeof Home
   href: string
+  area?: AdminArea
 }
 
 type NavGroup = {
@@ -204,38 +207,39 @@ export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
 export const ADMIN_NAV_GROUPS: NavGroup[] = [
   {
     heading: 'Overview',
-    items: [{ label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard' }]
+    items: [{ label: 'Dashboard', icon: LayoutDashboard, href: '/admin/dashboard', area: 'MONEY' }]
   },
   {
     heading: 'Money In',
     items: [
-      { label: 'Transactions', icon: Receipt, href: '/admin/transactions' },
-      { label: 'Donations', icon: Heart, href: '/admin/donations' },
-      { label: 'Subscriptions', icon: Repeat, href: '/admin/subscriptions' },
-      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees' },
-      { label: 'Adoption Payments', icon: HandCoins, href: '/admin/adoption-payments' }
+      { label: 'Transactions', icon: Receipt, href: '/admin/transactions', area: 'MONEY' },
+      { label: 'Donations', icon: Heart, href: '/admin/donations', area: 'MONEY' },
+      { label: 'Subscriptions', icon: Repeat, href: '/admin/subscriptions', area: 'MONEY' },
+      { label: 'Adoption Fees', icon: DollarSign, href: '/admin/adoption-fees', area: 'MONEY' },
+      { label: 'Adoption Payments', icon: HandCoins, href: '/admin/adoption-payments', area: 'MONEY' }
     ]
   },
   {
     heading: 'Programs',
     items: [
-      { label: 'Auctions', icon: Gavel, href: '/admin/auctions' },
-      { label: 'Products', icon: Package, href: '/admin/products' },
-      { label: 'Welcome Wieners', icon: Dog, href: '/admin/welcome-wieners' }
+      { label: 'Auctions', icon: Gavel, href: '/admin/auctions', area: 'AUCTIONS' },
+      { label: 'Products', icon: Package, href: '/admin/products', area: 'STORE' },
+      { label: 'Welcome Wieners', icon: Dog, href: '/admin/welcome-wieners', area: 'STORE' }
     ]
   },
   {
     heading: 'Adoptions',
     items: [
-      { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds' },
-      { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements' }
+      { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds', area: 'DOGS' },
+      { label: 'Applications', icon: ClipboardList, href: '/admin/applications', area: 'APPLICATIONS' },
+      { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements', area: 'AGREEMENTS' }
     ]
   },
   {
     heading: 'People',
     items: [
-      { label: 'Users', icon: Users, href: '/admin/users' },
-      { label: 'Newsletter', icon: Mail, href: '/admin/newsletter' }
+      { label: 'Users', icon: Users, href: '/admin/users', area: 'PEOPLE' },
+      { label: 'Newsletter', icon: Mail, href: '/admin/newsletter', area: 'PEOPLE' }
     ]
   },
   {

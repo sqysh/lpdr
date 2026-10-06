@@ -29,6 +29,7 @@ import { updateUserRole } from 'lib/actions/admin/user/updateUserRole'
 import { getUserById } from 'lib/actions/admin/user/getUserById'
 import Picture from 'components/_common/Picture'
 import { MigrationTroubleshootPanel } from 'app/(authenticated)/admin/users/[id]/_components/MigrationTroubleShootPanel'
+import { AdminAreasPanel } from './_components/AdminAreasPanel'
 
 type UserDetail = NonNullable<Awaited<ReturnType<typeof getUserById>>['data']>
 
@@ -312,6 +313,9 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
                 )}
               </section>
             )}
+
+            {/* Admin access */}
+            {loggedInUser.role === 'SUPER_USER' && user.role === 'ADMIN' && <AdminAreasPanel userId={user.id} initial={user.adminAreas} />}
           </div>
           {/* ── Right column — orders ── */}
           <div className="space-y-4">
