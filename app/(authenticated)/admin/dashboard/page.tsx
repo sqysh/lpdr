@@ -2,12 +2,12 @@ import { getSupporterLocations } from 'lib/actions/admin/dashboard/getSupporterL
 import { getPendingShipments } from 'lib/actions/admin/dashboard/queries/getPendingShipments'
 import { AdminDashboardClient } from './AdminDashboardClient'
 import { getTopSupporters } from 'lib/actions/admin/dashboard/queries/getTopSupporters'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getTotalRevenue } from 'lib/actions/admin/dashboard/queries/getTotalRevenue'
 import { getOrderMetrics } from 'lib/actions/admin/dashboard/queries/getOrderMetrics'
 
 export default async function AdminDashboardPage() {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: 'Unauthorized' }
 
   const [locations, shipments, topSupporters, totalRevenue, orderMetrics] = await Promise.all([

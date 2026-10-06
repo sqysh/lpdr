@@ -2,14 +2,14 @@
 
 import prisma from 'prisma/client'
 import { revalidatePath } from 'next/cache'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import type { ActionResult } from 'types/action.types'
 
 /** Removes an agreement with its signatures and order, for test runs and agreements started by mistake */
 export async function deleteAdoptionAgreement(id: string): Promise<ActionResult<{ id: string }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   if (!id) return { success: false, data: null, error: 'Missing agreement' }

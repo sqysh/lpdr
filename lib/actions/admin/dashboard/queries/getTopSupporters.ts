@@ -1,8 +1,8 @@
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 
 export async function getTopSupporters(limit = 5) {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   const grouped = await prisma.order.groupBy({

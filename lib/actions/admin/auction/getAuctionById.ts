@@ -1,12 +1,12 @@
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { serialize } from 'lib/utils/serializers.utils'
 import { auctionDetailArgs } from 'types/auction.types'
 
 export const getAuctionById = async (id: string) => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

@@ -2,7 +2,7 @@ import 'server-only'
 import { redirect } from 'next/navigation'
 import { auth } from 'lib/auth'
 import { AdminArea, Role } from '@prisma/client'
-import { hasAccess } from 'lib/auth/access'
+import { hasAccess, hasFullAccess } from 'lib/auth/access'
 
 export type Gate = { ok: true; userId: string; role: Role; email: string | null; adminAreas: AdminArea[] } | { ok: false; error: string }
 
@@ -29,6 +29,13 @@ export async function requireAccess(area: AdminArea): Promise<Gate> {
   const gate = await requireAdmin()
   if (!gate.ok) return gate
   if (!hasAccess(gate, area)) return { ok: false, error: "You don't have access to this part of the admin." }
+  return gate
+}
+
+export async function requireFullAccess(): Promise<Gate> {
+  const gate = await requireAdmin()
+  if (!gate.ok) return gate
+  if (!hasFullAccess(gate)) return { ok: false, error: 'Only admins with full access can change who is an admin.' }
   return gate
 }
 

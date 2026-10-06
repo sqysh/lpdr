@@ -8,16 +8,14 @@ import { resend } from 'lib/email/resend'
 import { orderShippedTemplate } from 'lib/email/templates/order-shipped.template'
 import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { hasAccess } from 'lib/auth/access'
 
-export const updateOrderShippingStatus = async ({
-  id,
-  shippingStatus
-}: {
-  id: string
-  shippingStatus: ShippingStatus
-}) => {
+export const updateOrderShippingStatus = async ({ id, shippingStatus }: { id: string; shippingStatus: ShippingStatus }) => {
   const gate = await requireAdmin()
-  if (gate.ok === false) return { success: false, error: gate.error, data: null }
+  if (gate.ok === false) return { success: false, data: null, error: gate.error }
+  if (!hasAccess(gate, 'MONEY') && !hasAccess(gate, 'AUCTIONS')) {
+    return { success: false, data: null, error: "You don't have access to update shipping." }
+  }
 
   try {
     const order = await prisma.order.update({

@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { serialize } from 'lib/utils/serializers.utils'
@@ -39,7 +39,7 @@ const adoptionPaymentArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
 export type IAdoptionPaymentRow = DecimalToNumber<Prisma.OrderGetPayload<typeof adoptionPaymentArgs>>
 
 export const getAdoptionPayments = async (): Promise<ActionResult<IAdoptionPaymentRow[]>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {

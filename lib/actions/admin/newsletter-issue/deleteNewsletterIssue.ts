@@ -3,11 +3,11 @@
 import { revalidatePath } from 'next/cache'
 import prisma from 'prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 
 export default async function deleteNewsletterIssue(id: string) {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('PEOPLE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (!id) return { success: false, error: 'Missing issue id', data: null }

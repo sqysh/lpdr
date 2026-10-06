@@ -2,11 +2,11 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 
 export default async function getNewsletters() {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('PEOPLE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

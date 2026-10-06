@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 
 type ActionResult<T = undefined> = {
@@ -12,7 +12,7 @@ type ActionResult<T = undefined> = {
 }
 
 export async function deleteWelcomeWiener(id: string): Promise<ActionResult> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('STORE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   if (!id) return { success: false, error: 'Missing id', data: null }

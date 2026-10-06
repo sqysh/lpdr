@@ -2,12 +2,12 @@
 
 import prisma from 'prisma/client'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { serialize } from 'lib/utils/serializers.utils'
 
 export async function getUserById(id: string) {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('PEOPLE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { revalidatePath } from 'next/cache'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -16,7 +16,7 @@ class AlreadyPaid extends Error {}
 
 /** Records a winner who paid outside Stripe, the same way a card payment would have been recorded */
 export async function markAuctionWinnerPaid(input: unknown): Promise<ActionResult<{ orderId: string }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(markAuctionWinnerPaidSchema, input)

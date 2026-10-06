@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { resend } from 'lib/email/resend'
@@ -15,7 +15,7 @@ import { getDachshundById } from 'lib/actions/_rescue-groups/getDachshundById'
 const SITE = process.env.NEXT_PUBLIC_SITE_URL
 
 export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ id: string; resent: boolean }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   if (!id) return { success: false, data: null, error: 'Missing agreement' }

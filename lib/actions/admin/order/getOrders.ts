@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { orderListArgs, type IOrderRow } from 'types/order.types'
 import type { ActionResult } from 'types/action.types'
@@ -10,7 +10,7 @@ import { serialize } from 'lib/utils/serializers.utils'
 import { createLog } from 'lib/actions/log/createLog'
 
 export const getOrders = async (where?: Prisma.OrderWhereInput): Promise<ActionResult<IOrderRow[]>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {

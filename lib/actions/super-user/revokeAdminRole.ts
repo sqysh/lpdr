@@ -3,12 +3,12 @@
 import prisma from 'prisma/client'
 import { Role } from '@prisma/client'
 import { createLog } from '../log/createLog'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireFullAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import type { ActionResult } from 'types/action.types'
 
 export async function revokeAdminRole(userId: string): Promise<ActionResult<null>> {
-  const gate = await requireAdmin()
+  const gate = await requireFullAccess()
   if (gate.ok === false) {
     await createLog('warn', 'Unauthorized revokeAdminRole attempt', { userId })
     return { success: false, data: null, error: gate.error }

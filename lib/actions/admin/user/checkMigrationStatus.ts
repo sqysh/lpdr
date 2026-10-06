@@ -1,12 +1,12 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { createLog } from '../../log/createLog'
 
 export async function checkMigrationStatus(email: string) {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('PEOPLE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

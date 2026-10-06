@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { serialize } from 'lib/utils/serializers.utils'
@@ -9,7 +9,7 @@ import { adoptionAgreementDetailArgs, type IAdoptionAgreement } from 'types/adop
 import type { ActionResult } from 'types/action.types'
 
 export const getAdoptionAgreementById = async (id: string): Promise<ActionResult<IAdoptionAgreement>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {

@@ -1,12 +1,13 @@
 'use server'
 
-import { requireAdmin, requireAuth } from 'lib/auth/guards'
+import { requireAuth } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import prisma from 'prisma/client'
 import { ADOPTION_TERMS_VERSION, getAdoptionTerms, OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
 import { findOwnedAgreement, hasSigned } from 'lib/adoption-agreement/agreement-access'
 import { serialize } from 'lib/utils/serializers.utils'
 import { createLog } from 'lib/actions/log/createLog'
+import { hasAccess } from 'lib/auth/access'
 
 export async function getAdoptionAgreementForAdopter(id: string) {
   const gate = await requireAuth()
@@ -15,9 +16,10 @@ export async function getAdoptionAgreementForAdopter(id: string) {
   try {
     const owned = await findOwnedAgreement(id, gate.userId)
 
-    // Admins can read any agreement, drafts included, to see exactly what the adopter sees. Read only:
-    // the sign actions still go through findOwnedAgreement, so an admin can never sign on someone's behalf
-    const readOnly = !owned && (await requireAdmin()).ok
+    // Admins with the Agreements area can read any agreement, drafts included, to see exactly what the
+    // adopter sees. Read only: the sign actions still go through findOwnedAgreement, so an admin can never
+    // sign on someone's behalf
+    const readOnly = !owned && hasAccess(gate, 'AGREEMENTS')
     if (!owned && !readOnly) return { success: false as const, data: null, error: 'Agreement not found' }
 
     const agreement = await prisma.adoptionAgreement.findUnique({

@@ -2,13 +2,13 @@
 
 import prisma from 'prisma/client'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import type { ActionResult } from 'types/action.types'
 import { IAdoptionFee } from 'types/adoption-fee'
 
 export const getAdoptionFees = async (): Promise<ActionResult<IAdoptionFee[]>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {

@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -11,7 +11,7 @@ import type { ActionResult } from 'types/action.types'
 import type { SellingFormat } from '@prisma/client'
 
 export const createAuctionItem = async (input: unknown): Promise<ActionResult<{ sellingFormat: SellingFormat }>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(createAuctionItemSchema, input)

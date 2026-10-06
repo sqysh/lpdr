@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -18,7 +18,7 @@ import { parseAdoptionFee } from 'lib/utils/adoption-agreement.utils'
 const OPEN_STATUSES = ['DRAFT', 'SENT', 'SIGNED', 'PAID'] as const
 
 export async function createAdoptionAgreement(input: unknown): Promise<ActionResult<{ id: string }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(prepareAdoptionAgreementSchema, input)

@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 
 export type AuctionSignups = {
   newAccounts: number
@@ -14,7 +14,7 @@ export type AuctionSignups = {
  * entirely, so the bidder count is the one that is actually attributable to the auction.
  */
 export async function getAuctionSignups(auctionId: string): Promise<AuctionSignups> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { newAccounts: 0, newBidders: 0 }
 
   const auction = await prisma.auction.findUnique({

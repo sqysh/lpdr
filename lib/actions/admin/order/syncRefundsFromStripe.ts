@@ -1,6 +1,6 @@
 'use server'
 
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { stripeClient } from 'lib/stripe/stripe-client'
@@ -12,7 +12,7 @@ const LOOKBACK_DAYS = 365
 
 /** Catches the site up on refunds made in Stripe that it never heard about. Only changes orders that don't already match. */
 export async function syncRefundsFromStripe(): Promise<ActionResult<{ checked: number; updated: number }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   try {

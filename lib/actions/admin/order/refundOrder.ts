@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -14,7 +14,7 @@ import type { ActionResult } from 'types/action.types'
  * path a refund made in the Stripe dashboard takes, so there's one place refunds get written.
  */
 export async function refundOrder(input: unknown): Promise<ActionResult<null>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(refundOrderSchema, input)

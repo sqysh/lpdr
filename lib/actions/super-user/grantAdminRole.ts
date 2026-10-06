@@ -5,7 +5,7 @@ import { Role } from '@prisma/client'
 import { createLog } from '../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import type { ActionResult } from 'types/action.types'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireFullAccess } from 'lib/auth/guards'
 
 type GrantedUser = {
   id: string
@@ -15,7 +15,7 @@ type GrantedUser = {
 }
 
 export async function grantAdminRole(email: string, role: 'ADMIN' | 'SUPER_USER'): Promise<ActionResult<GrantedUser>> {
-  const gate = await requireAdmin()
+  const gate = await requireFullAccess()
   if (gate.ok === false) {
     await createLog('warn', 'Unauthorized grantAdminRole attempt', { email, role })
     return { success: false, data: null, error: gate.error }

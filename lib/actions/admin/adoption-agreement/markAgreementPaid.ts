@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -14,7 +14,7 @@ import type { ActionResult } from 'types/action.types'
 import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-countersign'
 
 export async function markAgreementPaid(input: unknown): Promise<ActionResult<{ orderId: string }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(markAgreementPaidSchema, input)

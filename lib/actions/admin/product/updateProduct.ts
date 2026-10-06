@@ -3,11 +3,11 @@
 import prisma from 'prisma/client'
 import { ProductUpdateInputs } from 'types/product'
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 
 export const updateProduct = async (input: ProductUpdateInputs) => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('STORE')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -13,7 +13,7 @@ import type { ActionResult } from 'types/action.types'
 const EDITABLE_STATUSES = ['DRAFT', 'SENT'] as const
 
 export async function updateAdoptionAgreement(id: string, input: unknown): Promise<ActionResult<{ id: string }>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   if (!id) return { success: false, data: null, error: 'Missing agreement' }

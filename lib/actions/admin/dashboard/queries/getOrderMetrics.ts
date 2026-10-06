@@ -1,10 +1,10 @@
 import prisma from 'prisma/client'
 import { monthRange, lastNMonths } from 'lib/utils/date.utils'
 import { sumAmount } from 'lib/utils/math.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 
 export async function getOrderMetrics() {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   const now = new Date()

@@ -1,7 +1,7 @@
 'use server'
 
 import { getErrorMessage } from 'lib/utils/error.utils'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getPendingShipments } from './queries/getPendingShipments'
 import { getTotalRevenue } from './queries/getTotalRevenue'
 import { getOrderMetrics } from './queries/getOrderMetrics'
@@ -16,7 +16,7 @@ import { getTopSellingProducts } from './queries/getTopSellingProducts'
 import { createLog } from '../../log/createLog'
 
 export async function getDashboardData() {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('MONEY')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

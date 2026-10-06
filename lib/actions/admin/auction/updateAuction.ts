@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -11,7 +11,7 @@ import type { ActionResult } from 'types/action.types'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 export const updateAuction = async (id: string, input: unknown): Promise<ActionResult<null>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   if (!id) return { success: false, data: null, error: 'Missing id' }

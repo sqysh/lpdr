@@ -1,14 +1,14 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { pusherTrigger } from 'lib/pusher/pusher.utils'
 
 export async function toggleAuctionVisibility(auctionId: string) {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, error: gate.error, data: null }
 
   try {

@@ -4,11 +4,11 @@ import { z } from 'zod'
 import { AdminArea } from '@prisma/client'
 import { revalidatePath } from 'next/cache'
 import prisma from 'prisma/client'
-import { requireSuper } from 'lib/auth/guards'
 import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import type { ActionResult } from 'types/action.types'
+import { requireFullAccess } from 'lib/auth/guards'
 
 const schema = z.object({
   userId: z.string().min(1),
@@ -16,12 +16,16 @@ const schema = z.object({
 })
 
 export async function updateAdminAreas(input: unknown): Promise<ActionResult<null>> {
-  const gate = await requireSuper()
+  const gate = await requireFullAccess()
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(schema, input)
   if (parsed.ok === false) return parsed.result
   const { userId, areas } = parsed.data
+
+  // Changing your own areas could remove your own full access, with no way back
+  if (userId === gate.userId)
+    return { success: false, data: null, error: "You can't change your own access. Ask another full-access admin." }
 
   try {
     const user = await prisma.user.findUnique({ where: { id: userId }, select: { role: true, adminAreas: true } })

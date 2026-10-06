@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { createLog } from '../../log/createLog'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { updateAuctionItemSchema } from 'lib/schemas/auction.schema'
@@ -10,7 +10,7 @@ import type { ActionResult } from 'types/action.types'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 
 export const updateAuctionItem = async (id: string, input: unknown): Promise<ActionResult<null>> => {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AUCTIONS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(updateAuctionItemSchema, input)

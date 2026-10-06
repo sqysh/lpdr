@@ -2,7 +2,7 @@
 
 import prisma from 'prisma/client'
 import { AdoptionAgreementStatus, Prisma } from '@prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { parseInput } from 'lib/utils/validate.utils'
@@ -19,7 +19,7 @@ type Close = {
 }
 
 async function close({ input, from, to, refused, event }: Close): Promise<ActionResult<null>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const parsed = parseInput(closeAgreementSchema, input)

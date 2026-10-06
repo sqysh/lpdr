@@ -1,7 +1,7 @@
 'use server'
 
 import prisma from 'prisma/client'
-import { requireAdmin } from 'lib/auth/guards'
+import { requireAccess } from 'lib/auth/guards'
 import { createLog } from '../../log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import type { ActionResult } from 'types/action.types'
@@ -15,7 +15,7 @@ export type AdopterResult = {
 }
 
 export async function searchAdopters(query: string): Promise<ActionResult<AdopterResult[]>> {
-  const gate = await requireAdmin()
+  const gate = await requireAccess('AGREEMENTS')
   if (gate.ok === false) return { success: false, data: null, error: gate.error }
 
   const q = query.trim()
