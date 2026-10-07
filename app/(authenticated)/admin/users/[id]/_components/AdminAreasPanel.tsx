@@ -38,7 +38,7 @@ export function AdminAreasPanel({ userId, initial }: { userId: string; initial: 
         <p className="mt-1 text-xs text-muted-light dark:text-muted-dark">Which parts of the admin this person can open.</p>
       </div>
 
-      <fieldset className="px-5 py-4 space-y-2">
+      <fieldset className="px-5 py-4 grid grid-cols-2 gap-x-4 gap-y-1">
         <legend className="sr-only">Admin areas</legend>
         {AREAS.map((area) => (
           <label key={area} className="flex items-center gap-3 min-h-8 text-xs text-text-light dark:text-text-dark cursor-pointer">
