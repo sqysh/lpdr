@@ -1,7 +1,6 @@
 import { AdminArea } from '@prisma/client'
 import {
   BookOpen,
-  ClipboardList,
   Dog,
   DollarSign,
   FileSignature,
@@ -231,7 +230,6 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     heading: 'Adoptions',
     items: [
       { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds', area: 'DOGS' },
-      { label: 'Applications', icon: ClipboardList, href: '/admin/applications', area: 'APPLICATIONS' },
       { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements', area: 'AGREEMENTS' }
     ]
   },
