@@ -110,6 +110,12 @@ export async function mergeUsers({
         await tx.adoptionAgreement.updateMany({ where: { markedPaidById: duplicate.id }, data: { markedPaidById: primaryUserId } })
         await tx.adoptionAgreement.updateMany({ where: { closedById: duplicate.id }, data: { closedById: primaryUserId } })
 
+        await tx.application.updateMany({ where: { userId: duplicate.id }, data: { userId: primaryUserId } })
+        await tx.application.updateMany({ where: { assignedToId: duplicate.id }, data: { assignedToId: primaryUserId } })
+        await tx.applicationEvent.updateMany({ where: { actorId: duplicate.id }, data: { actorId: primaryUserId } })
+        await tx.savedMessage.updateMany({ where: { createdById: duplicate.id }, data: { createdById: primaryUserId } })
+        await tx.legacyApplication.updateMany({ where: { userId: duplicate.id }, data: { userId: primaryUserId } })
+
         // Watches are one per person per item, so drop the duplicate's where the primary already watches
         const primaryWatches = await tx.auctionItemWatch.findMany({ where: { userId: primaryUserId }, select: { auctionItemId: true } })
         await tx.auctionItemWatch.deleteMany({

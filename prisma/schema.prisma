@@ -151,6 +151,34 @@ enum AdminArea {
   PEOPLE // users, newsletter
 }
 
+enum ApplicationType {
+  ADOPTION
+  FOSTER
+}
+
+// Cathy's statuses, with RescueGroups' "Pending" split in two as she agreed
+enum ApplicationStatus {
+  SUBMITTED // new, unassigned until Cathy picks it up
+  REQUESTED_MORE_INFO // Cathy emailed a question, waiting on the applicant
+  REFERENCE_CHECK // with Gwen
+  WAITING_HOME_VISIT // with the dog's foster coordinator
+  HOME_VISIT_DONE // waiting on the coordinator's go-ahead
+  APPROVED_WAITING // approved, waiting for the right dog (RescueGroups' Waiting List)
+  UNDER_REVIEW // with Isabelle for the agreement
+  ADOPTED // agreement signed and paid
+  APPROVED // foster approved
+  CANCELLED
+}
+
+enum ApplicationEventKind {
+  SUBMITTED
+  STATUS_CHANGED
+  ASSIGNED
+  NOTE
+  EMAIL_SENT
+  DOG_CHANGED
+}
+
 // ─── Next Auth ────────────────────────────────────────────────────────────────────
 model Account {
   id                String  @id @default(cuid())
@@ -280,6 +308,12 @@ model User {
 
   // Only read for ADMIN. SUPER_USER always has every area, PACK_MEMBER never has any
   adminAreas AdminArea[] @default([])
+
+  applications         Application[]       @relation("ApplicantApplications")
+  assignedApplications Application[]       @relation("ApplicationAssignee")
+  applicationEvents    ApplicationEvent[]  @relation("ApplicationEventActor")
+  savedMessages        SavedMessage[]      @relation("SavedMessageCreator")
+  legacyApplications   LegacyApplication[] @relation("LegacyApplications")
 }
 
 // ─── Payment Method ────────────────────────────────────────────────────────────────────
@@ -826,6 +860,8 @@ model AdoptionAgreement {
   closedById   String?
   closedBy     User?     @relation("AgreementClosedBy", fields: [closedById], references: [id])
 
+  application Application?
+
   @@index([status, createdAt])
   @@index([userId])
   @@index([dogRescueGroupsId])
@@ -899,6 +935,99 @@ model SignInAttempt {
 
   @@index([identifier])
   @@index([createdAt])
+}
+
+model Application {
+  id     String            @id @default(cuid())
+  type   ApplicationType
+  status ApplicationStatus @default(SUBMITTED)
+
+  userId String
+  user   User   @relation("ApplicantApplications", fields: [userId], references: [id], onDelete: Restrict)
+
+  assignedToId String?
+  assignedTo   User?   @relation("ApplicationAssignee", fields: [assignedToId], references: [id], onDelete: SetNull)
+
+  // Dogs live in RescueGroups. The name is kept too, so the application still reads right after the dog is adopted and leaves the feed
+  dogRescueGroupsId String?
+  dogName           String?
+
+  // Saved with the form version they answered, so later wording changes never alter what they were asked
+  answers     Json
+  formVersion String
+
+  adoptionAgreementId String?            @unique
+  adoptionAgreement   AdoptionAgreement? @relation(fields: [adoptionAgreementId], references: [id], onDelete: SetNull)
+
+  submittedAt DateTime  @default(now())
+  approvedAt  DateTime?
+  closedAt    DateTime?
+  updatedAt   DateTime  @updatedAt
+
+  events ApplicationEvent[]
+
+  @@index([status])
+  @@index([assignedToId])
+  @@index([userId])
+  @@index([dogRescueGroupsId])
+}
+
+// Everything that happens to an application, with who did it. This replaces RescueGroups' comments field
+model ApplicationEvent {
+  id            String               @id @default(cuid())
+  applicationId String
+  application   Application          @relation(fields: [applicationId], references: [id], onDelete: Cascade)
+  kind          ApplicationEventKind
+
+  actorId String?
+  actor   User?   @relation("ApplicationEventActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  fromStatus ApplicationStatus?
+  toStatus   ApplicationStatus?
+  body       String? // a note, or the email that was sent
+  meta       Json? // e.g. who it was assigned to, the email subject and recipients
+
+  createdAt DateTime @default(now())
+
+  @@index([applicationId, createdAt])
+}
+
+// Cathy's pre-loaded emails. {firstName}, {dogName} and {signature} are filled in when she picks one, and she can edit before sending
+model SavedMessage {
+  id       String           @id @default(cuid())
+  name     String
+  subject  String
+  body     String
+  forType  ApplicationType? // null = used for both
+  isActive Boolean          @default(true)
+
+  createdById String?
+  createdBy   User?   @relation("SavedMessageCreator", fields: [createdById], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// The RescueGroups history, imported once from the export. Read-only; each row links back to RescueGroups for the full answers
+model LegacyApplication {
+  id                 String   @id @default(cuid())
+  rescueGroupsFormId String   @unique
+  formName           String // Adoption Application, Foster Application
+  submittedAt        DateTime
+  firstName          String?
+  lastName           String?
+  email              String? // filled from the contacts export, when it matches
+  status             String // as RescueGroups had it: Adopted, Cancelled, Adopted Elsewhere...
+  assignedTo         String?
+  animalName         String?
+  commentCount       Int      @default(0)
+
+  userId String?
+  user   User?   @relation("LegacyApplications", fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([lastName, firstName])
+  @@index([email])
+  @@index([userId])
 }
 
 // ─── STAGING TABLES ───────────────────────────────────────────────────
