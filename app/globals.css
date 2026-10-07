@@ -101,6 +101,7 @@ body {
     sans-serif;
 
   @apply bg-bg-light dark:bg-bg-dark;
+  padding-bottom: var(--bottom-bar-height, 0px);
 }
 
 .dark {
