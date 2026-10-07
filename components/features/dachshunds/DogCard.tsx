@@ -1,9 +1,23 @@
-import Link from 'next/link'
+import Link, { useLinkStatus } from 'next/link'
 import { motion } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 import { IDachshund } from 'types/rescue-groups.types'
 import { cardVariants } from 'lib/constants/motion.constants'
 import Picture from '../../_common/Picture'
+import { Loader2 } from 'lucide-react'
+
+/** useLinkStatus only reports on a navigation, so it has to live inside the Link. Without a loading
+ *  skeleton the grid stays up until the dog's page is ready, so this is what shows the tap registered */
+function PendingOverlay() {
+  const { pending } = useLinkStatus()
+  if (!pending) return null
+
+  return (
+    <span className="absolute inset-0 z-10 flex items-center justify-center bg-black/40" aria-hidden="true">
+      <Loader2 className="w-6 h-6 animate-spin text-white" />
+    </span>
+  )
+}
 
 export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
   const a = dog?.attributes
@@ -11,14 +25,7 @@ export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
   const pathname = usePathname()
 
   return (
-    <motion.li
-      layout
-      variants={cardVariants}
-      initial="hidden"
-      animate="show"
-      exit="exit"
-      className="group"
-    >
+    <motion.li layout variants={cardVariants} initial="hidden" animate="show" exit="exit" className="group">
       <Link
         href={`/dachshunds/${dog?.id}?from=${encodeURIComponent(pathname)}`}
         aria-label={`Meet ${a?.name}, ${a?.ageString}, ${a?.colorDetails} — click to view profile`}
@@ -35,17 +42,12 @@ export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
           />
         ) : (
           <div className="absolute inset-0 bg-surface-light dark:bg-surface-dark flex items-center justify-center">
-            <span className="text-muted-light dark:text-muted-dark text-xs font-mono">
-              No photo
-            </span>
+            <span className="text-muted-light dark:text-muted-dark text-xs font-mono">No photo</span>
           </div>
         )}
 
         {/* Gradient */}
-        <div
-          className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent"
-          aria-hidden="true"
-        />
+        <div className="absolute inset-0 bg-linear-to-t from-black/70 via-black/10 to-transparent" aria-hidden="true" />
 
         {/* Hover wash */}
         <div
@@ -53,12 +55,12 @@ export function DogCard({ dog, index }: { dog: IDachshund; index: number }) {
           aria-hidden="true"
         />
 
+        <PendingOverlay />
+
         {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-1.5">
           {a?.isAdoptionPending && (
-            <span className="text-[10px] font-bold tracking-widest uppercase bg-amber-500 text-white px-2 py-0.5">
-              Pending
-            </span>
+            <span className="text-[10px] font-bold tracking-widest uppercase bg-amber-500 text-white px-2 py-0.5">Pending</span>
           )}
           {a?.isSpecialNeeds && (
             <span className="text-[10px] font-bold tracking-widest uppercase bg-secondary-light dark:bg-secondary-dark text-white px-2 py-0.5">

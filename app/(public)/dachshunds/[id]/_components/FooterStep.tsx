@@ -62,7 +62,7 @@ export function FooterStep({
   }
 
   return (
-    <Link href={href} className={STEP_CLASS} aria-label={label}>
+    <Link href={href} prefetch className={STEP_CLASS} aria-label={label}>
       <StepBody name={name} direction={direction} />
     </Link>
   )
