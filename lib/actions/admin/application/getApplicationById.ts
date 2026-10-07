@@ -19,14 +19,14 @@ export async function getApplicationById(id: string) {
         adoptionAgreement: { select: { id: true, status: true } },
         events: {
           orderBy: { createdAt: 'desc' },
-          include: { actor: { select: { firstName: true, lastName: true, email: true } } }
+          include: { actor: { select: { id: true, firstName: true, lastName: true, email: true } } }
         }
       }
     })
     if (!application) return { success: false as const, data: null, error: 'Application not found' }
 
-    // Everything else this person has sent us: other applications here, and their RescueGroups history
-    const [otherApplications, legacy] = await Promise.all([
+    // Everything else this person has sent us, plus everyone who can be handed an application
+    const [otherApplications, legacy, reviewers] = await Promise.all([
       prisma.application.findMany({
         where: { userId: application.userId, id: { not: id } },
         orderBy: { submittedAt: 'desc' },
@@ -48,10 +48,19 @@ export async function getApplicationById(id: string) {
           ]
         },
         orderBy: { submittedAt: 'desc' }
+      }),
+      prisma.user.findMany({
+        where: { OR: [{ role: 'SUPER_USER' }, { role: 'ADMIN', adminAreas: { has: 'APPLICATIONS' } }] },
+        orderBy: [{ firstName: 'asc' }, { lastName: 'asc' }],
+        select: { id: true, firstName: true, lastName: true }
       })
     ])
 
-    return { success: true as const, error: null, data: serialize({ application, otherApplications, legacy }) }
+    return {
+      success: true as const,
+      error: null,
+      data: serialize({ application, otherApplications, legacy, reviewers, viewerId: gate.userId })
+    }
   } catch (error) {
     await createLog('error', 'Failed to load application', { applicationId: id, error: getErrorMessage(error) })
     return { success: false as const, data: null, error: 'Failed to load the application. Please try again.' }

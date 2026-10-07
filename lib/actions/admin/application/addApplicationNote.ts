@@ -23,7 +23,12 @@ export async function addApplicationNote(input: unknown): Promise<ActionResult<n
   const { applicationId, body } = parsed.data
 
   try {
-    await prisma.applicationEvent.create({ data: { applicationId, kind: 'NOTE', actorId: gate.userId, body } })
+    await prisma.$transaction([
+      prisma.applicationEvent.create({ data: { applicationId, kind: 'NOTE', actorId: gate.userId, body } }),
+      // A note counts as activity, so the list stops flagging it as gone quiet
+      prisma.application.update({ where: { id: applicationId }, data: { updatedAt: new Date() } })
+    ])
+    revalidatePath('/admin/applications')
     revalidatePath(`/admin/applications/${applicationId}`)
     return { success: true, data: null }
   } catch (error) {
