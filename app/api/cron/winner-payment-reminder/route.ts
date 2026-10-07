@@ -20,6 +20,9 @@ export async function GET(request: Request) {
   try {
     const now = Date.now()
     const oneDayAgo = new Date(now - DAY_MS)
+    // Runs are daily, but Vercel starts them a few seconds early or late, so a strict 24 hours skips every other night.
+    // 20 hours still blocks a double send if the cron is hit twice
+    const spacingCutoff = new Date(now - 20 * 60 * 60 * 1000)
     const windowCutoff = new Date(now - (1 + REMINDER_WINDOW_DAYS) * DAY_MS)
 
     const unpaidWinners = await prisma.auctionWinningBidder.findMany({
@@ -29,7 +32,7 @@ export async function GET(request: Request) {
         // Spacing belongs to the data, not the schedule. Without this, running the cron twice in
         // a day, or hitting it by hand while testing, sends the same person two emails an hour
         // apart. updatedAt moves when the reminder below is recorded.
-        updatedAt: { lt: oneDayAgo },
+        updatedAt: { lt: spacingCutoff },
         auction: { endDate: { lte: oneDayAgo, gte: windowCutoff } }
       },
       include: {
