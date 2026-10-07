@@ -12,7 +12,13 @@ export default async function DachshundPage({ params }: { params: Promise<{ id: 
   if (digits !== id) redirect(`/dachshunds/${digits}`)
 
   const result = await getDachshundById(id)
-  if (!result.success || !result.data?.data?.[0]) notFound()
+  if (!result.success) {
+    if (result.error === 'Dachshund not found') notFound()
+    // RescueGroups was unreachable. Throwing keeps the last good version of the page if Next has one,
+    // and otherwise shows the error page with a retry, instead of telling a supporter this dog doesn't exist
+    throw new Error(result.error ?? 'Failed to fetch dachshund')
+  }
+  if (!result.data?.data?.[0]) notFound()
 
   return <DachshundDetailClient data={result.data.data[0]} />
 }

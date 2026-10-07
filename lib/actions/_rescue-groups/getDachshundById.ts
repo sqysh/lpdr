@@ -24,7 +24,12 @@ export async function getDachshundById(id: string): Promise<ActionResult<{ data:
 
     return { success: true, data: json }
   } catch (error) {
-    await createLog('error', 'Failed to fetch dachshund by id', { id, error: getErrorMessage(error) })
+    await createLog('error', 'Failed to fetch dachshund by id', {
+      id,
+      error: getErrorMessage(error),
+      cause: error instanceof Error && error.cause ? String((error.cause as { code?: string }).code ?? error.cause) : undefined,
+      attempts: 3
+    })
     return { success: false, data: null, error: 'Failed to fetch dachshund' }
   }
 }
