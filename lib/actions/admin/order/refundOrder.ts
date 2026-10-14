@@ -8,6 +8,7 @@ import { parseInput } from 'lib/utils/validate.utils'
 import { stripeClient } from 'lib/stripe/stripe-client'
 import { refundOrderSchema } from 'lib/schemas/order.schema'
 import type { ActionResult } from 'types/action.types'
+import Stripe from 'stripe'
 
 /**
  * Sends the refund to Stripe. Recording it on the order is left to the charge.refunded webhook, the same
@@ -49,7 +50,11 @@ export async function refundOrder(input: unknown): Promise<ActionResult<null>> {
     // second partial refund later gets a new key because the running total has moved
     await stripeClient.refunds.create(
       { payment_intent: order.paymentIntentId, amount: amountCents, reason, metadata: { orderId, refundedBy: gate.userId } },
-      { idempotencyKey: `refund-${orderId}-${previouslyRefundedCents}-${amountCents}` }
+      // Keyed on what's been refunded so far plus the reason: a double click sends one refund, a genuine second
+      // partial refund gets a new key because the running total has moved, and changing the reason isn't refused.
+      // refundedBy stays out on purpose, so two admins refunding the same amount at once collide instead of
+      // refunding twice
+      { idempotencyKey: `refund-${orderId}-${previouslyRefundedCents}-${amountCents}-${reason ?? 'none'}` }
     )
 
     await createLog('info', 'Refund sent to Stripe', { orderId, amount: amountCents / 100, reason, refundedBy: gate.userId })
@@ -57,6 +62,17 @@ export async function refundOrder(input: unknown): Promise<ActionResult<null>> {
     return { success: true, data: null }
   } catch (error) {
     await createLog('error', 'Failed to send refund', { orderId, error: getErrorMessage(error) })
-    return { success: false, data: null, error: getErrorMessage(error) }
+
+    const code = error instanceof Stripe.errors.StripeError ? error.code : undefined
+    const message =
+      code === 'charge_already_refunded'
+        ? 'This payment has already been fully refunded in Stripe. Refresh the page to see it.'
+        : code === 'idempotency_error'
+          ? 'A refund for this order was just sent, possibly by someone else. Refresh the page before trying again.'
+          : code === 'amount_too_large'
+            ? 'That amount is more than what is left to refund on this payment in Stripe.'
+            : "The refund didn't go through. Check the payment in Stripe before trying again, so it isn't refunded twice."
+
+    return { success: false, data: null, error: message }
   }
 }

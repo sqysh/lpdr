@@ -9,7 +9,7 @@ import { WelcomeWienerProduct } from 'types/welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage, UserFacingError } from 'lib/utils/error.utils'
+import { getErrorMessage, getUserMessage, isExpectedError } from 'lib/utils/error.utils'
 import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createPaymentIntentSchema } from 'lib/schemas/payment.schema'
@@ -20,6 +20,7 @@ import { ADOPTION_FEE_CENTS, MIN_DONATION_CENTS } from 'lib/constants/adoption-f
 import { hasActiveAdoptionFee } from '../adoption-fee/hasActiveAdoptionFee'
 import { isDonation } from 'lib/constants/order.constants'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
+import { createHash } from 'crypto'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -335,12 +336,17 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
     }
 
+    // The key must change whenever the request does. Stripe rejects a reused key with different parameters,
+    // so a key built from only the amount broke when someone came back and ticked "save card" or picked a
+    // saved card. Hashing the full request keeps double clicks deduped while any real change gets its own key
+    const fingerprint = createHash('sha256').update(JSON.stringify(paymentIntentParams)).digest('hex').slice(0, 16)
+
     const idempotencyKey = winningBidderId
-      ? `winner-${winningBidderId}-${finalCents}`
+      ? `winner-${winningBidderId}-${fingerprint}`
       : orderType === 'ADOPTION_FEE'
-        ? `adoption-${userId}-${finalCents}-${new Date().toISOString().slice(0, 10)}`
+        ? `adoption-${userId}-${fingerprint}-${new Date().toISOString().slice(0, 10)}`
         : orderType === 'ADOPTION_AGREEMENT'
-          ? `agreement-${agreementId}-${finalCents}-${agreementUpdatedAt}`
+          ? `agreement-${agreementId}-${fingerprint}-${agreementUpdatedAt}`
           : undefined
 
     if (!paymentIntent) {
@@ -372,8 +378,16 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
     }
   } catch (error) {
-    const expected = error instanceof UserFacingError
-    await createLog(expected ? 'warn' : 'error', 'Failed to create payment intent', { error: getErrorMessage(error), orderType, userId })
-    return fail(getErrorMessage(error))
+    await createLog(isExpectedError(error) ? 'warn' : 'error', 'Failed to create payment intent', {
+      error: getErrorMessage(error),
+      orderType,
+      userId
+    })
+    return fail(
+      getUserMessage(
+        error,
+        "We couldn't start your payment. Please try again in a moment, or email lpdr@littlepawsdr.org if it keeps happening."
+      )
+    )
   }
 }
