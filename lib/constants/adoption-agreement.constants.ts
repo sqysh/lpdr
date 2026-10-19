@@ -14,10 +14,10 @@ type AdoptionTerms = {
  * what an earlier adopter agreed to. To revise: add a new dated entry, point the current version at it,
  * and leave every earlier entry exactly as it was.
  */
-export const ADOPTION_TERMS_VERSION = '2026-10-01'
+export const ADOPTION_TERMS_VERSION = '2026-10-19'
 
 export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
-  '2026-10-01': {
+  '2026-10-19': {
     intro:
       'Little Paws Dachshund Rescue, LPDR, is a South Carolina nonprofit corporation whose sole purpose is to ensure that each dachshund in its care is placed in a home that will lovingly care for and make the dachshund a permanent member of the family. LPDR is run exclusively by volunteers and does not profit financially from adoption fees or donations. LPDR wishes to give the dachshund described below to Adopter(s), and Adopter(s) wishes to adopt the dachshund and provide it a permanent and loving home.',
 
@@ -28,7 +28,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ],
       // 2
       [
-        'I/We agree that we will not transfer, sell, give, trade, or in any way change custody of the Dachshund from us to any other person or entity, including, without limitation, any laboratory or other rescue or humane group. The Dachshund will not be sold or given away. It can only be returned to Little Paws Dachshund Rescue. If the Adopter(s) no longer want or cannot keep the Dachshund, they acknowledge that they are required to return the dog to Little Paws Dachshund Rescue and if the Adopter(s) are more than 50 miles further away from the place of adoption, they assume sole responsibility and expense for returning the dog promptly and safely to Little Paws Dachshund Rescue. Adopter(s) shall immediately notify Little Paws Dachshund Rescue of their intent, in writing, to give up the dog. Further, in the event of any material dispute concerning the ownership or care or condition of the Dachshund, Little Paws Dachshund Rescue may, at its option, reclaim the dog.'
+        'I/We agree that we will not transfer, sell, give, trade, or in any way change custody of the Dachshund from us to any other person or entity, including, without limitation, any laboratory or other rescue or humane group. The Dachshund will not be sold or given away. It can only be returned to Little Paws Dachshund Rescue. If the Adopter(s) no longer want or cannot keep the Dachshund, they acknowledge that they are required to return the dog to Little Paws Dachshund Rescue and if the Adopter(s) are more than 50 milesfurther away from the place of adoption, they assume sole responsibility and expense for returning the dog promptly and safely to Little Paws Dachshund Rescue. Adopter(s) shall immediately notify Little Paws Dachshund Rescue of their intent, in writing, to give up the dog. Further, in the event of any material dispute concerning the ownership or care or condition of the Dachshund, Little Paws Dachshund Rescue may, at its option, reclaim the dog.'
       ],
       // 3
       [
@@ -37,7 +37,11 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       // 4
       [
         "I/We will keep the microchip tag on the dog at all times. I/We understand that all dogs adopted through Little Paws Dachshund Rescue are microchipped under the rescue's name at the time of adoption. I/We agree to have the microchip registration transferred to our name and contact information within thirty (30) days of adoption.",
-        "See directions for registering your dog's microchip on page one of this agreement.",
+        'This transfer may be completed in one of two ways:',
+        [
+          'I/We may contact AKC Reunite at 800-252-7894 to complete the ownership transfer directly, which may involve a fee and require rescue authorization.',
+          "I/We may request that the rescue's microchip coordinator complete the transfer at no cost by emailing chips@littlepawsdr.org within thirty (30) days of the dog going home. After thirty (30) days, the adopter must complete the transfer independently through the microchip company."
+        ],
         "Any changes to the adopter's contact information (including address or phone number) must also be reported to the rescue within thirty (30) days. The dog has also been outfitted with an LPDR ID tag, which must remain on the dog for their lifetime. In the event the dog is lost, stolen, or escapes, any expenses incurred are the sole responsibility of the adopter."
       ],
       // 5
@@ -60,7 +64,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ['I/We will never transport the Dachshund in an open vehicle or in any other way that will endanger the Dachshund during transport.'],
       // 10
       [
-        'I/We agree to a two-week trial period. The fourteen (14) day trial period begins on the day the Dachshund goes to his or her new home. LPDR will allow return of the Dachshund within that period if the adopter is unsatisfied with the Dachshund. We agree to contact LPDR, via email, to applications@littlepawsdr.org immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, the adoption fee will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the Dachshund to LPDR without penalty at any time before the expiration of the Trial Period.'
+        'I/We agree to a two-week trial period. LPDR will allow return of the Dachshund within two weeks of receiving the dog if the adopter is unsatisfied with the Dachshund. We agree to contact LPDR, via email, to applications@littlepawsdr.org immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, all adoption fees paid will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the Dachshund to LPDR without penalty at any time before the expiration of the Trial Period.'
       ],
       // 11
       [

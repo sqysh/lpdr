@@ -1,4 +1,5 @@
 import { COLOR } from 'lib/constants/order-confirmation-constants'
+import { OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 
 type Props = {
@@ -7,9 +8,21 @@ type Props = {
   link: string
 }
 
+const TEXT = `margin: 0 0 16px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;`
+const LIST = `margin: 0 0 24px 0; padding-left: 20px; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;`
+const SUBHEAD = `margin: 0 0 8px 0; color: ${COLOR.heading}; font-size: 15px; font-weight: 700;`
+
+// Read from the same list the signing page uses, so the email and the site can't name different accounts
+const offlinePayments = Object.values(OFFLINE_PAYMENT_INSTRUCTIONS)
+  .map(({ label, instruction }) => {
+    const note = label === 'PayPal' ? ' (please choose "Send to a friend" if you can, to avoid fees)' : ''
+    return `<li>${escapeHtml(instruction)}${note}</li>`
+  })
+  .join('')
+
 export function adoptionAgreementReadyTemplate({ firstName, dogName, link }: Props): string {
   const name = escapeHtml(dogName)
-  const greeting = firstName ? `Hi ${escapeHtml(firstName)},` : 'Hi,'
+  const greeting = firstName ? `Dear ${escapeHtml(firstName)},` : 'Hello,'
 
   return `
     <!DOCTYPE html>
@@ -30,13 +43,9 @@ export function adoptionAgreementReadyTemplate({ firstName, dogName, link }: Pro
                     Your adoption agreement for ${name} is ready
                   </h1>
 
-                  <p style="margin: 0 0 16px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">${greeting}</p>
-                  <p style="margin: 0 0 16px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">
-                    We're so glad ${name} is going home with you. Please review the entire adoption agreement, sign where indicated, and return as soon as possible. You'll choose how to pay the adoption fee (card, Zelle, Venmo or PayPal) when you sign.
-                  </p>
-                  <p style="margin: 0 0 32px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">
-                    You'll be asked to sign in with this email address.
-                  </p>
+                  <p style="${TEXT}">${greeting}</p>
+                  <p style="${TEXT}">Thank you for adopting from Little Paws Dachshund Rescue! Your adoption agreement is ready to review and sign online.</p>
+                  <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">You'll be asked to sign in with this email address.</p>
 
                   <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin-bottom: 32px;">
                     <tr>
@@ -48,7 +57,30 @@ export function adoptionAgreementReadyTemplate({ firstName, dogName, link }: Pro
                     </tr>
                   </table>
 
-                  <p style="margin: 0 0 8px 0; color: ${COLOR.body}; font-size: 13px; line-height: 1.7;">
+                  <p style="${SUBHEAD}">What to do</p>
+                  <ul style="${LIST}">
+                    <li>Read through the entire agreement and sign where indicated.</li>
+                    <li>Everything is done online, so there's nothing to print or scan.</li>
+                  </ul>
+
+                  <p style="${SUBHEAD}">Adoption fee</p>
+                  <p style="margin: 0 0 8px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">You'll choose how to pay when you sign. You can pay by card on the spot, or use one of these:</p>
+                  <ul style="${LIST}">${offlinePayments}</ul>
+                  <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">Your receipt serves as confirmation of your payment.</p>
+
+                  <p style="${SUBHEAD}">Microchip reminder</p>
+                  <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">Please remember to transfer the microchip registration to your name within thirty (30) days, as outlined in term 4 of the agreement.</p>
+
+                  <p style="${SUBHEAD}">Welcome home!</p>
+                  <p style="${TEXT}">We are thrilled ${name} has found a forever family. Once we receive both your signed agreement and payment, we'll sign on our end and send you the finalized agreement to complete the process.</p>
+                  <p style="margin: 0 0 32px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">And of course, we love pupdates! Feel free to share photos of ${name} settling into their new home anytime.</p>
+
+                  <p style="margin: 0 0 32px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">
+                    Isabell Ventouris<br />
+                    Little Paws Dachshund Rescue
+                  </p>
+
+                  <p style="margin: 0; color: ${COLOR.body}; font-size: 13px; line-height: 1.7;">
                     If something in the agreement looks wrong, reply to this email before signing and we'll correct it.
                   </p>
                 </td>
