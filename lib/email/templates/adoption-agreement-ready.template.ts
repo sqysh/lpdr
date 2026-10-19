@@ -69,7 +69,7 @@ export function adoptionAgreementReadyTemplate({ firstName, dogName, link }: Pro
                   <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">Your receipt serves as confirmation of your payment.</p>
 
                   <p style="${SUBHEAD}">Microchip reminder</p>
-                  <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">Please remember to transfer the microchip registration to your name within thirty (30) days, as outlined in term 4 of the agreement.</p>
+                  <p style="margin: 0 0 24px 0; color: ${COLOR.body}; font-size: 15px; line-height: 1.7;">Please remember to transfer the microchip registration to your name within thirty (30) days, as outlined on page one of the agreement.</p>
 
                   <p style="${SUBHEAD}">Welcome home!</p>
                   <p style="${TEXT}">We are thrilled ${name} has found a forever family. Once we receive both your signed agreement and payment, we'll sign on our end and send you the finalized agreement to complete the process.</p>
