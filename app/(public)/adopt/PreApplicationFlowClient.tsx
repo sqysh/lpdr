@@ -13,6 +13,7 @@ import { useConfettiStore } from 'stores/confetti.store'
 import { redeemBypassCodeSchema, RedeemBypassCodeInput, RedeemBypassCodeValues } from 'lib/schemas/adoption-fee.schema'
 import { redeemBypassCode } from 'lib/actions/adoption-fee/redeemBypassCode'
 import { useRefreshOnSignOut } from '@hooks/useRefreshOnSignOut.hook'
+import { AdoptionInformationContent } from './_components/AdoptionInformationContent'
 
 type Props = {
   savedCards: IPaymentMethod[]
@@ -92,51 +93,68 @@ export const PreApplicationFlowClient = ({ savedCards, userName, isAuthed, email
   const currentIndex = STEPS.indexOf(step)
 
   return (
-    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
-        <Header />
+    <main
+      id="main-content"
+      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark lg:grid lg:grid-cols-2 lg:items-start"
+    >
+      {/* Cathy asked for the information on this page, since adopters were skipping the separate one. On a
+          phone it comes first; on a wide screen it's the column people read while the form stays beside it */}
+      <section
+        aria-label="Adoption information"
+        className="px-4 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-16 lg:pb-32 border-b lg:border-b-0 lg:border-r border-border-light dark:border-border-dark"
+      >
+        <AdoptionInformationContent />
+      </section>
 
-        <Progress currentIndex={currentIndex} step={step} />
+      <div
+        id="application"
+        className="px-4 sm:px-6 lg:px-10 pt-12 sm:pt-16 pb-24 sm:pb-32 scroll-mt-20 lg:sticky lg:top-(--header-offset,0px) lg:max-h-[calc(100vh-var(--header-offset,0px))] lg:overflow-y-auto transition-[top] duration-300"
+      >
+        <div className="max-w-xl mx-auto">
+          <Header />
 
-        <AnimatePresence mode="wait">
-          {step === 'sign-in' && (
-            <PreApp1SignIn
-              magicEmail={magicEmail}
-              magicLinkSent={magicLinkSent}
-              setMagicEmail={setMagicEmail}
-              setMagicLinkSent={setMagicLinkSent}
-            />
-          )}
+          <Progress currentIndex={currentIndex} step={step} />
 
-          {step === 'terms' && (
-            <PreApp2Terms agreedToTerms={agreedToTerms} handleContinueToInfo={handleContinueToInfo} setAgreedToTerms={setAgreedToTerms} />
-          )}
+          <AnimatePresence mode="wait">
+            {step === 'sign-in' && (
+              <PreApp1SignIn
+                magicEmail={magicEmail}
+                magicLinkSent={magicLinkSent}
+                setMagicEmail={setMagicEmail}
+                setMagicLinkSent={setMagicLinkSent}
+              />
+            )}
 
-          {step === 'details' && (
-            <PreApp3Details
-              register={register}
-              errors={errors}
-              email={email}
-              bypassError={bypassError}
-              redeeming={redeeming}
-              onRedeemCode={handleRedeemCode}
-              onContinueToPayment={handleContinueToPayment}
-              setStep={setStep}
-            />
-          )}
+            {step === 'terms' && (
+              <PreApp2Terms agreedToTerms={agreedToTerms} handleContinueToInfo={handleContinueToInfo} setAgreedToTerms={setAgreedToTerms} />
+            )}
 
-          {step === 'payment' && (
-            <PreApp4Payment
-              savedCards={savedCards}
-              setStep={setStep}
-              email={email}
-              firstName={values.firstName ?? ''}
-              lastName={values.lastName ?? ''}
-              isAuthed={isAuthed}
-              userId={userId ?? ''}
-            />
-          )}
-        </AnimatePresence>
+            {step === 'details' && (
+              <PreApp3Details
+                register={register}
+                errors={errors}
+                email={email}
+                bypassError={bypassError}
+                redeeming={redeeming}
+                onRedeemCode={handleRedeemCode}
+                onContinueToPayment={handleContinueToPayment}
+                setStep={setStep}
+              />
+            )}
+
+            {step === 'payment' && (
+              <PreApp4Payment
+                savedCards={savedCards}
+                setStep={setStep}
+                email={email}
+                firstName={values.firstName ?? ''}
+                lastName={values.lastName ?? ''}
+                isAuthed={isAuthed}
+                userId={userId ?? ''}
+              />
+            )}
+          </AnimatePresence>
+        </div>
       </div>
     </main>
   )

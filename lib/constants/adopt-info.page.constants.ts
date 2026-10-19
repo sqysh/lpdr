@@ -1,10 +1,10 @@
 export const ADOPTION_GUIDELINES_AND_REQUIREMENTS = [
   'All adopters must be at least 21 years of age',
-  'You must own your home or have written permission from your landlord',
-  'All current pets must be spayed/neutered and up-to-date on vaccinations',
+  "You must own your home or, if you rent, provide us with your landlord's name and contact information",
+  'All current pets must be spayed/neutered, up-to-date on vaccinations, have a current heartworm test and be taking heartworm prevention',
   'You must have a secure, fenced yard or adequate exercise plan',
   'Previous pet ownership experience is strongly preferred',
-  'Home visits may be required for certain dogs',
+  'Virtual home visits are required for all dogs',
   'You must be financially prepared for ongoing veterinary care'
 ]
 
@@ -13,7 +13,7 @@ export const FIVE_STEP_PROCESS = [
     titleKey: 'Submit Application',
     text: 'Complete our comprehensive adoption application with detailed information about your lifestyle and experience.',
     linkKey: 'Start Application',
-    path: '/adopt'
+    path: '/adopt#application'
   },
   {
     titleKey: 'Application Review',
@@ -27,8 +27,7 @@ export const FIVE_STEP_PROCESS = [
   },
   {
     titleKey: 'Home Check',
-    text: 'A brief home visit to ensure your space is safe and suitable for your new pet.',
-    text3: 'This can often be done virtually for approved adopters.'
+    text: 'A thorough virtual home visit to ensure your space is safe and suitable for your new pet.'
   },
   {
     titleKey: 'Adoption Day',
@@ -48,5 +47,7 @@ export const STATES_WE_RESCUE = [
   'Pennsylvania',
   'New Jersey',
   'New York',
-  'Connecticut'
+  'Connecticut',
+  'West Virginia',
+  'Massachusetts'
 ]

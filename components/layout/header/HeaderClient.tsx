@@ -14,6 +14,7 @@ import { LinkBody } from 'components/_common/LinkBody'
 import { LinkSpinner } from 'components/_common/LinkSpinner'
 import { CartLinkContent } from './CartLinkContent'
 import { Role } from '@prisma/client'
+import { useEffect, useRef } from 'react'
 
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
@@ -30,6 +31,7 @@ const donateButton =
   'inline-flex items-center justify-center bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white font-mono uppercase transition-colors duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
 export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFee: boolean; isAuthed: boolean; userRole?: Role | null }) {
+  const headerRef = useRef<HTMLDivElement>(null)
   const { hidden } = useScrollDirection()
   const mobileNavOpen = useNavigationStore((s) => s.mobileNavOpen)
   const openMobileNav = useNavigationStore((s) => s.openMobileNav)
@@ -49,6 +51,16 @@ export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFe
       ? { href: '/admin/dashboard', label: 'Dashboard', icon: LayoutDashboard }
       : { href: '/my-pack', label: 'My Pack', icon: User }
 
+  useEffect(() => {
+    const el = headerRef.current
+    if (!el) return
+    const root = document.documentElement
+    root.style.setProperty('--header-offset', hidden ? '0px' : `${el.offsetHeight}px`)
+    return () => {
+      root.style.removeProperty('--header-offset')
+    }
+  }, [hidden])
+
   return (
     <>
       <a
@@ -60,6 +72,7 @@ export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFe
 
       {/* Whole header — slides up on scroll-down via CSS transform */}
       <div
+        ref={headerRef}
         className={`sticky top-0 z-50 w-full transition-transform duration-300 ease-out ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
       >
         {/* ── Top Bar (desktop/tablet only) ── */}
