@@ -72,5 +72,8 @@
   },
   "overrides": {
     "postcss": "^8.5.10"
+  },
+  "volta": {
+    "node": "24.22.1"
   }
 }
