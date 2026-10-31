@@ -25,18 +25,19 @@ export function Lightbox({
   const current = photos[idx]
   const many = photos.length > 1
 
-  // showModal gives focus trapping, Escape and focus return for free; the page behind stops scrolling while it's open
+  // showModal gives focus trapping, Escape and focus return for free; the page behind stops scrolling while it's open.
+  // The cleanup doesn't call close(): that fires the dialog's close event, so React's dev double-run of this
+  // effect would open the lightbox and immediately shut it again. Unmounting removes it on its own
   useEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
 
-    dialog.showModal()
+    if (!dialog.open) dialog.showModal()
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
     return () => {
       document.body.style.overflow = previousOverflow
-      if (dialog.open) dialog.close()
     }
   }, [])
 
@@ -56,7 +57,13 @@ export function Lightbox({
       }}
       className="fixed inset-0 m-0 p-0 w-full h-full max-w-none max-h-none bg-black/95 text-white backdrop:bg-black/80 flex items-center justify-center"
     >
-      <div className="absolute inset-0 px-2 sm:px-16 py-16" {...handlers}>
+      <div
+        className="absolute inset-0 px-2 sm:px-16 py-16"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) onClose()
+        }}
+        {...handlers}
+      >
         {/* Fills the area and keeps its shape, rather than sizing to whatever width the image reports */}
         <Picture
           key={current.url}

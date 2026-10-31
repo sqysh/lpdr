@@ -2,7 +2,7 @@ import { useModalsStore } from 'stores/modals.store'
 import { SectionHeading } from './SectionHeading'
 import { StatGrid } from './StatGrid'
 import { DachshundDescription } from './DachshundDescription'
-import { getCompatibility, getFosterNote, QUALITY_LABELS, TONE_DOT } from 'lib/utils/animal.utils'
+import { getCompatibility, getFosterNote, getQualityLabel, TONE_DOT } from 'lib/utils/animal.utils'
 import Link from 'next/link'
 
 export function RightInfoPanel({ a }) {
@@ -31,7 +31,7 @@ export function RightInfoPanel({ a }) {
                 role="listitem"
                 className="text-xs font-medium px-3 py-1.5 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-text-light dark:text-text-dark capitalize"
               >
-                {QUALITY_LABELS[q] ?? q}
+                {getQualityLabel(q)}
               </span>
             ))}
           </div>
@@ -44,13 +44,16 @@ export function RightInfoPanel({ a }) {
       <div>
         <SectionHeading>Living With {name}</SectionHeading>
         <div className="grid grid-cols-2 gap-2">
-          {getCompatibility(a).map(({ key, label, tone }) => (
+          {getCompatibility(a).map(({ key, label, tone, detail }) => (
             <div
               key={key}
               className="flex items-center gap-3 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark px-3 py-2.5"
             >
               <span aria-hidden="true" className={`w-2 h-2 shrink-0 ${TONE_DOT[tone]}`} />
-              <p className="text-xs font-medium text-text-light dark:text-text-dark min-w-0">{label}</p>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-text-light dark:text-text-dark">{label}</p>
+                {detail && <p className="text-[11px] text-muted-light dark:text-muted-dark mt-0.5">{detail}</p>}
+              </div>
             </div>
           ))}
         </div>
