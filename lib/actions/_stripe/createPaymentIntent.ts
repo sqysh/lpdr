@@ -36,6 +36,31 @@ const fail = (error: string): ActionResult<PaymentIntentData> => ({
   error
 })
 
+// Stripe caps each metadata value at 500 characters, and every Welcome Wiener item now carries its dog's id,
+// so a big cart is split across items, items2, items3. The webhook joins them back up
+function itemsMetadata(items: { id?: string; quantity: number; size?: string; welcomeWienerId?: string; feedAFosterId?: string }[]) {
+  const compact = items.map((i) => ({
+    i: i.id,
+    q: i.quantity,
+    ...(i.size && { s: i.size }),
+    ...(i.welcomeWienerId && { w: i.welcomeWienerId })
+  }))
+
+  const chunks: string[] = []
+  let current: typeof compact = []
+
+  for (const item of compact) {
+    if (current.length && JSON.stringify([...current, item]).length > 500) {
+      chunks.push(JSON.stringify(current))
+      current = []
+    }
+    current.push(item)
+  }
+  if (current.length) chunks.push(JSON.stringify(current))
+
+  return Object.fromEntries(chunks.map((c, n) => [n === 0 ? 'items' : `items${n + 1}`, c]))
+}
+
 export async function createPaymentIntent(input: unknown): Promise<ActionResult<PaymentIntentData>> {
   const gate = await requireAuth()
   if (gate.ok === false) return fail(gate.error)
@@ -282,15 +307,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         shipping: (shippingCents / 100).toFixed(2),
         coverFees: coverFees ? 'true' : 'false',
         feesCovered: (feesCoveredCents / 100).toFixed(2),
-        ...(items?.length && {
-          items: JSON.stringify(
-            items.map((i) => ({
-              i: i.id,
-              q: i.quantity,
-              ...(i.size && { s: i.size })
-            }))
-          )
-        }),
+        ...(items?.length && itemsMetadata(items)),
         winningBidderId: winningBidderId ?? '',
         agreementId: agreementId ?? '',
         auctionItemId: auctionItemId ?? '',

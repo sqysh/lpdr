@@ -10,6 +10,23 @@ import Stripe from 'stripe'
 import { ProductSizeEntry } from 'types/product'
 import { WelcomeWienerProduct } from 'types/welcome-wiener'
 
+type CompactLine = { i: string; q: number; s?: string | null; w?: string }
+
+// Items can be split across items, items2, items3 to stay under Stripe's 500-character metadata limit
+function readItems(metadata: Stripe.Metadata): CompactLine[] {
+  return Object.keys(metadata)
+    .filter((k) => /^items\d*$/.test(k))
+    .sort((a, b) => Number(a.slice(5) || 1) - Number(b.slice(5) || 1))
+    .flatMap((k) => JSON.parse(metadata[k]) as CompactLine[])
+}
+
+// New payments carry the dog's id as w. Older ones built it into the item id as "<wienerId>-<optionId>"
+function wienerRef(line: CompactLine) {
+  if (line.w) return { wienerId: line.w, optionId: line.i }
+  const [wienerId, ...rest] = line.i.split('-')
+  return { wienerId, optionId: rest.join('-') }
+}
+
 export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.PaymentIntent) {
   const { id, amount, metadata } = paymentIntent
 
@@ -27,13 +44,11 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
     const isRecurring = metadata?.isRecurring === 'true'
     const nbd = isRecurring && metadata?.nextBillingDate ? new Date(metadata.nextBillingDate) : null
 
-    // ── Resolve items + hasPhysical BEFORE creating the order ──
-    const compact =
-      orderType === 'PURCHASE' && metadata?.items ? (JSON.parse(metadata.items) as Array<{ i: string; q: number; s: string | null }>) : []
+    const compact = orderType === 'PURCHASE' ? readItems(metadata) : []
 
     const FEED_A_FOSTER_IDS = Object.keys(FEED_A_FOSTER_ITEMS)
-    const wienerLines = compact.filter((c) => !FEED_A_FOSTER_IDS.includes(c.i) && c.i.includes('-'))
-    const wienerIds = [...new Set(wienerLines.map((c) => c.i.split('-')[0]))]
+    const wienerLines = compact.filter((c) => !FEED_A_FOSTER_IDS.includes(c.i) && (c.w || c.i.includes('-')))
+    const wienerIds = [...new Set(wienerLines.map((c) => wienerRef(c).wienerId))]
     const ids = compact.map((c) => c.i)
 
     const [products, wieners, winningBidder, instantBuyItem] = await Promise.all([
@@ -201,8 +216,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
           continue
         }
 
-        const [wienerId, ...productIdParts] = line.i.split('-')
-        const productId = productIdParts.join('-')
+        const { wienerId, optionId } = wienerRef(line)
         const wiener = wieners.find((w) => w.id === wienerId)
         if (!wiener) {
           await createLog('warn', 'Order item could not be resolved', {
@@ -213,7 +227,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
         }
 
         const options = wiener.associatedProducts as unknown as WelcomeWienerProduct[]
-        const option = options.find((o) => o.id === productId)
+        const option = options.find((o) => o.id === optionId)
         const price = Number(option?.price ?? 0)
 
         await prisma.orderItem.create({
