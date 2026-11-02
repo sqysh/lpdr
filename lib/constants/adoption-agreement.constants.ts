@@ -36,7 +36,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ],
       // 4
       [
-        "I/We will keep the microchip tag on the dog at all times. I/We understand that all dogs adopted through Little Paws Dachshund Rescue are microchipped under the rescue's name at the time of adoption. I/We agree to have the microchip registration transferred to our name and contact information within thirty (30) days of adoption.",
+        "I/We will keep the microchip tag on the dog while he/she is outside of the home. I/We understand that all dogs adopted through Little Paws Dachshund Rescue are microchipped under the rescue's name at the time of adoption. I/We agree to have the microchip registration transferred to our name and contact information within thirty (30) days of adoption.",
         "Please see page 1 of this agreement for directions about how to transfer your dog's microchip.",
         "Any changes to the adopter's contact information (including address or phone number) must also be reported to the rescue within thirty (30) days. The dog has also been outfitted with an LPDR ID tag, which must remain on the dog for their lifetime. In the event the dog is lost, stolen, or escapes, any expenses incurred are the sole responsibility of the adopter."
       ],
@@ -50,11 +50,11 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ],
       // 7
       [
-        'I/We will keep the Dachshund on a leash at all times when not in a safe, enclosed and fenced area. I/We will not tie the Dachshund outside at any time nor will we leave the Dachshund outdoors while we are away from home.'
+        'I/We will keep the Dachshund on a leash at all times when not in a safe, enclosed, and fenced area. I/We will not tie the Dachshund outside at any time nor will we leave the Dachshund outdoors while we are away from home. If in the event of an escape from a leash, outdoor, secure area, or any other circumstances, Adopter(s) accept total responsibility for the Dachshund.'
       ],
       // 8
       [
-        "If, in the event of an escape from a leash, outdoor, secure area, or any other circumstance, Adopter(s) accept total responsibility for Dachshund. I/We agree to defend, indemnify and hold harmless LPDR, its trustees, officers, employees, agents, successors, assignees, all members of Little Paws Dachshund Rescue from and against any and all demands, claims, causes of action, or judgments, and any and all expenses (including, without limitation, reasonable attorney's fees) incurred in connection with this Agreement, including, without limitation, claims of any third party for injury to person, loss of life, or damage to property if anything arises. LPDR shall be entitled to choose its own attorney's. Any and all expenses are sole responsibility of Adopter(s)."
+        "I/We agree to defend, indemnify and hold harmless LPDR, its trustees, officers, employees, agents, successors, assignees, all members of Little Paws Dachshund Rescue from and against any and all demands, claims, causes of action, or judgments, and any and all expenses (including, without limitation, reasonable attorney's fees) incurred in connection with this Agreement, including, without limitation, claims of any third party for injury to person, loss of life, or damage to property if anything arises. LPDR shall be entitled to choose its own attorney's. Any and all expenses are sole responsibility of Adopter(s)."
       ],
       // 9
       [
