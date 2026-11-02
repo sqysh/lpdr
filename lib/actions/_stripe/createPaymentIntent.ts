@@ -38,9 +38,13 @@ const fail = (error: string): ActionResult<PaymentIntentData> => ({
 
 // Stripe caps each metadata value at 500 characters, and every Welcome Wiener item now carries its dog's id,
 // so a big cart is split across items, items2, items3. The webhook joins them back up
-function itemsMetadata(items: { id?: string; quantity: number; size?: string; welcomeWienerId?: string; feedAFosterId?: string }[]) {
+function itemsMetadata(
+  items: { id?: string; quantity: number; size?: string; welcomeWienerId?: string; welcomeWienerProductId?: string }[]
+) {
   const compact = items.map((i) => ({
-    i: i.id,
+    // Cart ids for Welcome Wiener items include the dog so two dogs' beds stay separate in the cart;
+    // the webhook only needs the option id, since the dog travels as w
+    i: i.welcomeWienerProductId ?? i.id,
     q: i.quantity,
     ...(i.size && { s: i.size }),
     ...(i.welcomeWienerId && { w: i.welcomeWienerId })

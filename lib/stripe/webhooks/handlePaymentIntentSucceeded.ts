@@ -20,9 +20,11 @@ function readItems(metadata: Stripe.Metadata): CompactLine[] {
     .flatMap((k) => JSON.parse(metadata[k]) as CompactLine[])
 }
 
-// New payments carry the dog's id as w. Older ones built it into the item id as "<wienerId>-<optionId>"
 function wienerRef(line: CompactLine) {
-  if (line.w) return { wienerId: line.w, optionId: line.i }
+  if (line.w) {
+    const prefix = `${line.w}-`
+    return { wienerId: line.w, optionId: line.i.startsWith(prefix) ? line.i.slice(prefix.length) : line.i }
+  }
   const [wienerId, ...rest] = line.i.split('-')
   return { wienerId, optionId: rest.join('-') }
 }
