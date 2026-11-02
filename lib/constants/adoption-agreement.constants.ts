@@ -74,7 +74,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ['I/We agree to allow LPDR to periodically check on the dog, at reasonable times, to be assured compliance with the above terms.'],
       // 14
       [
-        "In consideration of LPDR's transfer of the adopted dog to Adopter(s), as the Adopter(s), Adopter(s) agree that LPDR, its trustees, officers, employees, agents, successors and assignees, shall have no liability to LPDR for any damages for breach of duty or contractual obligation or any other claim of any kind, at law or equity, in connection with the Dachshund whether presently existing or arising in the future. If, for any reason, the Dachshund is returned to LPDR, or if this Agreement is terminated for any reason, LPDR shall have no obligation to pay Adopter(s) any refund, reimbursement or any other amount or fee."
+        "In consideration of LPDR's transfer of the adopted dog to the Adopter(s), the Adopter(s) agree that LPDR, its trustees, officers, employees, agents, successors and assignees shall have no liability to the Adopter(s) for any damages for breach of duty or contractual obligation or any other claim of any kind, at law or equity, in conjunction with the dachshund whether presently existing or arising in the future. If for any reason the dachshund is returned to LPDR, or if this agreement is terminated for any reason, LPDR shall have no obligation to pay Adopter(s) any refund, reimbursement, or any other amount or fee."
       ],
       // 15
       [
