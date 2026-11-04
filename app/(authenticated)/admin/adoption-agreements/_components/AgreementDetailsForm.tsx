@@ -4,6 +4,7 @@ import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import { FormField } from 'components/_primitives'
 import type { UpdateAdoptionAgreementInput } from 'lib/schemas/adoption-agreement.schema'
 import { Section } from './Secion'
+import { INBOX } from 'lib/constants/email.constants'
 
 type Fields = UpdateAdoptionAgreementInput
 
@@ -17,7 +18,7 @@ export const DEV_FILL = {
     dogColorMarkings: 'Black and tan, dapple on back',
     microchipNumber: '985112345678903',
     microchipManufacturer: 'AKC Reunite',
-    microchipRegistration: 'Call AKC Reunite at 800-252-7894 or email chips@littlepawsdr.org within 30 days to transfer registration.'
+    microchipRegistration: `Call AKC Reunite at 800-252-7894 or email ${INBOX.chips} within 30 days to transfer registration.`
   },
   medical: {
     rabiesDate: daysAgo(120),

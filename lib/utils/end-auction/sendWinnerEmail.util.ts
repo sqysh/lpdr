@@ -1,4 +1,6 @@
 import { createLog } from 'lib/actions/log/createLog'
+import { SENDER } from 'lib/constants/email.constants'
+import { SITE_URL } from 'lib/constants/site.constants'
 import { resend } from 'lib/email/resend'
 import { auctionWinningBidderTemplate } from 'lib/email/templates/winning-bidder.template'
 import { throttled } from 'lib/email/throttled'
@@ -32,13 +34,12 @@ export async function sendWinnerEmail({
   /** 0 for the notice sent when the auction ends, then 1 upward for each reminder. */
   reminderNumber?: number
 }) {
-  const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.littlepawsdr.org'
-  const url = `${BASE}/auctions/winner/${winningBidderId}`
+  const url = `${SITE_URL}/auctions/winner/${winningBidderId}`
 
   try {
     const { data, error } = await throttled(() =>
       resend.emails.send({
-        from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
+        from: SENDER.auctions,
         to: email,
         subject: subjectFor(reminderNumber),
         html: auctionWinningBidderTemplate({ url, firstName, items, itemsTotal, shipping, totalPrice, reminderNumber })

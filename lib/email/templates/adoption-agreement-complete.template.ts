@@ -1,10 +1,11 @@
+import { INBOX } from 'lib/constants/email.constants'
 import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 
 const NEXT_STEPS = [
-  ['Transfer the microchip within 30 days', 'Email chips@littlepawsdr.org and the rescue will transfer it to you at no cost.'],
+  ['Transfer the microchip within 30 days', `Email ${INBOX.chips} and the rescue will transfer it to you at no cost.`],
   ['See a vet within 30 days', 'Get settled into a vaccination and health plan with your own veterinarian.'],
-  ['Two-week trial period', "If things aren't working out, email applications@littlepawsdr.org within 14 days of adoption."]
+  ['Two-week trial period', `If things aren't working out, email ${INBOX.applications} within 14 days of adoption.`]
 ]
 
 export function adoptionAgreementCompleteTemplate({

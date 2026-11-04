@@ -12,6 +12,7 @@ import { adoptionAgreementReadyTemplate } from 'lib/email/templates/adoption-agr
 import type { ActionResult } from 'types/action.types'
 import { getDachshundById } from 'lib/actions/_rescue-groups/getDachshundById'
 import { SITE_URL } from 'lib/constants/site.constants'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 
 export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ id: string; resent: boolean }>> {
   const gate = await requireAccess('AGREEMENTS')
@@ -86,9 +87,9 @@ export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ 
 
     try {
       const { error } = await resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
+        from: SENDER.adoptions,
         to: agreement.email,
-        replyTo: 'applications@littlepawsdr.org',
+        replyTo: INBOX.applications,
         subject: `Your adoption agreement for ${agreement.dogName} is ready`,
         html: adoptionAgreementReadyTemplate({
           firstName: agreement.firstName,

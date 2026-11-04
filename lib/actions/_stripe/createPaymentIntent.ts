@@ -22,6 +22,7 @@ import { isDonation } from 'lib/constants/order.constants'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
 import { createHash } from 'crypto'
 import { getMemorialSettings } from 'lib/memorial/getMemorialSetting'
+import { INBOX } from 'lib/constants/email.constants'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -446,10 +447,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       userId
     })
     return fail(
-      getUserMessage(
-        error,
-        "We couldn't start your payment. Please try again in a moment, or email lpdr@littlepawsdr.org if it keeps happening."
-      )
+      getUserMessage(`We couldn't start your payment. Please try again in a moment, or email ${INBOX.general} if it keeps happening.`)
     )
   }
 }

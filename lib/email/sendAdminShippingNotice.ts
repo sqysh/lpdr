@@ -2,6 +2,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { resend } from 'lib/email/resend'
 import { throttled } from 'lib/email/throttled'
 import { adminOrderNotificationTemplate } from 'lib/email/templates/admin-order-notification.template'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 
 type ShippableOrder = {
   id: string
@@ -20,8 +21,8 @@ export async function sendAdminShippingNotice(order: ShippableOrder) {
   try {
     const { error } = await throttled(() =>
       resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
-        to: 'lpdr@littlepawsdr.org',
+        from: SENDER.general,
+        to: INBOX.general,
         subject: `New order to ship: #${order.id.slice(-8).toUpperCase()}`,
         html: adminOrderNotificationTemplate({
           orderId: order.id,

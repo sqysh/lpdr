@@ -3,6 +3,7 @@ import { orderConfirmationTemplate, getOrderEmailSubject } from 'lib/email/templ
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { SENDER } from 'lib/constants/email.constants'
 
 type OrderWithItems = Order & {
   items: OrderItem[]
@@ -12,7 +13,7 @@ type OrderWithItems = Order & {
 export default async function sendConfirmationEmail(order: OrderWithItems) {
   try {
     const result = await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL}>`,
+      from: SENDER.general,
       to: order.customerEmail,
       subject: getOrderEmailSubject(order),
       html: orderConfirmationTemplate(order)

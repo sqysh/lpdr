@@ -1,3 +1,5 @@
+import { INBOX, mailto } from 'lib/constants/email.constants'
+
 export function AgreementFooter() {
   return (
     <footer className="border-t border-border-light dark:border-border-dark">
@@ -5,10 +7,10 @@ export function AgreementFooter() {
         <p>
           Little Paws Dachshund Rescue ·{' '}
           <a
-            href="mailto:applications@littlepawsdr.org"
+            href={mailto(INBOX.applications)}
             className="hover:text-primary-light dark:hover:text-primary-dark underline-offset-2 hover:underline"
           >
-            lpdr@littlepawsdr.org
+            {INBOX.general}
           </a>
         </p>
 

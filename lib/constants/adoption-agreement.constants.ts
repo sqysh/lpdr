@@ -1,4 +1,5 @@
 import type { AdoptionPaymentMethod } from '@prisma/client'
+import { INBOX } from './email.constants'
 
 // A paragraph is a string; a bulleted list is an array of strings
 type TermsBlock = string | string[]
@@ -60,7 +61,7 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
       ['I/We will never transport the dog in an open vehicle or in any other way that will endanger the dog during transport.'],
       // 10
       [
-        'I/We agree to a two-week trial period. LPDR will allow return of the dog within two weeks of receiving the dog if the adopter is unsatisfied with the dog. We agree to contact LPDR, via email, to applications@littlepawsdr.org immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, all adoption fees paid will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the dog to LPDR without penalty at any time before the expiration of the Trial Period.'
+        `I/We agree to a two-week trial period. LPDR will allow return of the dog within two weeks of receiving the dog if the adopter is unsatisfied with the dog. We agree to contact LPDR, via email, to ${INBOX.applications} immediately upon the decision to return said dog and allow LPDR two weeks (2) to make arrangements for the dogs return transportation. All expenses incurred by the Adopter(s) will be non-refundable; however, all adoption fees paid will be fully refundable if LPDR is contacted within the fourteen (14) day period. Adopter(s) may arrange for the return of the dog to LPDR without penalty at any time before the expiration of the Trial Period.`
       ],
       // 11
       [
@@ -108,16 +109,15 @@ export const ADOPTION_TERMS: Record<string, AdoptionTerms> = {
 }
 
 // Shown on page one when an agreement has no directions of its own, since term 4 points there
-export const DEFAULT_MICROCHIP_DIRECTIONS =
-  "Contact AKC Reunite at 800-252-7894 to complete the ownership transfer directly, which may involve a fee and require rescue authorization. Or email chips@littlepawsdr.org within thirty (30) days of your dog going home and the rescue's microchip coordinator will complete the transfer at no cost. After thirty (30) days, the transfer must be completed independently through the microchip company."
+export const DEFAULT_MICROCHIP_DIRECTIONS = `Contact AKC Reunite at 800-252-7894 to complete the ownership transfer directly, which may involve a fee and require rescue authorization. Or email ${INBOX.chips} within thirty (30) days of your dog going home and the rescue's microchip coordinator will complete the transfer at no cost. After thirty (30) days, the transfer must be completed independently through the microchip company.`
 
 export const getAdoptionTerms = (version: string) => ADOPTION_TERMS[version] ?? null
 
 // Card is paid on the site, so it has no instructions
 export const OFFLINE_PAYMENT_INSTRUCTIONS: Record<Exclude<AdoptionPaymentMethod, 'CARD'>, { label: string; instruction: string }> = {
-  ZELLE: { label: 'Zelle', instruction: 'Send payment by Zelle to treasurer@littlepawsdr.org' },
+  ZELLE: { label: 'Zelle', instruction: `Send payment by Zelle to ${INBOX.treasurer}` },
   VENMO: { label: 'Venmo', instruction: 'Send payment by Venmo to @littlepawsdr' },
-  PAYPAL: { label: 'PayPal', instruction: 'Send payment by PayPal to treasurer@littlepawsdr.org' }
+  PAYPAL: { label: 'PayPal', instruction: `Send payment by PayPal to ${INBOX.treasurer}` }
 }
 
 export const AGREEMENT_FILTERS = ['ALL', 'DRAFT', 'SENT', 'SIGNED', 'PAID', 'COMPLETE', 'VOID', 'RETURNED'] as const

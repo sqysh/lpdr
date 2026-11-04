@@ -8,6 +8,7 @@ import { parseInput } from 'lib/utils/validate.utils'
 import { contactSchema } from 'lib/schemas/contact.schema'
 import { looksAutomated } from 'lib/utils/looksAutomated.utils'
 import { ActionResult } from 'types/action.types'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 
 export default async function sendContactEmail(input: unknown): Promise<ActionResult<null>> {
   const parsed = parseInput(contactSchema, input)
@@ -31,8 +32,8 @@ export default async function sendContactEmail(input: unknown): Promise<ActionRe
 
   try {
     const result = await resend.emails.send({
-      from: 'Little Paws Dachshund Rescue <lpdr@littlepawsdr.org>',
-      to: 'lpdr@littlepawsdr.org',
+      from: SENDER.general,
+      to: INBOX.general,
       replyTo: email,
       subject: `[Contact] ${subject}`,
       html: contactEmailTemplate({ name, email, subject, message })

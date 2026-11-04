@@ -3,6 +3,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { resend } from 'lib/email/resend'
 import { auctionAnomalyTemplate } from 'lib/email/templates/auction-anomaly.template'
+import { SENDER } from 'lib/constants/email.constants'
 
 /**
  * Things that should not be possible. Both of these have a billing consequence if they ever
@@ -66,7 +67,7 @@ export async function recordAuctionAnomaly({
 
   try {
     await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
+      from: SENDER.general,
       to: process.env.ALERT_EMAIL!,
       subject: `${ANOMALY_TYPES[type].title}: ${auctionTitle}`,
       html: auctionAnomalyTemplate({ auctionId, auctionTitle, type, itemName, message })

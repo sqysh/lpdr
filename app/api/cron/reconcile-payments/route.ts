@@ -5,6 +5,7 @@ import { stripeClient } from 'lib/stripe/stripe-client'
 import { resend } from 'lib/email/resend'
 import { paymentMismatchTemplate } from 'lib/email/templates/payment-mismatch.template'
 import type Stripe from 'stripe'
+import { SENDER } from 'lib/constants/email.constants'
 
 /**
  * Every succeeded charge should have an order behind it. On Sep 16 five did not, for twelve
@@ -83,7 +84,7 @@ export async function GET(request: Request) {
     })
 
     const { error: emailError } = await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
+      from: SENDER.general,
       to: process.env.ALERT_EMAIL!,
       subject: `${missing.length} payment${missing.length === 1 ? '' : 's'} with no order`,
       html: paymentMismatchTemplate({ payments: rows })

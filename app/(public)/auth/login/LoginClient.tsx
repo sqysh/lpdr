@@ -8,6 +8,7 @@ import { MagicLink } from 'components/features/auth/MagicLink'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { ArrowLeft } from 'lucide-react'
 import { useSearchParams } from 'next/navigation'
+import { INBOX } from 'lib/constants/email.constants'
 
 const ERROR_MESSAGES: Record<string, { title: string; body: string }> = {
   'facebook-no-email': {
@@ -26,7 +27,7 @@ const ERROR_MESSAGES: Record<string, { title: string; body: string }> = {
   },
   AccessDenied: {
     title: "We couldn't sign you in",
-    body: 'If you think this is a mistake, reply to any email from us or contact lpdr@littlepawsdr.org.'
+    body: `If you think this is a mistake, reply to any email from us or contact ${INBOX.general}.`
   },
   // Anything else NextAuth reports, so no error ever lands on a page with no explanation
   Default: {

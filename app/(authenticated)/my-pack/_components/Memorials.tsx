@@ -7,13 +7,14 @@ import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
 import { LinkBody } from 'components/_common/LinkBody'
 import { MyMemorial } from 'lib/actions/user/memorial/getMyMemorials'
+import { INBOX } from 'lib/constants/email.constants'
 
 const isExpired = (m: MyMemorial) => !!m.expiresAt && new Date(m.expiresAt) < new Date()
 
 // Written for the family, so a hidden memorial is described plainly without the admin's reason
 function statusText(m: MyMemorial) {
   if (m.status === 'PENDING') return 'Waiting for a quick review before it joins the Rainbow Bridge.'
-  if (m.status === 'HIDDEN') return 'Not shown on the Rainbow Bridge. Email lpdr@littlepawsdr.org with any questions.'
+  if (m.status === 'HIDDEN') return `Not shown on the Rainbow Bridge. Email ${INBOX.general} with any questions.`
   if (m.status === 'EXPIRED' || isExpired(m)) return `Was on the Rainbow Bridge until ${formatDate(m.expiresAt!)}.`
   return m.expiresAt ? `On the Rainbow Bridge until ${formatDate(m.expiresAt)}.` : 'On the Rainbow Bridge.'
 }

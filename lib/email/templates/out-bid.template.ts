@@ -1,6 +1,9 @@
+import { INBOX, mailto } from 'lib/constants/email.constants'
+
 import { escapeHtml } from 'lib/utils/html.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
+import { SITE_URL } from 'lib/constants/site.constants'
 
 type Props = {
   firstName: string
@@ -97,12 +100,12 @@ export const auctionOutBidTemplate = ({ firstName, itemName, itemImage, yourBid,
 
     <div style="margin-bottom: 24px;">
       <p style="margin: 0 0 10px 0; color: #52525b; font-size: 12px; font-family: 'Courier New', monospace; letter-spacing: 0.2em; text-transform: uppercase;">Questions? We&apos;re here to help.</p>
-      <p style="margin: 0;"><a href="mailto:lpdr@littlepawsdr.org" style="color: #0891b2; font-size: 14px;">lpdr@littlepawsdr.org</a></p>
+      <p style="margin: 0;"><a href="${mailto(INBOX.general)}" style="color: #0891b2; font-size: 14px;">${INBOX.general}</a></p>
     </div>
 
     <p style="margin: 24px 0 0 0; font-size: 12px; color: #52525b;">
-      <a href="https://www.littlepawsdr.org/privacy-policy" style="color: #52525b; margin-right: 16px;">Privacy Policy</a>
-      <a href="https://www.littlepawsdr.org/terms" style="color: #52525b;">Terms of Service</a>
+      <a href="${SITE_URL}/privacy-policy" style="color: #52525b; margin-right: 16px;">Privacy Policy</a>
+      <a href="${SITE_URL}/terms" style="color: #52525b;">Terms of Service</a>
     </p>
 
   </div>

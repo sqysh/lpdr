@@ -1,14 +1,7 @@
-export function contactEmailTemplate({
-  name,
-  email,
-  subject,
-  message
-}: {
-  name: string
-  email: string
-  subject: string
-  message: string
-}) {
+import { INBOX, mailto } from 'lib/constants/email.constants'
+import { SITE_URL } from 'lib/constants/site.constants'
+
+export function contactEmailTemplate({ name, email, subject, message }: { name: string; email: string; subject: string; message: string }) {
   return `
 <!DOCTYPE html>
 <html lang="en">
@@ -104,8 +97,8 @@ export function contactEmailTemplate({
         Questions? We&apos;re here to help.
       </p>
       <p style="margin: 0 0 6px 0;">
-        <a href="mailto:lpdr@littlepawsdr.org" style="color: #0891b2; font-size: 14px;">
-          lpdr@littlepawsdr.org
+        <a href="${mailto(INBOX.general)}" style="color: #0891b2; font-size: 14px;">
+          ${INBOX.general}
         </a>
       </p>
     </div>
@@ -113,8 +106,8 @@ export function contactEmailTemplate({
     <!-- Legal -->
     <div style="margin-top: 24px;">
       <p style="margin: 0; font-size: 12px; color: #52525b;">
-        <a href="https://www.littlepawsdr.org/privacy-policy" style="color: #52525b; margin-right: 16px;">Privacy Policy</a>
-        <a href="https://www.littlepawsdr.org/terms" style="color: #52525b;">Terms of Service</a>
+        <a href="${SITE_URL}/privacy-policy" style="color: #52525b; margin-right: 16px;">Privacy Policy</a>
+        <a href="${SITE_URL}/terms" style="color: #52525b;">Terms of Service</a>
       </p>
     </div>
 

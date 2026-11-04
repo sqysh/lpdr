@@ -6,6 +6,7 @@ import { getErrorMessage } from 'lib/utils/error.utils'
 import { resend } from 'lib/email/resend'
 import { emailChangeNotificationTemplate } from 'lib/email/templates/email-change-notification.template'
 import { requireAuth } from 'lib/auth/guards'
+import { SENDER } from 'lib/constants/email.constants'
 
 export async function verifyEmailChange(token: string) {
   const gate = await requireAuth()
@@ -54,7 +55,7 @@ export async function verifyEmailChange(token: string) {
     // report the whole operation as failed
     try {
       await resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <auth@littlepawsdr.org>',
+        from: SENDER.general,
         to: oldEmail,
         subject: 'Your email address has been changed',
         html: emailChangeNotificationTemplate({

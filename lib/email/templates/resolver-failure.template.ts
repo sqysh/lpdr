@@ -1,3 +1,5 @@
+import { SITE_URL } from 'lib/constants/site.constants'
+
 export const resolverFailureTemplate = ({
   auctionId,
   auctionTitle,
@@ -45,7 +47,7 @@ export const resolverFailureTemplate = ({
       ${auctionId}
     </p>
 
-    <a href="https://www.littlepawsdr.org/admin/auctions/${auctionId}" style="display:inline-block;background:#0891b2;color:#ffffff;text-decoration:none;padding:14px 32px;font-weight:700;font-size:12px;font-family:'Courier New',monospace;letter-spacing:0.2em;text-transform:uppercase;">
+    <a href="${SITE_URL}/admin/auctions/${auctionId}" style="display:inline-block;background:#0891b2;color:#ffffff;text-decoration:none;padding:14px 32px;font-weight:700;font-size:12px;font-family:'Courier New',monospace;letter-spacing:0.2em;text-transform:uppercase;">
       Open the auction &rarr;
     </a>
 

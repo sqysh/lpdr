@@ -6,6 +6,7 @@ import { requireSuper } from 'lib/auth/guards'
 import { resend } from 'lib/email/resend'
 import { accountMergedTemplate } from 'lib/email/templates/account-merged.template'
 import { getErrorMessage } from 'lib/utils/error.utils'
+import { SENDER } from 'lib/constants/email.constants'
 
 export async function mergeUsers({
   primaryUserId,
@@ -130,7 +131,7 @@ export async function mergeUsers({
 
     const firstName = primary.firstName ?? duplicate.firstName ?? null
     const { error: emailError } = await resend.emails.send({
-      from: 'Little Paws Dachshund Rescue <support@littlepawsdr.org>',
+      from: SENDER.general,
       to: primary.email,
       subject: 'Your accounts have been merged',
       html: accountMergedTemplate({

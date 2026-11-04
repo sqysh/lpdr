@@ -3,6 +3,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { auctionOutBidTemplate } from './templates/out-bid.template'
+import { SENDER } from 'lib/constants/email.constants'
 
 type SendOutbidEmailParams = {
   email: string
@@ -29,7 +30,7 @@ export const sendOutbidEmail = async ({
 }: SendOutbidEmailParams) => {
   try {
     const result = await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
+      from: SENDER.auctions,
       to: email,
       subject: `You've been outbid on ${itemName}`,
       html: auctionOutBidTemplate({ firstName, itemName, itemImage, yourBid, newBid, minimumBid, endsAt, url })

@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { NAV_LINKS, SOCIAL_LINKS } from 'lib/constants/footer.constants'
 import Picture from 'components/_common/Picture'
 import { FooterNewsletterForm } from './FooterNewsletterForm'
+import { INBOX, mailto } from 'lib/constants/email.constants'
 
 export default function Footer() {
   return (
@@ -33,10 +34,10 @@ export default function Footer() {
                 <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Contact</p>
               </div>
               <a
-                href="mailto:lpdr@littlepawsdr.org"
+                href={mailto(INBOX.general)}
                 className="block text-sm font-mono text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark pl-7"
               >
-                lpdr@littlepawsdr.org
+                {INBOX.general}
               </a>
             </address>
 

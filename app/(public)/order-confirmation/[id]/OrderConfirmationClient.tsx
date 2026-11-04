@@ -29,6 +29,7 @@ import { useConfettiStore } from 'stores/confetti.store'
 import { LinkBody } from 'components/_common/LinkBody'
 import { LinkSpinner } from 'components/_common/LinkSpinner'
 import { Line } from 'components/_primitives'
+import { INBOX } from 'lib/constants/email.constants'
 
 const headerLink =
   'flex items-center gap-1.5 text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark hover:text-cyan-600 dark:hover:text-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400'
@@ -52,7 +53,7 @@ const ADOPTION_NEXT_STEPS = [
   {
     icon: Cpu,
     title: 'Transfer the microchip within 30 days',
-    body: 'Email chips@littlepawsdr.org and the rescue will transfer it to you at no cost.'
+    body: `Email ${INBOX.chips} and the rescue will transfer it to you at no cost.`
   },
   {
     icon: Stethoscope,
@@ -62,7 +63,7 @@ const ADOPTION_NEXT_STEPS = [
   {
     icon: CalendarClock,
     title: 'Two-week trial period',
-    body: "If things aren't working out, email applications@littlepawsdr.org within 14 days."
+    body: `If things aren't working out, email ${INBOX.applications} within 14 days.`
   }
 ]
 

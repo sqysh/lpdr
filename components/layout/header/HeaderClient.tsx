@@ -15,6 +15,7 @@ import { LinkSpinner } from 'components/_common/LinkSpinner'
 import { CartLinkContent } from './CartLinkContent'
 import { Role } from '@prisma/client'
 import { useEffect, useRef } from 'react'
+import { INBOX } from 'lib/constants/email.constants'
 
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
@@ -103,10 +104,10 @@ export function HeaderClient({
                 <button
                   type="button"
                   onClick={openContact}
-                  aria-label="Email us at lpdr@littlepawsdr.org"
+                  aria-label={`Email us at ${INBOX.general}`}
                   className={`${topBarLink} hover:underline ${focusRing} rounded`}
                 >
-                  lpdr@littlepawsdr.org
+                  {INBOX.general}
                 </button>
                 <span className={`hidden md:inline ${infoText}`}>P.O. Box 108 · Brookfield, CT 06804</span>
                 <span className={`hidden lg:inline ${infoText}`}>EIN 46-3079501</span>

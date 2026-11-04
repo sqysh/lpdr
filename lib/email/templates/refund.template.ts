@@ -1,3 +1,4 @@
+import { INBOX, mailto } from 'lib/constants/email.constants'
 import { REFUND_REASONS, type RefundReason } from 'lib/constants/refund.constants'
 
 const money = (n: number) => `$${n.toFixed(2)}`
@@ -53,7 +54,7 @@ export const refundTemplate = ({ firstName, amount, reason }: { firstName: strin
       Questions? We&apos;re here to help.
     </p>
     <p style="margin:0;">
-      <a href="mailto:lpdr@littlepawsdr.org" style="color:#0891b2;font-size:14px;">lpdr@littlepawsdr.org</a>
+      <a href="${mailto(INBOX.general)}" style="color:#0891b2;font-size:14px;">${INBOX.general}</a>
     </p>
 
   </div>

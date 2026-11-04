@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { INBOX, mailto } from 'lib/constants/email.constants'
 
 export default function TerminatedPage() {
   return (
@@ -21,7 +22,7 @@ export default function TerminatedPage() {
 
           <div className="flex flex-col gap-3">
             <a
-              href="mailto:lpdr@littlepawsdr.org?subject=Account%20Closure"
+              href={mailto(INBOX.general, 'Account Closure')}
               className="w-full text-center px-6 py-3.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono font-black tracking-[0.25em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Contact Us

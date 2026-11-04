@@ -1,3 +1,5 @@
+import { INBOX, mailto } from 'lib/constants/email.constants'
+
 import { MemorialStatus, Order, OrderItem, OrderType, Prisma } from '@prisma/client'
 import { COLOR, ORDER_TYPE_EMAIL_CONFIG } from 'lib/constants/order-confirmation.constants'
 import { SITE_URL } from 'lib/constants/site.constants'
@@ -311,7 +313,7 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
                   <!-- Footer -->
                   ${sectionLabel('Questions? We&apos;re here to help.')}
                   <p style="margin: 0 0 24px 0;">
-                    <a href="mailto:lpdr@littlepawsdr.org" style="color: ${COLOR.accent}; text-decoration: underline; font-size: 13px;">lpdr@littlepawsdr.org</a>
+                    <a href="${mailto(INBOX.general)}" style="color: ${COLOR.accent}; text-decoration: underline; font-size: 13px;">${INBOX.general}</a>
                   </p>
 
                   <!-- Legal -->

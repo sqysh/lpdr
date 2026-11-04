@@ -5,6 +5,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { resend } from 'lib/email/resend'
 import { paymentFailedTemplate } from 'lib/email/templates/payment-failed.template'
+import { SENDER } from 'lib/constants/email.constants'
 
 export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
   try {
@@ -42,7 +43,7 @@ export async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // Send failure email if we have an address
     if (customerEmail) {
       await resend.emails.send({
-        from: 'Little Paws <payments@littlepawsdr.org>',
+        from: SENDER.treasurer,
         to: customerEmail,
         subject: 'Your donation payment failed',
         html: paymentFailedTemplate({

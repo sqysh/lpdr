@@ -1,5 +1,6 @@
 import { OrderType } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
+import { SENDER } from 'lib/constants/email.constants'
 import { resend } from 'lib/email/resend'
 import { paymentFailedTemplate } from 'lib/email/templates/payment-failed.template'
 import { throttled } from 'lib/email/throttled'
@@ -57,7 +58,7 @@ export async function handlePaymentIntentFailed(paymentIntent: Stripe.PaymentInt
     if (shouldEmail) {
       const { error } = await throttled(() =>
         resend.emails.send({
-          from: 'Little Paws <treasurer@littlepawsdr.org>',
+          from: SENDER.treasurer,
           to: customerEmail,
           subject: "Your payment didn't go through",
           html: paymentFailedTemplate({

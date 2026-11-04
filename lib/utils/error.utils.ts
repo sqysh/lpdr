@@ -1,3 +1,4 @@
+import { INBOX } from 'lib/constants/email.constants'
 import Stripe from 'stripe'
 
 export function getErrorMessage(error: unknown): string {
@@ -9,7 +10,7 @@ export function getErrorMessage(error: unknown): string {
 // A refusal the user caused and can fix, as opposed to something breaking. Logged as a warning, not an error
 export class UserFacingError extends Error {}
 
-const GENERIC_ERROR = 'Something went wrong. Please try again in a moment, or email lpdr@littlepawsdr.org if it keeps happening.'
+const GENERIC_ERROR = `Something went wrong. Please try again in a moment, or email ${INBOX.general} if it keeps happening.`
 
 /** Errors whose own text is written for the person on the screen: our refusals, and Stripe's card
  *  errors, which Stripe words for the cardholder ("Your card was declined"). Also decides warn vs error */

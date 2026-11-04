@@ -1,4 +1,5 @@
 import { createLog } from 'lib/actions/log/createLog'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 import { resend } from 'lib/email/resend'
 import { unpaidWinnersTemplate } from 'lib/email/templates/unpaid-winners.template'
 
@@ -14,8 +15,8 @@ export async function sendUnpaidWinnersAlert({ winners, auctionTitle }: { winner
 
   try {
     await resend.emails.send({
-      from: `Little Paws Dachshund Rescue <${process.env.RESEND_FROM_EMAIL!}>`,
-      to: 'auction@littlepawsdr.org',
+      from: SENDER.auctions,
+      to: INBOX.auctions,
       subject: `${winners.length} auction winner${winners.length === 1 ? '' : 's'} never paid`,
       html: unpaidWinnersTemplate({ winners, auctionTitle })
     })

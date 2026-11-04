@@ -13,6 +13,7 @@ import { getSigningContext } from 'lib/adoption-agreement/agreement-access'
 import { adoptionAgreementCompleteTemplate } from 'lib/email/templates/adoption-agreement-complete.template'
 import type { ActionResult } from 'types/action.types'
 import { SITE_URL } from 'lib/constants/site.constants'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 
 export async function countersignAdoptionAgreement(input: unknown): Promise<ActionResult<null>> {
   const gate = await requireAccess('AGREEMENTS')
@@ -47,9 +48,9 @@ export async function countersignAdoptionAgreement(input: unknown): Promise<Acti
     // The adoption is complete whether or not this email goes out, so a failure is logged rather than undone
     try {
       const { error } = await resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
+        from: SENDER.adoptions,
         to: agreement.email,
-        replyTo: 'applications@littlepawsdr.org',
+        replyTo: INBOX.applications,
         subject: `Your adoption of ${agreement.dogName} is complete`,
         html: adoptionAgreementCompleteTemplate({
           firstName: agreement.firstName,

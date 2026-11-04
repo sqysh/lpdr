@@ -4,6 +4,7 @@ import { createLog } from '../actions/log/createLog'
 import { magicLinkTemplate } from '../email/templates/magic-link.template'
 import { getRequestDetails } from 'lib/utils/log.server.utils'
 import { checkSignInRateLimit } from 'lib/utils/checkSignInRateLimit.utils'
+import { SENDER } from 'lib/constants/email.constants'
 
 /**
  * Mail security scanners issue a GET to every link in an incoming message to
@@ -24,7 +25,7 @@ export const magicLinkProvider: EmailConfig = {
   name: 'Email',
   type: 'email',
   maxAge: 15 * 60, // 15 mins
-  from: process.env.RESEND_FROM_EMAIL!,
+  from: SENDER.general,
   sendVerificationRequest: async ({ identifier: email, url, provider }) => {
     const details = await getRequestDetails()
     const limit = await checkSignInRateLimit({ email, ip: details.ip })

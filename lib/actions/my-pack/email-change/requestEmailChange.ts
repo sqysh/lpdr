@@ -9,6 +9,7 @@ import { requireAuth } from 'lib/auth/guards'
 import { stampUserGeoFromRequest } from '../../_infra/stampUserGeoFromRequest'
 import { createLog } from '../../log/createLog'
 import { HOUR_MS, isRateLimited } from 'lib/utils/rate-limit.utils'
+import { SENDER } from 'lib/constants/email.constants'
 
 const TOKEN_EXPIRY_HOURS = 24
 
@@ -47,7 +48,7 @@ export async function requestEmailChange(newEmail: string) {
     const verifyUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/verify-email-change?token=${token}`
 
     await resend.emails.send({
-      from: 'Little Paws Dachshund Rescue <auth@littlepawsdr.org>',
+      from: SENDER.general,
       to: normalizedEmail,
       subject: 'Verify your new email address',
       html: emailChangeVerificationTemplate({

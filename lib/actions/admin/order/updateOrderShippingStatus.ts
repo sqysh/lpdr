@@ -9,6 +9,7 @@ import { orderShippedTemplate } from 'lib/email/templates/order-shipped.template
 import { requireAdmin } from 'lib/auth/guards'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { hasAccess } from 'lib/auth/access'
+import { SENDER } from 'lib/constants/email.constants'
 
 export const updateOrderShippingStatus = async ({ id, shippingStatus }: { id: string; shippingStatus: ShippingStatus }) => {
   const gate = await requireAdmin()
@@ -34,7 +35,7 @@ export const updateOrderShippingStatus = async ({ id, shippingStatus }: { id: st
 
       const firstName = order.customerName.split(' ')[0]
       const { error: emailError } = await resend.emails.send({
-        from: 'Little Paws Dachshund Rescue <orders@littlepawsdr.org>',
+        from: SENDER.general,
         to: order.customerEmail,
         subject: 'Your order is on its way',
         html: orderShippedTemplate({

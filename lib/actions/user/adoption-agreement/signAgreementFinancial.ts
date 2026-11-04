@@ -15,6 +15,7 @@ import { resend } from 'lib/email/resend'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
 import { adoptionAgreementPaymentTemplate } from 'lib/email/templates/adoption-agreement-payment.template'
 import { SITE_URL } from 'lib/constants/site.constants'
+import { INBOX, SENDER } from 'lib/constants/email.constants'
 
 export async function signAgreementFinancial(input: unknown): Promise<ActionResult<{ paysByCard: boolean }>> {
   const gate = await requireAuth()
@@ -74,9 +75,9 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
 
       try {
         const { error } = await resend.emails.send({
-          from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
+          from: SENDER.adoptions,
           to: agreement.email,
-          replyTo: 'applications@littlepawsdr.org',
+          replyTo: INBOX.applications,
           subject: `How to pay for ${agreement.dogName}'s adoption`,
           html: adoptionAgreementPaymentTemplate({
             firstName: agreement.firstName,

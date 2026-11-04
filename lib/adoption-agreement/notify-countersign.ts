@@ -6,6 +6,7 @@ import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { SITE_URL } from 'lib/constants/site.constants'
+import { SENDER } from 'lib/constants/email.constants'
 
 /**
  * Tells the admin who prepared an agreement that it's paid and waiting for their countersignature.
@@ -26,7 +27,7 @@ export async function notifyAwaitingCountersign(agreementId: string, { skipUserI
     const link = `${SITE_URL}/admin/adoption-agreements/${agreementId}`
 
     const { error } = await resend.emails.send({
-      from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',
+      from: SENDER.adoptions,
       to: a.createdBy.email,
       subject: `Ready to countersign: ${a.dogName}`,
       html: `
