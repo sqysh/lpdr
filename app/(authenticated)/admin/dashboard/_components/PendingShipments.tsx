@@ -47,9 +47,9 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
   if (shipments.length === 0) return null
 
   return (
-    <div className="hidden sm:block absolute top-4 right-4 w-72 border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
+    <div className="hidden sm:flex flex-col absolute top-4 right-4 w-72 max-h-[calc(50%-1.5rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
       <div
-        className={`px-4 py-3 flex items-center justify-between gap-2 ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
+        className={`shrink-0 px-4 py-3 flex items-center justify-between gap-2 ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
       >
         <div className="flex items-center gap-2 min-w-0">
           <Truck className="w-3.5 h-3.5 text-amber-500 shrink-0" aria-hidden="true" />
@@ -83,7 +83,7 @@ export function PendingShipments({ shipments }: { shipments: Shipment[] }) {
       </div>
 
       {open && (
-        <div className="overflow-y-auto max-h-[50vh]">
+        <div className="min-h-0 overflow-y-auto">
           <ShipmentList shipments={shipments} />
         </div>
       )}

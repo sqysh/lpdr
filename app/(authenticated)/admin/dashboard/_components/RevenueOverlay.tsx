@@ -94,11 +94,13 @@ export function RevenueBreakdown({ liveRevenue, monthlyChange, sources }: Revenu
 
 export function RevenueOverlay(props: RevenueProps) {
   return (
-    <div className="hidden sm:block absolute top-4 left-4 w-72 border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
-      <div className="px-4 py-3 border-b border-border-light dark:border-border-dark">
+    <div className="hidden sm:flex flex-col absolute top-4 left-4 w-72 max-h-[calc(50%-1.5rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
+      <div className="shrink-0 px-4 py-3 border-b border-border-light dark:border-border-dark">
         <p className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Total revenue · all time</p>
       </div>
-      <RevenueBreakdown {...props} />
+      <div className="min-h-0 overflow-y-auto">
+        <RevenueBreakdown {...props} />
+      </div>
     </div>
   )
 }

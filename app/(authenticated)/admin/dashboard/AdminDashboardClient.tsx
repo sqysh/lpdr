@@ -176,7 +176,7 @@ export function AdminDashboardClient({
   }
 
   return (
-    <div className="relative h-[calc(100dvh-48px)] lg:h-dvh w-full">
+    <div className="relative h-[calc(100dvh-48px-var(--staging-bar-height,0px))] lg:h-[calc(100dvh-var(--staging-bar-height,0px))] w-full">
       {isLoaded && isResolved && (
         <GoogleMap
           // backgroundColor is only read when the map is created, so switching theme recreates the map

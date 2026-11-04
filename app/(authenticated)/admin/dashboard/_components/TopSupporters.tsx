@@ -62,9 +62,9 @@ export function TopSupporters({ supporters }: { supporters: Supporter[] }) {
   if (supporters.length === 0) return null
 
   return (
-    <div className="hidden sm:block absolute bottom-4 left-4 w-72 border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
+    <div className="hidden sm:flex flex-col absolute bottom-4 left-4 w-72 max-h-[calc(50%-1.5rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
       <div
-        className={`px-4 py-3 flex items-center justify-between gap-2 ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
+        className={`shrink-0 px-4 py-3 flex items-center justify-between gap-2 ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
       >
         <p className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark truncate">Top Supporters</p>
         <button
@@ -82,7 +82,7 @@ export function TopSupporters({ supporters }: { supporters: Supporter[] }) {
       </div>
 
       {open && (
-        <div className="overflow-y-auto max-h-[45vh]">
+        <div className="min-h-0 overflow-y-auto">
           <SupporterList supporters={supporters} />
         </div>
       )}

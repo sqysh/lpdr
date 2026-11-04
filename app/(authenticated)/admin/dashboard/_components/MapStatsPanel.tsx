@@ -32,7 +32,7 @@ export function MapStatsPanel({ total, regionCounts, onRegionClick }: RegionProp
   const [open, setOpen] = useState(true)
 
   return (
-    <div className="hidden sm:flex flex-col absolute bottom-4 right-4 w-56 max-h-[calc(50vh-2rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
+    <div className="hidden sm:flex flex-col absolute bottom-4 right-4 w-56 max-h-[calc(50%-1.5rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
       <div
         className={`shrink-0 px-4 py-3 flex items-center justify-between gap-2 ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
       >
