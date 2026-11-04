@@ -14,8 +14,7 @@ import { OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.c
 import { resend } from 'lib/email/resend'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
 import { adoptionAgreementPaymentTemplate } from 'lib/email/templates/adoption-agreement-payment.template'
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL
+import { SITE_URL } from 'lib/constants/site.constants'
 
 export async function signAgreementFinancial(input: unknown): Promise<ActionResult<{ paysByCard: boolean }>> {
   const gate = await requireAuth()
@@ -65,7 +64,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
 
     // Card payers go straight to the payment step. Everyone else needs the details somewhere they
     // can find again, not just on a page they might close
-    if (!paysByCard && SITE) {
+    if (!paysByCard && SITE_URL) {
       const { label, instruction } = OFFLINE_PAYMENT_INSTRUCTIONS[paymentMethod]
       const total = agreementTotal({
         adoptionFee: Number(agreement.adoptionFee),
@@ -85,7 +84,7 @@ export async function signAgreementFinancial(input: unknown): Promise<ActionResu
             total,
             methodLabel: label,
             instruction,
-            link: `${SITE}/adopt/agreement/${agreementId}`
+            link: `${SITE_URL}/adopt/agreement/${agreementId}`
           })
         })
         if (error) throw new Error(error.message)

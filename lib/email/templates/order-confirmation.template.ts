@@ -1,5 +1,6 @@
 import { MemorialStatus, Order, OrderItem, OrderType, Prisma } from '@prisma/client'
 import { COLOR, ORDER_TYPE_EMAIL_CONFIG } from 'lib/constants/order-confirmation.constants'
+import { SITE_URL } from 'lib/constants/site.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
 import { escapeHtml } from 'lib/utils/html.utils'
@@ -15,8 +16,6 @@ type OrderWithItems = Order & {
     additionalDonation: Prisma.Decimal | number | null
   } | null
 }
-
-const SITE = 'https://www.littlepawsdr.org'
 
 export function getOrderEmailSubject(order: OrderWithItems): string {
   const freq = order.recurringFrequency === 'YEARLY' ? 'Annual' : 'Monthly'
@@ -121,7 +120,7 @@ function buildNotices(order: OrderWithItems): string[] {
 
   if (order.isRecurring) {
     notices.push(
-      noticeBlock('Need to cancel?', `You can cancel your recurring donation anytime from ${link(`${SITE}/my-pack`, 'My Pack')}.`)
+      noticeBlock('Need to cancel?', `You can cancel your recurring donation anytime from ${link(`${SITE_URL}/my-pack`, 'My Pack')}.`)
     )
   }
 
@@ -129,7 +128,7 @@ function buildNotices(order: OrderWithItems): string[] {
     notices.push(
       noticeBlock(
         'Paid automatically',
-        `This was charged to your saved card because auto-pay is on for your account. You can turn it off any time in ${link(`${SITE}/my-pack`, 'My Pack')}.`
+        `This was charged to your saved card because auto-pay is on for your account. You can turn it off any time in ${link(`${SITE_URL}/my-pack`, 'My Pack')}.`
       )
     )
   }
@@ -152,7 +151,7 @@ function buildNotices(order: OrderWithItems): string[] {
     notices.push(
       noticeBlock(
         'Your agreement',
-        `You can view or print your signed agreement any time from ${link(`${SITE}/adopt/agreement/${order.adoptionAgreement.id}`, 'this link')}.`
+        `You can view or print your signed agreement any time from ${link(`${SITE_URL}/adopt/agreement/${order.adoptionAgreement.id}`, 'this link')}.`
       )
     )
 
@@ -172,8 +171,8 @@ function buildNotices(order: OrderWithItems): string[] {
       noticeBlock(
         'On the Rainbow Bridge',
         order.memorial.status === 'APPROVED'
-          ? `${name}'s butterfly is now on our ${link(`${SITE}/rainbow-bridge`, 'Rainbow Bridge memorial')}.`
-          : `${name}'s butterfly will join our ${link(`${SITE}/rainbow-bridge`, 'Rainbow Bridge memorial')} within a day or two, once our team has added it.`
+          ? `${name}'s butterfly is now on our ${link(`${SITE_URL}/rainbow-bridge`, 'Rainbow Bridge memorial')}.`
+          : `${name}'s butterfly will join our ${link(`${SITE_URL}/rainbow-bridge`, 'Rainbow Bridge memorial')} within a day or two, once our team has added it.`
       )
     )
   }
@@ -215,7 +214,7 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
     order.type === 'MEMORIAL_DONATION' && order.memorial
       ? `
     <div style="margin-bottom: 36px;">
-      <img src="${SITE}/api/memorial-art/${order.memorial.id}" width="476" alt="A butterfly carrying ${escapeHtml(order.memorial.dogName)}'s name across the Rainbow Bridge" style="display: block; width: 100%; max-width: 476px; height: auto; border: 0;" />
+      <img src="${SITE_URL}/api/memorial-art/${order.memorial.id}" width="476" alt="A butterfly carrying ${escapeHtml(order.memorial.dogName)}'s name across the Rainbow Bridge" style="display: block; width: 100%; max-width: 476px; height: auto; border: 0;" />
     </div>`
       : ''
 
@@ -317,9 +316,9 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
 
                   <!-- Legal -->
                   <p style="margin: 0 0 40px 0; font-size: 11px; color: ${COLOR.footer};">
-                    <a href="${SITE}/privacy-policy" style="color: ${COLOR.footer}; text-decoration: underline;">Privacy Policy</a>
+                    <a href="${SITE_URL}/privacy-policy" style="color: ${COLOR.footer}; text-decoration: underline;">Privacy Policy</a>
                     &nbsp;&nbsp;
-                    <a href="${SITE}/terms" style="color: ${COLOR.footer}; text-decoration: underline;">Terms of Service</a>
+                    <a href="${SITE_URL}/terms" style="color: ${COLOR.footer}; text-decoration: underline;">Terms of Service</a>
                   </p>
 
                   <!-- Bottom label -->

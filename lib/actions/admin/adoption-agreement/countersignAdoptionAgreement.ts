@@ -12,8 +12,7 @@ import { countersignAgreementSchema } from 'lib/schemas/adoption-agreement.schem
 import { getSigningContext } from 'lib/adoption-agreement/agreement-access'
 import { adoptionAgreementCompleteTemplate } from 'lib/email/templates/adoption-agreement-complete.template'
 import type { ActionResult } from 'types/action.types'
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL
+import { SITE_URL } from 'lib/constants/site.constants'
 
 export async function countersignAdoptionAgreement(input: unknown): Promise<ActionResult<null>> {
   const gate = await requireAccess('AGREEMENTS')
@@ -24,7 +23,7 @@ export async function countersignAdoptionAgreement(input: unknown): Promise<Acti
 
   const { agreementId, typedName } = parsed.data
 
-  if (!SITE) {
+  if (!SITE_URL) {
     await createLog('error', 'NEXT_PUBLIC_SITE_URL is not set; adoption agreement not countersigned', { agreementId })
     return { success: false, data: null, error: 'The site address is not configured.' }
   }
@@ -55,7 +54,7 @@ export async function countersignAdoptionAgreement(input: unknown): Promise<Acti
         html: adoptionAgreementCompleteTemplate({
           firstName: agreement.firstName,
           dogName: agreement.dogName,
-          link: `${SITE}/adopt/agreement/${agreementId}`
+          link: `${SITE_URL}/adopt/agreement/${agreementId}`
         })
       })
       if (error) throw new Error(error.message)

@@ -5,8 +5,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL
+import { SITE_URL } from 'lib/constants/site.constants'
 
 /**
  * Tells the admin who prepared an agreement that it's paid and waiting for their countersignature.
@@ -20,11 +19,11 @@ export async function notifyAwaitingCountersign(agreementId: string, { skipUserI
     })
 
     // Whoever recorded the payment themselves already knows it's waiting on them
-    if (!a || !SITE || a.createdById === skipUserId) return
+    if (!a || !SITE_URL || a.createdById === skipUserId) return
 
     const dog = escapeHtml(a.dogName)
     const adopter = escapeHtml([a.firstName, a.lastName].filter(Boolean).join(' '))
-    const link = `${SITE}/admin/adoption-agreements/${agreementId}`
+    const link = `${SITE_URL}/admin/adoption-agreements/${agreementId}`
 
     const { error } = await resend.emails.send({
       from: 'Little Paws Dachshund Rescue <adoptions@littlepawsdr.org>',

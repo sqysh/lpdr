@@ -2,6 +2,7 @@ import { Order, OrderType, RecurringFrequency } from '@prisma/client'
 import { createLog } from 'lib/actions/log/createLog'
 import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-countersign'
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
+import { SITE_URL } from 'lib/constants/site.constants'
 import { sendAdminShippingNotice } from 'lib/email/sendAdminShippingNotice'
 import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
 import sendMemorialReviewEmail from 'lib/email/sendMemorialReview.email'
@@ -13,8 +14,6 @@ import { ProductSizeEntry } from 'types/product'
 import { WelcomeWienerProduct } from 'types/welcome-wiener'
 
 type CompactLine = { i: string; q: number; s?: string | null; w?: string }
-
-const SITE = 'https://www.littlepawsdr.org'
 
 // Items can be split across items, items2, items3 to stay under Stripe's 500-character metadata limit
 function readItems(metadata: Stripe.Metadata): CompactLine[] {
@@ -477,7 +476,7 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
         })
 
         if (!existingMemorial && memorial.status === 'PENDING') {
-          await sendMemorialReviewEmail(memorial, order, SITE)
+          await sendMemorialReviewEmail(memorial, order, SITE_URL)
         }
       }
     }

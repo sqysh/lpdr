@@ -11,8 +11,7 @@ import { parseAdoptionFee } from 'lib/utils/adoption-agreement.utils'
 import { adoptionAgreementReadyTemplate } from 'lib/email/templates/adoption-agreement-ready.template'
 import type { ActionResult } from 'types/action.types'
 import { getDachshundById } from 'lib/actions/_rescue-groups/getDachshundById'
-
-const SITE = process.env.NEXT_PUBLIC_SITE_URL
+import { SITE_URL } from 'lib/constants/site.constants'
 
 export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ id: string; resent: boolean }>> {
   const gate = await requireAccess('AGREEMENTS')
@@ -21,7 +20,7 @@ export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ 
   if (!id) return { success: false, data: null, error: 'Missing agreement' }
 
   // A missing site URL would email a link starting with "undefined" and still report success
-  if (!SITE) {
+  if (!SITE_URL) {
     await createLog('error', 'NEXT_PUBLIC_SITE_URL is not set; adoption agreement not sent', { agreementId: id })
     return { success: false, data: null, error: 'The site address is not configured. The agreement was not sent.' }
   }
@@ -94,7 +93,7 @@ export async function sendAdoptionAgreement(id: string): Promise<ActionResult<{ 
         html: adoptionAgreementReadyTemplate({
           firstName: agreement.firstName,
           dogName: agreement.dogName,
-          link: `${SITE}/adopt/agreement/${id}`
+          link: `${SITE_URL}/adopt/agreement/${id}`
         })
       })
 
