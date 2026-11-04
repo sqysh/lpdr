@@ -101,17 +101,12 @@ body {
     sans-serif;
 
   @apply bg-bg-light dark:bg-bg-dark;
+  padding-top: var(--staging-bar-height, 0px);
   padding-bottom: var(--bottom-bar-height, 0px);
 }
 
 .dark {
   color-scheme: dark;
-}
-
-/* Set only on staging (data-staging on <html>); everywhere else the bar
-   height is unset and every offset that reads it falls back to 0px */
-:root[data-staging] {
-  --staging-bar-height: 28px;
 }
 
 @media (prefers-color-scheme: dark) {
