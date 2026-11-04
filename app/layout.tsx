@@ -20,6 +20,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={fontVariables}>
+        {process.env.NEXT_PUBLIC_APP_ENV === 'staging' && (
+          <div role="note" className="bg-amber-400 text-black text-center text-[11px] font-mono uppercase tracking-widest px-4 py-1.5">
+            Staging site: test cards only. Nothing here affects the real site.
+          </div>
+        )}
         <SessionProvider refetchOnWindowFocus={false}>
           <RootLayoutWrapper header={<Header />} navDrawer={<SiteNavigationDrawer />}>
             {children}
