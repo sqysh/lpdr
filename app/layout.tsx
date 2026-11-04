@@ -13,6 +13,8 @@ const fontVariables = [quicksand, workSans, bebas, nunito, signatureFont].map((f
 
 const themeScript = `(function(){try{if(window.matchMedia('(prefers-color-scheme: dark)').matches){document.documentElement.classList.add('dark')}}catch(e){}})()`
 
+const isStaging = process.env.NEXT_PUBLIC_APP_ENV === 'staging'
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
@@ -20,8 +22,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body className={fontVariables}>
-        {process.env.NEXT_PUBLIC_APP_ENV === 'staging' && (
-          <div role="note" className="bg-amber-400 text-black text-center text-[11px] font-mono uppercase tracking-widest px-4 py-1.5">
+        {isStaging && (
+          <div
+            role="note"
+            className="fixed inset-x-0 top-0 z-9999 h-(--staging-bar-height) flex items-center justify-center bg-amber-400 text-black text-[11px] font-mono uppercase tracking-widest px-4"
+          >
             Staging site: test cards only. Nothing here affects the real site.
           </div>
         )}

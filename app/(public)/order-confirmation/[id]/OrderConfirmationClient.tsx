@@ -120,7 +120,7 @@ export default function OrderConfirmationClient({ order }) {
         initial="hidden"
         animate="show"
         custom={0}
-        className="fixed top-0 left-0 right-0 z-50 border-b border-zinc-200 dark:border-border-dark bg-white/90 dark:bg-bg-dark/90 backdrop-blur-sm"
+        className="fixed top-(--staging-bar-height,0px) left-0 right-0 z-50 border-b border-zinc-200 dark:border-border-dark bg-white/90 dark:bg-bg-dark/90 backdrop-blur-sm"
       >
         <div className="max-w-2xl mx-auto px-4 430:px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">

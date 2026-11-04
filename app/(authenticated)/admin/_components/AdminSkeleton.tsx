@@ -8,7 +8,7 @@ export function AdminSkeleton({ columns = 4, rows = 8, hasToolbar = true }: Prop
   return (
     <main className="min-h-screen w-full bg-bg-light dark:bg-bg-dark animate-pulse">
       {/* ── Header (mirrors AdminPageHeader) ── */}
-      <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between">
+      <header className="sticky top-(--staging-bar-height,0px) z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div className="h-2.5 w-16 bg-surface-light dark:bg-surface-dark" />
           <div className="h-2 w-2.5 bg-surface-light dark:bg-surface-dark" />
@@ -46,11 +46,7 @@ export function AdminSkeleton({ columns = 4, rows = 8, hasToolbar = true }: Prop
             {Array.from({ length: rows }).map((_, r) => (
               <div key={r} className="px-4 py-3 flex items-center gap-6">
                 {Array.from({ length: columns }).map((_, c) => (
-                  <div
-                    key={c}
-                    className="h-3 bg-bg-light dark:bg-bg-dark"
-                    style={{ width: c === 0 ? '40%' : `${60 / columns}%` }}
-                  />
+                  <div key={c} className="h-3 bg-bg-light dark:bg-bg-dark" style={{ width: c === 0 ? '40%' : `${60 / columns}%` }} />
                 ))}
               </div>
             ))}
@@ -62,10 +58,7 @@ export function AdminSkeleton({ columns = 4, rows = 8, hasToolbar = true }: Prop
           <div className="h-2.5 w-32 bg-surface-light dark:bg-surface-dark" />
           <div className="flex gap-1.5">
             {Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="h-7 w-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark"
-              />
+              <div key={i} className="h-7 w-7 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark" />
             ))}
           </div>
         </div>

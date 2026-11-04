@@ -48,7 +48,7 @@ export default function AdminSidebar({
   return (
     <nav
       aria-label="Admin sections"
-      className="flex w-52 shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col py-4 h-screen sticky top-0"
+      className="flex w-52 shrink-0 bg-surface-light dark:bg-surface-dark border-r border-border-light dark:border-border-dark flex-col py-4 h-[calc(100vh-var(--staging-bar-height,0px))] sticky top-(--staging-bar-height,0px)"
     >
       {/* Brand */}
       <Link

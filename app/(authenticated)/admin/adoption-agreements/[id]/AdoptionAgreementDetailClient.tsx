@@ -87,7 +87,7 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
 
   return (
     <main id="main-content" className="min-h-screen w-full bg-bg-light dark:bg-bg-dark">
-      <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-3">
+      <header className="sticky top-(--staging-bar-height,0px) z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-3">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
           <Link
             href="/admin/adoption-agreements"

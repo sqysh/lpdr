@@ -65,7 +65,7 @@ export default function ProductForm({ product }: { product?: IProduct }) {
   return (
     <div className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       {/* ── Top bar ── */}
-      <div className="h-16.25 px-5 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center justify-between gap-3 sticky top-0 z-20">
+      <div className="h-16.25 px-5 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark flex items-center justify-between gap-3 sticky top-(--staging-bar-height,0px) z-20">
         <div className="flex items-center gap-3">
           <Link
             href="/admin/products"

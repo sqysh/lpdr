@@ -44,7 +44,7 @@ export function StickyHeader({
       initial={{ y: -48, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3, ease: 'easeOut' }}
-      className="sticky top-0 z-50 w-full border-b border-border-dark bg-bg-dark/90 backdrop-blur-sm"
+      className="sticky top-(--staging-bar-height,0px) z-50 w-full border-b border-border-dark bg-bg-dark/90 backdrop-blur-sm"
     >
       <div className="max-w-6xl mx-auto px-4 xs:px-5 sm:px-6 h-11 flex items-center justify-between gap-4">
         {/* Left — label */}

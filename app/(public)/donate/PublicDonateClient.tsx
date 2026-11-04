@@ -26,7 +26,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
   return (
     <>
       {/* ── Thin sticky header ── */}
-      <header className="sticky top-0 z-50 bg-topbar-light/95 dark:bg-topbar-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark">
+      <header className="sticky top-(--staging-bar-height,0px) z-50 bg-topbar-light/95 dark:bg-topbar-dark/95 backdrop-blur-sm border-b border-border-light dark:border-border-dark">
         <div className="max-w-5xl mx-auto w-full px-4 1150:px-0 h-12 flex items-center justify-between">
           <Link
             href="/"
@@ -73,7 +73,7 @@ export default function PublicDonateClient({ savedCards, userName, isAuthed, ema
               initial="hidden"
               animate="show"
               custom={0.5}
-              className="lg:sticky lg:top-14 space-y-8"
+              className="lg:sticky lg:top-[calc(3.5rem+var(--staging-bar-height,0px))] space-y-8"
               aria-label="About Little Paws Dachshund Rescue"
             >
               {/* Mission */}

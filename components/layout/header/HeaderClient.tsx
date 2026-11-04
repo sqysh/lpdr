@@ -65,7 +65,10 @@ export function HeaderClient({
     const el = headerRef.current
     if (!el) return
     const root = document.documentElement
-    root.style.setProperty('--header-offset', hidden ? '0px' : `${el.offsetHeight}px`)
+    root.style.setProperty(
+      '--header-offset',
+      hidden ? 'var(--staging-bar-height, 0px)' : `calc(var(--staging-bar-height, 0px) + ${el.offsetHeight}px)`
+    )
     return () => {
       root.style.removeProperty('--header-offset')
     }
@@ -83,7 +86,7 @@ export function HeaderClient({
       {/* Whole header — slides up on scroll-down via CSS transform */}
       <div
         ref={headerRef}
-        className={`sticky top-0 z-50 w-full transition-transform duration-300 ease-out ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
+        className={`sticky top-(--staging-bar-height,0px) z-50 w-full transition-transform duration-300 ease-out ${hidden ? '-translate-y-full' : 'translate-y-0'}`}
       >
         {/* ── Top Bar (desktop/tablet only) ── */}
         <header

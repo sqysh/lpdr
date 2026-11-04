@@ -14,7 +14,7 @@ type Props = {
 
 export function TopBar({ auction, statusConfig }: Props) {
   return (
-    <header className="sticky top-0 z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-4">
+    <header className="sticky top-(--staging-bar-height,0px) z-10 w-full border-b border-border-light dark:border-border-dark bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur px-4 h-10 flex items-center justify-between gap-4">
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
         <Link href="/admin/dashboard" className={`inline-flex items-center gap-1.5 ${crumbLink}`}>
           <LinkBody icon={<LayoutDashboard className="w-3 h-3" aria-hidden="true" />} label="Dashboard" />

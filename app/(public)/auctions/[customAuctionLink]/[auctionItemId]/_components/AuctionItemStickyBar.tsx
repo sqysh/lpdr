@@ -21,7 +21,7 @@ export function AuctionItemStickyBar({ customAuctionLink, item, isActive, isEnde
 
   return (
     <div
-      className={`sticky top-0 z-40 border-b border-border-light dark:border-border-dark backdrop-blur-sm ${
+      className={`sticky top-(--staging-bar-height,0px) z-40 border-b border-border-light dark:border-border-dark backdrop-blur-sm ${
         isLive ? 'bg-primary-light/5 dark:bg-primary-dark/5' : 'bg-bg-light/90 dark:bg-bg-dark/90'
       }`}
     >

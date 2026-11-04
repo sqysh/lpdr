@@ -47,7 +47,7 @@ export function TopBar() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
+    <header className="sticky top-(--staging-bar-height,0px) z-50 w-full border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
       <div className="max-w-5xl mx-auto px-4 sm:px-6 h-10 flex items-center justify-between">
         <Link href="/" className={mutedLink}>
           <LinkBody icon={HomeIcon} label="Home" />
