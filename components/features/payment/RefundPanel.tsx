@@ -101,7 +101,7 @@ export function RefundPanel({ orderId, remaining, presets = [] }: { orderId: str
       />
 
       <FormField id="refund-reason" label="Reason" type="select" {...register('reason')}>
-        <option value="requested_by_customer">Requested by the adopter</option>
+        <option value="requested_by_customer">Requested by the customer</option>
         <option value="duplicate">Duplicate payment</option>
         <option value="fraudulent">Fraudulent</option>
       </FormField>

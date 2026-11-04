@@ -19,7 +19,9 @@ import {
   AlertCircle,
   Mail,
   UserPlus,
-  FileSignature
+  FileSignature,
+  Rainbow,
+  RotateCcw
 } from 'lucide-react'
 import AdminPageHeader from 'app/(authenticated)/admin/_components/AdminPageHeader'
 
@@ -29,12 +31,14 @@ const sections = [
   { id: 'data-migration', label: 'Data Migration', icon: Database },
   { id: 'admin-access', label: 'Admin Access', icon: UserPlus },
   { id: 'orders', label: 'Orders', icon: Package },
+  { id: 'refunds', label: 'Refunds', icon: RotateCcw },
   { id: 'subscriptions', label: 'Subscriptions', icon: RefreshCw },
   { id: 'auctions', label: 'Auctions', icon: Gavel },
   { id: 'dachshunds', label: 'Dachshunds', icon: Dog },
   { id: 'welcome-wieners', label: 'Welcome Wieners', icon: Heart },
   { id: 'pack-members', label: 'Pack Members', icon: Users },
   { id: 'donations', label: 'Donations', icon: DollarSign },
+  { id: 'rainbow-bridge', label: 'Rainbow Bridge', icon: Rainbow },
   { id: 'products', label: 'Products & Merch', icon: ShoppingBag },
   { id: 'newsletter', label: 'Newsletter', icon: Mail },
   { id: 'adoptions', label: 'Adoption Applications', icon: ClipboardList },
@@ -394,6 +398,13 @@ export default function AdminGuideClient() {
                   <p>
                     <strong>FAILED</strong> — payment failed. The customer was not charged and has been notified automatically by email.
                   </p>
+                  <p>
+                    <strong>REFUNDED</strong>: the full payment has been returned. See{' '}
+                    <a href="#refunds" className="underline underline-offset-2">
+                      Refunds
+                    </a>
+                    .
+                  </p>
                 </Q>
                 <Q question="What should I do when I see a failed order?">
                   <p>
@@ -417,6 +428,74 @@ export default function AdminGuideClient() {
               </div>
             </section>
 
+            {/* Refunds */}
+            <section>
+              <SectionHeader id="refunds" icon={RotateCcw} title="Refunds" />
+              <div className="border border-border-light dark:border-border-dark p-6 space-y-6">
+                <Note type="info">
+                  You can refund any card payment yourself, in full or in part, at any time. There is no need to contact Sqysh or log in to
+                  Stripe.
+                </Note>
+                <Note type="warning">A refund cannot be undone. Double check the amount before you confirm.</Note>
+                <Q question="How do I refund an order?">
+                  <Step number={1}>Open the order from Orders.</Step>
+                  <Step number={2}>Find the Refund panel on the right side of the order page.</Step>
+                  <Step number={3}>
+                    The amount starts at the full amount left to refund. Leave it for a full refund, or change it for a partial one.
+                  </Step>
+                  <Step number={4}>Choose a reason and click Refund.</Step>
+                  <Step number={5}>
+                    The panel says the refund was sent and updates on its own once Stripe confirms it, usually within a few seconds. The
+                    customer is emailed automatically.
+                  </Step>
+                </Q>
+                <Q question="How long does a refund take to reach the customer?">
+                  <p>
+                    It is sent right away, but it usually takes 5 to 10 business days to show on their card statement, depending on their
+                    bank. It always goes back to the card they paid with.
+                  </p>
+                </Q>
+                <Q question="Can I refund the same order more than once?">
+                  <p>
+                    Yes. You can refund part now and more later. The Refund panel shows how much has been refunded so far and how much is
+                    left, and you can never refund more than what they paid.
+                  </p>
+                </Q>
+                <Q question="How do I tell if an order has been refunded?">
+                  <p>
+                    A fully refunded order shows the status <strong>REFUNDED</strong>. A partially refunded order keeps its status, and the
+                    Refund panel on the order page shows the amount refunded and the date.
+                  </p>
+                </Q>
+                <Q question="What happens to shipping when I refund?">
+                  <p>
+                    Once an order is fully refunded, the shipping panels disappear from the order page, since there is nothing left to send.
+                    A partial refund does not change anything about shipping, so mark the item as shipped as usual if it is still going out.
+                  </p>
+                </Q>
+                <Q question="How do I refund an adoption fee?">
+                  <p>
+                    Refund it from the adoption agreement rather than the order. The agreement&apos;s refund panel shows how long the dog
+                    was with the adopter and offers preset amounts. The order page has a link straight to it.
+                  </p>
+                </Q>
+                <Q question="What about payments made by Zelle, Venmo or PayPal?">
+                  <p>
+                    Those did not go through the site, so the site cannot send the money back. Send the refund the same way the payment came
+                    in.
+                  </p>
+                </Q>
+                <Q question="Does a refund cancel anything else?">
+                  <p>
+                    No. A memorial stays on the Rainbow Bridge until you hide it, and a recurring donation keeps going until it is
+                    cancelled. Refunding one monthly payment does not stop the next one.
+                  </p>
+                </Q>
+                <Q question="What if I refund from the Stripe dashboard instead?">
+                  <p>That works too. Refunds made in Stripe are recorded on the site automatically.</p>
+                </Q>
+              </div>
+            </section>
             {/* Subscriptions */}
             <section>
               <SectionHeader id="subscriptions" icon={RefreshCw} title="Subscriptions" />
@@ -449,6 +528,12 @@ export default function AdminGuideClient() {
                     Stripe will automatically retry the payment over the following days. If it continues to fail, the subscription will be
                     marked as past due. The pack member will receive an automated email from Stripe prompting them to update their payment
                     method. You do not need to do anything unless they contact you directly.
+                  </p>
+                </Q>
+                <Q question="Can I refund a recurring donation payment?">
+                  <p>
+                    Yes. Each monthly or yearly payment can be refunded on its own, in full or in part, from the order. Refunding a payment
+                    does not cancel the subscription.
                   </p>
                 </Q>
                 <Q question="Can I cancel a subscription on behalf of a pack member?">
@@ -691,6 +776,88 @@ export default function AdminGuideClient() {
               </div>
             </section>
 
+            {/* Rainbow Bridge */}
+            <section>
+              <SectionHeader id="rainbow-bridge" icon={Rainbow} title="Rainbow Bridge" />
+              <div className="border border-border-light dark:border-border-dark p-6 space-y-6">
+                <Note type="info">
+                  Every memorial is reviewed before it appears on the Rainbow Bridge. Nothing a donor writes goes public until an admin
+                  approves it.
+                </Note>
+                <Q question="What is a memorial gift?">
+                  <p>
+                    A memorial gift is a donation made in memory of a dog that has passed. The donor enters the dog&apos;s name, a short
+                    message and an optional photo, then pays by card. The site creates a butterfly carrying the dog&apos;s name over the
+                    Rainbow Bridge. Once approved, it appears on the Rainbow Bridge page for everyone to see.
+                  </p>
+                </Q>
+                <Q question="How does a memorial go from gift to the Rainbow Bridge?">
+                  <Step number={1}>
+                    A visitor opens Rainbow Bridge under Donate in the menu and fills in the memorial form. They do not need to be signed
+                    in.
+                  </Step>
+                  <Step number={2}>They pay by card. They get a confirmation page and a receipt email, and both show their butterfly.</Step>
+                  <Step number={3}>
+                    The memorial waits for review. An email goes to the review inbox, and a pulsing dot appears next to Rainbow Bridge in
+                    the admin sidebar.
+                  </Step>
+                  <Step number={4}>An admin reads it and approves or hides it.</Step>
+                  <Step number={5}>
+                    Once approved, it appears on the Rainbow Bridge page. It stays there until its display period ends, then comes off the
+                    page on its own.
+                  </Step>
+                </Q>
+                <Q question="How do I review a memorial?">
+                  <Step number={1}>Go to Rainbow Bridge in the sidebar. Memorials waiting for review are listed first.</Step>
+                  <Step number={2}>Check the name, the message and the photo if there is one.</Step>
+                  <Step number={3}>
+                    If something only needs a small fix, like a typo in the name, edit it before approving. The butterfly updates to match.
+                  </Step>
+                  <Step number={4}>Click Approve to put it on the Rainbow Bridge, or Hide to keep it off.</Step>
+                </Q>
+                <Q question="When should I hide a memorial?">
+                  <p>
+                    Hide anything that should not appear on a public page, like an inappropriate message, a photo that is not of a dog, or
+                    an obvious test. A hidden memorial is never shown on the Rainbow Bridge and its butterfly is not displayed anywhere. The
+                    donor sees in My Pack that it is not shown, with our email address in case they have questions. They do not see your
+                    reason.
+                  </p>
+                  <p>
+                    Hiding does not refund the gift. If the donor should get their money back, refund the order as well. See{' '}
+                    <a href="#refunds" className="underline underline-offset-2">
+                      Refunds
+                    </a>
+                    .
+                  </p>
+                </Q>
+                <Q question="Can I take down a memorial after approving it?">
+                  <p>Yes. Open it on the Rainbow Bridge page in the sidebar and hide it. It comes off the public page right away.</p>
+                </Q>
+                <Q question="What can I change in the Rainbow Bridge settings?">
+                  <p>
+                    Open Settings from the Rainbow Bridge admin page. You can turn memorial gifts on or off, choose whether donors can add a
+                    photo, set the longest message they can write, and set how long an approved memorial stays on the Rainbow Bridge.
+                  </p>
+                  <p>
+                    Turning memorial gifts off removes the Rainbow Bridge link from the menu and closes the form. Memorials already placed
+                    are not affected.
+                  </p>
+                </Q>
+                <Q question="Where do memorial gifts show up as payments?">
+                  <p>
+                    Under Donations, on the Memorial tab. Opening the order shows the memorial details: the dog&apos;s name, the message,
+                    the photo, and its current status.
+                  </p>
+                </Q>
+                <Q question="Where can the donor see their memorial?">
+                  <p>
+                    In My Pack, on the Giving tab, if they were signed in when they gave. Each memorial shows its butterfly and whether it
+                    is waiting for review, on the Rainbow Bridge, or no longer shown. The gift also counts toward their total giving.
+                  </p>
+                </Q>
+              </div>
+            </section>
+
             {/* Products */}
             <section>
               <SectionHeader id="products" icon={ShoppingBag} title="Products & Merch" />
@@ -853,6 +1020,13 @@ export default function AdminGuideClient() {
                     For Zelle, Venmo or PayPal, send the refund the same way the payment came in. The site does not send those.
                   </Step>
                   <p>Refunds made directly in the Stripe dashboard are recorded on the site automatically as well.</p>
+                  <p>
+                    For a refund that is not about a return, like an overpayment, refund the payment from its order. See{' '}
+                    <a href="#refunds" className="underline underline-offset-2">
+                      Refunds
+                    </a>
+                    .
+                  </p>
                 </Q>
 
                 <Q question="Where can the adopter see their agreement?">
