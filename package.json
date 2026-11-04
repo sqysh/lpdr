@@ -23,8 +23,9 @@
     "@stripe/stripe-js": "^8.6.1",
     "@vercel/analytics": "^2.0.1",
     "dotenv": "^17.4.2",
-    "firebase": "^11.9.1",
+    "firebase": "^13.2.0",
     "framer-motion": "^12.4.3",
+    "heic-to": "^1.6.7",
     "heic2any": "^0.0.4",
     "lucide-react": "^0.511.0",
     "next": "^16.1.6",
@@ -57,13 +58,13 @@
     "typescript": "^5"
   },
   "allowScripts": {
-    "@firebase/util@1.12.1": true,
     "fsevents@2.3.3": true,
-    "protobufjs@7.6.5": true,
     "sharp@0.34.5": true,
     "unrs-resolver@1.11.1": true,
-    "@prisma/engines@7.10.0": true,
-    "prisma@7.10.0": true
+    "prisma@7.10.1": true,
+    "@prisma/engines@7.10.1": true,
+    "@firebase/util@1.15.3": true,
+    "protobufjs@7.6.6": true
   },
   "overrides": {
     "postcss": "^8.5.10"

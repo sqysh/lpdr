@@ -48,11 +48,24 @@ type Props = {
 }
 
 const FORM_PATH = '/rainbow-bridge/remember'
+
 const MAX_PHOTO_BYTES = 25 * 1024 * 1024
+const MAX_GIF_BYTES = 5 * 1024 * 1024
 const PHOTO_EDGE = 1600
 
 type PhotoState = { preview: string | null; url: string | null; progress: number | null; error: string | null }
 const EMPTY_PHOTO: PhotoState = { preview: null, url: null, progress: null, error: null }
+
+// Some browsers report HEIC with an empty type, so the file extension is checked too
+const isHeic = (file: File) => /image\/hei[cf]/i.test(file.type) || /\.(heic|heif)$/i.test(file.name)
+const isGif = (file: File) => file.type === 'image/gif'
+
+// Only Safari can open HEIC itself, so it is converted first; the converter loads only when needed
+async function heicToJpeg(file: File) {
+  const { heicTo } = await import('heic-to/csp')
+  const blob = await heicTo({ blob: file, type: 'image/jpeg', quality: 0.9 })
+  return new File([blob], 'photo.jpg', { type: 'image/jpeg' })
+}
 
 // Phone photos are often 5-12MB. Redrawing to a 1600px JPEG keeps uploads quick on cellular,
 // and it drops the EXIF data, which can include where the photo was taken
@@ -138,19 +151,27 @@ export function MemorialForm({ settings, savedCards, userName, isAuthed, email, 
 
   const handlePhoto = async (file: File | undefined) => {
     if (!file) return
-    if (!file.type.startsWith('image/')) return setPhoto({ ...EMPTY_PHOTO, error: 'Please choose a photo.' })
+    if (!file.type.startsWith('image/') && !isHeic(file)) return setPhoto({ ...EMPTY_PHOTO, error: 'Please choose a photo.' })
     if (file.size > MAX_PHOTO_BYTES) return setPhoto({ ...EMPTY_PHOTO, error: 'That photo is too large. Please choose another one.' })
+    if (isGif(file) && file.size > MAX_GIF_BYTES)
+      return setPhoto({ ...EMPTY_PHOTO, error: 'That GIF is too large. Please choose one under 5MB.' })
 
     const run = ++uploadRun.current
-    setPhoto({ preview: URL.createObjectURL(file), url: null, progress: 0, error: null })
+    setPhoto({ preview: null, url: null, progress: 0, error: null })
 
     try {
-      const resized = await shrinkPhoto(file)
+      // GIFs go up as they are so they stay animated; everything else becomes a resized JPEG
+      const upload = isGif(file) ? file : await shrinkPhoto(isHeic(file) ? await heicToJpeg(file) : file)
+      if (run !== uploadRun.current) return
+
+      // Previewing the prepared file rather than the original, since a HEIC original won't display in most browsers
+      setPhoto((prev) => ({ ...prev, preview: URL.createObjectURL(upload) }))
+
       const url = await uploadFileToFirebase(
-        resized,
+        upload,
         (progress) => run === uploadRun.current && setPhoto((prev) => ({ ...prev, progress })),
         'image',
-        `memorials/${crypto.randomUUID()}.jpg`
+        `memorials/${crypto.randomUUID()}.${isGif(file) ? 'gif' : 'jpg'}`
       )
       if (run === uploadRun.current) setPhoto((prev) => ({ ...prev, url, progress: null }))
     } catch {
@@ -296,7 +317,7 @@ export function MemorialForm({ settings, savedCards, userName, isAuthed, email, 
                     <input
                       id="memorial-photo"
                       type="file"
-                      accept="image/*"
+                      accept="image/*,.heic,.heif"
                       className="peer sr-only"
                       onChange={(e) => {
                         handlePhoto(e.target.files?.[0])
