@@ -108,6 +108,12 @@ body {
   color-scheme: dark;
 }
 
+/* Set only on staging (data-staging on <html>); everywhere else the bar
+   height is unset and every offset that reads it falls back to 0px */
+:root[data-staging] {
+  --staging-bar-height: 28px;
+}
+
 @media (prefers-color-scheme: dark) {
   :root {
     color-scheme: dark;

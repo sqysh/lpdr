@@ -17,7 +17,7 @@ const isStaging = process.env.NEXT_PUBLIC_APP_ENV === 'staging'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="en" suppressHydrationWarning style={isStaging ? ({ '--staging-bar-height': '28px' } as React.CSSProperties) : undefined}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
