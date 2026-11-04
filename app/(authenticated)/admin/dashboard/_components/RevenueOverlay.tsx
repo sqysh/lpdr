@@ -1,6 +1,9 @@
+'use client'
+
 import { formatMoney } from 'lib/utils/currency.utils'
 import { HISTORICAL_TOTAL, sourceMeta } from 'lib/constants/dashboard.constants'
-import { TrendingDown, TrendingUp } from 'lucide-react'
+import { ChevronDown, TrendingDown, TrendingUp } from 'lucide-react'
+import { useState } from 'react'
 
 const COLORS = [
   'bg-primary-light dark:bg-primary-dark',
@@ -93,14 +96,30 @@ export function RevenueBreakdown({ liveRevenue, monthlyChange, sources }: Revenu
 }
 
 export function RevenueOverlay(props: RevenueProps) {
+  const [open, setOpen] = useState(true)
+
   return (
     <div className="hidden sm:flex flex-col absolute top-4 left-4 w-72 max-h-[calc(50%-1.5rem)] border border-border-light dark:border-border-dark bg-bg-light/95 dark:bg-bg-dark/95 backdrop-blur">
-      <div className="shrink-0 px-4 py-3 border-b border-border-light dark:border-border-dark">
-        <p className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Total revenue · all time</p>
-      </div>
-      <div className="min-h-0 overflow-y-auto">
-        <RevenueBreakdown {...props} />
-      </div>
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        aria-expanded={open}
+        aria-controls="revenue-breakdown"
+        className={`shrink-0 w-full flex items-center justify-between gap-3 px-4 py-3 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${open ? 'border-b border-border-light dark:border-border-dark' : ''}`}
+      >
+        <span className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
+          Total revenue · all time
+        </span>
+        <ChevronDown
+          className={`w-3.5 h-3.5 shrink-0 text-muted-light dark:text-muted-dark transition-transform ${open ? '' : '-rotate-90'}`}
+          aria-hidden="true"
+        />
+      </button>
+      {open && (
+        <div id="revenue-breakdown" className="min-h-0 overflow-y-auto">
+          <RevenueBreakdown {...props} />
+        </div>
+      )}
     </div>
   )
 }

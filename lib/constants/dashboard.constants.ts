@@ -1,12 +1,14 @@
 import { OrderType } from '@prisma/client'
-import { Dog, Gavel, Heart, Gift, RefreshCw, Package, Utensils } from 'lucide-react'
+import { Dog, Gavel, Heart, Gift, RefreshCw, Package, Utensils, Rainbow, FileSignature } from 'lucide-react'
 
 export const sourceMeta: Record<string, { label: string; icon: typeof Heart }> = {
   ADOPTION_FEE: { label: 'Adoption fees', icon: Heart },
+  ADOPTION_AGREEMENT: { label: 'Adoption agreements', icon: FileSignature },
   ONE_TIME_DONATION: { label: 'One-time donations', icon: Gift },
   RECURRING_DONATION: { label: 'Recurring donations', icon: RefreshCw },
   AUCTION_PURCHASE: { label: 'Auctions', icon: Gavel },
-  PURCHASE: { label: 'Purchases', icon: Gift }
+  PURCHASE: { label: 'Purchases', icon: Gift },
+  MEMORIAL_DONATION: { label: 'Memorial gifts', icon: Rainbow }
 }
 
 export const itemTypeMeta: Record<string, { label: string; icon: typeof Heart }> = {
@@ -21,8 +23,7 @@ export const HISTORICAL_ADOPTION_FEES = 16185
 export const HISTORICAL_AUCTIONS = 16317
 export const HISTORICAL_ORDERS = 10622
 export const HISTORICAL_ONE_TIME_DONATIONS = 49389
-export const HISTORICAL_TOTAL =
-  HISTORICAL_ADOPTION_FEES + HISTORICAL_AUCTIONS + HISTORICAL_ORDERS + HISTORICAL_ONE_TIME_DONATIONS
+export const HISTORICAL_TOTAL = HISTORICAL_ADOPTION_FEES + HISTORICAL_AUCTIONS + HISTORICAL_ORDERS + HISTORICAL_ONE_TIME_DONATIONS
 
 export const HISTORICAL_ADOPTION_COUNT = 0
 export const HISTORICAL_AUCTION_COUNT = 0
