@@ -5,7 +5,7 @@ import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
 
-const REVIEW_INBOX = 'lpdr@littlepawsdr.org'
+const REVIEW_INBOX = process.env.MEMORIAL_REVIEW_EMAIL ?? 'lpdr@littlepawsdr.org'
 
 export default async function sendMemorialReviewEmail(memorial: Memorial, order: Order, siteUrl: string) {
   try {
