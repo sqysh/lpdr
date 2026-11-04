@@ -106,7 +106,8 @@ export default function MyPackClient({
     ...(adoptionFees ?? []).map((a) => Number(a.feeAmount) || 0),
     ...(multiItemOrders ?? []).map((o) => Number(o.totalAmount) || 0),
     ...(auctionPurchases ?? []).map((o) => Number(o.totalAmount) || 0),
-    ...(adoptionAgreements ?? []).filter((a) => a.order).map((a) => Number(a.order!.totalAmount) || 0)
+    ...(adoptionAgreements ?? []).filter((a) => a.order).map((a) => Number(a.order!.totalAmount) || 0),
+    ...(memorials ?? []).map((m) => m.amount)
   ].reduce((sum, n) => sum + n, 0)
 
   const handleSetDefaultPaymentMethod = async (id: string) => {
