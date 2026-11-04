@@ -9,35 +9,20 @@ export function VolunteerApplicationClient() {
   const isDark = useThemeStore((s) => s.isDark)
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0}
-          className="mb-12 sm:mb-16"
-        >
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12 sm:mb-16">
           <div className="flex items-center gap-3 mb-4">
-            <span
-              className="block w-8 h-px bg-primary-light dark:bg-primary-dark"
-              aria-hidden="true"
-            />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Volunteer
-            </p>
+            <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Volunteer</p>
           </div>
           <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight mb-5">
             Get <span className="font-light text-muted-light dark:text-muted-dark">Involved</span>
           </h1>
           <p className="text-base text-muted-light dark:text-on-dark leading-relaxed">
-            Thank you for applying to volunteer with Little Paws Dachshund Rescue. This application
-            takes 15–30 minutes to complete. We rely on our volunteers to accomplish our mission of
-            helping unwanted and abandoned animals find new homes.
+            Thank you for applying to volunteer with Little Paws Dachshund Rescue. This application takes 15–30 minutes to complete. We rely
+            on our volunteers to accomplish our mission of helping unwanted and abandoned animals find new homes.
           </p>
         </motion.div>
 
@@ -91,14 +76,8 @@ export function VolunteerApplicationClient() {
           className="mb-12 sm:mb-16"
         >
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-              aria-hidden="true"
-            />
-            <h2
-              id="join-heading"
-              className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
-            >
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <h2 id="join-heading" className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
               Join the Family
             </h2>
           </div>
@@ -134,14 +113,8 @@ export function VolunteerApplicationClient() {
           aria-labelledby="application-heading"
         >
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-              aria-hidden="true"
-            />
-            <h2
-              id="application-heading"
-              className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
-            >
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <h2 id="application-heading" className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
               Volunteer Application
             </h2>
           </div>

@@ -1,16 +1,6 @@
 'use client'
 
-import {
-  Gavel,
-  ShoppingBag,
-  TrendingUp,
-  Clock,
-  Edit2,
-  LayoutDashboard,
-  Lock,
-  Tag,
-  Truck
-} from 'lucide-react'
+import { Gavel, ShoppingBag, TrendingUp, Clock, Edit2, LayoutDashboard, Lock, Tag, Truck } from 'lucide-react'
 import { formatMoney } from 'lib/utils/currency.utils'
 import Link from 'next/link'
 import { getItemStatusConfig } from 'lib/utils/auction.utils'
@@ -60,9 +50,7 @@ export default function AdminAuctionItemViewClient({
           { label: 'Minimum Bid', value: formatMoney(item.minimumBid) }
         ]
       : [{ label: 'Quantity', value: item.totalQuantity ? String(item.totalQuantity) : '—' }]),
-    ...(item.status === 'SOLD'
-      ? [{ label: 'Sold Price', value: formatMoney(item.soldPrice) }]
-      : []),
+    ...(item.status === 'SOLD' ? [{ label: 'Sold Price', value: formatMoney(item.soldPrice) }] : []),
     { label: 'Requires Shipping', value: item.requiresShipping ? 'Yes' : 'No' },
     ...(item.requiresShipping
       ? [
@@ -106,11 +94,7 @@ export default function AdminAuctionItemViewClient({
       ? { label: 'Status', value: item.status.toLowerCase(), icon: Tag, iconColor: 'text-pink-500' }
       : {
           label: 'Shipping',
-          value: item.requiresShipping
-            ? item.shippingCosts != null
-              ? formatMoney(item.shippingCosts)
-              : 'TBD'
-            : 'None',
+          value: item.requiresShipping ? (item.shippingCosts != null ? formatMoney(item.shippingCosts) : 'TBD') : 'None',
           icon: Truck,
           iconColor: 'text-pink-500'
         }
@@ -123,51 +107,39 @@ export default function AdminAuctionItemViewClient({
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
           <Link
             href="/admin/dashboard"
-            className="hidden sm:inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="hidden sm:inline-flex items-center gap-1.5 text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             <LayoutDashboard className="w-3 h-3" aria-hidden="true" />
             Dashboard
           </Link>
-          <span
-            className="hidden sm:inline text-[9px] font-mono text-border-light dark:text-border-dark"
-            aria-hidden="true"
-          >
+          <span className="hidden sm:inline text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
             /
           </span>
           <Link
             href="/admin/auctions"
-            className="hidden sm:inline text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="hidden sm:inline text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             Auctions
           </Link>
-          <span
-            className="hidden sm:inline text-[9px] font-mono text-border-light dark:text-border-dark"
-            aria-hidden="true"
-          >
+          <span className="hidden sm:inline text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
             /
           </span>
           <Link
             href={`/admin/auctions/${item.auctionId}?tab=items&type=${item.sellingFormat}`}
-            className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark shrink-0"
+            className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark shrink-0"
           >
             Auction Items
           </Link>
-          <span
-            className="text-[9px] font-mono text-border-light dark:text-border-dark"
-            aria-hidden="true"
-          >
+          <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
             /
           </span>
-          <h1
-            className="text-[9px] font-mono tracking-[0.15em] uppercase text-text-light dark:text-text-dark truncate"
-            aria-current="page"
-          >
+          <h1 className="text-[9px] font-mono tracking-tag uppercase text-text-light dark:text-text-dark truncate" aria-current="page">
             {item.name}
           </h1>
         </nav>
 
         {isActive && (
-          <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-[8px] font-mono tracking-[0.15em] uppercase text-amber-500 font-black">
+          <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-[8px] font-mono tracking-tag uppercase text-amber-500 font-black">
             <Lock size={9} aria-hidden="true" />
             <span className="hidden sm:inline">Limited Editing</span>
           </span>
@@ -180,16 +152,9 @@ export default function AdminAuctionItemViewClient({
           <div className="flex items-start justify-between gap-3 flex-wrap pt-6 pb-4">
             <div className="min-w-0">
               <div className="flex items-center gap-2.5 mb-2 flex-wrap">
-                <span
-                  className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-                  aria-hidden="true"
-                />
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                  Auction Item
-                </p>
-                <span
-                  className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 border ${statusConfig.classes}`}
-                >
+                <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Auction Item</p>
+                <span className={`text-[9px] font-black tracking-widest uppercase px-2 py-0.5 border ${statusConfig.classes}`}>
                   {statusConfig.label}
                 </span>
                 {isActive && (
@@ -208,7 +173,7 @@ export default function AdminAuctionItemViewClient({
               href={auctionEnded ? '#' : `/admin/auctions/${item.auctionId}/${item.id}/edit`}
               aria-disabled={auctionEnded}
               onClick={auctionEnded ? (e) => e.preventDefault() : undefined}
-              className={`flex items-center gap-2 px-3.5 py-2 border text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+              className={`flex items-center gap-2 px-3.5 py-2 border text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                 auctionEnded
                   ? 'border-border-light dark:border-border-dark text-muted-light/30 dark:text-muted-dark/30 cursor-not-allowed'
                   : 'border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40'
@@ -244,7 +209,7 @@ export default function AdminAuctionItemViewClient({
                   <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark">
                     <h3
                       id="item-description"
-                      className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
+                      className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
                     >
                       Description
                     </h3>
@@ -261,22 +226,17 @@ export default function AdminAuctionItemViewClient({
                 className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
               >
                 <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark">
-                  <h3
-                    id="item-details"
-                    className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
-                  >
+                  <h3 id="item-details" className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                     Details
                   </h3>
                 </div>
                 <dl className="divide-y divide-border-light dark:divide-border-dark">
                   {detailRows.map(({ label, value }) => (
                     <div key={label} className="grid grid-cols-[45%_1fr] gap-2 px-4 py-2.5">
-                      <dt className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark self-center">
+                      <dt className="text-[9px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark self-center">
                         {label}
                       </dt>
-                      <dd className="text-xs font-mono tabular-nums text-text-light dark:text-text-dark capitalize">
-                        {value}
-                      </dd>
+                      <dd className="text-xs font-mono tabular-nums text-text-light dark:text-text-dark capitalize">{value}</dd>
                     </div>
                   ))}
                 </dl>

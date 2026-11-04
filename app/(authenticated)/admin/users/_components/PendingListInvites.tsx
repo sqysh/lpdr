@@ -6,13 +6,7 @@ import { revokePendingAdminInvite } from 'lib/actions/admin/user/revokePendingAd
 
 type Invite = { id: string; email: string; createdAt: Date; role: string }
 
-export function PendingAdminInvitesList({
-  invites,
-  onRevoked
-}: {
-  invites: Invite[]
-  onRevoked: () => void
-}) {
+export function PendingAdminInvitesList({ invites, onRevoked }: { invites: Invite[]; onRevoked: () => void }) {
   const [revoking, setRevoking] = useState<string | null>(null)
 
   if (invites.length === 0) return null
@@ -28,7 +22,7 @@ export function PendingAdminInvitesList({
     <div className="border border-amber-500/30 bg-amber-500/5 mb-6">
       <div className="flex items-center gap-2 px-4 py-2.5 border-b border-amber-500/20">
         <Clock className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 dark:text-amber-400">
+        <p className="text-[10px] font-mono tracking-tag uppercase text-amber-600 dark:text-amber-400">
           Waiting to sign in ({invites.length})
         </p>
       </div>
@@ -36,12 +30,8 @@ export function PendingAdminInvitesList({
         {invites.map((invite) => (
           <div key={invite.id} className="flex items-center justify-between px-4 py-2.5">
             <div>
-              <p className="text-xs font-mono text-text-light dark:text-text-dark">
-                {invite.email}
-              </p>
-              <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                Will become {invite.role} on first sign-in
-              </p>
+              <p className="text-xs font-mono text-text-light dark:text-text-dark">{invite.email}</p>
+              <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">Will become {invite.role} on first sign-in</p>
             </div>
             <button
               type="button"

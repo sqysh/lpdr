@@ -37,17 +37,13 @@ export function PastAuctionCard({ auction, index }: { auction: IAuction; index: 
           </div>
         )}
         <div className="absolute top-3 left-3 bg-bg-light/90 dark:bg-bg-dark/90 backdrop-blur-sm px-2.5 py-1 border border-border-light dark:border-border-dark">
-          <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark font-black">
-            Ended
-          </span>
+          <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark font-black">Ended</span>
         </div>
       </div>
 
       {/* Info */}
       <div className="p-5">
-        <h3 className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-snug mb-3">
-          {auction.title}
-        </h3>
+        <h3 className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-snug mb-3">{auction.title}</h3>
 
         {/* Mini stats */}
         <div className="flex items-center gap-4 mb-3">

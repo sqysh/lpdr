@@ -23,7 +23,7 @@ export const inputCls = `
 `
 
 export const labelCls = `
-  block text-[10px] font-mono tracking-[0.15em] uppercase
+  block text-[10px] font-mono tracking-tag uppercase
   text-muted-light dark:text-muted-dark mb-1.5
 `
 
@@ -33,9 +33,7 @@ export function SectionHeader({ title, aside }: { title: string; aside?: React.R
   return (
     <div className="flex items-center gap-2 mb-5 pb-3 border-b border-border-light dark:border-border-dark">
       <div className="w-1 h-3.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-      <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-        {title}
-      </h2>
+      <h2 className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">{title}</h2>
       {aside && <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark ml-auto">{aside}</span>}
     </div>
   )

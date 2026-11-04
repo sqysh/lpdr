@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react'
 import { LinkBody } from 'components/_common/LinkBody'
 
 const linkClass =
-  'inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2'
+  'inline-flex items-center gap-1.5 text-[9px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2'
 
 const mutedLink = `${linkClass} text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark`
 

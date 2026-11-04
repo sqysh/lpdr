@@ -68,7 +68,7 @@ export default function AdminFilterTabs<T extends string>({ options, value, onCh
         aria-haspopup="listbox"
         aria-expanded={open}
         aria-label={label}
-        className="flex items-center gap-2 px-3 py-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[9px] font-mono tracking-[0.2em] uppercase text-text-light dark:text-text-dark transition-colors hover:border-primary-light/50 dark:hover:border-primary-dark/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+        className="flex items-center gap-2 px-3 py-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[9px] font-mono tracking-eyebrow uppercase text-text-light dark:text-text-dark transition-colors hover:border-primary-light/50 dark:hover:border-primary-dark/50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
       >
         <ListFilter className="w-3 h-3 text-muted-light dark:text-muted-dark" aria-hidden="true" />
         <span>{getLabel(value)}</span>
@@ -104,13 +104,15 @@ export default function AdminFilterTabs<T extends string>({ options, value, onCh
                   aria-hidden="true"
                 />
                 <span
-                  className={`flex-1 text-[9px] font-mono tracking-[0.2em] uppercase ${
+                  className={`flex-1 text-[9px] font-mono tracking-eyebrow uppercase ${
                     selected ? 'text-text-light dark:text-text-dark' : 'text-muted-light dark:text-muted-dark'
                   }`}
                 >
                   {getLabel(opt)}
                 </span>
-                {counts && <span className="text-[9px] font-mono tabular-nums text-primary-light dark:text-primary-dark">{counts[opt]}</span>}
+                {counts && (
+                  <span className="text-[9px] font-mono tabular-nums text-primary-light dark:text-primary-dark">{counts[opt]}</span>
+                )}
               </button>
             )
           })}

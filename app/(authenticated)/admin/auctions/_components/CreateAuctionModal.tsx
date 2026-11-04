@@ -101,7 +101,7 @@ export function CreateAuctionModal({ isOpen, onClose }: { isOpen: boolean; onClo
                   <Gavel size={14} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
                 </div>
                 <div>
-                  <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Admin</p>
+                  <p className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Admin</p>
                   <h2
                     id="auction-modal-title"
                     className="text-sm font-quicksand font-black text-text-light dark:text-text-dark leading-snug"
@@ -220,7 +220,7 @@ export function CreateAuctionModal({ isOpen, onClose }: { isOpen: boolean; onClo
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="px-4 py-2.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-[0.2em] uppercase hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors duration-150 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="px-4 py-2.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-eyebrow uppercase hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors duration-150 disabled:opacity-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 Cancel
               </button>
@@ -228,7 +228,7 @@ export function CreateAuctionModal({ isOpen, onClose }: { isOpen: boolean; onClo
                 type="submit"
                 disabled={isSubmitting}
                 aria-busy={isSubmitting}
-                className="flex items-center gap-2 px-4 py-2.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="flex items-center gap-2 px-4 py-2.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-eyebrow uppercase transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 {isSubmitting ? (
                   <>

@@ -43,9 +43,7 @@ export function EmailChangeSection({ currentEmail }: Props) {
     return (
       <div className="flex items-center gap-2 mt-1">
         <Check className="w-3 h-3 text-emerald-500 shrink-0" aria-hidden="true" />
-        <p className="font-mono text-[10px] tracking-[0.15em] uppercase text-emerald-500">
-          Verification sent — check your new email
-        </p>
+        <p className="font-mono text-[10px] tracking-tag uppercase text-emerald-500">Verification sent — check your new email</p>
       </div>
     )
   }
@@ -92,7 +90,7 @@ export function EmailChangeSection({ currentEmail }: Props) {
               type="button"
               onClick={handleSubmit}
               disabled={!email.trim() || loading}
-              className="flex items-center gap-1.5 px-3 py-2 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="flex items-center gap-1.5 px-3 py-2 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-eyebrow uppercase transition-colors disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               {loading ? (
                 <>
@@ -106,7 +104,7 @@ export function EmailChangeSection({ currentEmail }: Props) {
             <button
               type="button"
               onClick={handleCancel}
-              className="flex items-center gap-1.5 px-3 py-2 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-[0.2em] uppercase hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="flex items-center gap-1.5 px-3 py-2 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-eyebrow uppercase hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               <X className="w-3 h-3" aria-hidden="true" />
               Cancel

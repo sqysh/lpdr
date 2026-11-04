@@ -41,12 +41,7 @@ export function CartBar() {
       </AnimatePresence>
 
       {/* Bar */}
-      <div
-        className="fixed bottom-0 left-0 right-0 z-70"
-        role="region"
-        aria-label="Shopping cart"
-        aria-live="polite"
-      >
+      <div className="fixed bottom-0 left-0 right-0 z-70" role="region" aria-label="Shopping cart" aria-live="polite">
         <AnimatePresence>
           {isExpanded && (
             <motion.div
@@ -71,12 +66,7 @@ export function CartBar() {
                       aria-hidden="true"
                     >
                       {item.image ? (
-                        <Picture
-                          priority={true}
-                          src={item.image}
-                          alt=""
-                          className="w-full h-full object-cover"
-                        />
+                        <Picture priority={true} src={item.image} alt="" className="w-full h-full object-cover" />
                       ) : (
                         <div className="w-full h-full flex items-center justify-center">
                           <ShoppingBag className="w-3 h-3 text-muted-light dark:text-muted-dark" />
@@ -86,14 +76,8 @@ export function CartBar() {
 
                     {/* Name + qty */}
                     <div className="flex-1 min-w-0">
-                      <p className="text-[11px] font-mono text-text-light dark:text-text-dark truncate">
-                        {item.name}
-                      </p>
-                      {item.quantity > 1 && (
-                        <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                          ×{item.quantity}
-                        </p>
-                      )}
+                      <p className="text-[11px] font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
+                      {item.quantity > 1 && <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark">×{item.quantity}</p>}
                     </div>
 
                     {/* Price */}
@@ -119,7 +103,7 @@ export function CartBar() {
                 <button
                   type="button"
                   onClick={() => clearCart()}
-                  className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:underline"
+                  className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark hover:text-red-500 dark:hover:text-red-400 transition-colors focus:outline-none focus-visible:underline"
                 >
                   Clear cart
                 </button>
@@ -146,7 +130,7 @@ export function CartBar() {
                   {totalItems}
                 </span>
               </div>
-              <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
+              <span className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark">
                 {totalItems} item{totalItems !== 1 ? 's' : ''}
               </span>
             </button>
@@ -155,14 +139,12 @@ export function CartBar() {
             <div className="flex-1" aria-hidden="true" />
 
             {/* Total */}
-            <span className="font-quicksand font-black text-lg text-text-light dark:text-text-dark tabular-nums">
-              ${totalPrice}
-            </span>
+            <span className="font-quicksand font-black text-lg text-text-light dark:text-text-dark tabular-nums">${totalPrice}</span>
 
             {/* Checkout */}
             <Link
               href="/checkout"
-              className="inline-flex items-center gap-2 px-5 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="inline-flex items-center gap-2 px-5 py-2.5 text-[10px] font-mono tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Checkout
               <ArrowRight className="w-3 h-3" aria-hidden="true" />

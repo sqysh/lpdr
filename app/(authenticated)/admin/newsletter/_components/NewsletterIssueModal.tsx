@@ -5,14 +5,7 @@ import { useRouter } from 'next/navigation'
 import { AnimatePresence, motion } from 'framer-motion'
 import { X, FileText } from 'lucide-react'
 import { MONTHS, YEARS, CURRENT_YEAR } from 'lib/constants/date.constants'
-import {
-  fieldLabel,
-  fieldBase,
-  fieldInput,
-  focusRing,
-  buttonPrimary,
-  buttonSecondary
-} from 'lib/constants/form.styles.constants'
+import { fieldLabel, fieldBase, fieldInput, focusRing, buttonPrimary, buttonSecondary } from 'lib/constants/form.styles.constants'
 import createNewsletterIssue from 'lib/actions/admin/newsletter-issue/createNewsletterIssue'
 import { useEscapeKey } from 'lib/hooks/useEscapeKey.hook'
 import { FormState } from 'types/newsletter-issue.types'
@@ -23,12 +16,11 @@ const modalShell =
 
 const modalBar = 'px-5 py-4 border-border-light dark:border-border-dark'
 
-const modalTitle =
-  'font-mono text-[11px] tracking-[0.2em] uppercase text-text-light dark:text-text-dark'
+const modalTitle = 'font-mono text-[11px] tracking-eyebrow uppercase text-text-light dark:text-text-dark'
 
 const closeButton = `p-1 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors ${focusRing}`
 
-const previewLink = `inline-flex items-center gap-1.5 mt-2 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:underline`
+const previewLink = `inline-flex items-center gap-1.5 mt-2 text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:underline`
 
 const initialState = (): FormState => ({
   month: MONTHS[new Date().getMonth()],
@@ -52,8 +44,7 @@ export function NewsletterIssueModal({
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const update = <K extends keyof FormState>(key: K, value: FormState[K]) =>
-    setForm((prev) => ({ ...prev, [key]: value }))
+  const update = <K extends keyof FormState>(key: K, value: FormState[K]) => setForm((prev) => ({ ...prev, [key]: value }))
 
   useEscapeKey(isOpen, onClose)
 
@@ -129,12 +120,7 @@ export function NewsletterIssueModal({
                   <label htmlFor="ni-month" className={fieldLabel}>
                     Month
                   </label>
-                  <select
-                    id="ni-month"
-                    value={form.month}
-                    onChange={(e) => update('month', e.target.value)}
-                    className={fieldBase}
-                  >
+                  <select id="ni-month" value={form.month} onChange={(e) => update('month', e.target.value)} className={fieldBase}>
                     {MONTHS.map((m) => (
                       <option key={m} value={m}>
                         {m}
@@ -147,12 +133,7 @@ export function NewsletterIssueModal({
                   <label htmlFor="ni-year" className={fieldLabel}>
                     Year
                   </label>
-                  <select
-                    id="ni-year"
-                    value={form.year}
-                    onChange={(e) => update('year', e.target.value)}
-                    className={fieldBase}
-                  >
+                  <select id="ni-year" value={form.year} onChange={(e) => update('year', e.target.value)} className={fieldBase}>
                     {YEARS.map((y) => (
                       <option key={y} value={y}>
                         {y}
@@ -176,12 +157,7 @@ export function NewsletterIssueModal({
                   className={fieldInput}
                 />
                 {form.pdfUrl && (
-                  <a
-                    href={form.pdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={previewLink}
-                  >
+                  <a href={form.pdfUrl} target="_blank" rel="noopener noreferrer" className={previewLink}>
                     <FileText size={12} aria-hidden="true" />
                     Preview PDF
                   </a>
@@ -200,20 +176,10 @@ export function NewsletterIssueModal({
             </div>
 
             <div className={`${modalBar} border-t flex items-center gap-3`}>
-              <button
-                type="button"
-                onClick={onClose}
-                disabled={loading}
-                className={buttonSecondary}
-              >
+              <button type="button" onClick={onClose} disabled={loading} className={buttonSecondary}>
                 Cancel
               </button>
-              <button
-                type="button"
-                onClick={handleSave}
-                disabled={loading}
-                className={buttonPrimary}
-              >
+              <button type="button" onClick={handleSave} disabled={loading} className={buttonPrimary}>
                 {loading ? 'Saving...' : 'Add issue'}
               </button>
             </div>

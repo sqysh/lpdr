@@ -31,7 +31,7 @@ export default function CartClient() {
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
           <Link
             href="/merch"
-            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="inline-flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 mb-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             <LinkBody
               icon={<ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />}
@@ -42,7 +42,7 @@ export default function CartClient() {
 
           <div className="flex items-center gap-3 mb-2">
             <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">Your Cart</p>
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Your Cart</p>
           </div>
           <h1 className="font-quicksand font-black text-3xl sm:text-4xl text-text-light dark:text-text-dark leading-tight">
             {isEmpty ? (
@@ -73,9 +73,7 @@ export default function CartClient() {
               </div>
               <div>
                 <p className="font-quicksand font-black text-lg text-text-light dark:text-text-dark mb-1">Nothing here yet</p>
-                <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
-                  Add some items from the store to get started.
-                </p>
+                <p className="text-xs font-mono text-muted-light dark:text-muted-dark">Add some items from the store to get started.</p>
               </div>
 
               <div className="flex flex-wrap items-center justify-center gap-3">
@@ -147,7 +145,7 @@ export default function CartClient() {
                 <div className="px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
                   <div className="flex items-center gap-3">
                     <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-                    <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+                    <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
                       Order Summary
                     </p>
                   </div>
@@ -182,9 +180,7 @@ export default function CartClient() {
                   {/* Total */}
                   <div className="flex items-center justify-between">
                     <p className="text-xs font-mono font-black text-text-light dark:text-text-dark">Total</p>
-                    <p className="font-quicksand font-black text-xl text-primary-light dark:text-primary-dark">
-                      {formatMoney(total)}
-                    </p>
+                    <p className="font-quicksand font-black text-xl text-primary-light dark:text-primary-dark">{formatMoney(total)}</p>
                   </div>
                 </div>
 

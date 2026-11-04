@@ -12,6 +12,30 @@ declare global {
   }
 }
 
+// One load per page. Strict Mode remounts, and two widgets on one page, both wait on the same script
+let turnstileLoader: Promise<void> | null = null
+
+function loadTurnstile() {
+  if (window.turnstile) return Promise.resolve()
+
+  turnstileLoader ??= new Promise<void>((resolve, reject) => {
+    const script = document.createElement('script')
+    script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
+    script.async = true
+    script.defer = true
+    script.onload = () => resolve()
+    script.onerror = () => {
+      // Cleared so a later mount can try again instead of inheriting the failure
+      turnstileLoader = null
+      script.remove()
+      reject(new Error('Turnstile failed to load'))
+    }
+    document.head.appendChild(script)
+  })
+
+  return turnstileLoader
+}
+
 /**
  * Renders the Cloudflare Turnstile widget and hands the token back. Most people
  * see a tick and nothing else; a suspicious request gets a challenge.
@@ -44,32 +68,24 @@ export function Turnstile({
 
     let cancelled = false
 
-    const render = () => {
-      if (cancelled || !ref.current || !window.turnstile || widgetId.current) return
+    loadTurnstile()
+      .then(() => {
+        if (cancelled || !ref.current || !window.turnstile || widgetId.current) return
 
-      widgetId.current = window.turnstile.render(ref.current, {
-        sitekey: siteKey,
-        action,
-        theme: 'auto',
-        appearance: 'interaction-only',
-        size: 'flexible',
-        callback: (token: string) => onTokenRef.current(token),
-        'expired-callback': () => onTokenRef.current(null),
-        'error-callback': () => onTokenRef.current(null)
+        widgetId.current = window.turnstile.render(ref.current, {
+          sitekey: siteKey,
+          action,
+          theme: 'auto',
+          appearance: 'interaction-only',
+          size: 'flexible',
+          callback: (token: string) => onTokenRef.current(token),
+          'expired-callback': () => onTokenRef.current(null),
+          'error-callback': () => onTokenRef.current(null)
+        })
       })
-    }
-
-    if (window.turnstile) {
-      render()
-    } else {
-      const script = document.createElement('script')
-      script.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit'
-      script.async = true
-      script.defer = true
-      script.onload = render
-      script.onerror = () => onTokenRef.current(null)
-      document.head.appendChild(script)
-    }
+      .catch(() => {
+        if (!cancelled) onTokenRef.current(null)
+      })
 
     return () => {
       cancelled = true

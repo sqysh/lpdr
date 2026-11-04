@@ -38,13 +38,8 @@ export function MigrationTroubleshootPanel({ userId }: { userId: string }) {
   return (
     <div className="border border-amber-500/30 bg-amber-500/5 p-4 space-y-3">
       <div className="flex items-center gap-2">
-        <AlertCircle
-          className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400"
-          aria-hidden="true"
-        />
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 dark:text-amber-400">
-          Migration troubleshooting
-        </p>
+        <AlertCircle className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" aria-hidden="true" />
+        <p className="text-[10px] font-mono tracking-tag uppercase text-amber-600 dark:text-amber-400">Migration troubleshooting</p>
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -52,7 +47,7 @@ export function MigrationTroubleshootPanel({ userId }: { userId: string }) {
           type="button"
           onClick={handleDiagnose}
           disabled={diagnosing}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono tracking-[0.15em] uppercase border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono tracking-tag uppercase border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark transition-colors disabled:opacity-50"
         >
           <Search className="w-3 h-3" aria-hidden="true" />
           {diagnosing ? 'Checking...' : 'Diagnose'}
@@ -61,12 +56,9 @@ export function MigrationTroubleshootPanel({ userId }: { userId: string }) {
           type="button"
           onClick={handleRetrigger}
           disabled={retriggering}
-          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono tracking-[0.15em] uppercase bg-amber-500 text-white hover:bg-amber-600 transition-colors disabled:opacity-50"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 text-[10px] font-mono tracking-tag uppercase bg-amber-500 text-white hover:bg-amber-600 transition-colors disabled:opacity-50"
         >
-          <RefreshCw
-            className={`w-3 h-3 ${retriggering ? 'animate-spin' : ''}`}
-            aria-hidden="true"
-          />
+          <RefreshCw className={`w-3 h-3 ${retriggering ? 'animate-spin' : ''}`} aria-hidden="true" />
           {retriggering ? 'Running...' : 'Re-run migration'}
         </button>
       </div>

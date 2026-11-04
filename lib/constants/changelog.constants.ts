@@ -14,6 +14,41 @@ export interface ChangelogEntry {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    version: '1.13.0',
+    date: '2026-11-03',
+    title: 'Rainbow Bridge memorials',
+    changes: [
+      {
+        type: 'feature',
+        text: "Rainbow Bridge memorials. Families can give a memorial gift in honor of a dog they lost, with an $18 minimum. Each memorial gets a watercolor card with a butterfly carrying the dog's name over a rainbow bridge, and can include a photo and the family's name"
+      },
+      {
+        type: 'feature',
+        text: 'A new Rainbow Bridge page shows every approved memorial. It appears under Donate in the main menu once memorial gifts are turned on'
+      },
+      {
+        type: 'feature',
+        text: "The family gets their dog's butterfly card in their thank-you email and on their confirmation page, and can find their memorials in My Pack under Giving"
+      },
+      {
+        type: 'feature',
+        text: "Rainbow Bridge in the admin, under Programs. Approve memorials before they go up, hide one with a reason, fix a typo in a dog's name, or remove a photo. A pulsing dot in the sidebar shows when memorials are waiting for review, and a review email goes to lpdr@ for each new one"
+      },
+      {
+        type: 'feature',
+        text: 'Rainbow Bridge settings: turn memorial gifts on or off, set the minimum or a fixed amount, choose the quick-pick amounts, decide what families can add, whether memorials need review, and how long they stay up'
+      },
+      {
+        type: 'improvement',
+        text: "Memorial gifts have their own tab on the Donations page, and an order's details now show the memorial it paid for"
+      },
+      {
+        type: 'improvement',
+        text: 'Adoption agreement: the first indemnity clause (term 8) is removed since term 14 covers it, so the agreement now has 20 terms. Every reference to "dachshund" in the agreement now says "dog"'
+      }
+    ]
+  },
+  {
     version: '1.12.0',
     date: '2026-09-23',
     title: 'Adoption agreements',

@@ -37,15 +37,9 @@ const columns: Column<WelcomeWienerRow>[] = [
         )}
         <div className="min-w-0">
           <p className="text-xs font-nunito text-text-light dark:text-text-dark truncate">
-            {w.name ?? (
-              <span className="text-muted-light dark:text-muted-dark italic">Unnamed</span>
-            )}
+            {w.name ?? <span className="text-muted-light dark:text-muted-dark italic">Unnamed</span>}
           </p>
-          {w.bio && (
-            <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate max-w-45">
-              {w.bio}
-            </p>
-          )}
+          {w.bio && <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark truncate max-w-45">{w.bio}</p>}
         </div>
       </div>
     )
@@ -70,15 +64,9 @@ const columns: Column<WelcomeWienerRow>[] = [
         : w.isLive
           ? 'text-emerald-600 dark:text-emerald-400'
           : 'text-amber-600 dark:text-amber-400'
-      const dotColor = w.archivedAt
-        ? 'bg-border-light dark:bg-border-dark'
-        : w.isLive
-          ? 'bg-emerald-500'
-          : 'bg-amber-500'
+      const dotColor = w.archivedAt ? 'bg-border-light dark:bg-border-dark' : w.isLive ? 'bg-emerald-500' : 'bg-amber-500'
       return (
-        <span
-          className={`inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.15em] uppercase ${textColor}`}
-        >
+        <span className={`inline-flex items-center gap-1.5 text-[9px] font-mono tracking-tag uppercase ${textColor}`}>
           <span className={`w-1.5 h-1.5 shrink-0 ${dotColor}`} aria-hidden="true" />
           {status}
         </span>
@@ -91,7 +79,7 @@ const columns: Column<WelcomeWienerRow>[] = [
     cell: (w) => (
       <Link
         href={`/admin/welcome-wieners/${w.id}`}
-        className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark group-hover:text-primary-light dark:group-hover:text-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
+        className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark group-hover:text-primary-light dark:group-hover:text-primary-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
         aria-label={`Edit ${w.name ?? 'wiener'}`}
       >
         Edit →
@@ -109,10 +97,7 @@ export default function AdminWelcomeWienersClient({ welcomeWieners }: Props) {
         title="Welcome Wieners"
         count={{ value: wieners.length, noun: 'wiener' }}
         action={
-          <AdminHeaderButton
-            href="/admin/welcome-wieners/new"
-            icon={<Plus size={11} aria-hidden="true" />}
-          >
+          <AdminHeaderButton href="/admin/welcome-wieners/new" icon={<Plus size={11} aria-hidden="true" />}>
             Add Wiener
           </AdminHeaderButton>
         }
@@ -129,7 +114,7 @@ export default function AdminWelcomeWienersClient({ welcomeWieners }: Props) {
               No welcome wieners yet
               <Link
                 href="/admin/welcome-wieners/new"
-                className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:underline"
+                className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:underline"
               >
                 Add the first one →
               </Link>

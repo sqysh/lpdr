@@ -13,7 +13,7 @@ import { ActionPanel } from './ActionPanel'
 import { Status, StatusMessage } from 'components/_primitives/StatusMessage'
 import { useStatusMessage } from '@hooks/useStatusMessage.hook'
 
-const dangerButton = `shrink-0 inline-flex items-center gap-2 px-4 py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`
+const dangerButton = `shrink-0 inline-flex items-center gap-2 px-4 py-2.5 text-[10px] font-mono tracking-eyebrow uppercase transition-colors duration-200 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed`
 
 export function SettingsTab({ auction, role }: { auction: IAuctionDetail; role: Role }) {
   const router = useRouter()

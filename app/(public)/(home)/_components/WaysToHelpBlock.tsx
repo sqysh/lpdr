@@ -102,7 +102,7 @@ export const WaysToHelpBlock = () => {
       <div className="relative max-w-300 mx-auto">
         {/* Header */}
         <div className="text-center mb-10 sm:mb-14 1200:mb-16 space-y-2">
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Ways to Help</p>
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Ways to Help</p>
           <h2
             id="ways-to-help-heading"
             className="font-quicksand text-text-light dark:text-text-dark leading-tight"
@@ -118,13 +118,13 @@ export const WaysToHelpBlock = () => {
           aria-hidden="true"
         >
           <div className="flex-1 min-w-0">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Initiative</span>
+            <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Initiative</span>
           </div>
           <div className="sm:w-36 shrink-0">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Cost</span>
+            <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Cost</span>
           </div>
           <div className="sm:w-40 shrink-0 flex sm:justify-end">
-            <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Action</span>
+            <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Action</span>
           </div>
         </div>
 
@@ -164,7 +164,7 @@ export const WaysToHelpBlock = () => {
                   {/* Cost */}
                   <div className="sm:w-36 shrink-0">
                     <span
-                      className={`text-[10px] font-mono tracking-[0.2em] uppercase tabular-nums ${
+                      className={`text-[10px] font-mono tracking-eyebrow uppercase tabular-nums ${
                         row.free ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'
                       }`}
                     >
@@ -178,7 +178,7 @@ export const WaysToHelpBlock = () => {
                       <Link
                         href={row.href}
                         aria-label={`${row.cta} — ${row.label}`}
-                        className="group relative text-[10px] font-mono tracking-[0.2em] uppercase text-text-light dark:text-text-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark whitespace-nowrap pb-0.5"
+                        className="group relative text-[10px] font-mono tracking-eyebrow uppercase text-text-light dark:text-text-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark whitespace-nowrap pb-0.5"
                       >
                         {row.cta}
                         <span
@@ -187,7 +187,7 @@ export const WaysToHelpBlock = () => {
                         />
                       </Link>
                     ) : (
-                      <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+                      <span className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                         Just share the love
                       </span>
                     )}

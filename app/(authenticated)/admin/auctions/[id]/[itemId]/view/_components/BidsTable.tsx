@@ -12,14 +12,8 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
       className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
     >
       <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark">
-        <h3
-          id="bid-history"
-          className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
-        >
-          Bid History{' '}
-          <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">
-            {bids.length}
-          </span>
+        <h3 id="bid-history" className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
+          Bid History <span className="ml-1 text-primary-light dark:text-primary-dark tabular-nums">{bids.length}</span>
         </h3>
       </div>
 
@@ -29,25 +23,25 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
             <tr className="border-b border-border-light dark:border-border-dark">
               <th
                 scope="col"
-                className="px-4 py-2.5 text-left text-[9px] font-mono tracking-[0.2em] uppercase font-normal text-muted-light dark:text-muted-dark w-10"
+                className="px-4 py-2.5 text-left text-[9px] font-mono tracking-eyebrow uppercase font-normal text-muted-light dark:text-muted-dark w-10"
               >
                 #
               </th>
               <th
                 scope="col"
-                className="px-4 py-2.5 text-left text-[9px] font-mono tracking-[0.2em] uppercase font-normal text-muted-light dark:text-muted-dark"
+                className="px-4 py-2.5 text-left text-[9px] font-mono tracking-eyebrow uppercase font-normal text-muted-light dark:text-muted-dark"
               >
                 Bidder
               </th>
               <th
                 scope="col"
-                className="px-4 py-2.5 text-right text-[9px] font-mono tracking-[0.2em] uppercase font-normal text-muted-light dark:text-muted-dark"
+                className="px-4 py-2.5 text-right text-[9px] font-mono tracking-eyebrow uppercase font-normal text-muted-light dark:text-muted-dark"
               >
                 Amount
               </th>
               <th
                 scope="col"
-                className="hidden sm:table-cell px-4 py-2.5 text-right text-[9px] font-mono tracking-[0.2em] uppercase font-normal text-muted-light dark:text-muted-dark whitespace-nowrap"
+                className="hidden sm:table-cell px-4 py-2.5 text-right text-[9px] font-mono tracking-eyebrow uppercase font-normal text-muted-light dark:text-muted-dark whitespace-nowrap"
               >
                 Time
               </th>
@@ -62,19 +56,12 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
           >
             {sorted.length > 0 ? (
               sorted.map((bid, i) => {
-                const name =
-                  [bid?.user?.firstName, bid?.user?.lastName].filter(Boolean).join(' ') ||
-                  bid?.user?.email ||
-                  'Anonymous'
+                const name = [bid?.user?.firstName, bid?.user?.lastName].filter(Boolean).join(' ') || bid?.user?.email || 'Anonymous'
                 const isTop = i === 0
                 return (
                   <tr
                     key={bid.id}
-                    className={
-                      isTop
-                        ? 'bg-emerald-500/5'
-                        : 'hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
-                    }
+                    className={isTop ? 'bg-emerald-500/5' : 'hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'}
                   >
                     <td className="px-4 py-2.5">
                       <span
@@ -84,9 +71,7 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
                       </span>
                     </td>
                     <td className="px-4 py-2.5 min-w-0">
-                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate max-w-40 sm:max-w-none">
-                        {name}
-                      </p>
+                      <p className="text-xs font-mono text-text-light dark:text-text-dark truncate max-w-40 sm:max-w-none">{name}</p>
                       <p className="sm:hidden text-[9px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
                         {formatDateTime(bid.createdAt)}
                       </p>
@@ -99,9 +84,7 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
                       </span>
                     </td>
                     <td className="hidden sm:table-cell px-4 py-2.5 text-right whitespace-nowrap">
-                      <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                        {formatDateTime(bid.createdAt)}
-                      </span>
+                      <span className="text-[10px] font-mono text-muted-light dark:text-muted-dark">{formatDateTime(bid.createdAt)}</span>
                     </td>
                   </tr>
                 )
@@ -110,7 +93,7 @@ export function BidsTable({ bids }: { bids: IAuctionBid[] }) {
               <tr>
                 <td
                   colSpan={4}
-                  className="px-4 py-10 text-center text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
+                  className="px-4 py-10 text-center text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
                 >
                   No bids yet
                 </td>

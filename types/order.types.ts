@@ -10,7 +10,19 @@ export const orderDetailArgs = Prisma.validator<Prisma.OrderDefaultArgs>()({
   include: {
     items: { orderBy: { createdAt: 'asc' } },
     user: { select: { ...userContactSelect, anonymousBidding: true } },
-    adoptionAgreement: { select: { id: true } }
+    adoptionAgreement: { select: { id: true } },
+    memorial: {
+      select: {
+        id: true,
+        dogName: true,
+        status: true,
+        photoUrl: true,
+        message: true,
+        donorDisplayName: true,
+        showDonorName: true,
+        updatedAt: true
+      }
+    }
   }
 })
 

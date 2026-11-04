@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             {children}
           </RootLayoutWrapper>
         </SessionProvider>
-        <Analytics />
+        <Analytics debug={false} />
       </body>
     </html>
   )

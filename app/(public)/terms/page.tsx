@@ -22,12 +22,17 @@ function Section({ number, title, children }: SectionProps) {
       className="border-t border-border-light dark:border-border-dark pt-8 sm:pt-10"
     >
       <div className="flex items-baseline gap-4 mb-4">
-        <span className="font-mono text-[10px] tracking-[0.2em] text-primary-light dark:text-primary-dark shrink-0">{number}</span>
-        <h2 id={`section-${number}`} className="font-quicksand font-black text-lg sm:text-xl text-text-light dark:text-text-dark leading-tight">
+        <span className="font-mono text-[10px] tracking-eyebrow text-primary-light dark:text-primary-dark shrink-0">{number}</span>
+        <h2
+          id={`section-${number}`}
+          className="font-quicksand font-black text-lg sm:text-xl text-text-light dark:text-text-dark leading-tight"
+        >
           {title}
         </h2>
       </div>
-      <div className="pl-0 sm:pl-8 space-y-4 font-nunito text-sm sm:text-[15px] text-text-light dark:text-text-dark leading-relaxed">{children}</div>
+      <div className="pl-0 sm:pl-8 space-y-4 font-nunito text-sm sm:text-[15px] text-text-light dark:text-text-dark leading-relaxed">
+        {children}
+      </div>
     </motion.section>
   )
 }
@@ -48,7 +53,9 @@ function BulletList({ items }: { items: string[] }) {
 function SubSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div>
-      <h3 className="font-quicksand font-bold text-[13px] sm:text-sm text-text-light dark:text-text-dark uppercase tracking-wide mb-2">{title}</h3>
+      <h3 className="font-quicksand font-bold text-[13px] sm:text-sm text-text-light dark:text-text-dark uppercase tracking-wide mb-2">
+        {title}
+      </h3>
       <div className="space-y-3">{children}</div>
     </div>
   )
@@ -90,7 +97,7 @@ export default function TermsPage() {
             aria-hidden="true"
           >
             <div className="w-6 h-px bg-primary-light dark:bg-primary-dark" />
-            <span className="font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Legal</span>
+            <span className="font-mono text-[10px] tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Legal</span>
           </motion.div>
 
           <motion.h1
@@ -141,20 +148,20 @@ export default function TermsPage() {
             &quot;our&quot;), a volunteer-run 501(c)(3) nonprofit organization.
           </p>
           <p className="font-nunito text-sm sm:text-[15px] text-muted-light dark:text-muted-dark leading-relaxed mt-3">
-            By creating an account or using our Platform, you agree to be bound by these Terms. Please read them carefully. If you do not agree, do
-            not use our Platform.
+            By creating an account or using our Platform, you agree to be bound by these Terms. Please read them carefully. If you do not
+            agree, do not use our Platform.
           </p>
         </motion.div>
 
         {/* Section 1 */}
         <Section number="01" title="Eligibility">
           <p>
-            You must be at least 18 years of age to create an account or make any purchase or donation through our Platform. By using our Platform,
-            you represent and warrant that you meet this requirement.
+            You must be at least 18 years of age to create an account or make any purchase or donation through our Platform. By using our
+            Platform, you represent and warrant that you meet this requirement.
           </p>
           <p>
-            Our Platform is available to residents of the United States. We make no representation that the Platform is appropriate or available in
-            other locations.
+            Our Platform is available to residents of the United States. We make no representation that the Platform is appropriate or
+            available in other locations.
           </p>
         </Section>
 
@@ -162,21 +169,23 @@ export default function TermsPage() {
         <Section number="02" title="Accounts">
           <SubSection title="Registration">
             <p>
-              To access certain features of our Platform, you must create an account. You may sign in using your email address via a magic link or
-              through Google OAuth. You agree to provide accurate and complete information when creating your account and to keep it up to date.
+              To access certain features of our Platform, you must create an account. You may sign in using your email address via a magic
+              link or through Google OAuth. You agree to provide accurate and complete information when creating your account and to keep it
+              up to date.
             </p>
           </SubSection>
           <SubSection title="Account Security">
             <p>
-              You are responsible for maintaining the security of your account. Because we use passwordless authentication via magic links and OAuth,
-              you should keep your email account secure and log out of our Platform on shared devices. If you believe your account has been
-              compromised, contact us immediately.
+              You are responsible for maintaining the security of your account. Because we use passwordless authentication via magic links
+              and OAuth, you should keep your email account secure and log out of our Platform on shared devices. If you believe your
+              account has been compromised, contact us immediately.
             </p>
           </SubSection>
           <SubSection title="Account Termination">
             <p>
-              We reserve the right to suspend or terminate your account at any time if we believe you have violated these Terms, engaged in fraudulent
-              activity, or for any other reason at our sole discretion. You may also request deletion of your account at any time by contacting us.
+              We reserve the right to suspend or terminate your account at any time if we believe you have violated these Terms, engaged in
+              fraudulent activity, or for any other reason at our sole discretion. You may also request deletion of your account at any time
+              by contacting us.
             </p>
           </SubSection>
         </Section>
@@ -184,21 +193,21 @@ export default function TermsPage() {
         {/* Section 3 */}
         <Section number="03" title="Donations">
           <p>
-            All donations made through our Platform are voluntary contributions to Little Paws Dachshund Rescue, a 501(c)(3) nonprofit organization.
-            Donations are generally tax-deductible to the extent permitted by law. We recommend consulting a tax advisor regarding your specific
-            situation.
+            All donations made through our Platform are voluntary contributions to Little Paws Dachshund Rescue, a 501(c)(3) nonprofit
+            organization. Donations are generally tax-deductible to the extent permitted by law. We recommend consulting a tax advisor
+            regarding your specific situation.
           </p>
           <Warning>
-            All donations are final and non-refundable unless we determine at our sole discretion that a refund is appropriate due to a technical
-            error or other exceptional circumstance.
+            All donations are final and non-refundable unless we determine at our sole discretion that a refund is appropriate due to a
+            technical error or other exceptional circumstance.
           </Warning>
           <p>
-            Donation amounts displayed on our Platform are processed in U.S. dollars. Payment processing is handled by Stripe, Inc. By making a
-            donation you agree to Stripe&apos;s Terms of Service.
+            Donation amounts displayed on our Platform are processed in U.S. dollars. Payment processing is handled by Stripe, Inc. By
+            making a donation you agree to Stripe&apos;s Terms of Service.
           </p>
           <p>
-            We will send a donation receipt to the email address associated with your account. It is your responsibility to maintain records of your
-            donations for tax purposes.
+            We will send a donation receipt to the email address associated with your account. It is your responsibility to maintain records
+            of your donations for tax purposes.
           </p>
         </Section>
 
@@ -206,8 +215,8 @@ export default function TermsPage() {
         <Section number="04" title="Auctions">
           <SubSection title="Bidding">
             <p>
-              When you place a bid in one of our auctions, you are entering into a binding commitment to purchase the item at your bid price if you
-              are the winning bidder at the close of the auction. Bids cannot be retracted once placed.
+              When you place a bid in one of our auctions, you are entering into a binding commitment to purchase the item at your bid price
+              if you are the winning bidder at the close of the auction. Bids cannot be retracted once placed.
             </p>
             <BulletList
               items={[
@@ -221,21 +230,22 @@ export default function TermsPage() {
           </SubSection>
           <SubSection title="Winning Bidder Obligations">
             <p>
-              If you are the winning bidder, you will receive an email notification with instructions to complete payment. Payment must be completed
-              within the timeframe specified in that notification. Failure to complete payment may result in forfeiture of your winning bid,
-              suspension of your bidding privileges, and recovery of costs incurred by Little Paws.
+              If you are the winning bidder, you will receive an email notification with instructions to complete payment. Payment must be
+              completed within the timeframe specified in that notification. Failure to complete payment may result in forfeiture of your
+              winning bid, suspension of your bidding privileges, and recovery of costs incurred by Little Paws.
             </p>
           </SubSection>
           <SubSection title="Auction Integrity">
             <Warning>
-              Shill bidding, bid manipulation, or any attempt to artificially inflate prices or interfere with the auction process is strictly
-              prohibited and will result in immediate account termination.
+              Shill bidding, bid manipulation, or any attempt to artificially inflate prices or interfere with the auction process is
+              strictly prohibited and will result in immediate account termination.
             </Warning>
           </SubSection>
           <SubSection title="Item Descriptions">
             <p>
-              We make reasonable efforts to accurately describe auction items. All items are sold as described. Little Paws makes no warranties,
-              express or implied, regarding the condition, authenticity, or fitness for a particular purpose of any auction item.
+              We make reasonable efforts to accurately describe auction items. All items are sold as described. Little Paws makes no
+              warranties, express or implied, regarding the condition, authenticity, or fitness for a particular purpose of any auction
+              item.
             </p>
           </SubSection>
         </Section>
@@ -243,8 +253,8 @@ export default function TermsPage() {
         {/* Section 5 */}
         <Section number="05" title="Store Purchases">
           <p>
-            Our store sells physical and digital products including merchandise, Welcome Wiener donation packages, and e-cards. By placing an order
-            you agree to pay the listed price plus any applicable shipping fees and taxes.
+            Our store sells physical and digital products including merchandise, Welcome Wiener donation packages, and e-cards. By placing
+            an order you agree to pay the listed price plus any applicable shipping fees and taxes.
           </p>
           <SubSection title="Physical Products">
             <BulletList
@@ -258,15 +268,15 @@ export default function TermsPage() {
           </SubSection>
           <SubSection title="Digital Products & Donations">
             <p>
-              Welcome Wiener packages and e-cards are digital items delivered immediately upon successful payment. These items are non-refundable once
-              delivered.
+              Welcome Wiener packages and e-cards are digital items delivered immediately upon successful payment. These items are
+              non-refundable once delivered.
             </p>
           </SubSection>
           <SubSection title="Returns & Refunds">
             <p>
-              Physical merchandise may be returned within 14 days of delivery if it arrives damaged or defective. To initiate a return, contact us
-              with your order number and a description of the issue. We will provide a prepaid return label for eligible returns. Refunds are issued
-              to the original payment method within 5–10 business days of receiving the returned item.
+              Physical merchandise may be returned within 14 days of delivery if it arrives damaged or defective. To initiate a return,
+              contact us with your order number and a description of the issue. We will provide a prepaid return label for eligible returns.
+              Refunds are issued to the original payment method within 5–10 business days of receiving the returned item.
             </p>
             <Muted>We do not accept returns for items that have been used, washed, or altered. Sale items are final sale.</Muted>
           </SubSection>
@@ -275,17 +285,18 @@ export default function TermsPage() {
         {/* Section 6 */}
         <Section number="06" title="Adoption Fees">
           <p>
-            Adoption fees paid through our Platform are non-refundable deposits that reserve your place in the adoption process for a specific dog.
-            Payment of an adoption fee does not guarantee placement of a dog with you — placement decisions are made at the sole discretion of Little
-            Paws based on the dog&apos;s needs and your application.
+            Adoption fees paid through our Platform are non-refundable deposits that reserve your place in the adoption process for a
+            specific dog. Payment of an adoption fee does not guarantee placement of a dog with you — placement decisions are made at the
+            sole discretion of Little Paws based on the dog&apos;s needs and your application.
           </p>
           <p>
-            Adoption application processing is managed through Rescue Groups, a separate platform. These Terms do not govern your use of Rescue
-            Groups.
+            Adoption application processing is managed through Rescue Groups, a separate platform. These Terms do not govern your use of
+            Rescue Groups.
           </p>
           <Warning>
-            If an adoption is not completed due to circumstances within our control, your adoption fee may be applied to another dog or refunded at
-            our discretion. Fees are not refunded if you withdraw your application or are found to be ineligible after application review.
+            If an adoption is not completed due to circumstances within our control, your adoption fee may be applied to another dog or
+            refunded at our discretion. Fees are not refunded if you withdraw your application or are found to be ineligible after
+            application review.
           </Warning>
         </Section>
 
@@ -310,21 +321,21 @@ export default function TermsPage() {
         {/* Section 8 */}
         <Section number="08" title="Intellectual Property">
           <p>
-            All content on our Platform, including text, photographs, graphics, logos, and dog profiles, is the property of Little Paws Dachshund
-            Rescue or is used with permission. You may not reproduce, distribute, modify, or create derivative works from any content on our Platform
-            without our prior written consent.
+            All content on our Platform, including text, photographs, graphics, logos, and dog profiles, is the property of Little Paws
+            Dachshund Rescue or is used with permission. You may not reproduce, distribute, modify, or create derivative works from any
+            content on our Platform without our prior written consent.
           </p>
           <p>
-            Dog photographs submitted by fosters and volunteers remain the property of the photographer. By submitting a photograph to us, you grant
-            Little Paws a non-exclusive, royalty-free license to use that photograph on our Platform and in our communications.
+            Dog photographs submitted by fosters and volunteers remain the property of the photographer. By submitting a photograph to us,
+            you grant Little Paws a non-exclusive, royalty-free license to use that photograph on our Platform and in our communications.
           </p>
         </Section>
 
         {/* Section 9 */}
         <Section number="09" title="Disclaimers">
           <p>
-            Our Platform is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or implied. We do
-            not warrant that:
+            Our Platform is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind, either express or
+            implied. We do not warrant that:
           </p>
           <BulletList
             items={[
@@ -335,45 +346,46 @@ export default function TermsPage() {
             ]}
           />
           <Muted>
-            Little Paws is a volunteer-run organization. We do our best but cannot guarantee uninterrupted service or perfect accuracy in all
-            listings.
+            Little Paws is a volunteer-run organization. We do our best but cannot guarantee uninterrupted service or perfect accuracy in
+            all listings.
           </Muted>
         </Section>
 
         {/* Section 10 */}
         <Section number="10" title="Limitation of Liability">
           <Warning>
-            To the fullest extent permitted by law, Little Paws Dachshund Rescue, its officers, directors, volunteers, and agents shall not be liable
-            for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of our Platform, including
-            but not limited to loss of data, loss of donations, or auction disputes. Our total liability to you for any claim shall not exceed the
-            amount you paid to us in the 12 months preceding the claim.
+            To the fullest extent permitted by law, Little Paws Dachshund Rescue, its officers, directors, volunteers, and agents shall not
+            be liable for any indirect, incidental, special, consequential, or punitive damages arising out of or related to your use of our
+            Platform, including but not limited to loss of data, loss of donations, or auction disputes. Our total liability to you for any
+            claim shall not exceed the amount you paid to us in the 12 months preceding the claim.
           </Warning>
         </Section>
 
         {/* Section 11 */}
         <Section number="11" title="Indemnification">
           <p>
-            You agree to indemnify, defend, and hold harmless Little Paws Dachshund Rescue and its volunteers, officers, directors, and agents from
-            and against any claims, liabilities, damages, losses, and expenses (including reasonable attorneys&apos; fees) arising out of or in any
-            way connected with your use of our Platform, your violation of these Terms, or your violation of any rights of a third party.
+            You agree to indemnify, defend, and hold harmless Little Paws Dachshund Rescue and its volunteers, officers, directors, and
+            agents from and against any claims, liabilities, damages, losses, and expenses (including reasonable attorneys&apos; fees)
+            arising out of or in any way connected with your use of our Platform, your violation of these Terms, or your violation of any
+            rights of a third party.
           </p>
         </Section>
 
         {/* Section 12 */}
         <Section number="12" title="Governing Law">
           <p>
-            These Terms are governed by and construed in accordance with the laws of the State of Florida, without regard to its conflict of law
-            provisions. Any dispute arising under these Terms shall be resolved exclusively in the state or federal courts located in Florida, and you
-            consent to the personal jurisdiction of such courts.
+            These Terms are governed by and construed in accordance with the laws of the State of Florida, without regard to its conflict of
+            law provisions. Any dispute arising under these Terms shall be resolved exclusively in the state or federal courts located in
+            Florida, and you consent to the personal jurisdiction of such courts.
           </p>
         </Section>
 
         {/* Section 13 */}
         <Section number="13" title="Changes to These Terms">
           <p>
-            We may update these Terms from time to time. When we do, we will update the effective date at the top of this page and, for material
-            changes, notify registered users by email. Your continued use of our Platform after changes take effect constitutes your acceptance of the
-            updated Terms.
+            We may update these Terms from time to time. When we do, we will update the effective date at the top of this page and, for
+            material changes, notify registered users by email. Your continued use of our Platform after changes take effect constitutes
+            your acceptance of the updated Terms.
           </p>
         </Section>
 
@@ -405,7 +417,7 @@ export default function TermsPage() {
           </p>
           <Link
             href="/privacy-policy"
-            className="font-mono text-[10px] tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="font-mono text-[10px] tracking-tag uppercase text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             Privacy Policy →
           </Link>

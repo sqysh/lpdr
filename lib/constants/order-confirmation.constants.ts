@@ -9,6 +9,10 @@ export const ORDER_TYPE_EMAIL_CONFIG: Record<OrderType, { heading: string; body:
     heading: 'Your recurring gift is active!',
     body: "Your recurring donation has been set up successfully. Your ongoing support means the world to the dogs in our care, and you'll be charged automatically until you choose to cancel."
   },
+  MEMORIAL_DONATION: {
+    heading: 'Thank you for remembering them with us!',
+    body: 'Your memorial gift honors a dog who was dearly loved, and it helps the dachshunds in our care today. Their butterfly is on its way across the Rainbow Bridge.'
+  },
   ADOPTION_FEE: {
     heading: 'Your adoption fee is received!',
     body: "We've received your adoption fee payment. Our team will be in touch shortly with next steps."

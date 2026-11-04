@@ -2,7 +2,7 @@ import 'server-only'
 import prisma from 'prisma/client'
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
-import { COLOR } from 'lib/constants/order-confirmation-constants'
+import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
 

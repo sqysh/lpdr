@@ -5,10 +5,7 @@ import { FooterNewsletterForm } from './FooterNewsletterForm'
 
 export default function Footer() {
   return (
-    <footer
-      className="bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark"
-      aria-label="Site footer"
-    >
+    <footer className="bg-navbar-light dark:bg-navbar-dark border-t border-border-light dark:border-border-dark" aria-label="Site footer">
       <div className="max-w-180 1000:max-w-240 1200:max-w-300 mx-auto px-4 sm:px-6 lg:px-8">
         {/* ── Top accent line ── */}
         <div className="h-px bg-primary-light dark:bg-primary-dark opacity-30" aria-hidden="true" />
@@ -33,9 +30,7 @@ export default function Footer() {
             <address className="not-italic mt-6 space-y-1.5">
               <div className="flex items-center gap-3">
                 <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                  Contact
-                </p>
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Contact</p>
               </div>
               <a
                 href="mailto:lpdr@littlepawsdr.org"
@@ -69,9 +64,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-5">
               <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-              <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                Quick Links
-              </h2>
+              <h2 className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Quick Links</h2>
             </div>
             <nav aria-label="Footer navigation">
               <ul className="space-y-3" role="list">
@@ -97,9 +90,7 @@ export default function Footer() {
           <div>
             <div className="flex items-center gap-3 mb-5">
               <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-              <h2 className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                Newsletter
-              </h2>
+              <h2 className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Newsletter</h2>
             </div>
             <p className="text-[11px] font-mono text-on-dark leading-relaxed mb-4">
               Stay up to date with rescues, events, and ways to help.
@@ -113,14 +104,14 @@ export default function Footer() {
           <div className="flex items-center gap-4 flex-wrap justify-center xs:justify-start">
             <Link
               href="/privacy-policy"
-              className="text-[10px] font-mono tracking-[0.15em] uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="text-[10px] font-mono tracking-tag uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Privacy Policy
             </Link>
             <span className="w-px h-3 bg-border-light dark:bg-border-dark" aria-hidden="true" />
             <Link
               href="/terms"
-              className="text-[10px] font-mono tracking-[0.15em] uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="text-[10px] font-mono tracking-tag uppercase text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Terms of Service
             </Link>

@@ -78,6 +78,7 @@ enum OrderType {
   PURCHASE
   ECARD
   ADOPTION_AGREEMENT
+  MEMORIAL_DONATION
 }
 
 enum OrderItemType {
@@ -177,6 +178,13 @@ enum ApplicationEventKind {
   NOTE
   EMAIL_SENT
   DOG_CHANGED
+}
+
+enum MemorialStatus {
+  PENDING // paid, waiting for someone to review it
+  APPROVED // on the memorial page
+  HIDDEN // taken down by an admin, kept for the record
+  EXPIRED // past its display window, if they choose to have one
 }
 
 // ─── Next Auth ────────────────────────────────────────────────────────────────────
@@ -314,6 +322,10 @@ model User {
   applicationEvents    ApplicationEvent[]  @relation("ApplicationEventActor")
   savedMessages        SavedMessage[]      @relation("SavedMessageCreator")
   legacyApplications   LegacyApplication[] @relation("LegacyApplications")
+
+  memorials               Memorial[]         @relation("MemorialDonor")
+  memorialsApproved       Memorial[]         @relation("MemorialApprovedBy")
+  memorialSettingsUpdates MemorialSettings[] @relation("MemorialSettingsUpdatedBy")
 }
 
 // ─── Payment Method ────────────────────────────────────────────────────────────────────
@@ -417,6 +429,8 @@ model Order {
   // Cumulative, as Stripe reports it. The order only moves to REFUNDED when the whole charge is returned
   refundedAmount Decimal?  @db.Decimal(10, 2)
   refundedAt     DateTime?
+
+  memorial Memorial?
 
   @@index([type, createdAt])
   @@index([status])
@@ -1027,6 +1041,65 @@ model LegacyApplication {
 
   @@index([lastName, firstName])
   @@index([email])
+  @@index([userId])
+}
+
+model MemorialSettings {
+  id        String  @id @default("default")
+  isEnabled Boolean @default(false)
+
+  // Amount. Fixed wins when set; otherwise the minimum applies and donors pick
+  fixedAmount      Decimal?  @db.Decimal(10, 2)
+  minAmount        Decimal   @default(5) @db.Decimal(10, 2)
+  suggestedAmounts Decimal[] @db.Decimal(10, 2)
+
+  // What donors can share
+  allowPhoto       Boolean @default(false)
+  allowMessage     Boolean @default(true)
+  messageMaxLength Int     @default(280)
+  allowDonorName   Boolean @default(true)
+
+  // Review and display
+  requireApproval Boolean @default(true)
+  displayDays     Int? // null keeps memorials up for good
+
+  updatedAt   DateTime @updatedAt
+  updatedById String?
+  updatedBy   User?    @relation("MemorialSettingsUpdatedBy", fields: [updatedById], references: [id], onDelete: SetNull)
+}
+
+model Memorial {
+  id String @id @default(cuid())
+
+  dogName          String
+  message          String?
+  photoUrl         String?
+  donorDisplayName String? // e.g. "the Smith family"; only shown when showDonorName is true
+  showDonorName    Boolean @default(false)
+
+  // Picks the butterfly's colour and starting spot, so it stays the same on every visit
+  butterflySeed Int
+
+  status       MemorialStatus @default(PENDING)
+  approvedAt   DateTime?
+  approvedById String?
+  approvedBy   User?          @relation("MemorialApprovedBy", fields: [approvedById], references: [id], onDelete: SetNull)
+  hiddenReason String?
+  expiresAt    DateTime? // set on approval from displayDays
+
+  emailSentAt DateTime? // when the thank-you with the artwork went out
+
+  // The donation that paid for it. Unique, so one payment can never create two memorials
+  orderId String @unique
+  order   Order  @relation(fields: [orderId], references: [id], onDelete: Cascade)
+
+  userId String?
+  user   User?   @relation("MemorialDonor", fields: [userId], references: [id], onDelete: SetNull)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, approvedAt])
   @@index([userId])
 }
 

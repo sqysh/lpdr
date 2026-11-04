@@ -6,10 +6,12 @@ import { AmountState } from './DonateForm'
 
 export function CustomAmount({
   amount,
-  patchAmount
+  patchAmount,
+  min = 5
 }: {
   amount: { useCustom: boolean; customAmount: string }
   patchAmount: (data: Partial<AmountState>) => void
+  min?: number
 }) {
   const [amountBlurred, setAmountBlurred] = useState(false)
 
@@ -20,7 +22,9 @@ export function CustomAmount({
         className="block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-2"
       >
         Custom Amount
-        <span className="ml-1 text-muted-light/60 dark:text-muted-dark/60 normal-case tracking-normal font-sans">(min $5)</span>
+        <span className="ml-1 text-muted-light/60 dark:text-muted-dark/60 normal-case tracking-normal font-sans">
+          (min ${formatWithCommas(min)})
+        </span>
       </label>
       <div className="relative">
         <span
@@ -55,9 +59,9 @@ export function CustomAmount({
               focus-visible:border-primary-light dark:focus-visible:border-primary-dark
             `}
         />
-        {amount?.useCustom && amountBlurred && amount?.customAmount && parseFloat(amount?.customAmount) < 5 && (
+        {amount?.useCustom && amountBlurred && amount?.customAmount && parseFloat(amount?.customAmount) < min && (
           <p id="custom-amount-hint" role="alert" className="absolute text-[11px] text-red-500 dark:text-red-400 mt-1.5 font-mono">
-            Minimum donation is $5
+            Minimum donation is ${formatWithCommas(min)}
           </p>
         )}
       </div>

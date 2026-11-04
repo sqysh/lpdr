@@ -27,21 +27,9 @@ export function DrawerAuthSection({ session, isLinkActive, onClose }: Props) {
     return (
       <div className="px-4 py-4 space-y-1">
         {session.data.user.role === 'ADMIN' && (
-          <DrawerNavLink
-            href="/admin/dashboard"
-            icon={LayoutDashboard}
-            label="Dashboard"
-            active={false}
-            onClose={onClose}
-          />
+          <DrawerNavLink href="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" active={false} onClose={onClose} />
         )}
-        <DrawerNavLink
-          href="/my-pack"
-          icon={User}
-          label="My Pack"
-          active={isLinkActive('/my-pack')}
-          onClose={onClose}
-        />
+        <DrawerNavLink href="/my-pack" icon={User} label="My Pack" active={isLinkActive('/my-pack')} onClose={onClose} />
       </div>
     )
   }
@@ -58,31 +46,18 @@ export function DrawerAuthSection({ session, isLinkActive, onClose }: Props) {
               exit={{ opacity: 0 }}
               className="flex items-start gap-2 px-3.5 py-2.5 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark"
             >
-              <Mail
-                className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5"
-                aria-hidden="true"
-              />
+              <Mail className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
               <div>
-                <p className="text-xs uppercase tracking-[0.15em] text-text-light dark:text-text-dark">
-                  Check your inbox
-                </p>
+                <p className="text-xs uppercase tracking-tag text-text-light dark:text-text-dark">Check your inbox</p>
                 <p className="font-lato text-xs text-muted-light dark:text-muted-dark mt-0.5 leading-relaxed">
-                  Magic link sent to{' '}
-                  <span className="text-text-light dark:text-text-dark">{email}</span>
+                  Magic link sent to <span className="text-text-light dark:text-text-dark">{email}</span>
                 </p>
               </div>
             </motion.div>
           ) : (
-            <motion.div
-              key="form"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-            >
+            <motion.div key="form" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
               <div className="mb-3">
-                <p className="text-xs uppercase tracking-[0.25em] text-text-light dark:text-text-dark">
-                  Sign In
-                </p>
+                <p className="text-xs uppercase tracking-[0.25em] text-text-light dark:text-text-dark">Sign In</p>
                 <p className="font-lato text-xs text-muted-light dark:text-muted-dark mt-1 leading-relaxed">
                   Sign in to view your profile, orders, and more.
                 </p>
@@ -96,18 +71,11 @@ export function DrawerAuthSection({ session, isLinkActive, onClose }: Props) {
 
                 <div className="flex items-center gap-2.5" aria-hidden="true">
                   <span className="flex-1 h-px bg-border-light dark:bg-border-dark" />
-                  <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                    or
-                  </span>
+                  <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">or</span>
                   <span className="flex-1 h-px bg-border-light dark:bg-border-dark" />
                 </div>
 
-                <MagicLink
-                  email={email}
-                  redirectTo={redirectTo}
-                  setEmail={setEmail}
-                  setSent={setSent}
-                />
+                <MagicLink email={email} redirectTo={redirectTo} setEmail={setEmail} setSent={setSent} />
 
                 <div className="-mx-4 mt-1 border-t border-border-light dark:border-border-dark px-4 py-3">
                   <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark text-center leading-relaxed">

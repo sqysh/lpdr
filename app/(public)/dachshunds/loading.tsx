@@ -12,7 +12,7 @@ export default function Loading() {
             <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
             <p
               id="adopt-loading-heading"
-              className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark"
+              className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark"
             >
               Available Now
             </p>
@@ -26,10 +26,7 @@ export default function Loading() {
         {/* Grid */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-2" aria-hidden="true">
           {Array.from({ length: 8 }).map((_, i) => (
-            <div
-              key={i}
-              className="relative overflow-hidden aspect-3/4 bg-surface-light dark:bg-surface-dark animate-pulse"
-            >
+            <div key={i} className="relative overflow-hidden aspect-3/4 bg-surface-light dark:bg-surface-dark animate-pulse">
               {/* Label block anchored bottom-left, matching DogCard */}
               <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-5 space-y-2">
                 <div className="h-2.5 w-6 bg-bg-light/40 dark:bg-bg-dark/40" />

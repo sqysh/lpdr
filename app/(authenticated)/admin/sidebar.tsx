@@ -11,19 +11,22 @@ import { BypassCode } from './_components/BypassCode'
 import { NavRowBody } from 'app/(authenticated)/admin/_components/NavRowBody'
 import { useState } from 'react'
 import { LinkBody } from 'components/_common/LinkBody'
+import { AdminBadges } from 'lib/actions/admin/getAdminBadges'
 
 export default function AdminSidebar({
   onClose,
   email,
   role,
   bypassCode,
-  bypassCodeRotatesAt
+  bypassCodeRotatesAt,
+  badges
 }: {
   onClose?: () => void
   email: string
   role: Role
   bypassCode: string
   bypassCodeRotatesAt: string
+  badges: AdminBadges
 }) {
   const pathname = usePathname()
   const [signingOut, setSigningOut] = useState(false)
@@ -52,7 +55,7 @@ export default function AdminSidebar({
         href="/"
         className="flex items-center gap-2.5 px-4 mb-6 font-mono text-[11px] tracking-eyebrow uppercase text-text-light dark:text-text-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
       >
-        <LinkBody icon={null} label="Little Paws" />
+        <LinkBody icon={null} label="Little Paws" iconAfter />
         <span className="sr-only">, back to the site</span>
       </Link>
 
@@ -66,6 +69,8 @@ export default function AdminSidebar({
             {group.items.map((item) => {
               const Icon = item.icon
               const active = isActive(item.href)
+              const waiting = item.badge ? badges[item.badge] : 0
+
               return (
                 <Link
                   key={item.label}
@@ -78,6 +83,13 @@ export default function AdminSidebar({
                     <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                   )}
                   <NavRowBody Icon={Icon} label={item.label} />
+                  {waiting > 0 && (
+                    <span className="relative ml-auto flex w-2 h-2 shrink-0" title={`${waiting} waiting for review`}>
+                      <span className="absolute inset-0 rounded-full bg-amber-500 opacity-75 motion-safe:animate-ping" aria-hidden="true" />
+                      <span className="relative w-2 h-2 rounded-full bg-amber-500" aria-hidden="true" />
+                      <span className="sr-only">, {waiting} waiting for review</span>
+                    </span>
+                  )}
                 </Link>
               )
             })}

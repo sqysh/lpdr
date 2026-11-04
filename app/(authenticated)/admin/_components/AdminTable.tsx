@@ -21,15 +21,7 @@ type Props<T> = {
 
 const defaultRowClass = 'group hover:bg-primary-light/5 dark:hover:bg-primary-dark/5 transition-colors'
 
-export default function AdminTable<T>({
-  columns,
-  rows,
-  rowKey,
-  caption,
-  emptyMessage = 'No results',
-  rowClassName,
-  onRowClick
-}: Props<T>) {
+export default function AdminTable<T>({ columns, rows, rowKey, caption, emptyMessage = 'No results', rowClassName, onRowClick }: Props<T>) {
   return (
     <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark overflow-x-auto">
       <table className="w-full text-left">
@@ -40,7 +32,7 @@ export default function AdminTable<T>({
               <th
                 key={i}
                 scope="col"
-                className={`px-4 py-2.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark font-normal whitespace-nowrap ${
+                className={`px-4 py-2.5 text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark font-normal whitespace-nowrap ${
                   col.headerClassName ?? ''
                 }`}
               >
@@ -80,7 +72,7 @@ export default function AdminTable<T>({
             <tr>
               <td
                 colSpan={columns.length}
-                className="px-4 py-12 text-center text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark"
+                className="px-4 py-12 text-center text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark"
               >
                 {emptyMessage}
               </td>

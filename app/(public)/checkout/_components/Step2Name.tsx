@@ -59,7 +59,7 @@ export function Step2Name({ register, errors, control, onNext }: Props) {
         onClick={onNext}
         disabled={!isValid}
         aria-disabled={!isValid}
-        className={`w-full py-4 font-black text-[11px] tracking-[0.2em] uppercase font-mono transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2
+        className={`w-full py-4 font-black text-[11px] tracking-eyebrow uppercase font-mono transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2
           ${
             isValid
               ? 'bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white cursor-pointer'

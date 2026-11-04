@@ -7,7 +7,7 @@ const inputStyles = `w-full px-3.5 py-3 text-xs font-mono border border-border-l
 
 const lockedInputStyles = `${inputStyles} opacity-50 cursor-not-allowed`
 
-const labelStyles = `flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark`
+const labelStyles = `flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark`
 
 function LockedBadge() {
   return (

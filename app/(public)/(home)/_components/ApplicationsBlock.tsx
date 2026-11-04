@@ -10,8 +10,7 @@ const APPLICATIONS = [
     id: 'adopt',
     label: 'Adoption',
     heading: 'Adopt',
-    description:
-      'Give a dachshund their forever home. Browse our available dogs and start your application today.',
+    description: 'Give a dachshund their forever home. Browse our available dogs and start your application today.',
     href: '/adopt/application',
     cta: 'Apply to Adopt'
   },
@@ -35,8 +34,7 @@ const APPLICATIONS = [
     id: 'foster',
     label: 'Foster',
     heading: 'Foster',
-    description:
-      'Open your home temporarily to a dog in need. Fostering saves lives and prepares dogs for adoption.',
+    description: 'Open your home temporarily to a dog in need. Fostering saves lives and prepares dogs for adoption.',
     href: '/volunteer/foster',
     cta: 'Apply to Foster'
   },
@@ -44,8 +42,7 @@ const APPLICATIONS = [
     id: 'transportation',
     label: 'Transportation',
     heading: 'Transport',
-    description:
-      'Help move dogs safely between locations. Drivers and coordinators are always needed.',
+    description: 'Help move dogs safely between locations. Drivers and coordinators are always needed.',
     href: '/volunteer/transport',
     cta: 'Apply to Transport'
   }
@@ -61,21 +58,15 @@ export function ApplicationsBlock() {
         {/* Header */}
         <div className="mb-10 sm:mb-14">
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-              aria-hidden="true"
-            />
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Get Involved
-            </p>
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Get Involved</p>
           </div>
           <h2
             id="applications-heading"
             className="font-quicksand text-text-light dark:text-text-dark leading-tight"
             style={{ fontSize: 'clamp(1.5rem, 4vw, 3rem)' }}
           >
-            <span className="font-black">WAYS TO</span>{' '}
-            <span className="font-light">GET INVOLVED</span>
+            <span className="font-black">WAYS TO</span> <span className="font-light">GET INVOLVED</span>
           </h2>
         </div>
 
@@ -90,12 +81,7 @@ export function ApplicationsBlock() {
           className="grid grid-cols-1 xs:grid-cols-2 1000:grid-cols-5 gap-px bg-border-light dark:bg-border-dark border border-border-light dark:border-border-dark"
         >
           {APPLICATIONS.map((app) => (
-            <motion.div
-              key={app.id}
-              variants={itemVariants}
-              role="listitem"
-              className="bg-bg-light dark:bg-bg-dark"
-            >
+            <motion.div key={app.id} variants={itemVariants} role="listitem" className="bg-bg-light dark:bg-bg-dark">
               <Link
                 href={app.href}
                 aria-label={`${app.cta} — ${app.description}`}
@@ -103,7 +89,7 @@ export function ApplicationsBlock() {
               >
                 {/* Index */}
                 <span
-                  className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-4"
+                  className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-4"
                   aria-hidden="true"
                 >
                   {String(APPLICATIONS.indexOf(app) + 1).padStart(2, '0')}
@@ -115,23 +101,17 @@ export function ApplicationsBlock() {
                 </h3>
 
                 {/* Label */}
-                <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark mb-4">
+                <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark mb-4">
                   {app.label}
                 </p>
 
                 {/* Description */}
-                <p className="text-xs font-mono text-muted-light dark:text-muted-dark leading-relaxed flex-1 mb-6">
-                  {app.description}
-                </p>
+                <p className="text-xs font-mono text-muted-light dark:text-muted-dark leading-relaxed flex-1 mb-6">{app.description}</p>
 
                 {/* CTA */}
-                <div className="flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-text-light dark:text-text-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors duration-200">
+                <div className="flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-text-light dark:text-text-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors duration-200">
                   {app.cta}
-                  <ArrowRight
-                    size={11}
-                    className="group-hover:translate-x-0.5 transition-transform duration-200"
-                    aria-hidden="true"
-                  />
+                  <ArrowRight size={11} className="group-hover:translate-x-0.5 transition-transform duration-200" aria-hidden="true" />
                 </div>
               </Link>
             </motion.div>

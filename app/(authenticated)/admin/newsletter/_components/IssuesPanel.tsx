@@ -52,16 +52,11 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
       className: 'whitespace-nowrap',
       cell: (issue) => (
         <span
-          className={`inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.15em] uppercase ${
-            issue.isLive
-              ? 'text-emerald-600 dark:text-emerald-400'
-              : 'text-amber-600 dark:text-amber-400'
+          className={`inline-flex items-center gap-1.5 text-[9px] font-mono tracking-tag uppercase ${
+            issue.isLive ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'
           }`}
         >
-          <span
-            className={`w-1.5 h-1.5 shrink-0 ${issue.isLive ? 'bg-emerald-500' : 'bg-amber-500'}`}
-            aria-hidden="true"
-          />
+          <span className={`w-1.5 h-1.5 shrink-0 ${issue.isLive ? 'bg-emerald-500' : 'bg-amber-500'}`} aria-hidden="true" />
           {issue.isLive ? 'Live' : 'Draft'}
         </span>
       )
@@ -75,7 +70,7 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
           target="_blank"
           rel="noopener noreferrer"
           aria-label={`Open ${issue.month} ${issue.year} PDF in new tab`}
-          className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
           <FileText size={11} aria-hidden="true" />
           Open PDF
@@ -93,7 +88,7 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
               type="button"
               onClick={() => handleDelete(issue.id)}
               disabled={deletingId === issue.id}
-              className="text-[10px] font-mono tracking-[0.2em] uppercase text-red-600 dark:text-red-400 hover:underline disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
+              className="text-[10px] font-mono tracking-eyebrow uppercase text-red-600 dark:text-red-400 hover:underline disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500"
             >
               {deletingId === issue.id ? 'Deleting...' : 'Confirm'}
             </button>
@@ -101,7 +96,7 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
               type="button"
               onClick={() => setConfirmId(null)}
               disabled={deletingId === issue.id}
-              className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark disabled:opacity-40 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Cancel
             </button>
@@ -138,7 +133,7 @@ export function IssuesPanel({ issues }: { issues: NewsletterIssue[] }) {
         <StatusMessage status={status} />
 
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
             {issues.length} issue{issues.length !== 1 ? 's' : ''}
           </p>
           <AdminHeaderButton

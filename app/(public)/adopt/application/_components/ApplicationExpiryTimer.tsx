@@ -20,7 +20,7 @@ export function ApplicationExpiryTimer({ expiresAt }: { expiresAt: Date }) {
       >
         <div className="flex items-center gap-2">
           <span className="block w-3 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-          <p className="text-xs font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Access Expires</p>
+          <p className="text-xs font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Access Expires</p>
         </div>
         <p
           className={`text-sm uppercase tracking-wide tabular-nums ${

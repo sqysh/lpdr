@@ -19,9 +19,9 @@ import { useEffect, useRef } from 'react'
 const focusRing = 'focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 const topBarLink =
-  'text-on-dark text-[10px] font-mono tracking-[0.15em] uppercase hover:text-primary-light dark:hover:text-primary-dark transition-colors'
+  'text-on-dark text-[10px] font-mono tracking-tag uppercase hover:text-primary-light dark:hover:text-primary-dark transition-colors'
 
-const infoText = 'text-on-dark text-[10px] font-mono tracking-[0.15em] uppercase'
+const infoText = 'text-on-dark text-[10px] font-mono tracking-tag uppercase'
 
 const burger = `text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors ${focusRing} rounded p-1`
 
@@ -30,7 +30,17 @@ const cartLink = `relative inline-flex items-center ${focusRing} rounded p-1`
 const donateButton =
   'inline-flex items-center justify-center bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white font-mono uppercase transition-colors duration-200 whitespace-nowrap focus:outline-none focus-visible:ring-2 focus-visible:ring-white'
 
-export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFee: boolean; isAuthed: boolean; userRole?: Role | null }) {
+export function HeaderClient({
+  hasActiveFee,
+  isAuthed,
+  userRole,
+  memorialsEnabled
+}: {
+  hasActiveFee: boolean
+  isAuthed: boolean
+  userRole?: Role | null
+  memorialsEnabled: boolean
+}) {
   const headerRef = useRef<HTMLDivElement>(null)
   const { hidden } = useScrollDirection()
   const mobileNavOpen = useNavigationStore((s) => s.mobileNavOpen)
@@ -196,7 +206,7 @@ export function HeaderClient({ hasActiveFee, isAuthed, userRole }: { hasActiveFe
 
             <nav aria-label="Section navigation">
               <ul className="flex items-center space-x-6 list-none">
-                {mainNavigationLinks(hasActiveFee).map((section) => (
+                {mainNavigationLinks(hasActiveFee, memorialsEnabled).map((section) => (
                   <NavDropdown key={section.title} section={section} />
                 ))}
               </ul>

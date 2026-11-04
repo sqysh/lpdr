@@ -3,6 +3,7 @@ import { getPackMemberData } from 'lib/actions/my-pack/getPackMemberData'
 import { checkOwnMigrationStatus } from 'lib/actions/user/checkOwnMigrationStatus'
 import MyPackClient from './MyPackClient'
 import { getFeaturedAuction } from 'lib/actions/my-pack/getFeaturedAuction'
+import { getMyMemorials } from 'lib/actions/user/memorial/getMyMemorials'
 
 export default function MyPackPage() {
   return (
@@ -13,7 +14,12 @@ export default function MyPackPage() {
 }
 
 async function MyPackContent() {
-  const [packMember, migration, featuredAuction] = await Promise.all([getPackMemberData(), checkOwnMigrationStatus(), getFeaturedAuction()])
+  const [packMember, migration, featuredAuction, memorials] = await Promise.all([
+    getPackMemberData(),
+    checkOwnMigrationStatus(),
+    getFeaturedAuction(),
+    getMyMemorials()
+  ])
 
   const data = packMember?.data
 
@@ -30,6 +36,7 @@ async function MyPackContent() {
       hasPendingMigration={migration.success ? (migration.data?.pending ?? false) : false}
       featuredAuction={featuredAuction}
       adoptionAgreements={data?.adoptions.success ? data.adoptions.data : []}
+      memorials={memorials.success ? (memorials.data ?? []) : []}
     />
   )
 }

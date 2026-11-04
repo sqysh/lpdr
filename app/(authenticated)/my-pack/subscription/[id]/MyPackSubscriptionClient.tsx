@@ -20,9 +20,9 @@ const panel = 'border border-border-light dark:border-border-dark'
 
 const panelHead = 'px-5 py-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
 
-const panelLabel = 'text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark'
+const panelLabel = 'text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
 
-const rowLabel = 'text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark shrink-0'
+const rowLabel = 'text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark shrink-0'
 
 type Subscription = Awaited<ReturnType<typeof getSubscriptionById>>['data']
 

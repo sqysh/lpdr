@@ -71,6 +71,18 @@ export const getOrderById = async (id: string) => {
             healthCertificateFee: true,
             additionalDonation: true
           }
+        },
+        memorial: {
+          select: {
+            id: true,
+            dogName: true,
+            message: true,
+            photoUrl: true,
+            status: true,
+            donorDisplayName: true,
+            showDonorName: true,
+            updatedAt: true
+          }
         }
       }
     })

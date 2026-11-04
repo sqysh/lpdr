@@ -11,35 +11,19 @@ export default function PublicMerchClient({ products }: { products: IProduct[] }
   const sorted = [...inStock, ...outOfStock]
 
   return (
-    <main
-      id="main-content"
-      className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark"
-    >
+    <main id="main-content" className="min-h-screen bg-bg-light dark:bg-bg-dark text-text-light dark:text-text-dark">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-12 sm:pt-16 pb-24 sm:pb-32">
         {/* ── Header ── */}
-        <motion.div
-          variants={fadeUp}
-          initial="hidden"
-          animate="show"
-          custom={0}
-          className="mb-10 sm:mb-12"
-        >
+        <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10 sm:mb-12">
           <div className="flex items-center gap-3 mb-3">
-            <span
-              className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0"
-              aria-hidden="true"
-            />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              LPDR Store
-            </p>
+            <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">LPDR Store</p>
           </div>
           <h1 className="font-quicksand text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark leading-tight mb-3">
-            Merch &amp;{' '}
-            <span className="font-light text-muted-light dark:text-muted-dark">Goods</span>
+            Merch &amp; <span className="font-light text-muted-light dark:text-muted-dark">Goods</span>
           </h1>
           <p className="text-sm text-muted-light dark:text-muted-dark max-w-md leading-relaxed">
-            Every purchase supports our rescue efforts. Proceeds go directly to the care of our
-            dachshunds.
+            Every purchase supports our rescue efforts. Proceeds go directly to the care of our dachshunds.
           </p>
         </motion.div>
 
@@ -49,22 +33,16 @@ export default function PublicMerchClient({ products }: { products: IProduct[] }
           initial="hidden"
           animate="show"
           custom={1}
-          className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-6"
+          className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-6"
           aria-live="polite"
         >
           {inStock.length} item{inStock.length !== 1 ? 's' : ''} available
-          {outOfStock.length > 0 && (
-            <span className="ml-2 opacity-50">· {outOfStock.length} out of stock</span>
-          )}
+          {outOfStock.length > 0 && <span className="ml-2 opacity-50">· {outOfStock.length} out of stock</span>}
         </motion.p>
 
         {/* ── Grid ── */}
         {sorted.length > 0 ? (
-          <div
-            className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4"
-            role="list"
-            aria-label="Products"
-          >
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4" role="list" aria-label="Products">
             {sorted.map((product, i) => (
               <div key={product.id} role="listitem">
                 <ProductCard product={product} index={i} />
@@ -81,9 +59,7 @@ export default function PublicMerchClient({ products }: { products: IProduct[] }
             role="status"
             aria-live="polite"
           >
-            <p className="text-sm font-mono text-muted-light dark:text-muted-dark">
-              No products available right now. Check back soon.
-            </p>
+            <p className="text-sm font-mono text-muted-light dark:text-muted-dark">No products available right now. Check back soon.</p>
           </motion.div>
         )}
       </div>

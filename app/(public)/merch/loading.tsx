@@ -11,9 +11,7 @@ export default function Loading() {
         <div className="mb-10 sm:mb-12">
           <div className="flex items-center gap-3 mb-3">
             <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              LPDR Store
-            </p>
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">LPDR Store</p>
           </div>
           <div className="h-11 sm:h-14 w-64 sm:w-80 bg-surface-light dark:bg-surface-dark animate-pulse mb-3" />
           <div className="space-y-2 max-w-md">

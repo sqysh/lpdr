@@ -18,7 +18,7 @@ const VISIBILITY_BY_PRIORITY: Record<number, string> = {
 }
 
 const labelClass =
-  'group flex items-center gap-1 text-[10px] font-mono tracking-[0.2em] uppercase whitespace-nowrap text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'group flex items-center gap-1 text-[10px] font-mono tracking-eyebrow uppercase whitespace-nowrap text-on-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 const underline = (active: boolean) =>
   `absolute bottom-0 left-0 h-px bg-primary-light dark:bg-primary-dark transition-all duration-300 ease-out ${
@@ -85,13 +85,7 @@ export const NavDropdown = ({ section }: { section: Section }) => {
           </span>
         </Link>
       ) : (
-        <button
-          type="button"
-          onClick={() => setOpen((prev) => !prev)}
-          aria-expanded={open}
-          aria-haspopup="menu"
-          className={labelClass}
-        >
+        <button type="button" onClick={() => setOpen((prev) => !prev)} aria-expanded={open} aria-haspopup="menu" className={labelClass}>
           <span className={`relative py-7 ${isActive || open ? 'text-primary-light dark:text-primary-dark' : ''}`}>
             {section.title}
             <span aria-hidden="true" className={underline(isActive || open)} />
@@ -125,7 +119,7 @@ export const NavDropdown = ({ section }: { section: Section }) => {
                   role="menuitem"
                   aria-current={link.linkKey === pathname ? 'page' : undefined}
                   onClick={() => setOpen(false)}
-                  className={`group flex items-center text-[10px] font-mono tracking-[0.15em] uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+                  className={`group flex items-center text-[10px] font-mono tracking-tag uppercase transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                     link.linkKey === pathname
                       ? 'text-primary-light dark:text-primary-dark'
                       : 'text-on-dark hover:text-primary-light dark:hover:text-primary-dark'

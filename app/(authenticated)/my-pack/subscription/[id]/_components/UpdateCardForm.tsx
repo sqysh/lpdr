@@ -7,10 +7,10 @@ import { SyntheticEvent, useState } from 'react'
 import { motion } from 'framer-motion'
 import { FormError } from 'components/_primitives'
 
-const fieldLabel = 'block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2'
+const fieldLabel = 'block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-2'
 
 const buttonBase =
-  'py-3 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'py-3 text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 export function UpdateCardForm({
   subscriptionId,

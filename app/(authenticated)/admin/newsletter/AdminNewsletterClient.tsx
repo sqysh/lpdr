@@ -8,13 +8,7 @@ import { TABS } from 'lib/constants/newsletter.constants'
 import { SubscribersPanel } from 'app/(authenticated)/admin/newsletter/_components/SubscribersPanel'
 import { IssuesPanel } from 'app/(authenticated)/admin/newsletter/_components/IssuesPanel'
 
-export default function AdminNewsletterPageClient({
-  newsletters,
-  issues
-}: {
-  newsletters: Newsletter[]
-  issues: NewsletterIssue[]
-}) {
+export default function AdminNewsletterPageClient({ newsletters, issues }: { newsletters: Newsletter[]; issues: NewsletterIssue[] }) {
   const [tab, setTab] = useState<NewsletterTab>('subscribers')
 
   return (
@@ -32,7 +26,7 @@ export default function AdminNewsletterPageClient({
               aria-selected={tab === t.id}
               aria-controls={`panel-${t.id}`}
               onClick={() => setTab(t.id)}
-              className={`px-5 py-3 text-[10px] font-mono tracking-[0.2em] uppercase border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
+              className={`px-5 py-3 text-[10px] font-mono tracking-eyebrow uppercase border-b-2 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark ${
                 tab === t.id
                   ? 'border-primary-light dark:border-primary-dark text-primary-light dark:text-primary-dark'
                   : 'border-transparent text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark'

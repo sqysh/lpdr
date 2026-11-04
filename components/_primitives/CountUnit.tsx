@@ -16,7 +16,7 @@ export function CountUnit({ value, label, size = 'md', className = '' }: CountUn
         {String(value).padStart(2, '0')}
       </span>
       <span
-        className={`font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark ${
+        className={`font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark ${
           size === 'sm' ? 'text-[8px] mt-0.5' : size === 'lg' ? 'text-[8px] mt-0.5' : 'text-[9px] mt-1'
         }`}
       >

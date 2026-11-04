@@ -70,17 +70,14 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center">
-            <ShoppingBag
-              className="w-8 h-8 text-muted-light/30 dark:text-muted-dark/30"
-              aria-hidden="true"
-            />
+            <ShoppingBag className="w-8 h-8 text-muted-light/30 dark:text-muted-dark/30" aria-hidden="true" />
           </div>
         )}
 
         {/* Out of stock overlay */}
         {outOfStock && (
           <div className="absolute inset-0 bg-bg-light/70 dark:bg-bg-dark/70 flex items-center justify-center">
-            <span className="px-3 py-1 border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+            <span className="px-3 py-1 border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
               Out of stock
             </span>
           </div>
@@ -98,12 +95,7 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
       {/* ── Info ── */}
       <div className="flex flex-col flex-1 p-4 gap-3">
         <div className="flex-1 min-w-0">
-          <Link
-            href={`/merch/${product.id}`}
-            className="focus:outline-none focus-visible:underline"
-            tabIndex={-1}
-            aria-hidden="true"
-          >
+          <Link href={`/merch/${product.id}`} className="focus:outline-none focus-visible:underline" tabIndex={-1} aria-hidden="true">
             <p className="font-quicksand font-black text-sm text-text-light dark:text-text-dark leading-snug line-clamp-2">
               {product.name}
             </p>
@@ -119,7 +111,7 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
         <Link
           href={`/merch/${product.id}`}
           aria-label={`View full details for ${product.name}`}
-          className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
+          className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline"
         >
           View Details →
         </Link>
@@ -183,10 +175,7 @@ export function ProductCard({ product, index }: { product: IProduct; index: numb
                       exit={{ scale: 0 }}
                       transition={{ duration: 0.15 }}
                     >
-                      <Plus
-                        className="w-4 h-4 text-muted-light dark:text-muted-dark"
-                        aria-hidden="true"
-                      />
+                      <Plus className="w-4 h-4 text-muted-light dark:text-muted-dark" aria-hidden="true" />
                     </motion.span>
                   )}
                 </AnimatePresence>

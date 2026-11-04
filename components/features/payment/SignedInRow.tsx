@@ -31,14 +31,14 @@ export function SignedInRow() {
         </span>
       </div>
       <div className="min-w-0">
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">Signed in as</p>
+        <p className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark">Signed in as</p>
         <p className="text-xs font-mono truncate text-text-light dark:text-text-dark">{session.data?.user?.email}</p>
       </div>
       <button
         type="button"
         onClick={handleSignOut}
         disabled={signingOut}
-        className="shrink-0 ml-auto text-[9px] font-mono tracking-[0.15em] uppercase whitespace-nowrap transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+        className="shrink-0 ml-auto text-[9px] font-mono tracking-tag uppercase whitespace-nowrap transition-colors disabled:opacity-50 focus:outline-none focus-visible:ring-2 text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
       >
         {signingOut ? 'Signing out…' : 'Not you? Sign out'}
       </button>

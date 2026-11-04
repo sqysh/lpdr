@@ -111,7 +111,7 @@ export function Step3Address({
               <div className="px-6 py-5 border-b border-border-light dark:border-border-dark">
                 <div className="flex items-center gap-3 mb-1">
                   <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-                  <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+                  <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
                     Shipping Address
                   </p>
                 </div>
@@ -144,7 +144,7 @@ export function Step3Address({
                       setShowReplaceModal(false)
                       onNext()
                     }}
-                    className="w-full py-3.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    className="w-full py-3.5 text-[10px] font-mono tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
                     Save &amp; continue
                   </button>
@@ -154,7 +154,7 @@ export function Step3Address({
                       setShowReplaceModal(false)
                       onNext()
                     }}
-                    className="w-full py-3.5 text-[10px] font-mono tracking-[0.2em] uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                    className="w-full py-3.5 text-[10px] font-mono tracking-eyebrow uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                   >
                     Just this order
                   </button>
@@ -177,9 +177,7 @@ export function Step3Address({
           <h2 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-1">
             Shipping <span className="font-light text-muted-light dark:text-muted-dark">address</span>
           </h2>
-          <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">
-            One or more items in your cart ship physically.
-          </p>
+          <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed">One or more items in your cart ship physically.</p>
         </div>
 
         {userAddress && useSaved ? (
@@ -190,9 +188,7 @@ export function Step3Address({
               className="w-full flex items-start justify-between px-3.5 py-3.5 border-2 border-primary-light dark:border-primary-dark bg-primary-light/5 dark:bg-primary-dark/5 text-left focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               <div>
-                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark mb-1">
-                  Saved address
-                </p>
+                <p className="text-[10px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark mb-1">Saved address</p>
                 <p className="text-sm font-mono text-text-light dark:text-text-dark">
                   {userAddress.addressLine1}
                   {userAddress.addressLine2 && `, ${userAddress.addressLine2}`}
@@ -210,7 +206,7 @@ export function Step3Address({
                 setUseSaved(false)
                 onUseDifferentAddress()
               }}
-              className="w-full flex items-center gap-2 px-3.5 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="w-full flex items-center gap-2 px-3.5 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               <Plus className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
               Use a different address
@@ -225,7 +221,7 @@ export function Step3Address({
                   setUseSaved(true)
                   onUseSavedAddress()
                 }}
-                className="w-full flex items-center gap-2 px-3.5 py-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="w-full flex items-center gap-2 px-3.5 py-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 <ArrowLeft className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
                 Use saved address
@@ -263,14 +259,7 @@ export function Step3Address({
               />
 
               {/* State — select, use FormField with children */}
-              <FormField
-                id="checkout-state"
-                label="State"
-                type="select"
-                {...register('state')}
-                error={errors?.state?.message}
-                required
-              >
+              <FormField id="checkout-state" label="State" type="select" {...register('state')} error={errors?.state?.message} required>
                 <option value="" disabled>
                   Select state
                 </option>
@@ -301,7 +290,7 @@ export function Step3Address({
           <button
             type="button"
             onClick={onBack}
-            className="px-5 py-4 text-[10px] font-mono tracking-[0.2em] uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center gap-2"
+            className="px-5 py-4 text-[10px] font-mono tracking-eyebrow uppercase border-2 border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark hover:text-text-light dark:hover:text-text-dark transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center gap-2"
           >
             <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
             Back
@@ -311,7 +300,7 @@ export function Step3Address({
             onClick={handleContinue}
             disabled={!isValid}
             aria-disabled={!isValid}
-            className={`flex-1 py-4 font-black text-[11px] tracking-[0.2em] uppercase font-mono transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2 ${
+            className={`flex-1 py-4 font-black text-[11px] tracking-eyebrow uppercase font-mono transition-colors duration-200 focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2 ${
               isValid
                 ? 'bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white cursor-pointer'
                 : 'bg-surface-light dark:bg-surface-dark text-muted-light dark:text-muted-dark border-2 border-border-light dark:border-border-dark cursor-not-allowed'

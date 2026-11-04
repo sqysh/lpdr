@@ -20,7 +20,7 @@ export function SubscriptionSelector({ setBilling, billing, selected, setSelecte
         <div className="mb-8 sm:mb-10">
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-dark" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">Memberships</p>
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-dark">Memberships</p>
           </div>
           <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-5">
             <div>

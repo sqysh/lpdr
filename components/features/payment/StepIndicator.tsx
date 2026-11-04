@@ -1,16 +1,7 @@
 import { Check } from 'lucide-react'
 import { useThemeStore } from 'stores/theme.store'
 
-export function StepIndicator({
-  current,
-  labels,
-  isDark
-}: {
-  current: number
-  total: number
-  labels: string[]
-  isDark?: boolean
-}) {
+export function StepIndicator({ current, labels, isDark }: { current: number; total: number; labels: string[]; isDark?: boolean }) {
   const storeDark = useThemeStore((s) => s.isDark)
   const dark = isDark ?? storeDark
 
@@ -42,15 +33,11 @@ export function StepIndicator({
                   {isDone ? (
                     <Check className="w-3 h-3 text-white" aria-hidden="true" />
                   ) : (
-                    <span
-                      className={`text-[10px] font-mono font-bold ${isActive ? c.textActive : c.textIdle}`}
-                    >
-                      {stepNum}
-                    </span>
+                    <span className={`text-[10px] font-mono font-bold ${isActive ? c.textActive : c.textIdle}`}>{stepNum}</span>
                   )}
                 </div>
                 <span
-                  className={`text-[9px] font-mono tracking-[0.15em] uppercase whitespace-nowrap hidden sm:block
+                  className={`text-[9px] font-mono tracking-tag uppercase whitespace-nowrap hidden sm:block
                   ${isActive ? c.textActive : c.textIdle}`}
                 >
                   {label}

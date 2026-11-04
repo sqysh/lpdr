@@ -14,7 +14,7 @@ import { MyPackNav } from 'app/(authenticated)/my-pack/_components/MyPackNav'
 import { Settings } from 'app/(authenticated)/my-pack/_components/Settings'
 import { StatsStrip } from 'app/(authenticated)/my-pack/_components/StatsStrip'
 import { SectionShell } from 'app/(authenticated)/my-pack/_components/SectionShell'
-import { Dog, Gavel, Gift, Package, Pencil, Plus, Repeat } from 'lucide-react'
+import { Dog, Gavel, Gift, Package, Pencil, Plus, Rainbow, Repeat } from 'lucide-react'
 import { usePaymentMethodModal } from 'stores/payment-method-modal.store'
 import { addCardStyles } from 'lib/constants/my-pack.constants'
 import { StatusMessage } from 'components/_primitives/StatusMessage'
@@ -37,6 +37,8 @@ import { IAdoptionFee } from 'types/adoption-fee'
 import { IPaymentMethod } from 'types/payment-method.types'
 import type { MyAdoptionAgreement } from 'lib/actions/my-pack/getMyAdoptionAgreements'
 import { AdoptionActionBanner, AdoptionsTab } from './_components/AdoptionsTab'
+import { MyMemorial } from 'lib/actions/user/memorial/getMyMemorials'
+import { Memorials } from './_components/Memorials'
 
 export default function MyPackClient({
   user,
@@ -49,7 +51,8 @@ export default function MyPackClient({
   auctionPurchases,
   hasPendingMigration,
   featuredAuction,
-  adoptionAgreements
+  adoptionAgreements,
+  memorials
 }: {
   user: PackMember
   donations: Donation[]
@@ -73,6 +76,7 @@ export default function MyPackClient({
     isPubliclyVisible: boolean
   }
   adoptionAgreements: MyAdoptionAgreement[]
+  memorials: MyMemorial[]
 }) {
   const router = useRouter()
   const openPaymentMethodModal = usePaymentMethodModal((s) => s.open)
@@ -374,6 +378,17 @@ export default function MyPackClient({
                   }
                 >
                   <OneTimeDonations donations={donations} />
+                </SectionShell>
+
+                <SectionShell
+                  heading="Rainbow Bridge"
+                  action={
+                    <Link href="/rainbow-bridge/remember" className={addCardStyles}>
+                      <LinkBody icon={<Rainbow className="w-3 h-3 shrink-0" aria-hidden="true" />} label="Remember" />
+                    </Link>
+                  }
+                >
+                  <Memorials memorials={memorials} />
                 </SectionShell>
               </div>
             )}

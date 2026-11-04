@@ -35,7 +35,7 @@ export function FixedDonateTab() {
               transition={{ duration: 0.2 }}
               className="mr-2 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-xl rounded-l-lg p-5 w-64"
             >
-              <p className="font-mono text-[10px] tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark mb-1.5">
+              <p className="font-mono text-[10px] tracking-eyebrow uppercase text-primary-light dark:text-primary-dark mb-1.5">
                 Support the Rescue
               </p>
               <p className="font-quicksand font-black text-base text-text-light dark:text-text-dark leading-snug mb-2">
@@ -53,16 +53,10 @@ export function FixedDonateTab() {
           aria-label="Donate to Little Paws Dachshund Rescue"
           className="group flex flex-col items-center gap-2 bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark rounded-l-lg px-2.5 py-5 shadow-lg hover:pr-3 transition-all duration-200"
         >
-          <motion.div
-            animate={{ scale: [1, 1.15, 1] }}
-            transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-          >
+          <motion.div animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
             <Heart className="w-3.5 h-3.5 shrink-0" aria-hidden="true" fill="currentColor" />
           </motion.div>
-          <span
-            className="text-[11px] font-mono font-black tracking-[0.25em] uppercase"
-            style={{ writingMode: 'vertical-rl' }}
-          >
+          <span className="text-[11px] font-mono font-black tracking-[0.25em] uppercase" style={{ writingMode: 'vertical-rl' }}>
             Donate
           </span>
         </Link>
@@ -84,7 +78,7 @@ export function FixedDonateTab() {
               transition={{ duration: 0.2 }}
               className="absolute bottom-14 right-0 bg-white dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-xl rounded-lg p-4 w-56"
             >
-              <p className="font-mono text-[9px] tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark mb-1.5">
+              <p className="font-mono text-[9px] tracking-eyebrow uppercase text-primary-light dark:text-primary-dark mb-1.5">
                 Support the Rescue
               </p>
               <p className="font-quicksand font-black text-sm text-text-light dark:text-text-dark leading-snug mb-2">
@@ -92,7 +86,7 @@ export function FixedDonateTab() {
               </p>
               <Link
                 href="/donate"
-                className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark"
+                className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark"
               >
                 Donate now →
               </Link>
@@ -117,11 +111,7 @@ export function FixedDonateTab() {
                 <X className="w-5 h-5" aria-hidden="true" />
               </motion.div>
             ) : (
-              <motion.div
-                key="heart"
-                animate={{ scale: [1, 1.15, 1] }}
-                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
-              >
+              <motion.div key="heart" animate={{ scale: [1, 1.15, 1] }} transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}>
                 <Heart className="w-5 h-5" aria-hidden="true" fill="currentColor" />
               </motion.div>
             )}

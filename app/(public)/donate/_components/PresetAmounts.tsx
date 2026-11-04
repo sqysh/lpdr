@@ -10,9 +10,7 @@ interface PresetAmountsProps {
 export function PresetAmounts({ inputs, onSelect }: PresetAmountsProps) {
   return (
     <motion.fieldset variants={fadeUp} initial="hidden" animate="show" custom={0.25} className="mb-5 border-0 p-0 min-w-0">
-      <legend className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-3">
-        Select Amount
-      </legend>
+      <legend className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-3">Select Amount</legend>
       <div className="grid grid-cols-3 gap-2" role="group" aria-label="Preset donation amounts">
         {DONATION_PRESETS.map((amount) => {
           const isSelected = !inputs.useCustom && inputs.selectedAmount === amount

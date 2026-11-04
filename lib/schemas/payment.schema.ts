@@ -25,7 +25,16 @@ export const createPaymentIntentSchema = z.object({
   winningBidderId: z.string().optional(),
   auctionItemId: z.string().optional(),
   donorMessage: z.string().trim().max(500).optional(),
-  agreementId: z.string().optional()
+  agreementId: z.string().optional(),
+  memorial: z
+    .object({
+      dogName: z.string().trim().min(1, "Please enter your dog's name").max(60),
+      message: z.string().trim().max(500).optional(),
+      donorDisplayName: z.string().trim().max(80).optional(),
+      showDonorName: z.boolean().optional(),
+      photoUrl: z.url().max(500).optional()
+    })
+    .optional()
 })
 
 export type CreatePaymentIntentInput = z.infer<typeof createPaymentIntentSchema>

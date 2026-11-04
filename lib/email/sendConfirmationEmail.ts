@@ -1,10 +1,13 @@
-import { Order, OrderItem } from '@prisma/client'
+import { MemorialStatus, Order, OrderItem } from '@prisma/client'
 import { orderConfirmationTemplate, getOrderEmailSubject } from 'lib/email/templates/order-confirmation.template'
 import { resend } from 'lib/email/resend'
 import { createLog } from 'lib/actions/log/createLog'
 import { getErrorMessage } from 'lib/utils/error.utils'
 
-type OrderWithItems = Order & { items: OrderItem[] }
+type OrderWithItems = Order & {
+  items: OrderItem[]
+  memorial?: { id: string; dogName: string; status: MemorialStatus } | null
+}
 
 export default async function sendConfirmationEmail(order: OrderWithItems) {
   try {
@@ -20,13 +23,13 @@ export default async function sendConfirmationEmail(order: OrderWithItems) {
     }
 
     await createLog('info', 'Order confirmation sent', {
-      location: ['sendConfirmatioinEmail.ts'],
+      location: ['sendConfirmationEmail.ts'],
       orderId: order.id,
       messageId: result.data.id
     })
   } catch (error) {
     await createLog('error', 'Failed to send order confirmation email', {
-      location: ['sendConfirmatioinEmail.ts'],
+      location: ['sendConfirmationEmail.ts'],
       orderId: order.id,
       email: order.customerEmail,
       error: getErrorMessage(error)

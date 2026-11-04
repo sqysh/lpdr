@@ -24,16 +24,12 @@ export default async function VerifyPage({ searchParams }: { searchParams: Promi
       <div className="w-full max-w-sm border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-8">
         <div className="flex items-center gap-3 mb-6">
           <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-          <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-            Little Paws
-          </span>
+          <span className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Little Paws</span>
         </div>
 
         {valid ? (
           <>
-            <h1 className="font-quicksand font-black text-2xl text-text-light dark:text-text-dark leading-tight mb-3">
-              Confirm sign in
-            </h1>
+            <h1 className="font-quicksand font-black text-2xl text-text-light dark:text-text-dark leading-tight mb-3">Confirm sign in</h1>
             <p className="text-xs font-mono text-muted-light dark:text-muted-dark leading-relaxed mb-6">
               Press the button below to finish signing in to your account.
             </p>

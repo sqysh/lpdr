@@ -9,7 +9,7 @@ import { useModalsStore } from 'stores/modals.store'
 const DISMISS_AFTER = 7000
 
 const actionLink =
-  'flex-1 py-2 text-center text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'flex-1 py-2 text-center text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 export function CartToast() {
   const item = useModalsStore((s) => s.cartToastItem)
@@ -57,15 +57,11 @@ export function CartToast() {
 
               {/* Content */}
               <div className="flex-1 min-w-0">
-                <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary-light dark:text-primary-dark mb-0.5">
+                <p className="text-[10px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark mb-0.5">
                   Added to cart
                 </p>
-                <p className="text-sm font-mono text-text-light dark:text-text-dark truncate">
-                  {item.name}
-                </p>
-                <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mt-0.5 tabular-nums">
-                  ${item.price}
-                </p>
+                <p className="text-sm font-mono text-text-light dark:text-text-dark truncate">{item.name}</p>
+                <p className="text-[11px] font-mono text-muted-light dark:text-muted-dark mt-0.5 tabular-nums">${item.price}</p>
               </div>
 
               {/* Dismiss */}

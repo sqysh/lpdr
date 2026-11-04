@@ -35,9 +35,7 @@ export function FlowCard({ id, icon, title, summary, steps, faq, query = '', for
             <p className="font-quicksand font-black text-[13px] sm:text-sm text-text-light dark:text-text-dark truncate">
               <Highlight text={title} query={query} />
             </p>
-            <p className="text-[10px] sm:text-[11px] font-mono text-muted-light dark:text-muted-dark truncate">
-              {summary}
-            </p>
+            <p className="text-[10px] sm:text-[11px] font-mono text-muted-light dark:text-muted-dark truncate">{summary}</p>
           </div>
         </div>
         <ChevronDown
@@ -52,19 +50,15 @@ export function FlowCard({ id, icon, title, summary, steps, faq, query = '', for
 
           {faq && faq.length > 0 && (
             <div className="pt-2 space-y-3.5 sm:space-y-4">
-              <p className="text-[9px] sm:text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+              <p className="text-[9px] sm:text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                 Common questions
               </p>
               {faq.map((f, i) => {
                 const matches =
                   query.trim() &&
-                  (f.question.toLowerCase().includes(query.toLowerCase()) ||
-                    f.answer.toLowerCase().includes(query.toLowerCase()))
+                  (f.question.toLowerCase().includes(query.toLowerCase()) || f.answer.toLowerCase().includes(query.toLowerCase()))
                 return (
-                  <div
-                    key={i}
-                    className={matches ? 'border-l-2 border-primary-light dark:border-primary-dark pl-3 -ml-3' : ''}
-                  >
+                  <div key={i} className={matches ? 'border-l-2 border-primary-light dark:border-primary-dark pl-3 -ml-3' : ''}>
                     <p className="text-[11px] sm:text-xs font-mono font-bold text-text-light dark:text-text-dark mb-1">
                       <Highlight text={f.question} query={query} />
                     </p>

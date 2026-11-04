@@ -4,6 +4,8 @@ import { notifyAwaitingCountersign } from 'lib/adoption-agreement/notify-counter
 import { FEED_A_FOSTER_ITEMS } from 'lib/constants/feed-a-foster.constants'
 import { sendAdminShippingNotice } from 'lib/email/sendAdminShippingNotice'
 import sendConfirmationEmail from 'lib/email/sendConfirmationEmail'
+import sendMemorialReviewEmail from 'lib/email/sendMemorialReview.email'
+import { getMemorialSettings } from 'lib/memorial/getMemorialSetting'
 import { pusherSuperuser, pusherTrigger } from 'lib/pusher/pusher.utils'
 import prisma from 'prisma/client'
 import Stripe from 'stripe'
@@ -11,6 +13,8 @@ import { ProductSizeEntry } from 'types/product'
 import { WelcomeWienerProduct } from 'types/welcome-wiener'
 
 type CompactLine = { i: string; q: number; s?: string | null; w?: string }
+
+const SITE = 'https://www.littlepawsdr.org'
 
 // Items can be split across items, items2, items3 to stay under Stripe's 500-character metadata limit
 function readItems(metadata: Stripe.Metadata): CompactLine[] {
@@ -440,10 +444,49 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       }
     }
 
+    if (orderType === 'MEMORIAL_DONATION') {
+      const dogName = metadata.memorialDogName?.trim()
+
+      if (!dogName) {
+        await createLog('error', 'Memorial gift paid with no dog name in metadata', { orderId: order.id, paymentIntentId: id })
+      } else {
+        const settings = await getMemorialSettings()
+        const autoApprove = settings ? !settings.requireApproval : false
+        const now = new Date()
+
+        const existingMemorial = await prisma.memorial.findUnique({ where: { orderId: order.id }, select: { id: true } })
+
+        // Upsert on the unique orderId, so a retried webhook or a FAILED order upgraded above can't make a second memorial
+        const memorial = await prisma.memorial.upsert({
+          where: { orderId: order.id },
+          update: {},
+          create: {
+            orderId: order.id,
+            userId,
+            dogName,
+            message: metadata.memorialMessage ?? null,
+            photoUrl: metadata.memorialPhotoUrl ?? null,
+            donorDisplayName: metadata.memorialDonorName ?? null,
+            // The setting can change between checkout and now; the stricter answer wins
+            showDonorName: metadata.memorialShowDonor === 'true' && (settings?.allowDonorName ?? false),
+            butterflySeed: Math.floor(Math.random() * 2 ** 31),
+            status: autoApprove ? 'APPROVED' : 'PENDING',
+            approvedAt: autoApprove ? now : null,
+            expiresAt: autoApprove && settings?.displayDays ? new Date(now.getTime() + settings.displayDays * 86_400_000) : null
+          }
+        })
+
+        if (!existingMemorial && memorial.status === 'PENDING') {
+          await sendMemorialReviewEmail(memorial, order, SITE)
+        }
+      }
+    }
+
     const orderWithItems = await prisma.order.findUniqueOrThrow({
       where: { id: order.id },
       include: {
         items: true,
+        memorial: { select: { id: true, dogName: true, butterflySeed: true, status: true } },
         // Adoption emails itemize from the agreement, since the order itself has no items
         adoptionAgreement: {
           select: { id: true, dogName: true, adoptionFee: true, healthCertificateFee: true, additionalDonation: true }

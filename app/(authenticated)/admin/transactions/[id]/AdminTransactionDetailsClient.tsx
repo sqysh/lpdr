@@ -13,13 +13,9 @@ import { TransactionAnomalyBanner } from './_components/TransactionAnomalyBanner
 import { TransactionDonorMessage } from './_components/TransactionDonorMessage'
 import { TransactionRefundSection } from './_components/TransactionRefundSection'
 import { TransactionShipToSection } from './_components/TransactionShipToSection'
+import { TransactionMemorialSection } from './_components/TransactionMemorialSection'
 
-type Props = {
-  order: IOrder
-  subscriptionOrders: ISubscriptionOrder[]
-}
-
-export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Props) {
+export function AdminTransactionDetailsClient({ order, subscriptionOrders }: { order: IOrder; subscriptionOrders: ISubscriptionOrder[] }) {
   const isRefunded = order.status === 'REFUNDED'
   const hasPhysical = order.items.some((i) => i.isPhysical)
   const hasSubscriptionHistory = subscriptionOrders?.length > 1
@@ -36,6 +32,7 @@ export function AdminTransactionDetailsClient({ order, subscriptionOrders }: Pro
       <div className="w-full max-w-7xl px-4 sm:px-6 py-6 grid grid-cols-1 xl:grid-cols-[1fr_360px] gap-6 items-start">
         {/* Left */}
         <div className="space-y-6 min-w-0">
+          {order.memorial && <TransactionMemorialSection memorial={order.memorial} />}
           {order.donorMessage && <TransactionDonorMessage message={order.donorMessage} />}
           <TransactionItemsSection order={order} />
           {hasSubscriptionHistory && <TransactionSubscriptionHistory orders={subscriptionOrders} currentOrderId={order.id} />}

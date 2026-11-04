@@ -1,11 +1,12 @@
-import { Order, OrderItem, OrderType, Prisma } from '@prisma/client'
-import { COLOR, ORDER_TYPE_EMAIL_CONFIG } from 'lib/constants/order-confirmation-constants'
+import { MemorialStatus, Order, OrderItem, OrderType, Prisma } from '@prisma/client'
+import { COLOR, ORDER_TYPE_EMAIL_CONFIG } from 'lib/constants/order-confirmation.constants'
 import { formatMoney } from 'lib/utils/currency.utils'
 import { formatDate } from 'lib/utils/date.utils'
 import { escapeHtml } from 'lib/utils/html.utils'
 
 type OrderWithItems = Order & {
   items: OrderItem[]
+  memorial?: { id: string; dogName: string; status: MemorialStatus } | null
   adoptionAgreement?: {
     id: string
     dogName: string
@@ -22,6 +23,7 @@ export function getOrderEmailSubject(order: OrderWithItems): string {
   const subjects: Record<OrderType, string> = {
     ONE_TIME_DONATION: 'Thank You for Supporting Little Paws!',
     RECURRING_DONATION: `Your ${freq} Gift to Little Paws is Active`,
+    MEMORIAL_DONATION: order.memorial ? `In Loving Memory of ${order.memorial.dogName}` : 'Your Memorial Gift to Little Paws',
     ADOPTION_FEE: 'Your Adoption Fee Payment is Received',
     ADOPTION_AGREEMENT: 'Your Adoption Payment is Received',
     PURCHASE: 'Your Little Paws Order is Confirmed',
@@ -72,6 +74,8 @@ function buildDetailRows(order: OrderWithItems): string[] {
 
   const adoption = order.type === 'ADOPTION_AGREEMENT' ? order.adoptionAgreement : null
 
+  const memorial = order.type === 'MEMORIAL_DONATION' ? order.memorial : null
+
   // What they gave or bought
   if (adoption) {
     rows.push(row('Adopting', escapeHtml(adoption.dogName)))
@@ -80,6 +84,9 @@ function buildDetailRows(order: OrderWithItems): string[] {
       rows.push(row('Health certificate', formatMoney(Number(adoption.healthCertificateFee))))
     if (Number(adoption.additionalDonation ?? 0) > 0)
       rows.push(row('Additional donation', formatMoney(Number(adoption.additionalDonation))))
+  } else if (memorial) {
+    rows.push(row('In memory of', escapeHtml(memorial.dogName)))
+    rows.push(row('Memorial gift', formatMoney(subtotal)))
   } else if (order.items.length > 0) {
     for (const item of order.items) {
       const label = escapeHtml(item.itemName ?? 'Item') + ((item.quantity ?? 1) > 1 ? ` &times; ${item.quantity}` : '')
@@ -127,7 +134,12 @@ function buildNotices(order: OrderWithItems): string[] {
     )
   }
 
-  if (order.type === 'ADOPTION_FEE' || order.type === 'ONE_TIME_DONATION' || order.type === 'RECURRING_DONATION') {
+  if (
+    order.type === 'ADOPTION_FEE' ||
+    order.type === 'ONE_TIME_DONATION' ||
+    order.type === 'RECURRING_DONATION' ||
+    order.type === 'MEMORIAL_DONATION'
+  ) {
     notices.push(
       noticeBlock(
         'Tax information',
@@ -152,6 +164,18 @@ function buildNotices(order: OrderWithItems): string[] {
         )
       )
     }
+  }
+
+  if (order.type === 'MEMORIAL_DONATION' && order.memorial) {
+    const name = escapeHtml(order.memorial.dogName)
+    notices.push(
+      noticeBlock(
+        'On the Rainbow Bridge',
+        order.memorial.status === 'APPROVED'
+          ? `${name}'s butterfly is now on our ${link(`${SITE}/rainbow-bridge`, 'Rainbow Bridge memorial')}.`
+          : `${name}'s butterfly will join our ${link(`${SITE}/rainbow-bridge`, 'Rainbow Bridge memorial')} within a day or two, once our team has added it.`
+      )
+    )
   }
 
   return notices
@@ -184,6 +208,14 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
           ${escapeHtml(order.city ?? '')}, ${escapeHtml(order.state ?? '')} ${escapeHtml(order.zipPostalCode ?? '')}
         </p>
       </div>
+    </div>`
+      : ''
+
+  const artBlock =
+    order.type === 'MEMORIAL_DONATION' && order.memorial
+      ? `
+    <div style="margin-bottom: 36px;">
+      <img src="${SITE}/api/memorial-art/${order.memorial.id}" width="476" alt="A butterfly carrying ${escapeHtml(order.memorial.dogName)}'s name across the Rainbow Bridge" style="display: block; width: 100%; max-width: 476px; height: auto; border: 0;" />
     </div>`
       : ''
 
@@ -259,8 +291,10 @@ export function orderConfirmationTemplate(order: OrderWithItems): string {
                     ${copy.body}
                   </p>
 
+                  ${artBlock}
+
                   <!-- Details -->
-                  ${sectionLabel('Order details')}
+                 ${sectionLabel(order.type === 'MEMORIAL_DONATION' ? 'Gift details' : 'Order details')}
                   <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="width: 100%; margin-bottom: 32px;">
                     ${detailRows.join('')}
                   </table>

@@ -10,10 +10,10 @@ import { useThemeStore } from 'stores/theme.store'
 import { LinkBody } from 'components/_common/LinkBody'
 
 const subtleLink =
-  'shrink-0 inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'shrink-0 inline-flex items-center gap-1.5 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 // amber-600 rather than 500 so the warning clears 4.5:1 on the light background
-const warningText = 'text-[10px] font-mono tracking-[0.15em] uppercase text-amber-600 dark:text-amber-400'
+const warningText = 'text-[10px] font-mono tracking-tag uppercase text-amber-600 dark:text-amber-400'
 
 // RescueGroups hosts a light and a dark version of the same form
 const FORM_CODE_DARK = 'ZKCVRYSQ'

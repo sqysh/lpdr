@@ -39,20 +39,12 @@ export function ActionPanel({
     <div className="pt-6 mt-6 border-t border-border-light dark:border-border-dark">
       <div className="flex items-center gap-3 mb-4">
         <span className={`block w-4 h-px shrink-0 ${styles.rule}`} aria-hidden="true" />
-        <p className={`text-[10px] font-mono tracking-[0.2em] uppercase ${styles.label}`}>
-          {sectionLabel}
-        </p>
+        <p className={`text-[10px] font-mono tracking-eyebrow uppercase ${styles.label}`}>{sectionLabel}</p>
       </div>
-      <div
-        className={`border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${styles.box}`}
-      >
+      <div className={`border p-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 ${styles.box}`}>
         <div>
-          <p className="text-xs font-mono text-text-light dark:text-text-dark font-medium mb-0.5">
-            {title}
-          </p>
-          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">
-            {description}
-          </p>
+          <p className="text-xs font-mono text-text-light dark:text-text-dark font-medium mb-0.5">{title}</p>
+          <p className="text-[10px] font-mono text-muted-light dark:text-muted-dark leading-relaxed">{description}</p>
         </div>
         {children}
       </div>

@@ -13,7 +13,7 @@ export function AuctionItemDangerZone({ deleting, confirmDel, onDelete, onCancel
       <div className="px-4 py-3 border-b border-red-500/20">
         <div className="flex items-center gap-2">
           <span className="block w-3 h-px bg-red-500 shrink-0" aria-hidden="true" />
-          <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-red-500">Danger Zone</p>
+          <p className="text-[9px] font-mono tracking-eyebrow uppercase text-red-500">Danger Zone</p>
         </div>
       </div>
       <div className="px-4 py-4">
@@ -26,7 +26,7 @@ export function AuctionItemDangerZone({ deleting, confirmDel, onDelete, onCancel
           onClick={onDelete}
           disabled={deleting}
           aria-busy={deleting}
-          className={`w-full py-2.5 text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50 ${
+          className={`w-full py-2.5 text-[10px] font-mono tracking-eyebrow uppercase transition-colors duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-red-500 disabled:opacity-50 ${
             confirmDel
               ? 'border border-transparent bg-red-500 text-white'
               : 'border border-red-500/30 text-red-500 hover:bg-red-500 hover:text-white'

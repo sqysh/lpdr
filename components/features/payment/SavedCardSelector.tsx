@@ -10,16 +10,9 @@ type Props = {
   onUseSavedCard: () => void
 }
 
-const labelClass = `block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2`
+const labelClass = `block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-2`
 
-export function SavedCardSelector({
-  savedCards,
-  selectedCardId,
-  useNewCard,
-  onSelectCard,
-  onUseNewCard,
-  onUseSavedCard
-}: Props) {
+export function SavedCardSelector({ savedCards, selectedCardId, useNewCard, onSelectCard, onUseNewCard, onUseSavedCard }: Props) {
   if (!savedCards?.length) return null
 
   return (
@@ -53,10 +46,7 @@ export function SavedCardSelector({
                 </div>
               </div>
               {selectedCardId === card.stripePaymentId && (
-                <CheckCircle
-                  className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0"
-                  aria-hidden="true"
-                />
+                <CheckCircle className="w-4 h-4 text-primary-light dark:text-primary-dark shrink-0" aria-hidden="true" />
               )}
             </button>
           ))}
@@ -64,7 +54,7 @@ export function SavedCardSelector({
           <button
             type="button"
             onClick={onUseNewCard}
-            className="w-full flex items-center gap-2 px-3.5 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="w-full flex items-center gap-2 px-3.5 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             <Plus className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
             Use a different card
@@ -74,7 +64,7 @@ export function SavedCardSelector({
         <button
           type="button"
           onClick={onUseSavedCard}
-          className="flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none"
+          className="flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none"
         >
           <ArrowLeft className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
           Use a saved card

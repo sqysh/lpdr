@@ -10,17 +10,15 @@ export default function SuspendedPage() {
         <div className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark p-8">
           <div className="flex items-center gap-3 mb-6">
             <span className="block w-6 h-px bg-secondary-light dark:bg-secondary-dark shrink-0" aria-hidden="true" />
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-secondary-light dark:text-secondary-dark">
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-secondary-light dark:text-secondary-dark">
               Account Suspended
             </p>
           </div>
 
-          <h1 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-3">
-            Your account is on hold
-          </h1>
+          <h1 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-3">Your account is on hold</h1>
           <p className="text-sm text-muted-light dark:text-muted-dark leading-relaxed mb-8">
-            Access to your account has been temporarily suspended. If you believe this is a mistake or would like to
-            resolve it, please reach out to our team and we&apos;ll be glad to help.
+            Access to your account has been temporarily suspended. If you believe this is a mistake or would like to resolve it, please
+            reach out to our team and we&apos;ll be glad to help.
           </p>
 
           <div className="flex flex-col gap-3">
@@ -32,7 +30,7 @@ export default function SuspendedPage() {
             </a>
             <Link
               href="/"
-              className="w-full text-center px-6 py-3 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="w-full text-center px-6 py-3 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Return Home
             </Link>

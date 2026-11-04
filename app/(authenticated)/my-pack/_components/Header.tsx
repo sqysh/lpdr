@@ -64,7 +64,7 @@ export function Header({
           className="flex items-center gap-3 mb-1"
         >
           <span className="block w-5 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">
             {formatRole(user.role)}
           </p>
         </motion.div>
@@ -107,7 +107,7 @@ export function Header({
                 type="submit"
                 disabled={nameLoading}
                 aria-label="Save name"
-                className="px-3 py-2 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-[0.2em] uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50"
+                className="px-3 py-2 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white text-[10px] font-mono tracking-eyebrow uppercase transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-50"
               >
                 {nameLoading ? (
                   <motion.span
@@ -124,7 +124,7 @@ export function Header({
                 type="button"
                 onClick={() => setEditingName(false)}
                 aria-label="Cancel editing name"
-                className="px-3 py-2 border border-border-light dark:border-border-dark text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                className="px-3 py-2 border border-border-light dark:border-border-dark text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
               >
                 Cancel
               </button>
@@ -137,9 +137,7 @@ export function Header({
             transition={{ duration: 0.3, delay: 0.15 }}
             className="flex items-center gap-2"
           >
-            <h1 className="font-quicksand font-black text-3xl sm:text-4xl text-text-light dark:text-text-dark leading-tight">
-              {fullName}
-            </h1>
+            <h1 className="font-quicksand font-black text-3xl sm:text-4xl text-text-light dark:text-text-dark leading-tight">{fullName}</h1>
             <button
               type="button"
               onClick={() => {

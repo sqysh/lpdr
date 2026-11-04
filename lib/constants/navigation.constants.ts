@@ -1,4 +1,5 @@
 import { AdminArea } from '@prisma/client'
+import { AdminBadges } from 'lib/actions/admin/getAdminBadges'
 import {
   BookOpen,
   Dog,
@@ -18,6 +19,7 @@ import {
   Newspaper,
   Package,
   PawPrint,
+  Rainbow,
   Receipt,
   Repeat,
   User,
@@ -43,6 +45,7 @@ type NavItem = {
   icon: typeof Home
   href: string
   area?: AdminArea
+  badge?: keyof AdminBadges
 }
 
 type NavGroup = {
@@ -63,10 +66,11 @@ export const HIDDEN_PATHS = [
   '/terms',
   '/donate',
   '/adopt/application',
-  '/adopt/agreement'
+  '/adopt/agreement',
+  '/rainbow-bridge/remember'
 ]
 
-export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
+export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boolean): Section[] => {
   const now = new Date()
   const isFeedAFosterAvailable = now.getMonth() === 6
   return [
@@ -122,6 +126,14 @@ export const mainNavigationLinks = (hasActiveFee: boolean): Section[] => {
           linkKey: '/welcomewieners',
           linkText: 'Welcome Wieners'
         },
+        ...(memorialsEnabled
+          ? [
+              {
+                linkKey: '/rainbow-bridge',
+                linkText: 'Rainbow Bridge'
+              }
+            ]
+          : []),
         {
           linkKey: '/shoptohelp',
           linkText: 'Shop To Help'
@@ -223,14 +235,15 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Auctions', icon: Gavel, href: '/admin/auctions', area: 'AUCTIONS' },
       { label: 'Products', icon: Package, href: '/admin/products', area: 'STORE' },
-      { label: 'Welcome Wieners', icon: Dog, href: '/admin/welcome-wieners', area: 'STORE' }
+      { label: 'Welcome Wieners', icon: Dog, href: '/admin/welcome-wieners', area: 'STORE' },
+      { label: 'Rainbow Bridge', icon: Rainbow, href: '/admin/memorials', area: 'MONEY', badge: 'memorialsPending' }
     ]
   },
   {
     heading: 'Adoptions',
     items: [
       { label: 'Dachshunds', icon: PawPrint, href: '/admin/dachshunds', area: 'DOGS' },
-      { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements', area: 'AGREEMENTS' }
+      { label: 'Agreements', icon: FileSignature, href: '/admin/adoption-agreements', area: 'AGREEMENTS', badge: 'agreementsWaiting' }
     ]
   },
   {

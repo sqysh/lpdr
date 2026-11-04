@@ -61,7 +61,7 @@ export function OneTimeDonations({ donations }) {
                     <Link
                       href={`/order-confirmation/${d.id}?ref=giving`}
                       aria-label={`View order confirmation for ${formatDate(d.createdAt)}`}
-                      className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+                      className="inline-flex items-center gap-1.5 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
                     >
                       <span className="hidden sm:inline">View</span>
                     </Link>

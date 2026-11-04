@@ -181,9 +181,7 @@ export default function AdoptFAQClient({ dachshunds }) {
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12 sm:mb-16">
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              FAQ
-            </p>
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">FAQ</p>
           </div>
           <h1 className="font-quicksand text-4xl sm:text-5xl font-bold text-text-light dark:text-text-dark leading-tight mb-4">
             Frequently Asked <span className="font-light text-muted-light dark:text-muted-dark">Questions</span>
@@ -212,9 +210,7 @@ export default function AdoptFAQClient({ dachshunds }) {
                 </h2>
               </dt>
               <dd>
-                <p className="text-sm sm:text-base text-muted-light dark:text-muted-dark leading-relaxed">
-                  {renderAnswer(item.a)}
-                </p>
+                <p className="text-sm sm:text-base text-muted-light dark:text-muted-dark leading-relaxed">{renderAnswer(item.a)}</p>
               </dd>
             </motion.div>
           ))}
@@ -227,9 +223,7 @@ export default function AdoptFAQClient({ dachshunds }) {
           <div className="px-4 sm:px-6 py-8 max-w-3xl mx-auto">
             <div className="flex items-center gap-3 mb-6">
               <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
-              <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-                Available now
-              </p>
+              <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Available now</p>
             </div>
           </div>
 
@@ -254,11 +248,11 @@ export default function AdoptFAQClient({ dachshunds }) {
                   <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors duration-300" />
                   {isAdoptionPending && (
                     <div className="absolute top-2 left-2 px-2 py-0.5 bg-black/60">
-                      <p className="text-white text-[9px] font-mono tracking-[0.15em] uppercase">Pending</p>
+                      <p className="text-white text-[9px] font-mono tracking-tag uppercase">Pending</p>
                     </div>
                   )}
                   <div className="absolute bottom-0 left-0 right-0 px-3 py-2 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
-                    <p className="text-white text-xs font-mono tracking-[0.15em] uppercase truncate">{name}</p>
+                    <p className="text-white text-xs font-mono tracking-tag uppercase truncate">{name}</p>
                   </div>
                 </Link>
               )
@@ -268,7 +262,7 @@ export default function AdoptFAQClient({ dachshunds }) {
           <div className="px-4 sm:px-6 py-6 max-w-3xl mx-auto">
             <Link
               href="/dachshunds"
-              className="inline-flex items-center gap-2 text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors"
             >
               View all dachshunds
               <svg

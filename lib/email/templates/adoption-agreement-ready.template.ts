@@ -1,4 +1,4 @@
-import { COLOR } from 'lib/constants/order-confirmation-constants'
+import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { OFFLINE_PAYMENT_INSTRUCTIONS } from 'lib/constants/adoption-agreement.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 

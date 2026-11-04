@@ -14,36 +14,39 @@ export function AuctionItemFormHeader({ auctionId, auctionItemSellingFormat, isU
       <nav aria-label="Breadcrumb" className="flex items-center gap-2 min-w-0">
         <Link
           href="/admin/dashboard"
-          className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          className="inline-flex items-center gap-1.5 text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
           <LayoutDashboard className="w-3 h-3" aria-hidden="true" />
           Dashboard
         </Link>
-        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">/</span>
+        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+          /
+        </span>
         <Link
           href="/admin/auctions"
-          className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
           Auctions
         </Link>
-        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">/</span>
+        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+          /
+        </span>
         <Link
           href={`/admin/auctions/${auctionId}?tab=items&type=${auctionItemSellingFormat ?? 'AUCTION'}`}
-          className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+          className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
         >
           Auction Items
         </Link>
-        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">/</span>
-        <h1
-          className="text-[9px] font-mono tracking-[0.15em] uppercase text-text-light dark:text-text-dark truncate"
-          aria-current="page"
-        >
+        <span className="text-[9px] font-mono text-border-light dark:text-border-dark" aria-hidden="true">
+          /
+        </span>
+        <h1 className="text-[9px] font-mono tracking-tag uppercase text-text-light dark:text-text-dark truncate" aria-current="page">
           {isUpdating ? 'Edit Item' : 'New Item'}
         </h1>
       </nav>
 
       {isActive && (
-        <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-[8px] font-mono tracking-[0.15em] uppercase text-amber-500 font-black">
+        <span className="shrink-0 flex items-center gap-1.5 px-2 py-0.5 bg-amber-500/10 border border-amber-500/30 text-[8px] font-mono tracking-tag uppercase text-amber-500 font-black">
           <Lock size={9} aria-hidden="true" /> Limited Editing
         </span>
       )}

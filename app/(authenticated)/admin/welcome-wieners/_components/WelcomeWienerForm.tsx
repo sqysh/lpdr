@@ -2,11 +2,7 @@
 
 import { Check, Dog, ImagePlus, LayoutDashboard, Loader2, Minus, Plus, X } from 'lucide-react'
 import { IWelcomeWiener, WelcomeWienerProduct } from 'types/welcome-wiener'
-import {
-  WELCOME_WIENER_CATALOG,
-  WELCOME_WIENER_CATEGORIES,
-  WELCOME_WIENER_CATEGORY_LABELS
-} from 'lib/constants/welcome-wiener.constants'
+import { WELCOME_WIENER_CATALOG, WELCOME_WIENER_CATEGORIES, WELCOME_WIENER_CATEGORY_LABELS } from 'lib/constants/welcome-wiener.constants'
 import { uploadFileToFirebase } from 'lib/firebase/firebase.utils'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
@@ -21,14 +17,14 @@ import Picture from 'components/_common/Picture'
 import { DangerZone } from './DangerZone'
 
 const crumb =
-  'text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
+  'text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark'
 
 const crumbSep = 'text-[9px] font-mono text-border-light dark:text-muted-dark/70'
 
 const panel = 'border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark'
 
 const panelHead =
-  'px-4 py-2.5 border-b border-border-light dark:border-border-dark text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark'
+  'px-4 py-2.5 border-b border-border-light dark:border-border-dark text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark'
 
 const thumb = 'relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden'
 
@@ -121,10 +117,9 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
       flash({
         tone: 'success',
         message: `${payload.name} updated`,
-        description: [
-          `${associated.length} donation product${associated.length === 1 ? '' : 's'}`,
-          payload.isLive ? 'Live' : 'Draft'
-        ].join(' · ')
+        description: [`${associated.length} donation product${associated.length === 1 ? '' : 's'}`, payload.isLive ? 'Live' : 'Draft'].join(
+          ' · '
+        )
       })
       router.refresh()
       setLoading(false)
@@ -153,10 +148,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
           <span className={crumbSep} aria-hidden="true">
             /
           </span>
-          <h1
-            className="text-[9px] font-mono tracking-[0.15em] uppercase text-text-light dark:text-text-dark truncate"
-            aria-current="page"
-          >
+          <h1 className="text-[9px] font-mono tracking-tag uppercase text-text-light dark:text-text-dark truncate" aria-current="page">
             {isUpdating ? 'Edit Wiener' : 'New Wiener'}
           </h1>
         </nav>
@@ -170,9 +162,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
               <Dog size={15} className="text-primary-light dark:text-primary-dark" aria-hidden="true" />
             </div>
             <div className="min-w-0">
-              <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-                Welcome Wiener
-              </p>
+              <p className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Welcome Wiener</p>
               <h2 className="text-xl font-quicksand font-black text-text-light dark:text-text-dark leading-snug truncate">
                 {isUpdating ? `Edit ${form?.name ?? 'Wiener'}` : 'Add Wiener'}
               </h2>
@@ -210,14 +200,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                 rows={6}
               />
 
-              <FormField
-                id="ww-age"
-                label="Age"
-                name="age"
-                value={form?.age ?? ''}
-                onChange={handleInput}
-                placeholder="3 years"
-              />
+              <FormField id="ww-age" label="Age" name="age" value={form?.age ?? ''} onChange={handleInput} placeholder="3 years" />
 
               {/* ── Donation products ── */}
               <SectionLabel>Donation Products</SectionLabel>
@@ -226,7 +209,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                   const items = WELCOME_WIENER_CATALOG.filter((p) => p.category === category)
                   return (
                     <div key={category}>
-                      <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light/60 dark:text-muted-dark/60 mb-2">
+                      <p className="text-[10px] font-mono tracking-tag uppercase text-muted-light/60 dark:text-muted-dark/60 mb-2">
                         {WELCOME_WIENER_CATEGORY_LABELS[category]}
                       </p>
                       <div className="space-y-1">
@@ -348,7 +331,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                   {loading && pendingPhotos.length > 0 ? (
                     <div className="px-4 py-3 border border-border-light dark:border-border-dark">
                       <div className="flex items-center justify-between mb-1.5">
-                        <span className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
+                        <span className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
                           Uploading
                         </span>
                         <span className="text-[9px] font-mono text-primary-light dark:text-primary-dark tabular-nums">
@@ -356,17 +339,14 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                         </span>
                       </div>
                       <div className="h-1 w-full bg-bg-light dark:bg-bg-dark overflow-hidden">
-                        <div
-                          className="h-1 bg-primary-light dark:bg-primary-dark transition-all"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
+                        <div className="h-1 bg-primary-light dark:bg-primary-dark transition-all" style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   ) : (
                     <>
                       <label
                         htmlFor="photos"
-                        className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase cursor-pointer transition-colors"
+                        className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-eyebrow uppercase cursor-pointer transition-colors"
                       >
                         <ImagePlus size={13} aria-hidden="true" />
                         {pendingPhotos.length > 0 ? `${pendingPhotos.length} selected — add more` : 'Select photos'}
@@ -400,9 +380,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                       <div key={p.id} className="flex items-center justify-between">
                         <span className="text-[11px] font-mono text-text-light dark:text-text-dark">{p.name}</span>
                         <div className="flex items-center gap-3">
-                          <span className="text-[11px] font-mono text-primary-light dark:text-primary-dark tabular-nums">
-                            ${p.price}
-                          </span>
+                          <span className="text-[11px] font-mono text-primary-light dark:text-primary-dark tabular-nums">${p.price}</span>
                           <button
                             type="button"
                             onClick={() => toggleProduct(p)}
@@ -415,9 +393,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
                       </div>
                     ))}
                     <div className="pt-2 border-t border-border-light dark:border-border-dark flex items-center justify-between">
-                      <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark">
-                        Total
-                      </span>
+                      <span className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark">Total</span>
                       <span className="text-sm font-mono font-bold text-primary-light dark:text-primary-dark tabular-nums">
                         ${associated.reduce((sum, p) => sum + p.price, 0)}
                       </span>
@@ -453,7 +429,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
           )}
           <Link
             href="/admin/welcome-wieners"
-            className="px-4 py-2.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-[0.2em] uppercase hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="px-4 py-2.5 border border-border-light dark:border-border-dark text-muted-light dark:text-muted-dark text-[10px] font-mono tracking-eyebrow uppercase hover:text-text-light dark:hover:text-text-dark hover:border-primary-light/40 dark:hover:border-primary-dark/40 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             Cancel
           </Link>
@@ -462,7 +438,7 @@ export function WelcomeWienerForm({ welcomeWiener }: { welcomeWiener: IWelcomeWi
             onClick={handleSave}
             disabled={loading}
             aria-busy={loading}
-            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white dark:text-bg-dark text-[10px] font-mono tracking-[0.2em] uppercase transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+            className="flex items-center justify-center gap-2 px-6 py-2.5 bg-primary-light dark:bg-primary-dark hover:bg-secondary-light dark:hover:bg-secondary-dark text-white dark:text-bg-dark text-[10px] font-mono tracking-eyebrow uppercase transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
           >
             {loading ? (
               <>

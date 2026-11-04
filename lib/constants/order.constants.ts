@@ -1,6 +1,7 @@
 import { OrderType } from '@prisma/client'
 
-export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string }> = {
+// Typed against OrderType so adding a new order type fails the build here instead of showing a blank heading
+export const ORDER_TYPE_CONFIG: Record<OrderType, { label: string; message: string }> = {
   ONE_TIME_DONATION: {
     label: 'Donation Confirmed',
     message: 'Your generosity helps rescued dachshunds find their forever homes. Every dollar makes a real difference.'
@@ -9,6 +10,10 @@ export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string 
     label: 'Recurring Donation Active',
     message: 'Your ongoing support means our dogs get consistent care all year long. Thank you for being a monthly hero.'
   },
+  MEMORIAL_DONATION: {
+    label: 'Memorial Gift Received',
+    message: 'Thank you for honoring your dog with a gift to Little Paws. Their butterfly is on its way across the Rainbow Bridge.'
+  },
   PURCHASE: {
     label: 'Order Confirmed',
     message: 'Your order is confirmed. Every purchase supports the dogs in our rescue program.'
@@ -16,12 +21,12 @@ export const ORDER_TYPE_CONFIG: Record<string, { label: string; message: string 
   ADOPTION_FEE: {
     label: 'Application Fee Received',
     message:
-      "We've received your adoption application fee. Our team will be in touch within 3–5 business days — your perfect dachshund match is out there!"
+      "We've received your adoption application fee. Our team will be in touch within 3 to 5 business days. Your perfect dachshund match is out there!"
   },
   AUCTION_PURCHASE: {
     label: 'Payment Confirmed',
     message:
-      "Your auction payment has been received. Thank you for supporting Little Paws — we'll be in touch with details about your item shortly."
+      "Your auction payment has been received. Thank you for supporting Little Paws. We'll be in touch with details about your item shortly."
   },
   ADOPTION_AGREEMENT: {
     label: 'Adoption',
@@ -37,6 +42,7 @@ export const FILTERS = [
   'ALL',
   'ONE_TIME_DONATION',
   'RECURRING_DONATION',
+  'MEMORIAL_DONATION',
   'ADOPTION_FEE',
   'ADOPTION_AGREEMENT',
   'AUCTION_PURCHASE',
@@ -49,6 +55,7 @@ export const FILTER_LABELS: Record<Filter, string> = {
   ALL: 'All',
   ONE_TIME_DONATION: 'One-time',
   RECURRING_DONATION: 'Recurring',
+  MEMORIAL_DONATION: 'Memorial',
   ADOPTION_FEE: 'Application fee',
   ADOPTION_AGREEMENT: 'Adoption',
   PURCHASE: 'Purchase',
@@ -81,15 +88,16 @@ export const DECLINE_EXPLANATIONS: Record<string, string> = {
 }
 
 // One place so Transactions, Donations and the dashboard can't drift on what counts as a donation
-export const DONATION_TYPES = [OrderType.ONE_TIME_DONATION, OrderType.RECURRING_DONATION] as const
+export const DONATION_TYPES = [OrderType.ONE_TIME_DONATION, OrderType.RECURRING_DONATION, OrderType.MEMORIAL_DONATION] as const
 
-export const DONATION_FILTERS = ['ALL', 'ONE_TIME_DONATION', 'RECURRING_DONATION'] as const
+export const DONATION_FILTERS = ['ALL', 'ONE_TIME_DONATION', 'RECURRING_DONATION', 'MEMORIAL_DONATION'] as const
 export type DonationFilter = (typeof DONATION_FILTERS)[number]
 
 export const DONATION_FILTER_LABELS: Record<DonationFilter, string> = {
   ALL: 'All',
   ONE_TIME_DONATION: 'One-time',
-  RECURRING_DONATION: 'Recurring'
+  RECURRING_DONATION: 'Recurring',
+  MEMORIAL_DONATION: 'Memorial'
 }
 
 export const isDonation = (type: OrderType) => (DONATION_TYPES as readonly OrderType[]).includes(type)

@@ -51,7 +51,7 @@ export function FeedAFosterCard({ i, item, isAvailable }: Props) {
       <div className="relative aspect-3/2 overflow-hidden bg-surface-light dark:bg-surface-dark flex items-center justify-center border-b border-border-light dark:border-border-dark">
         {/* Subtle index watermark */}
         <span
-          className="absolute top-3 left-4 font-mono text-[10px] tracking-[0.2em] uppercase text-muted-light/50 dark:text-muted-dark/50"
+          className="absolute top-3 left-4 font-mono text-[10px] tracking-eyebrow uppercase text-muted-light/50 dark:text-muted-dark/50"
           aria-hidden="true"
         >
           {String(i + 1).padStart(2, '0')}
@@ -73,12 +73,8 @@ export function FeedAFosterCard({ i, item, isAvailable }: Props) {
       {/* Content */}
       <div className={`flex flex-col flex-1 p-5 sm:p-6 gap-4 ${!isAvailable ? 'opacity-50' : ''}`}>
         <div>
-          <h2 className="font-quicksand text-lg font-bold text-text-light dark:text-text-dark mb-2">
-            {item.title}
-          </h2>
-          <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">
-            {item.textKey}
-          </p>
+          <h2 className="font-quicksand text-lg font-bold text-text-light dark:text-text-dark mb-2">{item.title}</h2>
+          <p className="text-sm text-muted-light dark:text-on-dark leading-relaxed">{item.textKey}</p>
         </div>
 
         <div className="mt-auto pt-2">

@@ -11,10 +11,10 @@ import { useStatusMessage } from 'lib/hooks/useStatusMessage.hook'
 import { TransactionLabel } from './TransactionLabel'
 
 const shipButton =
-  'w-full py-3 font-mono font-black text-[10px] tracking-[0.2em] uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2'
+  'w-full py-3 font-mono font-black text-[10px] tracking-eyebrow uppercase bg-primary-light dark:bg-primary-dark text-white dark:text-bg-dark hover:bg-secondary-light dark:hover:bg-secondary-dark disabled:opacity-60 disabled:cursor-not-allowed transition-colors focus:outline-none focus-visible:ring-4 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark flex items-center justify-center gap-2'
 
 const shippedPill =
-  'inline-flex items-center gap-2 px-3 py-2 border border-emerald-500/40 bg-emerald-500/5 text-[10px] font-mono tracking-[0.2em] uppercase text-emerald-600 dark:text-emerald-400'
+  'inline-flex items-center gap-2 px-3 py-2 border border-emerald-500/40 bg-emerald-500/5 text-[10px] font-mono tracking-eyebrow uppercase text-emerald-600 dark:text-emerald-400'
 
 export function TransactionFulfillmentSection({ order }: { order: IOrder }) {
   const router = useRouter()

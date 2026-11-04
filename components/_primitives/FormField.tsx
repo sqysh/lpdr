@@ -63,7 +63,7 @@ export const FormField = forwardRef<FieldElement, FormFieldProps>(function FormF
   // for the field colours to apply. That removes the arrow, drawn back below.
   const selectClass = `${fieldClass} appearance-none pr-10 cursor-pointer`
 
-  const labelClass = `block text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark mb-2`
+  const labelClass = `block text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark mb-2`
   const errorClass = `text-[11px] text-red-600 dark:text-red-400 font-mono mt-1.5`
 
   const handleChange: React.ChangeEventHandler<FieldElement> = (e) => {

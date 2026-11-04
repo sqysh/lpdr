@@ -46,13 +46,8 @@ export function DangerZone({
   return (
     <section className="border border-red-500/30 dark:border-red-400/30 bg-red-500/5 dark:bg-red-400/5">
       <div className="px-4 py-2.5 border-b border-red-500/30 dark:border-red-400/30 flex items-center gap-2">
-        <AlertTriangle
-          className="w-3 h-3 text-red-500 dark:text-red-400 shrink-0"
-          aria-hidden="true"
-        />
-        <h3 className="text-[9px] font-mono tracking-[0.2em] uppercase text-red-500 dark:text-red-400">
-          {title}
-        </h3>
+        <AlertTriangle className="w-3 h-3 text-red-500 dark:text-red-400 shrink-0" aria-hidden="true" />
+        <h3 className="text-[9px] font-mono tracking-eyebrow uppercase text-red-500 dark:text-red-400">{title}</h3>
       </div>
 
       <div className="px-4 py-3">
@@ -61,9 +56,7 @@ export function DangerZone({
             <p className="text-[11px] font-mono text-text-light dark:text-text-dark leading-relaxed">
               {confirmText ?? `${label}? This can't be undone.`}
             </p>
-            {error && (
-              <p className="text-[10px] font-mono text-red-500 dark:text-red-400">{error}</p>
-            )}
+            {error && <p className="text-[10px] font-mono text-red-500 dark:text-red-400">{error}</p>}
             <div className="flex items-center gap-2">
               <button
                 type="button"
@@ -95,11 +88,7 @@ export function DangerZone({
           <div className="flex items-center justify-between gap-3">
             <div className="min-w-0">
               <p className="text-[11px] font-mono text-text-light dark:text-text-dark">{label}</p>
-              {description && (
-                <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark mt-0.5">
-                  {description}
-                </p>
-              )}
+              {description && <p className="text-[9px] font-mono text-muted-light dark:text-muted-dark mt-0.5">{description}</p>}
             </div>
             <button
               type="button"

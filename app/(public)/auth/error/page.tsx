@@ -3,8 +3,7 @@ import Link from 'next/link'
 const ERROR_MESSAGES: Record<string, { title: string; description: string }> = {
   Configuration: {
     title: 'Something went wrong',
-    description:
-      'There is a problem with the server configuration. Please try again later or contact us if it persists.'
+    description: 'There is a problem with the server configuration. Please try again later or contact us if it persists.'
   },
   AccessDenied: {
     title: 'Access denied',
@@ -34,9 +33,7 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
           {/* Eyebrow */}
           <div className="flex items-center gap-3 mb-6">
             <span className="block w-6 h-px bg-secondary-light dark:bg-secondary-dark shrink-0" aria-hidden="true" />
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-secondary-light dark:text-secondary-dark">
-              Sign In Error
-            </p>
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-secondary-light dark:text-secondary-dark">Sign In Error</p>
           </div>
 
           <h1 className="font-quicksand text-2xl font-bold text-text-light dark:text-text-dark mb-3">{title}</h1>
@@ -51,7 +48,7 @@ export default async function AuthErrorPage({ searchParams }: { searchParams: Pr
             </Link>
             <Link
               href="/"
-              className="w-full text-center px-6 py-3 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
+              className="w-full text-center px-6 py-3 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark"
             >
               Return Home
             </Link>

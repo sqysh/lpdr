@@ -8,7 +8,7 @@ export function PlanSummary({ setView, T, selectedTier, billing }) {
         <button
           type="button"
           onClick={() => setView('select')}
-          className="inline-flex items-center gap-2 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mb-10"
+          className="inline-flex items-center gap-2 text-[10px] font-mono tracking-eyebrow uppercase text-muted-dark hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mb-10"
         >
           <ArrowLeft className="w-3.5 h-3.5" aria-hidden="true" />
           Change plan
@@ -17,7 +17,7 @@ export function PlanSummary({ setView, T, selectedTier, billing }) {
         {/* Eyebrow */}
         <div className="flex items-center gap-3 mb-4">
           <span className="block w-8 h-px bg-primary-dark" aria-hidden="true" />
-          <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-dark">Memberships</p>
+          <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-dark">Memberships</p>
         </div>
 
         <h1 className="font-quicksand text-3xl sm:text-4xl font-black text-text-dark leading-tight mb-1">Complete your</h1>
@@ -28,7 +28,7 @@ export function PlanSummary({ setView, T, selectedTier, billing }) {
           <div className="flex items-start justify-between gap-4 mb-4">
             <div>
               <span
-                className={`text-[9px] font-mono tracking-[0.2em] uppercase px-2 py-0.5 border border-border-dark ${T[selectedTier!.tier].labelClass}`}
+                className={`text-[9px] font-mono tracking-eyebrow uppercase px-2 py-0.5 border border-border-dark ${T[selectedTier!.tier].labelClass}`}
               >
                 {T[selectedTier!.tier].label}
               </span>
@@ -42,7 +42,7 @@ export function PlanSummary({ setView, T, selectedTier, billing }) {
 
           {billing === 'YEARLY' && (
             <div className="pt-4 border-t border-border-dark flex items-center justify-between">
-              <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-dark">You save</span>
+              <span className="text-[10px] font-mono tracking-tag uppercase text-muted-dark">You save</span>
               <span className={`font-quicksand font-black text-lg ${T[selectedTier!.tier].darkPriceActive}`}>
                 ${selectedTier!.price.MONTHLY * 12 - selectedTier!.price.YEARLY}
               </span>

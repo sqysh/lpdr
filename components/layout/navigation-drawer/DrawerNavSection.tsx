@@ -17,9 +17,7 @@ export function DrawerNavSection({
   const [expandedSections, setExpandedSections] = useState<string[]>([])
 
   const toggleSection = (title: string) => {
-    setExpandedSections((prev) =>
-      prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]
-    )
+    setExpandedSections((prev) => (prev.includes(title) ? prev.filter((t) => t !== title) : [...prev, title]))
   }
 
   return (
@@ -37,7 +35,7 @@ export function DrawerNavSection({
               }`}
             >
               <navLink.icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-[0.15em]">{navLink.title}</span>
+              <span className="text-xs uppercase tracking-tag">{navLink.title}</span>
             </Link>
           ) : (
             <button
@@ -45,13 +43,8 @@ export function DrawerNavSection({
               className="w-full flex items-center gap-3 px-4 py-3 text-muted-light dark:text-muted-dark hover:text-text-light dark:hover:text-text-dark hover:bg-surface-light dark:hover:bg-surface-dark transition-colors focus-visible:outline-none"
             >
               <navLink.icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-              <span className="text-xs uppercase tracking-[0.15em] flex-1 text-left">
-                {navLink.title}
-              </span>
-              <motion.div
-                animate={{ rotate: expandedSections.includes(navLink.title) ? 180 : 0 }}
-                transition={{ duration: 0.2 }}
-              >
+              <span className="text-xs uppercase tracking-tag flex-1 text-left">{navLink.title}</span>
+              <motion.div animate={{ rotate: expandedSections.includes(navLink.title) ? 180 : 0 }} transition={{ duration: 0.2 }}>
                 <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
               </motion.div>
             </button>

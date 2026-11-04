@@ -27,7 +27,7 @@ export function MyPackAvatar({ userImage, initials }: { userImage?: string | nul
         )}
       </div>
 
-      <span className="text-[10px] font-mono tracking-[0.2em] uppercase text-on-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
+      <span className="text-[10px] font-mono tracking-eyebrow uppercase text-on-dark group-hover:text-primary-light dark:group-hover:text-primary-dark transition-colors">
         {pending ? 'Loading...' : 'My Pack'}
       </span>
     </>

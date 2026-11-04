@@ -5,6 +5,9 @@ const devScriptHosts = isDev ? ' https://va.vercel-scripts.com' : ''
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ['10.0.0.204'],
+  outputFileTracingIncludes: {
+    '/api/memorial-art/[id]': ['./public/images/memorial/**/*']
+  },
   images: {
     remotePatterns: [
       {

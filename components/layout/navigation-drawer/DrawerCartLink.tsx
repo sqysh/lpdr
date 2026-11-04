@@ -1,15 +1,7 @@
 import { ShoppingBasket } from 'lucide-react'
 import Link from 'next/link'
 
-export function DrawerCartLink({
-  totalItems,
-  active,
-  onClose
-}: {
-  totalItems: number
-  active: boolean
-  onClose: () => void
-}) {
+export function DrawerCartLink({ totalItems, active, onClose }: { totalItems: number; active: boolean; onClose: () => void }) {
   return (
     <Link
       href="/cart"
@@ -32,7 +24,7 @@ export function DrawerCartLink({
           </span>
         )}
       </span>
-      <span className="text-xs uppercase tracking-[0.15em]">Cart</span>
+      <span className="text-xs uppercase tracking-tag">Cart</span>
     </Link>
   )
 }

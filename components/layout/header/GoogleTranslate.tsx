@@ -75,8 +75,7 @@ export default function GoogleTranslate() {
     // Load the script
     if (!document.querySelector('script[src*="translate.google.com"]')) {
       const script = document.createElement('script')
-      script.src =
-        'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
+      script.src = 'https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit'
       document.body.appendChild(script)
     } else {
       // Script already loaded, just sync state
@@ -179,7 +178,7 @@ export default function GoogleTranslate() {
           disabled={!isReady || isTranslating}
           className="inline-flex items-center gap-3 px-4 py-2.5 bg-button-light dark:bg-surface-dark/50 transition-colors notranslate disabled:opacity-50 disabled:cursor-not-allowed h-11 cursor-pointer w-[126.41px] border-l-2 border-l-primary-light dark:border-l-primary-dark"
         >
-          <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-on-dark">
+          <span className="text-[10px] font-mono tracking-tag uppercase text-on-dark">
             {isTranslating ? 'Translating…' : LANGUAGES.find((l) => l.code === currentLang)?.name}
           </span>
           <motion.span
@@ -205,7 +204,7 @@ export default function GoogleTranslate() {
                   key={lang.code}
                   onClick={() => changeLanguage(lang.code)}
                   disabled={isTranslating}
-                  className={`group relative w-full text-left py-1.5 text-[10px] font-mono tracking-[0.15em] uppercase transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed ${
+                  className={`group relative w-full text-left py-1.5 text-[10px] font-mono tracking-tag uppercase transition-colors disabled:opacity-50 cursor-pointer disabled:cursor-not-allowed ${
                     currentLang === lang.code
                       ? 'text-primary-light dark:text-primary-dark'
                       : 'text-on-dark hover:text-primary-light dark:hover:text-primary-dark'

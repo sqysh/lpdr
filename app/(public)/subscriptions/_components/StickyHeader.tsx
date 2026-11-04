@@ -57,7 +57,7 @@ export function StickyHeader({
             <ArrowLeft size={14} aria-hidden="true" />
           </button>
           <span className="block w-4 h-px bg-primary-dark shrink-0" aria-hidden="true" />
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-primary-dark">Subscriptions</p>
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-primary-dark">Subscriptions</p>
         </div>
 
         {/* Center — selected tier */}
@@ -68,7 +68,7 @@ export function StickyHeader({
               initial={{ opacity: 0, y: 4 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.2 }}
-              className="text-[10px] font-mono tracking-[0.2em] uppercase text-text-dark truncate"
+              className="text-[10px] font-mono tracking-eyebrow uppercase text-text-dark truncate"
             >
               {selectedTier.name}&nbsp;
               <span className="text-primary-dark">
@@ -76,7 +76,7 @@ export function StickyHeader({
               </span>
             </motion.p>
           ) : (
-            <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-dark">Select a tier</p>
+            <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-dark">Select a tier</p>
           )}
         </div>
 
@@ -86,7 +86,7 @@ export function StickyHeader({
           disabled={!selected || loading}
           aria-busy={loading}
           aria-label={selectedTier ? `Subscribe to ${selectedTier.name}` : 'Select a tier to subscribe'}
-          className="shrink-0 flex items-center gap-2 px-4 py-1.5 text-[10px] font-mono tracking-[0.2em] uppercase bg-primary-dark text-bg-dark hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed"
+          className="shrink-0 flex items-center gap-2 px-4 py-1.5 text-[10px] font-mono tracking-eyebrow uppercase bg-primary-dark text-bg-dark hover:bg-secondary-dark transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed"
         >
           {loading ? (
             <>

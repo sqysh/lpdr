@@ -1,4 +1,4 @@
-import { COLOR } from 'lib/constants/order-confirmation-constants'
+import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 import { formatMoney } from 'lib/utils/currency.utils'
 

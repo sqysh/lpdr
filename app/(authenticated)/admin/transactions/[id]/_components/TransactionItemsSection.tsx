@@ -37,64 +37,66 @@ export function TransactionItemsSection({ order }: { order: IOrder }) {
         </span>
       </div>
 
-      <ul className="divide-y divide-border-light dark:divide-border-dark">
-        {order.items.map((item) => {
-          const quantity = item.quantity ?? 1
-          const unitPrice = Number(item.price)
-          const lineTotal = Number(unitPrice * quantity)
+      {order.items.length > 0 && (
+        <ul className="divide-y divide-border-light dark:divide-border-dark">
+          {order.items.map((item) => {
+            const quantity = item.quantity ?? 1
+            const unitPrice = Number(item.price)
+            const lineTotal = Number(unitPrice * quantity)
 
-          return (
-            <li key={item.id} className="flex items-start gap-4 px-4 py-3">
-              <div className="shrink-0 w-12 h-12 border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark overflow-hidden relative">
-                {item.itemImage ? (
-                  <Image src={item.itemImage} alt="" fill sizes="48px" className="object-cover" />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
-                    {item.isPhysical ? (
-                      <Package className="w-4 h-4 text-muted-light dark:text-muted-dark" />
-                    ) : (
-                      <Heart className="w-4 h-4 text-primary-light dark:text-primary-dark" />
-                    )}
-                  </div>
-                )}
-              </div>
-
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 min-w-0">
-                  <p className="text-sm font-nunito text-text-light dark:text-text-dark truncate">{item.itemName ?? 'Unnamed item'}</p>
-                  {!item.isPhysical && (
-                    <span className="shrink-0 px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-[8px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark">
-                      Donation
-                    </span>
+            return (
+              <li key={item.id} className="flex items-start gap-4 px-4 py-3">
+                <div className="shrink-0 w-12 h-12 border border-border-light dark:border-border-dark bg-bg-light dark:bg-bg-dark overflow-hidden relative">
+                  {item.itemImage ? (
+                    <Image src={item.itemImage} alt="" fill sizes="48px" className="object-cover" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center" aria-hidden="true">
+                      {item.isPhysical ? (
+                        <Package className="w-4 h-4 text-muted-light dark:text-muted-dark" />
+                      ) : (
+                        <Heart className="w-4 h-4 text-primary-light dark:text-primary-dark" />
+                      )}
+                    </div>
                   )}
                 </div>
 
-                {/* One fact per cell, so the numbers can be scanned rather than read */}
-                <dl className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-[10px] font-mono text-muted-light dark:text-muted-dark">
-                  <div className="flex gap-1">
-                    <dt className="uppercase tracking-tag">Unit</dt>
-                    <dd className="tabular-nums text-text-light dark:text-text-dark">{formatMoney(unitPrice)}</dd>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <p className="text-sm font-nunito text-text-light dark:text-text-dark truncate">{item.itemName ?? 'Unnamed item'}</p>
+                    {!item.isPhysical && (
+                      <span className="shrink-0 px-1.5 py-0.5 border border-primary-light/30 dark:border-primary-dark/30 text-[8px] font-mono tracking-tag uppercase text-primary-light dark:text-primary-dark">
+                        Donation
+                      </span>
+                    )}
                   </div>
 
-                  <div className="flex gap-1">
-                    <dt className="uppercase tracking-tag">Qty</dt>
-                    <dd className="tabular-nums text-text-light dark:text-text-dark">{quantity}</dd>
-                  </div>
-
-                  {item.size && (
+                  {/* One fact per cell, so the numbers can be scanned rather than read */}
+                  <dl className="flex flex-wrap gap-x-4 gap-y-0.5 mt-1 text-[10px] font-mono text-muted-light dark:text-muted-dark">
                     <div className="flex gap-1">
-                      <dt className="uppercase tracking-tag">Size</dt>
-                      <dd className="text-text-light dark:text-text-dark">{item.size}</dd>
+                      <dt className="uppercase tracking-tag">Unit</dt>
+                      <dd className="tabular-nums text-text-light dark:text-text-dark">{formatMoney(unitPrice)}</dd>
                     </div>
-                  )}
-                </dl>
-              </div>
 
-              <p className="shrink-0 text-sm font-mono tabular-nums text-text-light dark:text-text-dark">{formatMoney(lineTotal)}</p>
-            </li>
-          )
-        })}
-      </ul>
+                    <div className="flex gap-1">
+                      <dt className="uppercase tracking-tag">Qty</dt>
+                      <dd className="tabular-nums text-text-light dark:text-text-dark">{quantity}</dd>
+                    </div>
+
+                    {item.size && (
+                      <div className="flex gap-1">
+                        <dt className="uppercase tracking-tag">Size</dt>
+                        <dd className="text-text-light dark:text-text-dark">{item.size}</dd>
+                      </div>
+                    )}
+                  </dl>
+                </div>
+
+                <p className="shrink-0 text-sm font-mono tabular-nums text-text-light dark:text-text-dark">{formatMoney(lineTotal)}</p>
+              </li>
+            )
+          })}
+        </ul>
+      )}
 
       {/* ── Totals ── */}
       <dl className="border-t border-border-light dark:border-border-dark px-4 py-3 space-y-1.5">

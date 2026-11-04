@@ -27,4 +27,4 @@ export const bebas = Bebas_Neue({
   variable: '--font-bebas'
 })
 
-export const signatureFont = Caveat({ subsets: ['latin'], weight: ['500'], variable: '--font-caveat' })
+export const signatureFont = Caveat({ subsets: ['latin'], weight: ['500'], preload: false, variable: '--font-caveat' })

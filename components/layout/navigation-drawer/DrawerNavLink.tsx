@@ -10,14 +10,7 @@ type Props = {
   showActiveBorder?: boolean
 }
 
-export function DrawerNavLink({
-  href,
-  icon: Icon,
-  label,
-  active,
-  onClose,
-  showActiveBorder
-}: Props) {
+export function DrawerNavLink({ href, icon: Icon, label, active, onClose, showActiveBorder }: Props) {
   return (
     <Link
       href={href}
@@ -29,7 +22,7 @@ export function DrawerNavLink({
       }`}
     >
       <Icon className="w-4 h-4 shrink-0" aria-hidden="true" />
-      <span className="text-xs uppercase tracking-[0.15em]">{label}</span>
+      <span className="text-xs uppercase tracking-tag">{label}</span>
     </Link>
   )
 }

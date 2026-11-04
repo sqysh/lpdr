@@ -13,7 +13,7 @@ import { DrawerNavSection } from './DrawerNavSection'
 import { useNavigationStore } from 'stores/navigation.store'
 import { useCartStore } from 'stores/cart.store'
 
-export default function NavigationDrawer({ hasActiveFee }) {
+export default function NavigationDrawer({ hasActiveFee, memorialsEnabled }: { hasActiveFee: boolean; memorialsEnabled: boolean }) {
   const mobileNavigation = useNavigationStore((s) => s.mobileNavOpen)
   const closeMobileNav = useNavigationStore((s) => s.closeMobileNav)
   const openMobileNav = useNavigationStore((s) => s.openMobileNav)
@@ -66,7 +66,7 @@ export default function NavigationDrawer({ hasActiveFee }) {
 
               <div className="mx-4 border-t border-border-light dark:border-border-dark" />
 
-              <DrawerNavSection links={mainNavigationLinks(hasActiveFee)} isLinkActive={isLinkActive} onClose={onClose} />
+              <DrawerNavSection links={mainNavigationLinks(hasActiveFee, memorialsEnabled)} isLinkActive={isLinkActive} onClose={onClose} />
             </div>
           </motion.div>
         </>

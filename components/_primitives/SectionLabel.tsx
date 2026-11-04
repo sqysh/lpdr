@@ -12,7 +12,7 @@ export function SectionLabel({ children, muted = false, className = '' }: Sectio
         aria-hidden="true"
       />
       <p
-        className={`text-[10px] font-mono tracking-[0.2em] uppercase ${muted ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'}`}
+        className={`text-[10px] font-mono tracking-eyebrow uppercase ${muted ? 'text-muted-light dark:text-muted-dark' : 'text-primary-light dark:text-primary-dark'}`}
       >
         {children}
       </p>

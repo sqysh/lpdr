@@ -19,6 +19,9 @@ const COL_COUNT = 7
 
 const latestOf = (orders: IOrderRow[]) => [...orders].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())[0]
 
+const kindOf = (o: IOrderRow): DonationFilter =>
+  o.isRecurring ? 'RECURRING_DONATION' : o.type === 'MEMORIAL_DONATION' ? 'MEMORIAL_DONATION' : 'ONE_TIME_DONATION'
+
 export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
   const router = useRouter()
   const [filter, setFilter] = useState<DonationFilter>('ALL')
@@ -61,7 +64,7 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
   }, [orders])
 
   const counts = useMemo(() => {
-    const base: Record<DonationFilter, number> = { ALL: 0, ONE_TIME_DONATION: 0, RECURRING_DONATION: 0 }
+    const base: Record<DonationFilter, number> = { ALL: 0, ONE_TIME_DONATION: 0, RECURRING_DONATION: 0, MEMORIAL_DONATION: 0 }
     const seen = new Set<string>()
 
     for (const o of orders) {
@@ -70,10 +73,8 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
         const key = o.stripeSubscriptionId ?? o.id
         if (seen.has(key)) continue
         seen.add(key)
-        base.RECURRING_DONATION++
-      } else {
-        base.ONE_TIME_DONATION++
       }
+      base[kindOf(o)]++
       base.ALL++
     }
 
@@ -81,7 +82,7 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
   }, [orders])
 
   const displayRows = useMemo<DisplayRow[]>(() => {
-    const filtered = filter === 'ALL' ? orders : orders.filter((o) => (filter === 'RECURRING_DONATION' ? o.isRecurring : !o.isRecurring))
+    const filtered = filter === 'ALL' ? orders : orders.filter((o) => kindOf(o) === filter)
 
     const groups = new Map<string, IOrderRow[]>()
     const flat: IOrderRow[] = []
@@ -197,7 +198,9 @@ export function AdminDonationsClient({ orders }: { orders: IOrderRow[] }) {
                           </>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">One-time</td>
+                      <td className="px-4 py-3 text-[10px] font-mono text-muted-light dark:text-muted-dark whitespace-nowrap">
+                        {row.order.type === 'MEMORIAL_DONATION' ? 'Memorial' : 'One-time'}
+                      </td>
                       <td className="px-4 py-3 text-xs font-mono tabular-nums font-bold text-text-light dark:text-text-dark whitespace-nowrap">
                         {formatMoney(row.order.totalAmount)}
                       </td>

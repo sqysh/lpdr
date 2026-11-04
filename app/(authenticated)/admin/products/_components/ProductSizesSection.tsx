@@ -85,7 +85,7 @@ export function ProductSizesSection({ form, set }: Props) {
           className="flex items-center gap-2 px-3 py-2 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors w-full justify-center mt-1"
         >
           <Plus className="w-3 h-3" aria-hidden="true" />
-          <span className="text-[10px] font-mono tracking-[0.2em] uppercase">Add Size</span>
+          <span className="text-[10px] font-mono tracking-eyebrow uppercase">Add Size</span>
         </button>
       </div>
     </section>

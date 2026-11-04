@@ -9,7 +9,7 @@ import { WelcomeWienerProduct } from 'types/welcome-wiener'
 import { validateSavedCard } from './validateSavedCard'
 import { getOrCreateStripeCustomer } from './getOrCreateCustomer'
 import { requireAuth } from 'lib/auth/guards'
-import { getErrorMessage, getUserMessage, isExpectedError } from 'lib/utils/error.utils'
+import { getErrorMessage, getUserMessage, isExpectedError, UserFacingError } from 'lib/utils/error.utils'
 import { grossUpCents } from 'lib/utils/fees.utils'
 import { parseInput } from 'lib/utils/validate.utils'
 import { createPaymentIntentSchema } from 'lib/schemas/payment.schema'
@@ -21,6 +21,7 @@ import { hasActiveAdoptionFee } from '../adoption-fee/hasActiveAdoptionFee'
 import { isDonation } from 'lib/constants/order.constants'
 import { agreementTotal } from 'lib/utils/adoption-agreement.utils'
 import { createHash } from 'crypto'
+import { getMemorialSettings } from 'lib/memorial/getMemorialSetting'
 
 const RATE_LIMIT_MAX_ATTEMPTS = 5
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000
@@ -73,8 +74,19 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
   if (parsed.ok === false) return parsed.result
 
-  const { amount, orderType, saveCard, coverFees, savedCardId, items, winningBidderId, auctionItemId, donorMessage, agreementId } =
-    parsed.data
+  const {
+    amount,
+    orderType,
+    saveCard,
+    coverFees,
+    savedCardId,
+    items,
+    winningBidderId,
+    auctionItemId,
+    donorMessage,
+    agreementId,
+    memorial
+  } = parsed.data
 
   const userId = gate.userId
 
@@ -138,11 +150,11 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         const product = products.find((p) => p.id === item.id)
 
         if (product) {
-          if (!product.isLive) throw new Error(`${product.name} is no longer available`)
+          if (!product.isLive) throw new UserFacingError(`${product.name} is no longer available`)
           const sizes = product.sizes as ProductSizeEntry[] | null
           const available = item.size ? (sizes?.find((s) => s.size === item.size)?.quantity ?? 0) : product.countInStock
           if (item.quantity > available) {
-            throw new Error(`Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`)
+            throw new UserFacingError(`Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`)
           }
           itemsBase += Number(product.price) * item.quantity
           shippingBase += Number(product.shippingPrice)
@@ -150,12 +162,12 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         }
 
         const wiener = wieners.find((w) => w.id === item.welcomeWienerId)
-        if (!wiener) throw new Error(`Item unavailable: ${item.name}`)
-        if (!wiener.isLive) throw new Error(`${wiener.name} is no longer accepting donations`)
+        if (!wiener) throw new UserFacingError(`Item unavailable: ${item.name}`)
+        if (!wiener.isLive) throw new UserFacingError(`${wiener.name} is no longer accepting donations`)
 
         const options = wiener.associatedProducts as unknown as WelcomeWienerProduct[]
         const option = options.find((o) => o.id === (item.welcomeWienerProductId ?? item.id))
-        if (!option) throw new Error(`Invalid donation option for ${wiener.name}`)
+        if (!option) throw new UserFacingError(`Invalid donation option for ${wiener.name}`)
 
         itemsBase += Number(option.price) * item.quantity
       }
@@ -164,7 +176,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       baseCents = Math.round(itemsBase * 100) + shippingCents
     } else if (orderType === 'AUCTION_PURCHASE') {
       if (auctionItemId) {
-        // Instant buy — a fixed-price item, priced from the database
+        // Instant buy: a fixed-price item, priced from the database
         const item = await prisma.auctionItem.findFirst({
           where: { id: auctionItemId, auction: { status: 'ACTIVE' } },
           select: {
@@ -177,10 +189,10 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
           }
         })
 
-        if (!item) throw new Error('This item is no longer available')
-        if (item.sellingFormat !== 'FIXED') throw new Error('This item is not available for instant buy')
-        if (item.status === 'SOLD') throw new Error('This item has already been sold')
-        if (item.buyNowPrice == null) throw new Error('This item has no price set')
+        if (!item) throw new UserFacingError('This item is no longer available')
+        if (item.sellingFormat !== 'FIXED') throw new UserFacingError('This item is not available for instant buy')
+        if (item.status === 'SOLD') throw new UserFacingError('This item has already been sold')
+        if (item.buyNowPrice == null) throw new UserFacingError('This item has no price set')
 
         const shipping = item.requiresShipping ? Number(item.shippingCosts ?? 0) : 0
 
@@ -204,22 +216,22 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
             userId,
             winningBidderId
           })
-          throw new Error('This auction win is not associated with your account')
+          throw new UserFacingError('This auction win is not associated with your account')
         }
 
         if (winner.winningBidPaymentStatus === 'PAID') {
-          throw new Error('This auction item has already been paid for')
+          throw new UserFacingError('This auction item has already been paid for')
         }
 
         existingWinnerIntentId = winner.paymentIntentId
 
         const itemsTotal = winner.auctionItems.reduce((sum, i) => sum + Number(i.soldPrice ?? 0), 0)
-        if (itemsTotal <= 0) throw new Error('This auction win has no items to pay for')
+        if (itemsTotal <= 0) throw new UserFacingError('This auction win has no items to pay for')
 
         shippingCents = Math.round(Number(winner.shipping ?? 0) * 100)
         baseCents = Math.round(itemsTotal * 100) + shippingCents
       } else {
-        throw new Error('Missing auction reference')
+        throw new UserFacingError('Missing auction reference')
       }
     } else if (orderType === 'ADOPTION_FEE') {
       // Someone whose confirmation is slow will try again, and without this they pay twice for
@@ -228,12 +240,12 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
       if (active.isActive) {
         await createLog('warn', 'Adoption fee attempted while one is already active', { userId })
-        throw new Error('You already have access to the adoption application.')
+        throw new UserFacingError('You already have access to the adoption application.')
       }
 
       baseCents = ADOPTION_FEE_CENTS
     } else if (orderType === 'ADOPTION_AGREEMENT') {
-      if (!agreementId) throw new Error('Missing adoption agreement')
+      if (!agreementId) throw new UserFacingError('Missing adoption agreement')
 
       const agreement = await prisma.adoptionAgreement.findUnique({
         where: { id: agreementId },
@@ -250,11 +262,12 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       })
 
       // Same message for missing and someone else's, so an id never confirms another adopter's agreement
-      if (!agreement || agreement.userId !== userId) throw new Error('Adoption agreement not found')
-      if (agreement.status === 'PAID' || agreement.status === 'COMPLETE') throw new Error('This adoption has already been paid for')
-      if (agreement.status !== 'SIGNED') throw new Error('Please sign the agreement before paying')
+      if (!agreement || agreement.userId !== userId) throw new UserFacingError('Adoption agreement not found')
+      if (agreement.status === 'PAID' || agreement.status === 'COMPLETE')
+        throw new UserFacingError('This adoption has already been paid for')
+      if (agreement.status !== 'SIGNED') throw new UserFacingError('Please sign the agreement before paying')
       if (agreement.paymentMethod !== 'CARD')
-        throw new Error('This adoption is set up to be paid another way. Please check your agreement email')
+        throw new UserFacingError('This adoption is set up to be paid another way. Please check your agreement email')
 
       // Every amount comes from the signed agreement, never from the browser
       baseCents = Math.round(
@@ -266,6 +279,25 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       )
       purchaseDescription = `Adoption of ${agreement.dogName} by ${displayName}`
       agreementUpdatedAt = agreement.updatedAt.getTime().toString()
+    } else if (orderType === 'MEMORIAL_DONATION') {
+      // Every rule comes from the admin's memorial settings, never from the browser
+      const settings = await getMemorialSettings()
+      if (!settings?.isEnabled) throw new UserFacingError('Memorial gifts are not available right now.')
+      if (!memorial?.dogName) throw new UserFacingError("Please enter your dog's name.")
+      if (memorial.message && !settings.allowMessage) throw new UserFacingError('Messages are not part of memorial gifts right now.')
+      if (memorial.message && memorial.message.length > settings.messageMaxLength) {
+        throw new UserFacingError(`Please keep your message under ${settings.messageMaxLength} characters.`)
+      }
+      if (memorial.photoUrl && !settings.allowPhoto) throw new UserFacingError('Photos are not part of memorial gifts right now.')
+      if (memorial.photoUrl && !memorial.photoUrl.startsWith('https://firebasestorage.googleapis.com/')) {
+        throw new UserFacingError('Please upload the photo again.')
+      }
+
+      const minCents = Math.round(Number(settings.minAmount) * 100)
+      baseCents = settings.fixedAmount != null ? Math.round(Number(settings.fixedAmount) * 100) : (amount ?? 0)
+      if (baseCents < minCents) throw new UserFacingError(`The minimum memorial gift is $${Number(settings.minAmount)}.`)
+
+      purchaseDescription = `Memorial gift in honor of ${memorial.dogName} from ${displayName}`
     } else {
       // Donor-chosen amount (one-time and recurring donations)
       baseCents = amount ?? 0
@@ -287,6 +319,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
     const descriptions: Record<OrderType, string> = {
       ONE_TIME_DONATION: `One-time donation from ${displayName}`,
       RECURRING_DONATION: `Recurring donation from ${displayName}`,
+      MEMORIAL_DONATION: purchaseDescription,
       ADOPTION_FEE: `Adoption fee from ${displayName}`,
       ADOPTION_AGREEMENT: purchaseDescription,
       AUCTION_PURCHASE: auctionItemId ? purchaseDescription : `Auction payment from ${displayName}`,
@@ -315,7 +348,15 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         winningBidderId: winningBidderId ?? '',
         agreementId: agreementId ?? '',
         auctionItemId: auctionItemId ?? '',
-        ...(isDonation(orderType) && donorMessage && { donorMessage })
+        ...(isDonation(orderType) && donorMessage && { donorMessage }),
+        ...(orderType === 'MEMORIAL_DONATION' &&
+          memorial && {
+            memorialDogName: memorial.dogName,
+            ...(memorial.message && { memorialMessage: memorial.message }),
+            ...(memorial.donorDisplayName && { memorialDonorName: memorial.donorDisplayName }),
+            memorialShowDonor: memorial.showDonorName ? 'true' : 'false',
+            ...(memorial.photoUrl && { memorialPhotoUrl: memorial.photoUrl })
+          })
       }
     }
 
@@ -337,7 +378,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       const existing = await stripeClient.paymentIntents.retrieve(existingWinnerIntentId).catch(() => null)
 
       if (existing?.status === 'succeeded' || existing?.status === 'processing') {
-        throw new Error('This auction win has already been paid for')
+        throw new UserFacingError('This auction win has already been paid for')
       }
 
       if (existing && REUSABLE_STATUSES.has(existing.status)) {

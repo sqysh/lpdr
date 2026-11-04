@@ -14,9 +14,7 @@ export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrd
         <motion.div variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-10">
           <div className="flex items-center gap-3 mb-3">
             <span className="block w-6 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-            <p className="text-xs font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark">
-              Multi Item Orders
-            </p>
+            <p className="text-xs font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark">Multi Item Orders</p>
           </div>
           <div className="flex items-start justify-between gap-4">
             <h1 className="font-quicksand text-4xl sm:text-5xl font-black text-text-light dark:text-text-dark leading-tight">
@@ -24,12 +22,12 @@ export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrd
             </h1>
             <Link
               href="/my-pack"
-              className="shrink-0 text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mt-2"
+              className="shrink-0 text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark transition-colors focus:outline-none focus-visible:underline mt-2"
             >
               ← My Pack
             </Link>
           </div>
-          <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-light dark:text-muted-dark mt-3">
+          <p className="text-[10px] font-mono tracking-tag uppercase text-muted-light dark:text-muted-dark mt-3">
             {orders.length} order{orders.length !== 1 ? 's' : ''}
           </p>
         </motion.div>
@@ -48,7 +46,7 @@ export default function MultiItemOrdersClient({ orders }: { orders: MultiItemOrd
             <p className="text-sm font-mono text-muted-light dark:text-muted-dark">You haven&apos;t made any orders yet.</p>
             <Link
               href="/merch"
-              className="inline-block mt-4 text-[10px] font-mono tracking-[0.2em] uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:underline"
+              className="inline-block mt-4 text-[10px] font-mono tracking-eyebrow uppercase text-primary-light dark:text-primary-dark hover:text-secondary-light dark:hover:text-secondary-dark transition-colors focus:outline-none focus-visible:underline"
             >
               Browse the store →
             </Link>

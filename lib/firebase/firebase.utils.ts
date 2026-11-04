@@ -10,14 +10,15 @@ import { storage } from './firebase'
 export const uploadFileToFirebase = async (
   file: File,
   onProgress: (progress: number) => void = () => {},
-  type: 'image' | 'video' = 'image'
+  type: 'image' | 'video' = 'image',
+  path?: string
 ): Promise<string> => {
   if (!file) {
     throw new Error('No file provided')
   }
 
   // Create a storage reference
-  const storageRef = ref(storage, `${type}s/${file.name}`)
+  const storageRef = ref(storage, path ?? `${type}s/${file.name}`)
 
   // Start the upload task
   const uploadTask = uploadBytesResumable(storageRef, file)

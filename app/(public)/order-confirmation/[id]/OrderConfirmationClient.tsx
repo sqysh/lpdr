@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import Link from 'next/link'
+import Image from 'next/image'
 import {
   CheckCircle,
   ArrowRight,
@@ -87,8 +88,17 @@ export default function OrderConfirmationClient({ order }) {
   }, [clearCart, isNewOrder, showConfetti])
 
   const adoption = order?.type === 'ADOPTION_AGREEMENT' ? order?.adoptionAgreement : null
+  const memorial = order?.type === 'MEMORIAL_DONATION' ? order?.memorial : null
   const frequency = order?.isRecurring ? FREQUENCY[order?.recurringFrequency as keyof typeof FREQUENCY] : null
-  const typeCode = frequency ? 'RD' : 'DN'
+  const typeCode = frequency ? 'RD' : memorial ? 'MG' : 'DN'
+  const itemLabel = frequency ? `${frequency.label} Donation` : memorial ? 'Memorial Gift' : 'One-Time Donation'
+  const message = memorial ? memorial.message : order?.donorMessage
+
+  const primaryAction = adoption
+    ? { href: `/adopt/agreement/${adoption.id}`, label: 'View your agreement' }
+    : memorial
+      ? { href: '/rainbow-bridge', label: 'Visit the Rainbow Bridge' }
+      : { href: '/', label: 'Back to site' }
 
   const shipping = Number(order?.shipping ?? 0)
   const feesCovered = order?.coverFees ? Number(order?.feesCovered ?? 0) : 0
@@ -173,6 +183,48 @@ export default function OrderConfirmationClient({ order }) {
           </motion.div>
         )}
 
+        {/* ── The memorial card, the same art the email carries ── */}
+        {memorial && (
+          <motion.figure
+            variants={fadeUp}
+            initial="hidden"
+            animate="show"
+            custom={0.5}
+            className="mb-6 border border-cyan-600/30 dark:border-violet-400/30 bg-cyan-600/5 dark:bg-violet-400/5"
+          >
+            <Image
+              src={`/api/memorial-art/${memorial.id}?v=${new Date(memorial.updatedAt).getTime()}`}
+              alt={`In loving memory of ${memorial.dogName}`}
+              width={960}
+              height={640}
+              unoptimized
+              priority
+              className="w-full h-auto"
+            />
+            <figcaption className="flex items-center gap-4 px-5 py-4">
+              {memorial.photoUrl && (
+                <Image
+                  src={memorial.photoUrl}
+                  alt={memorial.dogName}
+                  width={160}
+                  height={160}
+                  sizes="80px"
+                  className="w-20 h-20 shrink-0 object-cover border border-cyan-600/30 dark:border-violet-400/30"
+                />
+              )}
+              <div className="min-w-0">
+                <p className="text-[10px] uppercase tracking-[0.25em] text-cyan-600 dark:text-violet-400 mb-1">In loving memory</p>
+                <p className="text-lg text-zinc-950 dark:text-text-dark leading-snug wrap-break-word">{memorial.dogName}</p>
+                <p className="font-lato text-xs text-zinc-500 dark:text-muted-dark leading-relaxed mt-1">
+                  {memorial.status === 'APPROVED'
+                    ? 'Their butterfly is now on the Rainbow Bridge.'
+                    : 'Their butterfly will join the Rainbow Bridge once our team has reviewed it.'}
+                </p>
+              </div>
+            </figcaption>
+          </motion.figure>
+        )}
+
         {/* ── Receipt ── */}
         <motion.div
           variants={fadeUp}
@@ -225,9 +277,8 @@ export default function OrderConfirmationClient({ order }) {
                   <span className="font-mono text-[10px] font-bold tracking-widest text-zinc-400 dark:text-muted-dark/50">{typeCode}</span>
                 </div>
                 <div className="flex flex-col min-w-0">
-                  <p className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">
-                    {frequency ? `${frequency.label} Donation` : 'One-Time Donation'}
-                  </p>
+                  <p className="text-xs uppercase tracking-wide text-zinc-950 dark:text-text-dark">{itemLabel}</p>
+                  {memorial && <p className="text-xs text-zinc-400 dark:text-muted-dark/70 truncate">In memory of {memorial.dogName}</p>}
                   {order?.tierName && (
                     <p className="text-xs uppercase tracking-wide text-zinc-400 dark:text-muted-dark/50">{order.tierName}</p>
                   )}
@@ -241,11 +292,13 @@ export default function OrderConfirmationClient({ order }) {
               </div>
             ))}
 
-          {order?.donorMessage && (
+          {message && (
             <div className="px-5 py-4 border-t border-zinc-200 dark:border-border-dark">
-              <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark/50 mb-2">Your message</p>
+              <p className="text-[10px] uppercase tracking-[0.25em] text-zinc-400 dark:text-muted-dark/50 mb-2">
+                {memorial ? 'Your words for them' : 'Your message'}
+              </p>
               <p className="font-lato text-sm text-zinc-700 dark:text-muted-dark leading-relaxed whitespace-pre-wrap wrap-break-word">
-                {order.donorMessage}
+                {message}
               </p>
             </div>
           )}
@@ -264,7 +317,10 @@ export default function OrderConfirmationClient({ order }) {
               </>
             ) : (
               <>
-                <Line label={frequency ? `${frequency.label} gift` : 'Subtotal'} value={formatMoney(subtotal)} />
+                <Line
+                  label={frequency ? `${frequency.label} gift` : memorial ? 'Memorial gift' : 'Subtotal'}
+                  value={formatMoney(subtotal)}
+                />
                 {shipping > 0 && <Line label="Shipping" value={formatMoney(shipping)} />}
               </>
             )}
@@ -300,6 +356,14 @@ export default function OrderConfirmationClient({ order }) {
               <div className="flex justify-between items-center">
                 <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Date</span>
                 <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark">{formatLongDate(order.paidAt)}</span>
+              </div>
+            )}
+            {memorial && (
+              <div className="flex justify-between items-center">
+                <span className="font-lato text-[10px] text-zinc-400 dark:text-muted-dark/50">Shown as</span>
+                <span className="font-lato text-[10px] text-zinc-600 dark:text-muted-dark truncate max-w-50">
+                  {memorial.showDonorName && memorial.donorDisplayName ? memorial.donorDisplayName : 'Anonymous'}
+                </span>
               </div>
             )}
             {frequency && (
@@ -362,7 +426,7 @@ export default function OrderConfirmationClient({ order }) {
           ) : (
             <>
               <Link
-                href={adoption ? `/adopt/agreement/${adoption.id}` : '/'}
+                href={primaryAction.href}
                 className="group relative flex-1 overflow-hidden flex items-center justify-between px-6 py-3.5 text-sm uppercase tracking-widest text-white bg-cyan-600 hover:bg-cyan-500 dark:bg-violet-500 dark:hover:bg-violet-400 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-600 dark:focus-visible:ring-violet-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white dark:focus-visible:ring-offset-bg-dark"
               >
                 <span
@@ -370,7 +434,7 @@ export default function OrderConfirmationClient({ order }) {
                   aria-hidden="true"
                 />
                 <span className="w-fit flex items-center space-x-2">
-                  <LinkBody icon={null} label={adoption ? 'View your agreement' : 'Back to site'} spinnerClass="w-4 h-4" />
+                  <LinkBody icon={null} label={primaryAction.label} spinnerClass="w-4 h-4" />
                 </span>
                 <ArrowRight className="w-4 h-4" aria-hidden="true" />
               </Link>

@@ -18,7 +18,7 @@ export function PreApp1SignIn({ magicLinkSent, magicEmail, setMagicEmail, setMag
       <div className="mb-6">
         <div className="flex items-center gap-2 mb-3">
           <span className="block w-4 h-px bg-primary-light dark:bg-primary-dark shrink-0" aria-hidden="true" />
-          <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">Step 1</p>
+          <p className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Step 1</p>
         </div>
         <h2 id="step-sign-in-heading" className="font-quicksand text-xl font-bold text-text-light dark:text-text-dark mb-1.5">
           Sign in to continue

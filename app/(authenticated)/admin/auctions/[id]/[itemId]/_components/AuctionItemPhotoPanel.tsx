@@ -37,25 +37,15 @@ export function AuctionItemPhotoPanel({
   return (
     <section className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark">
       <div className="px-4 py-2.5 border-b border-border-light dark:border-border-dark">
-        <h3 className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark">
-          Photos
-        </h3>
+        <h3 className="text-[9px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Photos</h3>
       </div>
       {/* Existing + pending photos grid */}
       <div className="grid grid-cols-3 gap-2 mb-2">
         {/* Existing photos */}
         {isUpdating &&
           photos.map((photo) => (
-            <div
-              key={photo.id}
-              className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden"
-            >
-              <Picture
-                priority={false}
-                src={photo.url}
-                alt={photo.name ?? 'Photo'}
-                className="w-full h-full object-cover"
-              />
+            <div key={photo.id} className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden">
+              <Picture priority={false} src={photo.url} alt={photo.name ?? 'Photo'} className="w-full h-full object-cover" />
               {photo.isPrimary && (
                 <span className="absolute top-1 left-1 text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 bg-primary-light dark:bg-primary-dark text-white">
                   Primary
@@ -98,12 +88,7 @@ export function AuctionItemPhotoPanel({
             key={`${file.name}-${i}`}
             className="relative group aspect-square border border-border-light dark:border-border-dark overflow-hidden"
           >
-            <Picture
-              priority={false}
-              src={previewUrl}
-              alt={file.name}
-              className="w-full h-full object-cover"
-            />
+            <Picture priority={false} src={previewUrl} alt={file.name} className="w-full h-full object-cover" />
             {i === 0 && !isUpdating && (
               <span className="absolute top-1 left-1 text-[9px] font-black tracking-widest uppercase px-1.5 py-0.5 bg-primary-light dark:bg-primary-dark text-white">
                 Primary
@@ -127,7 +112,7 @@ export function AuctionItemPhotoPanel({
       {/* File input */}
       <label
         htmlFor="photos"
-        className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-[0.2em] uppercase cursor-pointer transition-colors"
+        className="flex items-center justify-center gap-2 px-4 py-3 border border-dashed border-border-light dark:border-border-dark hover:border-primary-light dark:hover:border-primary-dark text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark text-[10px] font-mono tracking-eyebrow uppercase cursor-pointer transition-colors"
       >
         <ImagePlus size={13} aria-hidden="true" />
         {pendingPhotos.length > 0 ? `${pendingPhotos.length} selected — add more` : 'Select photos'}

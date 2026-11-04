@@ -46,8 +46,7 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
     },
     {
       header: 'Subscribed',
-      className:
-        'text-[10px] font-mono tracking-widest text-muted-light dark:text-muted-dark whitespace-nowrap',
+      className: 'text-[10px] font-mono tracking-widest text-muted-light dark:text-muted-dark whitespace-nowrap',
       cell: (n) => formatDate(new Date(n.createdAt))
     }
   ]
@@ -68,7 +67,7 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
             onChange={(e) => handleSearch(e.target.value)}
             placeholder="Search subscribers..."
             aria-label="Search newsletter subscribers"
-            className="w-full pl-8 pr-8 py-2 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-[10px] font-mono tracking-[0.2em] text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark transition-colors"
+            className="w-full pl-8 pr-8 py-2 bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark text-[10px] font-mono tracking-eyebrow text-text-light dark:text-text-dark placeholder:text-muted-light dark:placeholder:text-muted-dark focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark transition-colors"
           />
           {search && (
             <button
@@ -83,25 +82,17 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
         </div>
 
         <div className="flex items-center gap-3 shrink-0">
-          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark whitespace-nowrap">
+          <p className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark whitespace-nowrap">
             {filtered.length} subscriber{filtered.length !== 1 ? 's' : ''}
           </p>
           <button
             type="button"
             onClick={handleCopyAll}
             disabled={filtered.length === 0}
-            aria-label={
-              copied
-                ? 'Emails copied to clipboard'
-                : 'Copy all emails to clipboard as comma-separated list'
-            }
-            className="inline-flex items-center gap-2 px-3 py-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[10px] font-mono tracking-[0.2em] uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
+            aria-label={copied ? 'Emails copied to clipboard' : 'Copy all emails to clipboard as comma-separated list'}
+            className="inline-flex items-center gap-2 px-3 py-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark hover:text-primary-light dark:hover:text-primary-dark hover:border-primary-light dark:hover:border-primary-dark transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-light dark:focus-visible:ring-primary-dark disabled:opacity-30 disabled:cursor-not-allowed whitespace-nowrap"
           >
-            {copied ? (
-              <Check size={11} aria-hidden="true" />
-            ) : (
-              <Copy size={11} aria-hidden="true" />
-            )}
+            {copied ? <Check size={11} aria-hidden="true" /> : <Copy size={11} aria-hidden="true" />}
             {copied ? 'Copied' : 'Copy all emails'}
           </button>
         </div>
@@ -117,13 +108,7 @@ export function SubscribersPanel({ newsletters }: { newsletters: Newsletter[] })
       />
 
       {totalPages > 1 && (
-        <Pagination
-          page={safePage}
-          totalPages={totalPages}
-          onPage={setPage}
-          totalItems={filtered.length}
-          pageSize={PAGE_SIZE}
-        />
+        <Pagination page={safePage} totalPages={totalPages} onPage={setPage} totalItems={filtered.length} pageSize={PAGE_SIZE} />
       )}
     </div>
   )
