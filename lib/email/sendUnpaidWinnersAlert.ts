@@ -15,7 +15,7 @@ export async function sendUnpaidWinnersAlert({ winners, auctionTitle }: { winner
 
   try {
     await resend.emails.send({
-      from: SENDER.auctions,
+      from: SENDER.notifications,
       to: INBOX.auctions,
       subject: `${winners.length} auction winner${winners.length === 1 ? '' : 's'} never paid`,
       html: unpaidWinnersTemplate({ winners, auctionTitle })

@@ -21,7 +21,7 @@ export async function sendAdminShippingNotice(order: ShippableOrder) {
   try {
     const { error } = await throttled(() =>
       resend.emails.send({
-        from: SENDER.general,
+        from: SENDER.notifications,
         to: INBOX.general,
         subject: `New order to ship: #${order.id.slice(-8).toUpperCase()}`,
         html: adminOrderNotificationTemplate({

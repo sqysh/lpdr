@@ -308,7 +308,7 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
                           orderId={a.order.id}
                           remaining={remaining}
                           presets={[
-                            { label: 'Aplication fee', amount: Number(a.user.adoptionFees[0]?.feeAmount ?? 0) },
+                            { label: 'Application fee', amount: Number(a.user.adoptionFees[0]?.feeAmount ?? 0) },
                             { label: 'Adoption fee', amount: Number(a.adoptionFee) },
                             { label: 'Certificate', amount: Number(a.healthCertificateFee ?? 0) },
                             { label: 'Donation', amount: Number(a.additionalDonation ?? 0) }

@@ -67,7 +67,7 @@ export async function recordAuctionAnomaly({
 
   try {
     await resend.emails.send({
-      from: SENDER.general,
+      from: SENDER.notifications,
       to: process.env.ALERT_EMAIL!,
       subject: `${ANOMALY_TYPES[type].title}: ${auctionTitle}`,
       html: auctionAnomalyTemplate({ auctionId, auctionTitle, type, itemName, message })

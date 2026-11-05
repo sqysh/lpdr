@@ -25,7 +25,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         {isStaging && (
           <div
             role="note"
-            className="fixed inset-x-0 top-0 z-9999 h-(--staging-bar-height) flex items-center justify-center bg-amber-400 text-black text-[11px] font-mono uppercase tracking-widest px-4"
+            className="fixed inset-x-0 top-0 z-9999 h-(--staging-bar-height) print:hidden flex items-center justify-center bg-amber-400 text-black text-[11px] font-mono uppercase tracking-widest px-4"
           >
             Staging site: test cards only. Nothing here affects the real site.
           </div>

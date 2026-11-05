@@ -32,7 +32,7 @@ export default async function sendContactEmail(input: unknown): Promise<ActionRe
 
   try {
     const result = await resend.emails.send({
-      from: SENDER.general,
+      from: SENDER.notifications,
       to: INBOX.general,
       replyTo: email,
       subject: `[Contact] ${subject}`,

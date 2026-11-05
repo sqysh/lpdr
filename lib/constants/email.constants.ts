@@ -17,7 +17,9 @@ export const SENDER = {
   general: from(INBOX.general),
   adoptions: from(INBOX.applications),
   treasurer: from(INBOX.treasurer),
-  auctions: from(INBOX.auctions)
+  auctions: from(INBOX.auctions),
+  /** Alerts to our own inboxes. Gmail hides mail sent from an inbox to itself, so these can't share an address */
+  notifications: from(`notifications@${DOMAIN}`)
 } as const
 
 export const mailto = (address: string, subject?: string) => `mailto:${address}${subject ? `?subject=${encodeURIComponent(subject)}` : ''}`

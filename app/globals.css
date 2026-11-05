@@ -152,6 +152,12 @@ input[type="number"]::-webkit-outer-spin-button {
   pointer-events: none;
 }
 
+@media print {
+  body {
+    padding-top: 0;
+  }
+}
+
 /* ────────────────────────────────────────────────────────────────────────
    Keyframes
    ──────────────────────────────────────────────────────────────────────── */

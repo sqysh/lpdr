@@ -26,7 +26,7 @@ export default async function sendMemorialReviewEmail(memorial: Memorial, order:
     })
 
     const result = await resend.emails.send({
-      from: SENDER.general,
+      from: SENDER.notifications,
       to: REVIEW_INBOX,
       subject: email.subject,
       html: email.html,
