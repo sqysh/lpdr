@@ -9,6 +9,7 @@ import { pusherSuperuser } from 'lib/pusher/pusher.utils'
 import { migrateMongoUser } from './actions/migrate/migrateMongoUser'
 import { handleFacebookCallback } from './callbacks/facebook.callback'
 import { googleProvider, facebookProvider, magicLinkProvider } from './auth/index'
+import { hasPendingMigration } from './actions/migrate/hasPendingMigration'
 
 /** The provider ids are not what you would want to read in a feed. */
 const SIGN_IN_METHOD: Record<string, string> = {
@@ -101,19 +102,20 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         )
       }
 
-      // Lazy Mongo migration — fires after user exists in DB
+      // Guests on the old site left orders and donations without an account, so any waiting
+      // record triggers it, not only an old account. Runs on every sign-in until nothing is left
       if (user.email) {
-        const mongoUser = await prisma.mongoUser.findUnique({
-          where: { email: user.email.toLowerCase().trim() }
-        })
+        const pending = await hasPendingMigration(user.email).catch(() => false)
 
-        if (mongoUser) {
-          await migrateMongoUser(user.email, user.id).catch((err) =>
-            createLog('error', 'Mongo migration failed silently', {
+        if (pending) {
+          const result = await migrateMongoUser(user.email, user.id)
+          if (!result.success) {
+            await createLog('error', 'Migration on sign-in failed, will retry next sign-in', {
               email: user.email,
-              error: err instanceof Error ? err.message : 'Unknown error'
+              userId: user.id,
+              error: result.error
             })
-          )
+          }
         }
       }
     },
