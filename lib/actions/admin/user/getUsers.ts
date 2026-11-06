@@ -21,7 +21,7 @@ export default async function getUsers() {
         email: true,
         hasMigrated: true,
         _count: {
-          select: { paymentMethods: true }
+          select: { paymentMethods: true, orders: { where: { source: 'MONGO_MIGRATION' } } }
         }
       }
     })
@@ -103,15 +103,16 @@ export default async function getUsers() {
       const hasStagingRecord = stagingEmailSet.has(normalizedEmail)
       const paymentMethodCount = u._count.paymentMethods
 
-      let migrationStatus: 'migrated' | 'not-needed' | 'pending'
+      let migrationStatus: 'migrated' | 'prior-account' | 'not-needed' | 'pending'
 
       if (u.hasMigrated) {
-        migrationStatus = 'migrated'
+        migrationStatus = u._count.orders > 0 ? 'migrated' : 'prior-account'
       } else if (hasStagingRecord || pendingCount > 0) {
         migrationStatus = 'pending'
       } else {
         migrationStatus = 'not-needed'
       }
+
       return {
         ...u,
         migrationStatus,

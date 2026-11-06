@@ -184,7 +184,7 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
             <div className="flex items-start gap-2.5 px-5 py-3 border-t border-primary-light/30 dark:border-primary-dark/30 bg-primary-light/5 dark:bg-primary-dark/5">
               <Info className="w-3.5 h-3.5 text-primary-light dark:text-primary-dark shrink-0 mt-0.5" aria-hidden="true" />
               <p className="text-[11px] font-mono text-text-light dark:text-text-dark leading-relaxed">
-                Migration ran successfully. This user had no orders, donations, or other history on the previous site.
+                Had an account on the previous site, but no orders, donations, or other history to bring over.
               </p>
             </div>
           )}

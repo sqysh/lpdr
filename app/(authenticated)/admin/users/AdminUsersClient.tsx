@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
-import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Minus, Search } from 'lucide-react'
+import { AlertCircle, ArrowRight, CheckCircle, CreditCard, Minus, Search, UserCheck } from 'lucide-react'
 import { formatDate } from 'lib/utils/date.utils'
 import { RoleFilter } from 'types/user'
 import { formatRole } from 'lib/utils/user.utils'
@@ -47,6 +47,12 @@ const columns: Column<User>[] = [
               <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-emerald-500/40 text-emerald-600 dark:text-emerald-400 bg-emerald-500/5 text-[8px] font-mono tracking-tag uppercase shrink-0">
                 <CheckCircle className="w-2.5 h-2.5" aria-hidden="true" />
                 Migrated
+              </span>
+            )}
+            {user.migrationStatus === 'prior-account' && (
+              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 border border-primary-light/40 dark:border-primary-dark/40 text-primary-light dark:text-primary-dark bg-primary-light/5 dark:bg-primary-dark/5 text-[8px] font-mono tracking-tag uppercase shrink-0">
+                <UserCheck className="w-2.5 h-2.5" aria-hidden="true" />
+                Prior account
               </span>
             )}
             {user.migrationStatus === 'not-needed' && (
