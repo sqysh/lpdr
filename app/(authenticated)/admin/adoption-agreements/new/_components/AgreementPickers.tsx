@@ -140,11 +140,13 @@ function DogGrid({
 }
 
 export function DogPicker({
+  pending,
   available,
   hold,
   unavailable,
   onSelect
 }: {
+  pending: DogOption[]
   available: DogOption[]
   hold: DogOption[]
   unavailable: Record<string, string>
@@ -154,6 +156,7 @@ export function DogPicker({
   const [showHold, setShowHold] = useState(false)
 
   const matches = (d: DogOption) => d.name.toLowerCase().includes(filter.trim().toLowerCase())
+  const visiblePending = filter ? pending.filter(matches) : pending
   const visibleAvailable = filter ? available.filter(matches) : available
   const visibleHold = filter ? hold.filter(matches) : hold
 
@@ -174,6 +177,22 @@ export function DogPicker({
           className={inputClass}
         />
       </div>
+
+      {pending.length > 0 && (
+        <div className="space-y-3 pb-4 border-b border-border-light dark:border-border-dark">
+          <h3 className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">
+            Adoption pending ({visiblePending.length})
+          </h3>
+          <p className="text-xs font-mono text-muted-light dark:text-muted-dark">
+            Marked pending in RescueGroups, so an adopter has been chosen. This is usually where the dog is when the agreement goes out.
+          </p>
+          {visiblePending.length > 0 ? (
+            <DogGrid dogs={visiblePending} unavailable={unavailable} onSelect={onSelect} />
+          ) : (
+            <p className="text-xs font-mono text-muted-light dark:text-muted-dark">No pending dogs match.</p>
+          )}
+        </div>
+      )}
 
       <div className="space-y-3">
         <h3 className="text-[10px] font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">

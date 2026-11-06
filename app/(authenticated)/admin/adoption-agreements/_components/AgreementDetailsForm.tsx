@@ -3,7 +3,7 @@
 import type { FieldErrors, UseFormRegister } from 'react-hook-form'
 import { FormField } from 'components/_primitives'
 import type { UpdateAdoptionAgreementInput } from 'lib/schemas/adoption-agreement.schema'
-import { Section } from './Secion'
+import { Section } from './Section'
 import { INBOX } from 'lib/constants/email.constants'
 
 type Fields = UpdateAdoptionAgreementInput

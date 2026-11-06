@@ -15,7 +15,7 @@ import {
 } from 'lib/schemas/adoption-agreement.schema'
 import type { AdopterResult } from 'lib/actions/admin/adoption-agreement/searchAdopters'
 import { AdopterSearch, ChosenSummary, DogPicker, type DogOption } from './_components/AgreementPickers'
-import { Section } from '../_components/Secion'
+import { Section } from '../_components/Section'
 import { AgreementDetailsForm } from '../_components/AgreementDetailsForm'
 
 const EMPTY: PrepareAdoptionAgreementInput = {
@@ -40,10 +40,12 @@ const EMPTY: PrepareAdoptionAgreementInput = {
 }
 
 export function NewAdoptionAgreementClient({
+  pendingDogs,
   availableDogs,
   holdDogs,
   unavailableDogs
 }: {
+  pendingDogs: DogOption[]
   availableDogs: DogOption[]
   holdDogs: DogOption[]
   unavailableDogs: Record<string, string>
@@ -116,7 +118,13 @@ export function NewAdoptionAgreementClient({
             {dog ? (
               <ChosenSummary label="Dog" title={dog.name} photo={dog.photo} onChange={() => chooseDog(null)} />
             ) : (
-              <DogPicker available={availableDogs} hold={holdDogs} unavailable={unavailableDogs} onSelect={chooseDog} />
+              <DogPicker
+                pending={pendingDogs}
+                available={availableDogs}
+                hold={holdDogs}
+                unavailable={unavailableDogs}
+                onSelect={chooseDog}
+              />
             )}
           </Section>
         )}

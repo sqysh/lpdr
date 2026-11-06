@@ -16,7 +16,7 @@ import {
 } from 'lib/schemas/adoption-agreement.schema'
 import type { IAdoptionAgreement } from 'types/adoption-agreement.types'
 import { AgreementDetailsForm } from '../../_components/AgreementDetailsForm'
-import { Section } from '../../_components/Secion'
+import { Section } from '../../_components/Section'
 import Link from 'next/link'
 import { LinkBody } from 'components/_common/LinkBody'
 

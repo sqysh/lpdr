@@ -5,7 +5,8 @@ import { NewAdoptionAgreementClient } from './NewAdoptionAgreementClient'
 const PAGE = { pageLimit: 250, currentPage: 1 }
 
 export default async function NewAdoptionAgreementPage() {
-  const [available, hold, taken] = await Promise.all([
+  const [pending, available, hold, taken] = await Promise.all([
+    getDachshundsByStatus({ status: 'Pending', ...PAGE, source: 'admin-agreement-pending' }),
     getDachshundsByStatus({ status: 'Available', ...PAGE, source: 'admin-agreement-available' }),
     getDachshundsByStatus({ status: 'Hold', ...PAGE, source: 'admin-agreement-hold' }),
     prisma.adoptionAgreement.findMany({
@@ -33,6 +34,11 @@ export default async function NewAdoptionAgreementPage() {
       .sort((a, b) => a.name.localeCompare(b.name))
 
   return (
-    <NewAdoptionAgreementClient availableDogs={toOptions(available.data)} holdDogs={toOptions(hold.data)} unavailableDogs={unavailable} />
+    <NewAdoptionAgreementClient
+      pendingDogs={toOptions(pending.data)}
+      availableDogs={toOptions(available.data)}
+      holdDogs={toOptions(hold.data)}
+      unavailableDogs={unavailable}
+    />
   )
 }
