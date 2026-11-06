@@ -105,7 +105,6 @@ export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boo
       ],
       priority: 1
     },
-
     {
       title: 'Donate',
       icon: DollarSign,
@@ -113,6 +112,10 @@ export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boo
         {
           linkKey: '/donate',
           linkText: 'One-Time'
+        },
+        {
+          linkKey: '/subscriptions',
+          linkText: 'Subscriptions'
         },
         ...(isFeedAFosterAvailable
           ? [
@@ -126,14 +129,6 @@ export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boo
           linkKey: '/welcomewieners',
           linkText: 'Welcome Wieners'
         },
-        ...(memorialsEnabled
-          ? [
-              {
-                linkKey: '/rainbow-bridge',
-                linkText: 'Rainbow Bridge'
-              }
-            ]
-          : []),
         {
           linkKey: '/shoptohelp',
           linkText: 'Shop To Help'
@@ -141,6 +136,16 @@ export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boo
       ],
       priority: 1
     },
+    ...(memorialsEnabled
+      ? [
+          {
+            title: 'Rainbow Bridge',
+            linkKey: '/rainbow-bridge',
+            icon: Rainbow,
+            priority: 2
+          }
+        ]
+      : []),
     {
       title: 'Adopt',
       icon: Heart,
@@ -192,13 +197,6 @@ export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boo
       linkKey: '/merch',
       icon: Gift,
       priority: 1
-    },
-
-    {
-      title: 'Subscriptions',
-      linkKey: '/subscriptions',
-      icon: Repeat,
-      priority: 2
     },
     {
       title: 'Auctions',
