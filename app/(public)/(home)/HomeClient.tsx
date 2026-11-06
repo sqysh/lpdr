@@ -7,6 +7,7 @@ import InstagramBlock from 'app/(public)/(home)/_components/InstagramBlock'
 import { LPDRLogo } from 'app/(public)/(home)/_components/LPDRLogo'
 import { WaysToHelpBlock } from 'app/(public)/(home)/_components/WaysToHelpBlock'
 import { WelcomeWienersBlock } from 'app/(public)/(home)/_components/WelcomeWienersBlock'
+import { AuctionDonationsBanner } from './_components/AuctionDonationBanner'
 
 export const HomeClient = ({
   dachshunds,
@@ -22,6 +23,7 @@ export const HomeClient = ({
       <Hero auction={auction} />
       <AboutBlock />
       <AvailableDogsBlock data={dachshunds?.data?.data} />
+      <AuctionDonationsBanner />
       <LPDRLogo />
       <DogGalleryBlock />
       <WaysToHelpBlock />
