@@ -10,7 +10,6 @@ const WINGS = [
 ]
 const BODY = '/images/memorial/butterfly-body.png'
 const SPARK_COLORS = ['#f9a8d4', '#fdba74', '#fde68a', '#86efac', '#7dd3fc', '#c4b5fd']
-const FLOWN_KEY = 'lpdr-butterfly-flown'
 const REST_ANGLE = -8
 
 type Layer = 'front' | 'behind'
@@ -191,13 +190,7 @@ export function MemorialButterfly({ containerRef }: { containerRef: RefObject<HT
       measure()
       bf!.classList.remove(styles.landed, styles.behind, styles.glide)
 
-      // Once per visit; after that it's already resting on the card
-      let flown = false
-      try {
-        flown = sessionStorage.getItem(FLOWN_KEY) === '1'
-        sessionStorage.setItem(FLOWN_KEY, '1')
-      } catch {}
-      if (reduced || flown) return land()
+      if (reduced) return land()
 
       const duration = page!.clientWidth < 560 ? 7000 : 8200
       const t0 = performance.now()
