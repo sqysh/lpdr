@@ -5,31 +5,41 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { LayoutDashboard, User, Mail } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import type { useSession } from 'next-auth/react'
 import { DrawerNavLink } from './DrawerNavLink'
 import { GoogleButton } from 'components/features/auth/GoogleButton'
 import { FacebookButton } from 'components/features/auth/FacebookButton'
 import { MagicLink } from 'components/features/auth/MagicLink'
+import { LinkBody } from 'components/_common/LinkBody'
 
 type Props = {
-  session: any
+  session: ReturnType<typeof useSession>
   isLinkActive: (link: string) => boolean
-  onClose: () => void
+  onLinkClick: (href: string) => void
 }
 
-export function DrawerAuthSection({ session, isLinkActive, onClose }: Props) {
+export function DrawerAuthSection({ session, isLinkActive, onLinkClick }: Props) {
   const pathname = usePathname()
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
 
   const redirectTo = `${pathname}?ref=navdrawer`
+  const role = session.data?.user?.role
+  const isStaff = role === 'ADMIN' || role === 'SUPER_USER'
 
   if (session.data?.user) {
     return (
       <div className="px-4 py-4 space-y-1">
-        {session.data.user.role === 'ADMIN' && (
-          <DrawerNavLink href="/admin/dashboard" icon={LayoutDashboard} label="Dashboard" active={false} onClose={onClose} />
+        {isStaff && (
+          <DrawerNavLink
+            href="/admin/dashboard"
+            icon={LayoutDashboard}
+            label="Dashboard"
+            active={isLinkActive('/admin/dashboard')}
+            onLinkClick={onLinkClick}
+          />
         )}
-        <DrawerNavLink href="/my-pack" icon={User} label="My Pack" active={isLinkActive('/my-pack')} onClose={onClose} />
+        <DrawerNavLink href="/my-pack" icon={User} label="My Pack" active={isLinkActive('/my-pack')} onLinkClick={onLinkClick} />
       </div>
     )
   }
@@ -82,10 +92,10 @@ export function DrawerAuthSection({ session, isLinkActive, onClose }: Props) {
                     New to Little Paws?{' '}
                     <Link
                       href="/adopt"
-                      onClick={onClose}
-                      className="text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light"
+                      onClick={() => onLinkClick('/adopt')}
+                      className="inline-flex items-center gap-1 text-primary-light dark:text-primary-dark hover:underline underline-offset-2 focus:outline-none focus-visible:ring-1 focus-visible:ring-primary-light"
                     >
-                      Start your adoption journey
+                      <LinkBody icon={null} label="Start your adoption journey" iconAfter spinnerClass="w-2.5 h-2.5" />
                     </Link>
                   </p>
                 </div>

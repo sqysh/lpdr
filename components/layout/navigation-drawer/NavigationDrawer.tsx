@@ -4,7 +4,7 @@ import { mainNavigationLinks } from 'lib/constants/navigation.constants'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useSession } from 'next-auth/react'
 import { usePathname, useSearchParams } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { DrawerHeader } from './DrawerHeader'
 import { DrawerAuthSection } from './DrawerAuthSection'
 import { DrawerCartLink } from './DrawerCartLink'
@@ -25,6 +25,19 @@ export default function NavigationDrawer({ hasActiveFee, memorialsEnabled }: { h
 
   const onClose = () => closeMobileNav()
   const isLinkActive = (link: string) => pathname === link
+
+  // A tapped link keeps the drawer open, with its spinner showing, until the new page has arrived
+  const lastPath = useRef(pathname)
+  useEffect(() => {
+    if (lastPath.current === pathname) return
+    lastPath.current = pathname
+    closeMobileNav()
+  }, [pathname, closeMobileNav])
+
+  // Tapping the page you're already on has nothing to load, so that one closes straight away
+  const onLinkClick = (href: string) => {
+    if (isLinkActive(href.split('?')[0])) onClose()
+  }
 
   useEffect(() => {
     if (searchParams.get('auth') === 'success') {
@@ -54,11 +67,11 @@ export default function NavigationDrawer({ hasActiveFee, memorialsEnabled }: { h
             <DrawerHeader onClose={onClose} />
 
             <div className="flex-1 overflow-y-auto pb-20">
-              <DrawerAuthSection session={session} isLinkActive={isLinkActive} onClose={onClose} />
+              <DrawerAuthSection session={session} isLinkActive={isLinkActive} onLinkClick={onLinkClick} />
 
               <div className="mx-4 border-t border-border-light/50 dark:border-border-dark" />
 
-              <DrawerCartLink totalItems={totalItems} active={isLinkActive('/cart')} onClose={onClose} />
+              <DrawerCartLink totalItems={totalItems} active={isLinkActive('/cart')} onLinkClick={onLinkClick} />
 
               <div className="mx-4 border-t border-border-light/50 dark:border-border-dark" />
 
@@ -66,7 +79,11 @@ export default function NavigationDrawer({ hasActiveFee, memorialsEnabled }: { h
 
               <div className="mx-4 border-t border-border-light dark:border-border-dark" />
 
-              <DrawerNavSection links={mainNavigationLinks(hasActiveFee, memorialsEnabled)} isLinkActive={isLinkActive} onClose={onClose} />
+              <DrawerNavSection
+                links={mainNavigationLinks(hasActiveFee, memorialsEnabled)}
+                isLinkActive={isLinkActive}
+                onLinkClick={onLinkClick}
+              />
             </div>
           </motion.div>
         </>
