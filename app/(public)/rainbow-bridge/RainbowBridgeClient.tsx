@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, X } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { LinkBody } from 'components/_common/LinkBody'
+import { MemorialButterfly } from './_components/MemorialButterfly'
 
 export type WallMemorial = {
   id: string
@@ -76,10 +77,11 @@ function PhotoViewer({ viewing, onClose }: { viewing: Viewing | null; onClose: (
 
 export default function RainbowBridgeClient({ memorials, canRemember }: { memorials: WallMemorial[]; canRemember: boolean }) {
   const [viewing, setViewing] = useState<Viewing | null>(null)
+  const wallRef = useRef<HTMLDivElement>(null)
 
   return (
-    <main className="min-h-dvh px-4 1150:px-0 pt-12 sm:pt-16 pb-24 sm:pb-32 bg-bg-light dark:bg-bg-dark">
-      <div className="max-w-5xl mx-auto w-full">
+    <main className="min-h-dvh overflow-x-clip px-4 1150:px-0 pt-12 sm:pt-16 pb-24 sm:pb-32 bg-bg-light dark:bg-bg-dark">
+      <div ref={wallRef} className="relative max-w-5xl mx-auto w-full">
         <motion.header variants={fadeUp} initial="hidden" animate="show" custom={0} className="mb-12 sm:mb-16">
           <div className="flex items-center gap-3 mb-4">
             <span className="block w-8 h-px bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
@@ -130,7 +132,8 @@ export default function RainbowBridgeClient({ memorials, canRemember }: { memori
                 whileInView="show"
                 viewport={{ once: true, margin: '-40px' }}
                 custom={(i % 2) * 0.2}
-                className="border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
+                data-memorial-card
+                className="relative z-2 border border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark"
               >
                 <article aria-labelledby={`memorial-${m.id}`}>
                   <div className="relative">
@@ -141,6 +144,7 @@ export default function RainbowBridgeClient({ memorials, canRemember }: { memori
                       height={640}
                       unoptimized
                       loading={i < 2 ? 'eager' : 'lazy'}
+                      data-memorial-art
                       className="w-full h-auto"
                     />
 
@@ -190,6 +194,8 @@ export default function RainbowBridgeClient({ memorials, canRemember }: { memori
             ))}
           </ul>
         )}
+
+        {memorials.length > 0 && <MemorialButterfly containerRef={wallRef} />}
       </div>
 
       <PhotoViewer viewing={viewing} onClose={() => setViewing(null)} />
