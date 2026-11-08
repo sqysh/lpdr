@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { ArrowRight, X } from 'lucide-react'
 import { fadeUp } from 'lib/constants/motion.constants'
 import { LinkBody } from 'components/_common/LinkBody'
-import { MemorialButterfly } from './_components/MemorialButterfly'
+import { Butterfly, Flight, FlightContext, FlightPoint } from 'components/_common/butterfly/Butterfly'
 
 export type WallMemorial = {
   id: string
@@ -73,6 +73,55 @@ function PhotoViewer({ viewing, onClose }: { viewing: Viewing | null; onClose: (
       )}
     </AnimatePresence>
   )
+}
+
+// Waypoints come from where the memorial cards actually are, so the flight fits any screen size.
+// layer: which side of the cards the butterfly should be on after passing that point.
+function wallRoute({ width, offLeft, rect, findAll }: FlightContext): Flight | null {
+  const cards = findAll('[data-memorial-card]')
+  if (!cards.length) return null
+  const a = rect(cards[0])
+  const b = cards[1] ? rect(cards[1]) : null
+  const narrow = width < 560
+  const timing = { duration: narrow ? 7000 : 8200, scale: narrow ? 0.8 : 1 }
+
+  if (b && Math.abs(a.t - b.t) < 4) {
+    const land: FlightPoint = { x: a.r - 84, y: a.t - 4, layer: 'front' }
+    return {
+      ...timing,
+      points: [
+        { x: offLeft, y: a.t - 420, layer: 'front' }, // high and off to the side
+        { x: width * 0.28, y: a.t - 70, layer: 'front' }, // the swoop: dives low across the page
+        { x: width * 0.6, y: a.t - 190, layer: 'behind' }, // pulls back up
+        { x: b.l + b.w * 0.55, y: b.t + b.h * 0.45, layer: 'behind' },
+        { x: b.l + b.w * 0.4, y: b.b + 70, layer: 'front' },
+        { x: a.l + a.w * 0.35, y: a.b + 50, layer: 'front' },
+        { x: a.l - 40, y: a.t + a.h * 0.55, layer: 'front' },
+        // the last stretch rises gently toward the landing spot, so it arrives facing almost upright
+        { x: a.l + a.w * 0.5, y: a.t + a.h * 0.3, layer: 'front' },
+        { x: land.x - 40, y: land.y + 110, layer: 'front' },
+        land
+      ]
+    }
+  }
+
+  // One column (phones, or a single memorial): the whole flight stays around the top card so it never leaves the screen.
+  // It slips behind the card's art and comes out past the left edge, where the switch back to the front can't be seen.
+  const art = rect(cards[0].querySelector('[data-memorial-art]') ?? cards[0])
+  const land: FlightPoint = { x: a.l + a.w * 0.74, y: a.t - 4, layer: 'front' }
+  return {
+    ...timing,
+    points: [
+      { x: offLeft, y: a.t - 300, layer: 'front' },
+      { x: width * 0.35, y: a.t - 60, layer: 'front' }, // swoops low across the intro
+      { x: width * 0.82, y: a.t - 150, layer: 'behind' }, // pulls up on the right
+      { x: width * 0.55, y: art.t + art.h * 0.55, layer: 'behind' },
+      { x: -110, y: art.t + art.h * 0.3, layer: 'front' }, // out past the left edge
+      { x: width * 0.22, y: a.t - 130, layer: 'front' }, // swings back in above the card
+      { x: land.x - 30, y: land.y + 80, layer: 'front' }, // dips over the art
+      land
+    ]
+  }
 }
 
 export default function RainbowBridgeClient({ memorials, canRemember }: { memorials: WallMemorial[]; canRemember: boolean }) {
@@ -195,7 +244,7 @@ export default function RainbowBridgeClient({ memorials, canRemember }: { memori
           </ul>
         )}
 
-        {memorials.length > 0 && <MemorialButterfly containerRef={wallRef} />}
+        {memorials.length > 0 && <Butterfly containerRef={wallRef} route={wallRoute} obstacles="[data-memorial-card]" />}
       </div>
 
       <PhotoViewer viewing={viewing} onClose={() => setViewing(null)} />

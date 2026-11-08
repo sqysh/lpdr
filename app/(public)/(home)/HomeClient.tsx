@@ -12,15 +12,17 @@ import { AuctionDonationsBanner } from './_components/AuctionDonationBanner'
 export const HomeClient = ({
   dachshunds,
   welcomeWieners,
-  auction
+  auction,
+  memorialsEnabled
 }: {
   dachshunds: any
   welcomeWieners: any
   auction: HeroAuction | null
+  memorialsEnabled: boolean
 }) => {
   return (
     <>
-      <Hero auction={auction} />
+      <Hero auction={auction} showRainbowBridge={memorialsEnabled} />
       <AboutBlock />
       <AvailableDogsBlock data={dachshunds?.data?.data} />
       <AuctionDonationsBanner />

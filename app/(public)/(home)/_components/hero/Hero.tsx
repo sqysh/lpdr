@@ -9,7 +9,9 @@ import { HeroDesktopBar } from './HeroDesktopBar'
 import { CarouselArrows } from './CarouselArrows'
 import { AuctionStatus } from '@prisma/client'
 import { useReducedMotion } from 'framer-motion'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { Butterfly } from 'components/_common/butterfly/Butterfly'
+import { RainbowBridgePerch, heroRoute } from './RainbowBridgePerch'
 
 export type HeroAuction = {
   id: string
@@ -22,8 +24,11 @@ export type HeroAuction = {
   isPubliclyVisible: boolean
 }
 
-export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
+const HERO_LAYERS = { front: 20, behind: 1 }
+
+export const Hero = ({ auction, showRainbowBridge }: { auction: HeroAuction | null; showRainbowBridge: boolean }) => {
   const reduceMotion = useReducedMotion()
+  const heroRef = useRef<HTMLElement>(null)
   const [hovered, setHovered] = useState(false)
   const [focused, setFocused] = useState(false)
   const [stopped, setStopped] = useState(false)
@@ -37,9 +42,10 @@ export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
 
   return (
     <section
+      ref={heroRef}
       aria-roledescription="carousel"
       aria-label="Featured"
-      className="relative w-full bg-bg-light dark:bg-bg-dark h-svh 1200:min-h-225 1200:h-full 1200:max-h-25 -mt-16 sm:-mt-33.5"
+      className="relative w-full overflow-x-clip bg-bg-light dark:bg-bg-dark h-svh 1200:min-h-225 1200:h-full 1200:max-h-25 -mt-16 sm:-mt-33.5"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onFocus={() => setFocused(true)}
@@ -50,6 +56,12 @@ export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
       <HeroBackground paused={stopped || !!reduceMotion} />
       <div className="max-w-180 1000:max-w-240 1200:max-w-300 mx-auto relative z-10 flex h-full min-h-[inherit] flex-col justify-between">
         <SlideContent slide={slide} index={current} total={SLIDES.length} />
+        {/* In the flow above the bars on phones; on desktop the bars are absolute, so it sits above them on the right */}
+        {showRainbowBridge && (
+          <div className="relative z-10 flex justify-center px-4 pb-6 968:absolute 968:right-0 968:bottom-50 968:p-0">
+            <RainbowBridgePerch />
+          </div>
+        )}
         <div className="relative z-10 w-full bg-navbar-light dark:bg-navbar-dark">
           <HeroMobileBar
             current={current}
@@ -72,6 +84,7 @@ export const Hero = ({ auction }: { auction: HeroAuction | null }) => {
         </div>
       </div>
       <CarouselArrows goNext={goNext} goPrev={goPrev} />
+      {showRainbowBridge && <Butterfly containerRef={heroRef} route={heroRoute} zIndex={HERO_LAYERS} />}
     </section>
   )
 }

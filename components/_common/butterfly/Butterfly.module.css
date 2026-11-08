@@ -1,18 +1,14 @@
-.bf {
+.butterfly {
   position: absolute;
   left: 0;
   top: 0;
   width: 0;
   height: 0;
   pointer-events: none;
-  z-index: 3;
   will-change: transform;
   visibility: hidden;
 }
-.bf.behind {
-  z-index: 1;
-}
-.bf.ready {
+.ready {
   visibility: visible;
 }
 
@@ -32,8 +28,15 @@
   transform: rotateX(32deg);
   transition: transform 0.9s ease;
 }
-.bf.landed .tilt {
+.landed .tilt {
   transform: rotateX(48deg);
+}
+.pose img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
 }
 
 .wing {
@@ -42,30 +45,18 @@
   transform-origin: 49.84% 50%;
   filter: drop-shadow(0 0 6px rgba(196, 181, 253, 0.55));
 }
-.wing img,
-.body {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
 .wing img {
   filter: saturate(0.15) brightness(1.12) contrast(1.05);
 }
-.body {
-  transform: translateZ(2px);
-}
-
 .left {
-  animation: flapL var(--flap, 0.15s) cubic-bezier(0.45, 0, 0.55, 1) infinite
+  animation: flapLeft var(--flap, 0.15s) cubic-bezier(0.45, 0, 0.55, 1) infinite
     alternate;
 }
 .right {
-  animation: flapR var(--flap, 0.15s) cubic-bezier(0.45, 0, 0.55, 1) infinite
-    alternate;
+  animation: flapRight var(--flap, 0.15s) cubic-bezier(0.45, 0, 0.55, 1)
+    infinite alternate;
 }
-@keyframes flapL {
+@keyframes flapLeft {
   from {
     transform: rotateY(-6deg);
   }
@@ -73,7 +64,7 @@
     transform: rotateY(74deg);
   }
 }
-@keyframes flapR {
+@keyframes flapRight {
   from {
     transform: rotateY(6deg);
   }
@@ -81,24 +72,23 @@
     transform: rotateY(-74deg);
   }
 }
-
-.bf.glide .left {
+.glide .left {
   animation: none;
   transform: rotateY(14deg);
   transition: transform 0.12s;
 }
-.bf.glide .right {
+.glide .right {
   animation: none;
   transform: rotateY(-14deg);
   transition: transform 0.12s;
 }
-.bf.landed .left {
-  animation: restL 3.4s ease-in-out infinite;
+.landed .left {
+  animation: restLeft 3.4s ease-in-out infinite;
 }
-.bf.landed .right {
-  animation: restR 3.4s ease-in-out infinite;
+.landed .right {
+  animation: restRight 3.4s ease-in-out infinite;
 }
-@keyframes restL {
+@keyframes restLeft {
   0%,
   60%,
   100% {
@@ -117,7 +107,7 @@
     transform: rotateY(8deg);
   }
 }
-@keyframes restR {
+@keyframes restRight {
   0%,
   60%,
   100% {
@@ -136,14 +126,33 @@
     transform: rotateY(-8deg);
   }
 }
+.body {
+  transform: translateZ(2px);
+}
 
+.shadow {
+  position: absolute;
+  left: -38px;
+  top: 14px;
+  width: 76px;
+  height: 12px;
+  border-radius: 50%;
+  background: radial-gradient(rgba(0, 0, 0, 0.5), transparent 70%);
+  opacity: 0;
+  transition: opacity 0.6s;
+}
+.landed .shadow {
+  opacity: 1;
+}
+
+/* the rainbow drifting across the wings, cut to each wing's shape */
 .sheen,
 .glint {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  -webkit-mask: var(--m) center / 100% 100% no-repeat;
-  mask: var(--m) center / 100% 100% no-repeat;
+  -webkit-mask: var(--mask) center / 100% 100% no-repeat;
+  mask: var(--mask) center / 100% 100% no-repeat;
 }
 .sheen {
   background: linear-gradient(
@@ -163,9 +172,6 @@
   mix-blend-mode: color;
   animation: sheen 4s linear infinite;
 }
-.right .sheen {
-  animation-delay: -0.35s;
-}
 .glint {
   background: linear-gradient(
     100deg,
@@ -176,6 +182,9 @@
   background-size: 260% 100%;
   mix-blend-mode: soft-light;
   animation: glint 2.6s ease-in-out infinite;
+}
+.right .sheen {
+  animation-delay: -0.35s;
 }
 @keyframes sheen {
   from {
@@ -195,21 +204,7 @@
   }
 }
 
-.shadow {
-  position: absolute;
-  left: -38px;
-  top: 14px;
-  width: 76px;
-  height: 12px;
-  border-radius: 50%;
-  background: radial-gradient(rgba(0, 0, 0, 0.5), transparent 70%);
-  opacity: 0;
-  transition: opacity 0.6s;
-}
-.bf.landed .shadow {
-  opacity: 1;
-}
-
+/* the wake */
 .spark {
   position: absolute;
   left: 0;
@@ -219,12 +214,8 @@
   margin: -3.5px 0 0 -3.5px;
   border-radius: 50%;
   pointer-events: none;
-  z-index: 3;
-  background: radial-gradient(#fff 0 25%, var(--c) 45%, transparent 72%);
-  animation: spark 1.2s ease-out forwards;
-}
-.sparkBehind {
-  z-index: 1;
+  background: radial-gradient(#fff 0 25%, var(--color) 45%, transparent 72%);
+  animation: spark var(--life, 1.2s) ease-out forwards;
 }
 @keyframes spark {
   from {
@@ -237,14 +228,42 @@
       scale(0.2);
   }
 }
+.streak {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 2px;
+  border-radius: 2px;
+  pointer-events: none;
+  transform-origin: 0 50%;
+  background: linear-gradient(
+    90deg,
+    #f9a8d4,
+    #fdba74,
+    #fde68a,
+    #86efac,
+    #7dd3fc,
+    #c4b5fd
+  );
+  filter: blur(0.5px) drop-shadow(0 0 6px rgba(196, 181, 253, 0.8));
+  animation: streak 1.6s ease-out forwards;
+}
+@keyframes streak {
+  from {
+    opacity: 0.9;
+  }
+  to {
+    opacity: 0;
+  }
+}
 
 @media (prefers-reduced-motion: reduce) {
   .left,
   .right,
+  .landed .left,
+  .landed .right,
   .sheen,
-  .glint,
-  .bf.landed .left,
-  .bf.landed .right {
+  .glint {
     animation: none !important;
   }
 }
