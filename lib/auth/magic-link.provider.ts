@@ -44,7 +44,7 @@ export const magicLinkProvider: EmailConfig = {
 
     try {
       const result = await resend.emails.send({
-        from: `Little Paws Dachshund Rescue <${provider.from!}>`,
+        from: provider.from!,
         to: email,
         subject: 'Sign in to Little Paws Dachshund Rescue',
         html: magicLinkTemplate(toConfirmUrl(url))
