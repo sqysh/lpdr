@@ -97,13 +97,25 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
         })
       : null
 
-    const address = geoUser?.address as {
+    const savedAddress = geoUser?.address as {
       addressLine1?: string
       addressLine2?: string
       city?: string
       state?: string
       zipPostalCode?: string
     } | null
+
+    // The address entered at checkout is the one to ship to. The saved address only covers
+    // payments started before checkout sent one, and orders that don't go through checkout.
+    const address = metadata.shipLine1
+      ? {
+          addressLine1: metadata.shipLine1,
+          addressLine2: metadata.shipLine2 || undefined,
+          city: metadata.shipCity,
+          state: metadata.shipState,
+          zipPostalCode: metadata.shipZip
+        }
+      : savedAddress
 
     const orderData = {
       type: orderType,
@@ -502,9 +514,17 @@ export async function handlePaymentIntentSucceeded(paymentIntent: Stripe.Payment
       })
     )
 
-    if (hasPhysical && orderWithItems.addressLine1) {
-      // Not awaited, same as the receipt: the webhook should answer Stripe quickly
-      void sendAdminShippingNotice(orderWithItems)
+    if (hasPhysical) {
+      if (orderWithItems.addressLine1) {
+        // Not awaited, same as the receipt: the webhook should answer Stripe quickly
+        void sendAdminShippingNotice(orderWithItems)
+      } else {
+        await createLog('error', 'Order needs shipping but has no address', {
+          orderId: order.id,
+          paymentIntentId: id,
+          email: order.customerEmail
+        })
+      }
     }
 
     // Notifications are best effort. The order exists and the money has moved; a Pusher outage

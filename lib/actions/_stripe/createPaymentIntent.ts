@@ -86,7 +86,8 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
     auctionItemId,
     donorMessage,
     agreementId,
-    memorial
+    memorial,
+    address
   } = parsed.data
 
   const userId = gate.userId
@@ -122,6 +123,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
     let shippingCents = 0
     let purchaseDescription = `Order from ${displayName}`
     let agreementUpdatedAt = ''
+    let shipTo: Record<string, string> = {}
 
     if (items?.length) {
       const ids = items.map((i) => i.id).filter((id): id is string => !!id)
@@ -140,6 +142,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
       }
 
       let itemsBase = 0
+      let needsShipping = false
       let shippingBase = 0
 
       for (const item of items) {
@@ -158,6 +161,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
             throw new UserFacingError(`Only ${available} of ${product.name}${item.size ? ` (${item.size})` : ''} available`)
           }
           itemsBase += Number(product.price) * item.quantity
+          if (product.isPhysicalProduct) needsShipping = true
           shippingBase += Number(product.shippingPrice)
           continue
         }
@@ -175,6 +179,20 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
 
       shippingCents = Math.round(shippingBase * 100)
       baseCents = Math.round(itemsBase * 100) + shippingCents
+
+      // Checked against the products in the database, not the cart's copy, and before anyone is charged.
+      // A checkout bug once skipped the address step and paid orders came through with nowhere to ship.
+      if (needsShipping) {
+        const line1 = address?.addressLine1?.trim()
+        const line2 = address?.addressLine2?.trim()
+        const city = address?.city?.trim()
+        const state = address?.state?.trim()
+        const zip = address?.zipPostalCode?.trim()
+
+        if (!line1 || !city || !state || !zip) throw new UserFacingError('Please add a shipping address before paying.')
+
+        shipTo = { shipLine1: line1, ...(line2 && { shipLine2: line2 }), shipCity: city, shipState: state, shipZip: zip }
+      }
     } else if (orderType === 'AUCTION_PURCHASE') {
       if (auctionItemId) {
         // Instant buy: a fixed-price item, priced from the database
@@ -346,6 +364,7 @@ export async function createPaymentIntent(input: unknown): Promise<ActionResult<
         coverFees: coverFees ? 'true' : 'false',
         feesCovered: (feesCoveredCents / 100).toFixed(2),
         ...(items?.length && itemsMetadata(items)),
+        ...shipTo,
         winningBidderId: winningBidderId ?? '',
         agreementId: agreementId ?? '',
         auctionItemId: auctionItemId ?? '',

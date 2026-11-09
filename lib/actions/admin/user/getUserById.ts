@@ -52,7 +52,8 @@ export async function getUserById(id: string) {
           }
         },
         paymentMethods: true,
-        adminAreas: true
+        adminAreas: true,
+        address: true
       }
     })
 

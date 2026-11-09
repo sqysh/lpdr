@@ -15,7 +15,8 @@ import {
   ChevronRight,
   AlertCircle,
   Info,
-  CreditCard
+  CreditCard,
+  Home
 } from 'lucide-react'
 import Link from 'next/link'
 import { formatDate } from 'lib/utils/date.utils'
@@ -29,6 +30,15 @@ import Picture from 'components/_common/Picture'
 import { MigrationTroubleshootPanel } from 'app/(authenticated)/admin/users/[id]/_components/MigrationTroubleShootPanel'
 import { AdminAreasPanel } from './_components/AdminAreasPanel'
 import { hasFullAccess } from 'lib/auth/access'
+
+type SavedAddress = {
+  name?: string | null
+  addressLine1?: string | null
+  addressLine2?: string | null
+  city?: string | null
+  state?: string | null
+  zipPostalCode?: string | null
+} | null
 
 type UserDetail = NonNullable<Awaited<ReturnType<typeof getUserById>>['data']>
 
@@ -69,6 +79,8 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [tab, setTab] = useState<'role' | 'merge'>('role')
+
+  const address = user.address as SavedAddress
 
   const dirty = role !== user.role
   const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || 'Unnamed user'
@@ -291,6 +303,32 @@ export default function AdminUserDetailsClient({ user, migrationStatus, loggedIn
           {canSetAreas && <AdminAreasPanel userId={user.id} initial={user.adminAreas} />}
 
           <div className="space-y-6">
+            <section className="border border-border-light dark:border-border-dark divide-y divide-border-light dark:divide-border-dark">
+              <div className="px-4 py-3">
+                <p className={EYEBROW}>Shipping address</p>
+              </div>
+              {address?.addressLine1 ? (
+                <div className="px-4 py-3 flex items-start gap-2.5 min-w-0">
+                  <Home className="w-3.5 h-3.5 shrink-0 mt-0.5 text-muted-light dark:text-muted-dark" aria-hidden="true" />
+                  <div className="min-w-0 font-mono text-[11px] text-text-light dark:text-text-dark leading-relaxed">
+                    {address.name && <p>{address.name}</p>}
+                    <p>
+                      {address.addressLine1}
+                      {address.addressLine2 && `, ${address.addressLine2}`}
+                    </p>
+                    <p>
+                      {address.city}, {address.state} {address.zipPostalCode}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="px-4 py-3 flex items-center gap-2 text-muted-light dark:text-muted-dark">
+                  <Home className="w-3.5 h-3.5 shrink-0" aria-hidden="true" />
+                  <p className="font-mono text-[11px]">No saved address</p>
+                </div>
+              )}
+            </section>
+
             <section className="border border-border-light dark:border-border-dark divide-y divide-border-light dark:divide-border-dark">
               <div className="px-4 py-3 flex items-center justify-between">
                 <p className={EYEBROW}>Payment methods</p>

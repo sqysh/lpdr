@@ -34,6 +34,17 @@ export const createPaymentIntentSchema = z.object({
       showDonorName: z.boolean().optional(),
       photoUrl: z.url().max(500).optional()
     })
+    .optional(),
+  address: z
+    .object({
+      addressLine1: z.string().trim().max(200).nullable().optional(),
+      addressLine2: z.string().trim().max(200).nullable().optional(),
+      city: z.string().trim().max(100).nullable().optional(),
+      state: z.string().trim().max(50).nullable().optional(),
+      zipPostalCode: z.string().trim().max(20).nullable().optional(),
+      country: z.string().trim().max(2).nullable().optional()
+    })
+    .nullable()
     .optional()
 })
 

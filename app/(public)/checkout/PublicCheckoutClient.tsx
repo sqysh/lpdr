@@ -77,12 +77,6 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
     hasSavedAddress: !!userAddress
   })
 
-  const isValid =
-    !!values.firstName?.trim() &&
-    !!values.lastName?.trim() &&
-    EMAIL_REGEX.test(email ?? '') &&
-    (usingSavedCard ? true : payment.cardComplete)
-
   // ── Shipping address — single source for display AND submit ───────────────
   const addressSource = values.useSavedAddress ? userAddress : values
 
@@ -96,6 +90,21 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
         country: 'US'
       }
     : null
+
+  // shippingAddress is already the saved or typed address, whichever the buyer chose
+  const hasCompleteAddress =
+    !hasPhysical ||
+    (!!shippingAddress?.addressLine1?.trim() &&
+      !!shippingAddress.city?.trim() &&
+      !!shippingAddress.state &&
+      !!shippingAddress.zipPostalCode?.trim())
+
+  const isValid =
+    !!values.firstName?.trim() &&
+    !!values.lastName?.trim() &&
+    EMAIL_REGEX.test(email ?? '') &&
+    (usingSavedCard ? true : payment.cardComplete) &&
+    hasCompleteAddress
 
   const formattedShippingAddress = shippingAddress
     ? [shippingAddress.addressLine1, shippingAddress.addressLine2, shippingAddress.city, shippingAddress.state].filter(Boolean).join(', ') +
@@ -184,7 +193,7 @@ export function PublicCheckoutClient({ savedCards, userAddress, userName, isAuth
               >
                 <SignedInRow />
 
-                {effectiveStep === 4 && hasPhysical && userAddress && (
+                {effectiveStep === 4 && hasPhysical && hasCompleteAddress && (
                   <div className="flex items-start gap-3 px-4 py-3 border-t border-border-light dark:border-border-dark">
                     <div
                       className="shrink-0 w-6 h-6 flex items-center justify-center bg-primary-light/10 dark:bg-primary-dark/10 border border-primary-light/30 dark:border-primary-dark/30 mt-0.5"
