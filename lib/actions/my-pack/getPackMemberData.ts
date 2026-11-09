@@ -141,7 +141,17 @@ export const getPackMemberData = async () => {
 
           existing.cycles += 1
 
-          // orders are sorted asc, so the first one seen is the most recent
+          // Orders are oldest first, so each later one carries the current tier, amount and billing date.
+          // The id stays the first order's, which is what the details link uses.
+          existing.tierName = o.tierName ?? existing.tierName
+          existing.amount = Number(o.totalAmount)
+          existing.interval = o.recurringFrequency ?? existing.interval
+          if (o.nextBillingDate && (!existing.nextBillingDate || o.nextBillingDate > existing.nextBillingDate)) {
+            existing.nextBillingDate = o.nextBillingDate
+          }
+          // A cancellation can land on any order in the subscription, and once cancelled it stays cancelled
+          if (o.status === 'CANCELLED') existing.status = 'CANCELLED'
+
           return acc
         }, {})
     )
