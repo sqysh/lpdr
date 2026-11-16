@@ -67,7 +67,8 @@ export const HIDDEN_PATHS = [
   '/donate',
   '/adopt/application',
   '/adopt/agreement',
-  '/rainbow-bridge/remember'
+  '/rainbow-bridge/remember',
+  '/raffle'
 ]
 
 export const mainNavigationLinks = (hasActiveFee: boolean, memorialsEnabled: boolean): Section[] => {

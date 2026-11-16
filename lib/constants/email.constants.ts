@@ -1,5 +1,7 @@
 const DOMAIN = 'littlepawsdr.org'
 const ORG = 'Little Paws Dachshund Rescue'
+/** Temporary: Cathy countersigns while Isabelle gets up to speed, so the "ready to countersign" notice goes to her instead of the agreement's creator. Set back to null to restore per-creator routing. */
+export const COUNTERSIGN_NOTIFY_OVERRIDE: string | null = `cathyn@${DOMAIN}`
 
 /** Inboxes people write to or that we notify */
 export const INBOX = {

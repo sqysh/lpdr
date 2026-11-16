@@ -6,7 +6,7 @@ import { COLOR } from 'lib/constants/order-confirmation.constants'
 import { escapeHtml } from 'lib/utils/html.utils'
 import { getErrorMessage } from 'lib/utils/error.utils'
 import { SITE_URL } from 'lib/constants/site.constants'
-import { SENDER } from 'lib/constants/email.constants'
+import { COUNTERSIGN_NOTIFY_OVERRIDE, SENDER } from 'lib/constants/email.constants'
 
 /**
  * Tells the admin who prepared an agreement that it's paid and waiting for their countersignature.
@@ -21,6 +21,8 @@ export async function notifyAwaitingCountersign(agreementId: string, { skipUserI
 
     // Whoever recorded the payment themselves already knows it's waiting on them
     if (!a || !SITE_URL || a.createdById === skipUserId) return
+    // Whoever recorded the payment already knows, but an override recipient always needs telling
+    if (!COUNTERSIGN_NOTIFY_OVERRIDE && a.createdById === skipUserId) return
 
     const dog = escapeHtml(a.dogName)
     const adopter = escapeHtml([a.firstName, a.lastName].filter(Boolean).join(' '))
@@ -28,7 +30,7 @@ export async function notifyAwaitingCountersign(agreementId: string, { skipUserI
 
     const { error } = await resend.emails.send({
       from: SENDER.adoptions,
-      to: a.createdBy.email,
+      to: COUNTERSIGN_NOTIFY_OVERRIDE ?? a.createdBy.email,
       subject: `Ready to countersign: ${a.dogName}`,
       html: `
         <div style="max-width: 520px; margin: 0 auto; padding: 32px 24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;">
