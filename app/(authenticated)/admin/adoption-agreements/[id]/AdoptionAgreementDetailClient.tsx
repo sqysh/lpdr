@@ -172,11 +172,11 @@ export function AdoptionAgreementDetailClient({ agreement: a }: { agreement: Agr
           <Panel title="Medical">
             <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 divide-y sm:divide-y-0 divide-border-light dark:divide-border-dark">
               <Row label="Rabies" value={a.rabiesDate && `${date(a.rabiesDate)}${a.rabiesDuration ? ` · ${a.rabiesDuration}` : ''}`} />
+              <Row label="Bordetella" value={a.bordetellaDate && `${date(a.bordetellaDate)} · 1 year`} />
               <Row
-                label="Bordetella"
-                value={a.bordetellaDate && `${date(a.bordetellaDate)}${a.bordetellaDuration ? ` · ${a.bordetellaDuration}` : ''}`}
+                label="Distemper"
+                value={a.distemperDate && `${date(a.distemperDate)}${a.distemperDuration ? ` · ${a.distemperDuration}` : ''}`}
               />
-              <Row label="Distemper" value={date(a.distemperDate)} />
               <Row label="Spay / neuter" value={date(a.spayNeuterDate)} />
               <Row label="Heartworm test" value={a.heartwormTest} />
               <Row label="Fecal test" value={a.fecalTest} />

@@ -56,6 +56,7 @@ export const prepareAdoptionAgreementSchema = z.object({
   bordetellaDate: optionalDate,
   bordetellaDuration: optionalText(50),
   distemperDate: optionalDate,
+  distemperDuration: optionalText(50),
   spayNeuterDate: optionalDate,
   heartwormTest: optionalText(200),
   fecalTest: optionalText(200),

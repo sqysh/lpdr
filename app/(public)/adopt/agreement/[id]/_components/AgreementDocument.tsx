@@ -59,8 +59,9 @@ export function AgreementDocument({ data }: { data: AgreementData }) {
         <h3 className="text-f10 font-mono tracking-eyebrow uppercase text-muted-light dark:text-muted-dark">Medical</h3>
         <dl>
           <Fact label="Rabies" value={withDuration(a.rabiesDate, a.rabiesDuration)} />
-          <Fact label="Bordetella" value={withDuration(a.bordetellaDate, a.bordetellaDuration)} />
-          <Fact label="Distemper" value={withDuration(a.distemperDate, null)} />
+          {/* Bordetella is always a 1-year vaccine, so the stored duration is ignored */}
+          <Fact label="Bordetella" value={withDuration(a.bordetellaDate, a.bordetellaDate ? '1 year' : null)} />
+          <Fact label="Distemper" value={withDuration(a.distemperDate, a.distemperDuration)} />
           <Fact label="Spay / neuter" value={withDuration(a.spayNeuterDate, null)} />
           <Fact label="Heartworm test" value={a.heartwormTest} />
           <Fact label="Fecal test" value={a.fecalTest} />

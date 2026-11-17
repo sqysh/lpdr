@@ -24,8 +24,8 @@ export const DEV_FILL = {
     rabiesDate: daysAgo(120),
     rabiesDuration: '1 year',
     bordetellaDate: daysAgo(90),
-    bordetellaDuration: '6 months',
     distemperDate: daysAgo(120),
+    distemperDuration: '1 year',
     spayNeuterDate: daysAgo(200),
     heartwormTest: `Negative, ${daysAgo(60)}`,
     fecalTest: `Negative, ${daysAgo(60)}`,
@@ -107,29 +107,29 @@ export function AgreementDetailsForm({ register, errors, fill, colorHint, firstS
             <option value="3 years">3 years</option>
           </FormField>
           <FormField
-            id="bordetellaDate"
-            label="Bordetella vaccine"
-            type="date"
-            {...register('bordetellaDate')}
-            error={errors.bordetellaDate?.message}
-          />
-          <FormField
-            id="bordetellaDuration"
-            label="Bordetella duration"
-            type="select"
-            {...register('bordetellaDuration')}
-            error={errors.bordetellaDuration?.message}
-          >
-            <option value="">Select</option>
-            <option value="6 months">6 months</option>
-            <option value="1 year">1 year</option>
-          </FormField>
-          <FormField
             id="distemperDate"
             label="Distemper vaccine"
             type="date"
             {...register('distemperDate')}
             error={errors.distemperDate?.message}
+          />
+          <FormField
+            id="distemperDuration"
+            label="Distemper duration"
+            type="select"
+            {...register('distemperDuration')}
+            error={errors.distemperDuration?.message}
+          >
+            <option value="">Select</option>
+            <option value="1 year">1 year</option>
+            <option value="3 years">3 years</option>
+          </FormField>
+          <FormField
+            id="bordetellaDate"
+            label="Bordetella vaccine"
+            type="date"
+            {...register('bordetellaDate')}
+            error={errors.bordetellaDate?.message}
           />
           <FormField
             id="spayNeuterDate"

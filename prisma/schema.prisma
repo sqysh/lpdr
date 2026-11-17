@@ -815,6 +815,7 @@ model AdoptionAgreement {
   bordetellaDate          DateTime?
   bordetellaDuration      String?
   distemperDate           DateTime?
+  distemperDuration       String?
   spayNeuterDate          DateTime?
   // Free text on the form ("Date & Results"), so kept as one field rather than split
   heartwormTest           String?
