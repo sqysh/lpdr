@@ -21,14 +21,18 @@ export async function searchAdopters(query: string): Promise<ActionResult<Adopte
   const q = query.trim()
   if (q.length < 2) return { success: true, data: [] }
 
+  const terms = q.split(/\s+/).filter(Boolean)
+
   try {
     const users = await prisma.user.findMany({
       where: {
-        OR: [
-          { email: { contains: q, mode: 'insensitive' } },
-          { firstName: { contains: q, mode: 'insensitive' } },
-          { lastName: { contains: q, mode: 'insensitive' } }
-        ]
+        AND: terms.map((term) => ({
+          OR: [
+            { email: { contains: term, mode: 'insensitive' } },
+            { firstName: { contains: term, mode: 'insensitive' } },
+            { lastName: { contains: term, mode: 'insensitive' } }
+          ]
+        }))
       },
       select: {
         id: true,
@@ -37,7 +41,8 @@ export async function searchAdopters(query: string): Promise<ActionResult<Adopte
         email: true,
         adoptionFees: { select: { createdAt: true }, orderBy: { createdAt: 'desc' }, take: 1 }
       },
-      take: 8
+      orderBy: { createdAt: 'desc' },
+      take: 25
     })
 
     return {
