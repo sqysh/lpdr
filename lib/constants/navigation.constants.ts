@@ -18,6 +18,7 @@ import {
   Mail,
   Newspaper,
   Package,
+  Palette,
   PawPrint,
   Rainbow,
   Receipt,
@@ -46,6 +47,8 @@ type NavItem = {
   href: string
   area?: AdminArea
   badge?: keyof AdminBadges
+  /** Shows a NEW tag beside the label, for a section people haven't seen yet. Remove it once it's familiar. */
+  isNew?: boolean
 }
 
 type NavGroup = {
@@ -257,7 +260,8 @@ export const ADMIN_NAV_GROUPS: NavGroup[] = [
     items: [
       { label: 'Guide', icon: BookOpen, href: '/admin/guide' },
       { label: 'Flows', icon: Workflow, href: '/admin/flows' },
-      { label: 'Changelog', icon: History, href: '/admin/changelog' }
+      { label: 'Changelog', icon: History, href: '/admin/changelog' },
+      { label: 'Brand Identity', icon: Palette, href: '/admin/brand-identity', isNew: true }
     ]
   },
   {

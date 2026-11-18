@@ -1,0 +1,92 @@
+/*
+  Color roles for the master artwork (see the comment at the top of brand/lpdr-master.svg).
+  The custom properties inherit into the <use> clones, so setting them on a wrapper themes every layer.
+*/
+
+/* Dark foreground, for light backgrounds. The whites of the eyes, catchlights and markings stay see-through. */
+.onLight {
+  color: var(--color-text-light);
+}
+
+/* Dark backgrounds keep the coat as drawn: dark fur with white markings, whites of the eyes and catchlights.
+   The silhouette fills the markings, a thin light outline separates the dark fur from the background,
+   and the wordmark takes the light foreground. */
+.onDark {
+  color: var(--color-text-light);
+  --lpdr-paper: var(--color-text-dark);
+  --lpdr-sclera: var(--color-text-dark);
+  --lpdr-glint: var(--color-text-dark);
+  --lpdr-type: var(--color-text-dark);
+  --lpdr-outline: var(--color-text-dark);
+  --lpdr-outline-width: 8;
+}
+
+/* Fully monochromatic, for print: the wings go back to plain paper */
+.mono {
+  --lpdr-wing: transparent;
+  --lpdr-wing-sheen: transparent;
+}
+
+/* Overlay: one flat colour so the trace edge is easy to read against the reference */
+.overlay {
+  --lpdr-blink: 0;
+  --lpdr-flutter: 0;
+  --lpdr-ear: 0;
+  --lpdr-gaze-x: 0;
+  --lpdr-gaze-y: 0;
+  --lpdr-wing: transparent;
+  --lpdr-wing-sheen: transparent;
+  --lpdr-iris: currentColor;
+}
+
+.difference {
+  --lpdr-blink: 0;
+  --lpdr-flutter: 0;
+  --lpdr-ear: 0;
+  --lpdr-gaze-x: 0;
+  --lpdr-gaze-y: 0;
+  color: #fff;
+  mix-blend-mode: difference;
+}
+
+/* Layer map: each animatable layer in its own colour, from the butterfly's own rainbow */
+.layers {
+  color: var(--color-muted-light);
+  --lpdr-wing: transparent;
+  --lpdr-wing-sheen: transparent;
+  --lpdr-paper: transparent;
+}
+.layers [data-id="lpdr-ear-left"],
+.layers [data-id="lpdr-ear-right"] {
+  color: #fdba74;
+}
+.layers [data-id^="lpdr-eye-"] {
+  --lpdr-sclera: #7dd3fc;
+}
+.layers [data-id^="lpdr-pupil-"] {
+  --lpdr-iris: var(--color-primary-light);
+  --lpdr-glint: #fde68a;
+}
+.layers [data-id^="lpdr-eyelid-"] {
+  opacity: 0;
+}
+.layers [data-id="lpdr-nose"] {
+  color: #c4b5fd;
+}
+.layers [data-id="lpdr-mouth"] {
+  color: var(--color-primary-dark);
+}
+.layers [data-id^="lpdr-paw-"] {
+  color: #86efac;
+  --lpdr-paper: #dcfce7;
+}
+.layers [data-id="lpdr-butterfly"] {
+  color: #f9a8d4;
+  --lpdr-wing: #fce7f3;
+}
+.layers [data-id="lpdr-butterfly-body"] {
+  color: var(--color-secondary-dark);
+}
+.layers [data-id="lpdr-ground"] {
+  color: var(--color-text-light);
+}

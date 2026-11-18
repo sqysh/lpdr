@@ -83,6 +83,11 @@ export default function AdminSidebar({
                     <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-primary-light dark:bg-primary-dark" aria-hidden="true" />
                   )}
                   <NavRowBody Icon={Icon} label={item.label} />
+                  {item.isNew && (
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 border border-primary-light/40 dark:border-primary-dark/40 px-1 py-px font-mono text-[7px] tracking-tag uppercase text-primary-light dark:text-primary-dark">
+                      New
+                    </span>
+                  )}
                   {waiting > 0 && (
                     <span className="relative ml-auto flex w-2 h-2 shrink-0" title={`${waiting} waiting for review`}>
                       <span className="absolute inset-0 rounded-full bg-amber-500 opacity-75 motion-safe:animate-ping" aria-hidden="true" />

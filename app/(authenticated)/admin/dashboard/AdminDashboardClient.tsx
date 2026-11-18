@@ -13,6 +13,7 @@ import { RevenueBreakdown, RevenueOverlay } from './_components/RevenueOverlay'
 import { RegionCount } from './_types/map.types'
 import { DollarSign, Heart, Loader2, MapPin, Truck } from 'lucide-react'
 import { DockTab, MobileDock } from './_components/MobileDock'
+import { BrandIdentityAnnouncement } from './_components/BrandIdentityAnnouncement'
 import Link from 'next/link'
 
 export function AdminDashboardClient({
@@ -224,6 +225,8 @@ export function AdminDashboardClient({
           <span className="sr-only">Loading map</span>
         </div>
       )}
+
+      <BrandIdentityAnnouncement />
 
       <MapStatsPanel total={points.length} regionCounts={regionCounts} onRegionClick={focusRegion} />
 
